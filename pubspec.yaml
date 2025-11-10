@@ -39,7 +39,13 @@ dependencies:
     git:
       url: https://github.com/google/flutter-desktop-embedding
       path: plugins/window_size
-
+  flutter_chat_core: ^2.0.0
+  flutter_chat_ui: ^2.0.0
+  flyer_chat_image_message: ^2.0.0
+  flyer_chat_system_message: ^2.0.0
+  flutter_link_previewer: ^4.0.0
+  flyer_chat_text_message: ^2.0.0
+  
 dev_dependencies:
   build_runner: ^2.4.11
   custom_lint: ^0.8.0
