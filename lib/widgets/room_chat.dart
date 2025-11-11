@@ -14,6 +14,7 @@ class RoomChat extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final urlRegex = RegExp(r"https?://[^\s\]\(\)]+");
     final controller = RoomChatController.provider("1");
     final theme = Theme.of(context);
     return Chat(
@@ -25,7 +26,10 @@ class RoomChat extends HookConsumerWidget {
         ),
       ),
       builders: Builders(
-        composerBuilder: (_) => Composer(),
+        composerBuilder: (_) => Composer(
+          sendIconColor: theme.colorScheme.primary,
+          sendOnEnter: true,
+        ),
         textMessageBuilder:
             (
               context,
@@ -36,9 +40,7 @@ class RoomChat extends HookConsumerWidget {
             }) => FlyerChatTextMessage(
               message: message.copyWith(
                 text: message.text.replaceAllMapped(
-                  RegExp(
-                    r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+",
-                  ),
+                  urlRegex,
                   (match) => "[${match.group(0)}](${match.group(0)})",
                 ),
               ),
@@ -49,26 +51,22 @@ class RoomChat extends HookConsumerWidget {
               sentLinksColor: Colors.blue,
               receivedLinksColor: Colors.blue,
             ),
-        linkPreviewBuilder: (_, message, isSentByMe) {
-          return LinkPreview(
-            text: message.text,
-            backgroundColor: isSentByMe
-                ? theme.colorScheme.inversePrimary
-                : theme.colorScheme.surfaceContainerLow,
-            insidePadding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-            linkPreviewData: message.linkPreviewData,
-            onLinkPreviewDataFetched: (linkPreviewData) {
-              ref
-                  .watch(controller)
-                  .updateMessage(
-                    message,
-                    message.copyWith(linkPreviewData: linkPreviewData),
-                  );
-            },
-            // You can still customize the appearance
-            parentContent: message.text,
-          );
-        },
+        linkPreviewBuilder: (_, message, isSentByMe) => LinkPreview(
+          text: urlRegex.firstMatch(message.text)?.group(0) ?? "",
+          backgroundColor: isSentByMe
+              ? theme.colorScheme.inversePrimary
+              : theme.colorScheme.surfaceContainerLow,
+          insidePadding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          linkPreviewData: message.linkPreviewData,
+          onLinkPreviewDataFetched: (linkPreviewData) {
+            ref
+                .watch(controller)
+                .updateMessage(
+                  message,
+                  message.copyWith(linkPreviewData: linkPreviewData),
+                );
+          },
+        ),
         imageMessageBuilder:
             (
               _,

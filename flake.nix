@@ -44,10 +44,13 @@
             pkgs.mkShell {
               packages = with pkgs; [
                 jdk17
+                rustc
                 flutter
                 android.platform-tools
               ];
               env = rec {
+                LD_LIBRARY_PATH = "${pkgs.lib.makeLibraryPath (with pkgs; [ sqlite ])}:$LD_LIBRARY_PATH";
+
                 ANDROID_HOME = "${android.androidsdk}/libexec/android-sdk";
                 ANDROID_SDK_ROOT = ANDROID_HOME;
                 JAVA_HOME = pkgs.jdk17;

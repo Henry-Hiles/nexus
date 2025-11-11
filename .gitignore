@@ -35,3 +35,6 @@ key.properties
 
 # Generated Files
 *.g.dart
+
+# Devel Password
+password.txt
