@@ -1,8 +1,9 @@
-import "package:color_hash/color_hash.dart";
 import "package:flutter/material.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/spaces_controller.dart";
+import "package:nexus/helpers/extension_helper.dart";
+import "package:nexus/widgets/avatar.dart";
 
 class Sidebar extends HookConsumerWidget {
   const Sidebar({super.key});
@@ -14,89 +15,75 @@ class Sidebar extends HookConsumerWidget {
       shape: Border(),
       child: Row(
         children: [
-          NavigationRail(
-            scrollable: true,
-            useIndicator: false,
-            onDestinationSelected: (value) => index.value = value,
-            destinations: [
-              NavigationRailDestination(
-                icon: Icon(Icons.home),
-                label: Text("Home"),
-                padding: EdgeInsets.only(top: 12),
-              ),
-              NavigationRailDestination(
-                icon: Icon(Icons.person),
-                label: Text("Messages"),
-                padding: EdgeInsets.only(top: 12),
-              ),
-              ...ref
-                  .watch(SpacesController.provider)
-                  .when(
-                    loading: () => [],
-                    error: (error, stack) {
-                      debugPrintStack(
-                        label: error.toString(),
-                        stackTrace: stack,
-                      );
-                      throw error;
-                    },
-                    data: (spaces) => spaces.map(
-                      (space) => NavigationRailDestination(
-                        icon: ClipRRect(
-                          borderRadius: BorderRadius.all(Radius.circular(12)),
-                          child: SizedBox(
-                            width: 40,
-                            height: 40,
-                            child:
-                                space.avatar ??
-                                ColoredBox(
-                                  color: ColorHash(space.roomData.name).color,
-                                  child: Center(
-                                    child: Text(space.roomData.name[0]),
-                                  ),
-                                ),
-                          ),
+          ref
+              .watch(SpacesController.provider)
+              .when(
+                loading: SizedBox.shrink,
+                error: (error, stack) {
+                  debugPrintStack(label: error.toString(), stackTrace: stack);
+                  throw error;
+                },
+                data: (spaces) => NavigationRail(
+                  scrollable: true,
+                  onDestinationSelected: (value) => index.value = value,
+                  destinations: spaces
+                      .map(
+                        (space) => NavigationRailDestination(
+                          icon: Avatar(space.avatar, space.title),
+                          label: Text(space.title),
+                          padding: EdgeInsets.only(top: 4),
                         ),
-                        label: Text(space.roomData.name),
-                        padding: EdgeInsets.only(top: 12),
-                      ),
-                    ),
-                  ),
-            ],
-            selectedIndex: index.value,
-          ),
+                      )
+                      .toList(),
+                  selectedIndex: index.value,
+                ),
+              ),
           Expanded(
-            child: Scaffold(
-              backgroundColor: Colors.transparent,
-              appBar: AppBar(
-                title: Text("Some Space"),
-                backgroundColor: Colors.transparent,
-              ),
-              body: NavigationRail(
-                scrollable: true,
-                backgroundColor: Colors.transparent,
-                extended: true,
-                destinations: [
-                  NavigationRailDestination(
-                    icon: Icon(Icons.numbers),
-                    label: Text("Room 1"),
-                  ),
-                  NavigationRailDestination(
-                    icon: Icon(Icons.numbers),
-                    label: Text("Room 2"),
-                  ),
-                  NavigationRailDestination(
-                    icon: Icon(Icons.numbers),
-                    label: Text("Room 3"),
-                  ),
-                  NavigationRailDestination(
-                    icon: Icon(Icons.numbers),
-                    label: Text("Room 4"),
-                  ),
-                ],
-                selectedIndex: 0,
-              ),
-            ),
+            child: ref
+                .watch(SpacesController.provider)
+                .betterWhen(
+                  data: (spaces) {
+                    final space = spaces[index.value];
+                    return Scaffold(
+                      backgroundColor: Colors.transparent,
+                      appBar: AppBar(
+                        title: Row(
+                          children: [
+                            Avatar(space.avatar, space.title),
+                            SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                space.title,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                        backgroundColor: Colors.transparent,
+                      ),
+                      body: NavigationRail(
+                        scrollable: true,
+                        backgroundColor: Colors.transparent,
+                        extended: true,
+                        destinations: space.children
+                            .map(
+                              (room) => NavigationRailDestination(
+                                icon: Avatar(
+                                  room.avatar,
+                                  room.title,
+                                  fallback: index.value == 1
+                                      ? null
+                                      : Icon(Icons.numbers),
+                                ),
+                                label: Text(room.title),
+                              ),
+                            )
+                            .toList(),
+                        selectedIndex: space.children.isEmpty ? null : 0,
+                      ),
+                    );
+                  },
+                ),
           ),
         ],
       ),
