@@ -8,6 +8,8 @@ import "package:dynamic_system_colors/dynamic_system_colors.dart";
 import "package:window_size/window_size.dart";
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
   await windowManager.ensureInitialized();
   await windowManager.waitUntilReadyToShow(
     WindowOptions(titleBarStyle: TitleBarStyle.hidden),
