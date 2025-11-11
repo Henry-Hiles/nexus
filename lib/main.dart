@@ -2,15 +2,18 @@ import "dart:io";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/widgets/room_chat.dart";
 import "package:nexus/widgets/sidebar.dart";
+import "package:scaled_app/scaled_app.dart";
 import "package:window_manager/window_manager.dart";
 import "package:flutter/material.dart";
 import "package:dynamic_system_colors/dynamic_system_colors.dart";
 import "package:window_size/window_size.dart";
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await windowManager.ensureInitialized();
+  ScaledWidgetsFlutterBinding.ensureInitialized(
+    scaleFactor: (deviceSize) => deviceSize.longestSide / 1600,
+  );
 
+  await windowManager.ensureInitialized();
   await windowManager.waitUntilReadyToShow(
     WindowOptions(titleBarStyle: TitleBarStyle.hidden),
   );
