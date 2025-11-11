@@ -7,6 +7,7 @@ import "package:flyer_chat_system_message/flyer_chat_system_message.dart";
 import "package:flyer_chat_text_message/flyer_chat_text_message.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/room_chat_controller.dart";
+import "package:nexus/helpers/launch_helper.dart";
 
 class RoomChat extends HookConsumerWidget {
   const RoomChat({super.key});
@@ -42,7 +43,11 @@ class RoomChat extends HookConsumerWidget {
                 ),
               ),
               index: index,
+              onLinkTap: (url, _) =>
+                  ref.watch(LaunchHelper.provider).launchUrl(Uri.parse(url)),
               linksDecoration: TextDecoration.underline,
+              sentLinksColor: Colors.blue,
+              receivedLinksColor: Colors.blue,
             ),
         linkPreviewBuilder: (_, message, isSentByMe) {
           return LinkPreview(
