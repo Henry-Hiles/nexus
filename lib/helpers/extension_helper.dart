@@ -1,4 +1,5 @@
 import "package:flutter/widgets.dart";
+import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:matrix/matrix.dart";
 import "package:nexus/models/full_room.dart";
@@ -35,5 +36,86 @@ extension GetImage on Uri {
       thumb.toString(),
       headers: {"authorization": "Bearer ${client.accessToken}"},
     );
+  }
+}
+
+extension ToMessage on Event {
+  Future<Message?> toMessage({bool mustBeText = false}) async {
+    final replyId = relationshipType == RelationshipTypes.reply
+        ? relationshipEventId
+        : null;
+    final metadata = {
+      "eventType": type,
+      "displayName": senderFromMemoryOrFallback.displayName,
+      "txnId": transactionId,
+    };
+
+    if (redacted) {
+      return Message.text(
+        metadata: metadata,
+        id: eventId,
+        authorId: senderId,
+        text: "~~This message has been redacted.~~",
+        deletedAt: redactedBecause?.originServerTs,
+      );
+    }
+
+    final asText = Message.text(
+      metadata: metadata,
+      id: eventId,
+      authorId: senderId,
+      text: body,
+      replyToMessageId: replyId,
+      deliveredAt: originServerTs,
+    );
+
+    if (mustBeText) return asText;
+
+    return switch (type) {
+      EventTypes.Message => switch (messageType) {
+        MessageTypes.Image => Message.image(
+          metadata: metadata,
+          id: eventId,
+          authorId: senderId,
+          source: (await getAttachmentUri()).toString(),
+          replyToMessageId: replyId,
+          deliveredAt: originServerTs,
+        ),
+        MessageTypes.Audio => Message.audio(
+          metadata: metadata,
+          id: eventId,
+          authorId: senderId,
+          text: body,
+          replyToMessageId: replyId,
+          source: (await getAttachmentUri()).toString(),
+          deliveredAt: originServerTs,
+          duration: Duration(hours: 1),
+        ),
+        MessageTypes.File => Message.file(
+          name: content["filename"].toString(),
+          metadata: metadata,
+          id: eventId,
+          authorId: senderId,
+          source: (await getAttachmentUri()).toString(),
+          replyToMessageId: replyId,
+          deliveredAt: originServerTs,
+        ),
+        _ => asText,
+      },
+      EventTypes.RoomMember => Message.system(
+        metadata: metadata,
+        id: eventId,
+        authorId: senderId,
+        text:
+            "${senderFromMemoryOrFallback.calcDisplayname()} joined the room.",
+      ),
+      EventTypes.Redaction => null,
+      _ => Message.unsupported(
+        metadata: metadata,
+        id: eventId,
+        authorId: senderId,
+        replyToMessageId: replyId,
+      ),
+    };
   }
 }

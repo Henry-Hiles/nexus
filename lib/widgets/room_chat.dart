@@ -14,6 +14,7 @@ import "package:nexus/controllers/current_room_controller.dart";
 import "package:nexus/controllers/room_chat_controller.dart";
 import "package:nexus/helpers/extension_helper.dart";
 import "package:nexus/helpers/launch_helper.dart";
+import "package:nexus/widgets/top_widget.dart";
 import "package:nexus/widgets/room_avatar.dart";
 
 class RoomChat extends HookConsumerWidget {
@@ -86,16 +87,11 @@ class RoomChat extends HookConsumerWidget {
                               required bool isSentByMe,
                               MessageGroupStatus? groupStatus,
                             }) => kDebugMode
-                            ? FlyerChatTextMessage(
-                                message: TextMessage(
-                                  id: message.id,
-                                  authorId: message.authorId,
-                                  text:
-                                      "Unsupported message type: ${message.metadata?["eventType"]}",
+                            ? Text(
+                                "${message.authorId} sent ${message.metadata?["eventType"]}",
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  color: Colors.grey,
                                 ),
-                                receivedBackgroundColor: Colors.red,
-                                sentBackgroundColor: Colors.red,
-                                index: index,
                               )
                             : SizedBox.shrink(),
                         textMessageBuilder:
@@ -114,31 +110,9 @@ class RoomChat extends HookConsumerWidget {
                                 SizedBox(height: 8),
 
                                 FlyerChatTextMessage(
-                                  topWidget: Padding(
-                                    padding: EdgeInsets.only(bottom: 12),
-                                    child: InkWell(
-                                      onTap: () => showAboutDialog(
-                                        context: context,
-                                      ), // TODO: Show user profile
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        spacing: 8,
-                                        children: [
-                                          Avatar(
-                                            userId: message.authorId,
-                                            headers: headers,
-                                          ),
-                                          Text(
-                                            message.metadata?["displayName"] ??
-                                                message.authorId,
-                                            style: theme.textTheme.titleMedium
-                                                ?.copyWith(
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
+                                  topWidget: TopWidget(
+                                    message,
+                                    headers: headers,
                                   ),
                                   message: message.copyWith(
                                     text: message.text.replaceAllMapped(
@@ -188,6 +162,7 @@ class RoomChat extends HookConsumerWidget {
                               required bool isSentByMe,
                               MessageGroupStatus? groupStatus,
                             }) => FlyerChatImageMessage(
+                              topWidget: TopWidget(message, headers: headers),
                               message: message,
                               index: index,
                               headers: headers,
@@ -204,6 +179,7 @@ class RoomChat extends HookConsumerWidget {
                                 context: context,
                               ), // TODO: Download
                               child: FlyerChatFileMessage(
+                                topWidget: TopWidget(message, headers: headers),
                                 message: message,
                                 index: index,
                               ),
