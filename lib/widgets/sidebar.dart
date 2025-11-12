@@ -4,7 +4,7 @@ import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/current_room_controller.dart";
 import "package:nexus/controllers/spaces_controller.dart";
 import "package:nexus/helpers/extension_helper.dart";
-import "package:nexus/widgets/avatar.dart";
+import "package:nexus/widgets/room_avatar.dart";
 
 class Sidebar extends HookConsumerWidget {
   const Sidebar({super.key});
@@ -13,6 +13,7 @@ class Sidebar extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedSpace = useState(0);
     final selectedRoom = useState(0);
+
     return Drawer(
       shape: Border(),
       child: Row(
@@ -27,11 +28,17 @@ class Sidebar extends HookConsumerWidget {
                 },
                 data: (spaces) => NavigationRail(
                   scrollable: true,
-                  onDestinationSelected: (value) => selectedSpace.value = value,
+                  onDestinationSelected: (value) {
+                    selectedSpace.value = value;
+                    selectedRoom.value = 0;
+                    ref
+                        .watch(CurrentRoomController.provider.notifier)
+                        .set(spaces[selectedSpace.value].children[0]);
+                  },
                   destinations: spaces
                       .map(
                         (space) => NavigationRailDestination(
-                          icon: Avatar(space.avatar, space.title),
+                          icon: RoomAvatar(space.avatar, space.title),
                           label: Text(space.title),
                           padding: EdgeInsets.only(top: 4),
                         ),
@@ -51,7 +58,7 @@ class Sidebar extends HookConsumerWidget {
                       appBar: AppBar(
                         title: Row(
                           children: [
-                            Avatar(space.avatar, space.title),
+                            RoomAvatar(space.avatar, space.title),
                             SizedBox(width: 12),
                             Expanded(
                               child: Text(
@@ -67,10 +74,13 @@ class Sidebar extends HookConsumerWidget {
                         scrollable: true,
                         backgroundColor: Colors.transparent,
                         extended: true,
+                        selectedIndex: space.children.isEmpty
+                            ? null
+                            : selectedRoom.value,
                         destinations: space.children
                             .map(
                               (room) => NavigationRailDestination(
-                                icon: Avatar(
+                                icon: RoomAvatar(
                                   room.avatar,
                                   room.title,
                                   fallback: selectedSpace.value == 1
@@ -87,9 +97,6 @@ class Sidebar extends HookConsumerWidget {
                               .watch(CurrentRoomController.provider.notifier)
                               .set(space.children[value]);
                         },
-                        selectedIndex: space.children.isEmpty
-                            ? null
-                            : selectedRoom.value,
                       ),
                     );
                   },

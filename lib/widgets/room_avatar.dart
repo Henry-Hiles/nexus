@@ -1,11 +1,11 @@
 import "package:color_hash/color_hash.dart";
 import "package:flutter/widgets.dart";
 
-class Avatar extends StatelessWidget {
+class RoomAvatar extends StatelessWidget {
   final Widget? avatar;
   final String title;
   final Widget? fallback;
-  const Avatar(this.avatar, this.title, {this.fallback, super.key});
+  const RoomAvatar(this.avatar, this.title, {this.fallback, super.key});
 
   @override
   Widget build(BuildContext context) => ClipRRect(

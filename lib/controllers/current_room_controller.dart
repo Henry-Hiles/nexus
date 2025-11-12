@@ -9,7 +9,10 @@ class CurrentRoomController extends AsyncNotifier<FullRoom> {
     SpacesController.provider.future,
   ))[0].children[0].roomData.fullRoom;
 
-  void set(FullRoom room) => state = AsyncValue.data(room);
+  Future<void> set(FullRoom room) async {
+    await future;
+    state = AsyncValue.data(room);
+  }
 
   static final provider =
       AsyncNotifierProvider<CurrentRoomController, FullRoom>(

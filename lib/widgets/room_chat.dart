@@ -14,6 +14,7 @@ import "package:nexus/controllers/current_room_controller.dart";
 import "package:nexus/controllers/room_chat_controller.dart";
 import "package:nexus/helpers/extension_helper.dart";
 import "package:nexus/helpers/launch_helper.dart";
+import "package:nexus/widgets/room_avatar.dart";
 
 class RoomChat extends HookConsumerWidget {
   final bool isDesktop;
@@ -39,7 +40,19 @@ class RoomChat extends HookConsumerWidget {
                     ? null
                     : DrawerButton(onPressed: Scaffold.of(context).openDrawer),
                 actionsPadding: EdgeInsets.symmetric(horizontal: 8),
-                title: Text(room.title),
+                title: Row(
+                  children: [
+                    RoomAvatar(
+                      room.avatar,
+                      room.title,
+                      fallback: Icon(Icons.numbers),
+                    ),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Text(room.title, overflow: TextOverflow.ellipsis),
+                    ),
+                  ],
+                ),
                 actions: [
                   if (!(Platform.isAndroid || Platform.isIOS))
                     IconButton(
