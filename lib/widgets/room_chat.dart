@@ -4,6 +4,7 @@ import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:flutter_chat_ui/flutter_chat_ui.dart";
+import "package:flutter_hooks/flutter_hooks.dart";
 import "package:flutter_link_previewer/flutter_link_previewer.dart";
 import "package:flyer_chat_file_message/flyer_chat_file_message.dart";
 import "package:flyer_chat_image_message/flyer_chat_image_message.dart";
@@ -21,8 +22,23 @@ class RoomChat extends HookConsumerWidget {
   final bool isDesktop;
   const RoomChat({required this.isDesktop, super.key});
 
+  void showContextMenu({
+    required BuildContext context,
+    required Offset globalPosition,
+    required VoidCallback onTap,
+  }) => showMenu(
+    context: context,
+    position: RelativeRect.fromRect(
+      Rect.fromPoints(globalPosition, globalPosition),
+      Offset.zero & (context.findRenderObject() as RenderBox).size,
+    ),
+    color: Theme.of(context).colorScheme.surfaceContainerHighest,
+    items: [PopupMenuItem(onTap: onTap, child: Text("Reply"))],
+  );
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final replyToMessageId = useState<String?>(null);
     final urlRegex = RegExp(r"https?://[^\s\]\(\)]+");
     final theme = Theme.of(context);
     return ref
@@ -73,6 +89,28 @@ class RoomChat extends HookConsumerWidget {
                           onPrimary: theme.colorScheme.onPrimaryContainer,
                         ),
                       ),
+                      onMessageSecondaryTap:
+                          (
+                            context,
+                            message, {
+                            required details,
+                            required index,
+                          }) => showContextMenu(
+                            context: context,
+                            globalPosition: details.globalPosition,
+                            onTap: () => replyToMessageId.value = message.id,
+                          ),
+                      onMessageLongPress:
+                          (
+                            context,
+                            message, {
+                            required details,
+                            required index,
+                          }) => showContextMenu(
+                            context: context,
+                            globalPosition: details.globalPosition,
+                            onTap: () => replyToMessageId.value = message.id,
+                          ),
                       builders: Builders(
                         composerBuilder: (_) => Composer(
                           sendIconColor: theme.colorScheme.primary,
@@ -101,36 +139,23 @@ class RoomChat extends HookConsumerWidget {
                               index, {
                               required bool isSentByMe,
                               MessageGroupStatus? groupStatus,
-                            }) => Column(
-                              crossAxisAlignment: isSentByMe
-                                  ? CrossAxisAlignment.end
-                                  : CrossAxisAlignment.start,
-                              spacing: 8,
-                              children: [
-                                SizedBox(height: 8),
-
-                                FlyerChatTextMessage(
-                                  topWidget: TopWidget(
-                                    message,
-                                    headers: headers,
-                                  ),
-                                  message: message.copyWith(
-                                    text: message.text.replaceAllMapped(
-                                      urlRegex,
-                                      (match) =>
-                                          "[${match.group(0)}](${match.group(0)})",
-                                    ),
-                                  ),
-                                  showTime: true,
-                                  index: index,
-                                  onLinkTap: (url, _) => ref
-                                      .watch(LaunchHelper.provider)
-                                      .launchUrl(Uri.parse(url)),
-                                  linksDecoration: TextDecoration.underline,
-                                  sentLinksColor: Colors.blue,
-                                  receivedLinksColor: Colors.blue,
+                            }) => FlyerChatTextMessage(
+                              topWidget: TopWidget(message, headers: headers),
+                              message: message.copyWith(
+                                text: message.text.replaceAllMapped(
+                                  urlRegex,
+                                  (match) =>
+                                      "[${match.group(0)}](${match.group(0)})",
                                 ),
-                              ],
+                              ),
+                              showTime: true,
+                              index: index,
+                              onLinkTap: (url, _) => ref
+                                  .watch(LaunchHelper.provider)
+                                  .launchUrl(Uri.parse(url)),
+                              linksDecoration: TextDecoration.underline,
+                              sentLinksColor: Colors.blue,
+                              receivedLinksColor: Colors.blue,
                             ),
                         linkPreviewBuilder: (_, message, isSentByMe) =>
                             LinkPreview(
@@ -196,9 +221,12 @@ class RoomChat extends HookConsumerWidget {
                               index: index,
                             ),
                       ),
-                      onMessageSend: ref
-                          .watch(controllerProvider.notifier)
-                          .send,
+                      onMessageSend: (message) {
+                        ref
+                            .watch(controllerProvider.notifier)
+                            .send(message, replyTo: replyToMessageId.value);
+                        replyToMessageId.value = null;
+                      },
                       resolveUser: ref
                           .watch(controllerProvider.notifier)
                           .resolveUser,

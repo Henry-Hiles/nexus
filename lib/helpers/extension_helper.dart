@@ -5,6 +5,7 @@ import "package:matrix/matrix.dart";
 import "package:nexus/models/full_room.dart";
 import "package:nexus/widgets/error_dialog.dart";
 import "package:nexus/widgets/loading.dart";
+import "package:html2md/html2md.dart";
 
 extension BetterWhen<T> on AsyncValue<T> {
   Widget betterWhen({
@@ -60,11 +61,16 @@ extension ToMessage on Event {
       );
     }
 
+    final formatted = convert(
+      formattedText.isEmpty ? body : formattedText,
+      ignore: replyId == null ? null : ["mx-reply"],
+    );
+
     final asText = Message.text(
       metadata: metadata,
       id: eventId,
       authorId: senderId,
-      text: body,
+      text: formatted,
       replyToMessageId: replyId,
       deliveredAt: originServerTs,
     );
@@ -77,6 +83,7 @@ extension ToMessage on Event {
           metadata: metadata,
           id: eventId,
           authorId: senderId,
+          text: formatted,
           source: (await getAttachmentUri()).toString(),
           replyToMessageId: replyId,
           deliveredAt: originServerTs,
@@ -85,7 +92,7 @@ extension ToMessage on Event {
           metadata: metadata,
           id: eventId,
           authorId: senderId,
-          text: body,
+          text: formatted,
           replyToMessageId: replyId,
           source: (await getAttachmentUri()).toString(),
           deliveredAt: originServerTs,

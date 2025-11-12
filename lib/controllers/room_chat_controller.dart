@@ -43,9 +43,11 @@ class RoomChatController extends AsyncNotifier<ChatController> {
     return controller.updateMessage(message, newMessage);
   }
 
-  Future<void> send(String message) async {
-    await room.sendTextEvent(message);
-  }
+  Future<void> send(String message, {String? replyTo}) async =>
+      await room.sendTextEvent(
+        message,
+        inReplyTo: replyTo == null ? null : await room.getEventById(replyTo),
+      );
 
   Future<chat.User> resolveUser(String id) async {
     final user = await room.client.getUserProfile(id);

@@ -73,6 +73,7 @@ class TopWidget extends ConsumerWidget {
                               replyText,
                               overflow: TextOverflow.ellipsis,
                               style: Theme.of(context).textTheme.labelMedium,
+                              maxLines: 1,
                             ),
                           ),
                         ],

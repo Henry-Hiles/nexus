@@ -8,9 +8,7 @@ import "package:dynamic_system_colors/dynamic_system_colors.dart";
 import "package:window_size/window_size.dart";
 
 void main() async {
-  ScaledWidgetsFlutterBinding.ensureInitialized(
-    scaleFactor: (size) => size.width > 1080 ? 1.3 : 1,
-  );
+  ScaledWidgetsFlutterBinding.ensureInitialized(scaleFactor: (size) => 1);
 
   await windowManager.ensureInitialized();
   await windowManager.waitUntilReadyToShow(
