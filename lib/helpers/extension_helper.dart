@@ -20,16 +20,20 @@ extension BetterWhen<T> on AsyncValue<T> {
 
 extension GetFullRoom on Room {
   Future<FullRoom> get fullRoom async {
-    final thumb = await avatar?.getThumbnailUri(client, width: 24, height: 24);
     return FullRoom(
       roomData: this,
       title: getLocalizedDisplayname(),
-      avatar: thumb == null
-          ? null
-          : Image.network(
-              thumb.toString(),
-              headers: {"authorization": "Bearer ${client.accessToken}"},
-            ),
+      avatar: await avatar?.asImage(client),
+    );
+  }
+}
+
+extension GetImage on Uri {
+  Future<Image?> asImage(Client client) async {
+    final thumb = await getThumbnailUri(client, width: 24, height: 24);
+    return Image.network(
+      thumb.toString(),
+      headers: {"authorization": "Bearer ${client.accessToken}"},
     );
   }
 }

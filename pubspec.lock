@@ -582,6 +582,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flyer_chat_file_message:
+    dependency: "direct main"
+    description:
+      name: flyer_chat_file_message
+      sha256: "9d3e40819ebd3a32c6821e32a54caf7675af80dd05ce679f8113277f2379ecf4"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.3.1"
   flyer_chat_image_message:
     dependency: "direct main"
     description:
@@ -1166,6 +1174,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.28.0"
+  scaled_app:
+    dependency: "direct main"
+    description:
+      name: scaled_app
+      sha256: a2ad9f22cf2200a5ce455b59c5ea7bfb09a84acfc52452d1db54f4958c99d76a
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.3.0"
   screen_retriever:
     dependency: transitive
     description:

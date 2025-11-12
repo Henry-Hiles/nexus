@@ -1,6 +1,7 @@
 import "package:flutter/material.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
+import "package:nexus/controllers/current_room_controller.dart";
 import "package:nexus/controllers/spaces_controller.dart";
 import "package:nexus/helpers/extension_helper.dart";
 import "package:nexus/widgets/avatar.dart";
@@ -10,7 +11,8 @@ class Sidebar extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final index = useState(0);
+    final selectedSpace = useState(0);
+    final selectedRoom = useState(0);
     return Drawer(
       shape: Border(),
       child: Row(
@@ -25,7 +27,7 @@ class Sidebar extends HookConsumerWidget {
                 },
                 data: (spaces) => NavigationRail(
                   scrollable: true,
-                  onDestinationSelected: (value) => index.value = value,
+                  onDestinationSelected: (value) => selectedSpace.value = value,
                   destinations: spaces
                       .map(
                         (space) => NavigationRailDestination(
@@ -35,7 +37,7 @@ class Sidebar extends HookConsumerWidget {
                         ),
                       )
                       .toList(),
-                  selectedIndex: index.value,
+                  selectedIndex: selectedSpace.value,
                 ),
               ),
           Expanded(
@@ -43,7 +45,7 @@ class Sidebar extends HookConsumerWidget {
                 .watch(SpacesController.provider)
                 .betterWhen(
                   data: (spaces) {
-                    final space = spaces[index.value];
+                    final space = spaces[selectedSpace.value];
                     return Scaffold(
                       backgroundColor: Colors.transparent,
                       appBar: AppBar(
@@ -71,7 +73,7 @@ class Sidebar extends HookConsumerWidget {
                                 icon: Avatar(
                                   room.avatar,
                                   room.title,
-                                  fallback: index.value == 1
+                                  fallback: selectedSpace.value == 1
                                       ? null
                                       : Icon(Icons.numbers),
                                 ),
@@ -79,7 +81,15 @@ class Sidebar extends HookConsumerWidget {
                               ),
                             )
                             .toList(),
-                        selectedIndex: space.children.isEmpty ? null : 0,
+                        onDestinationSelected: (value) {
+                          selectedRoom.value = value;
+                          ref
+                              .watch(CurrentRoomController.provider.notifier)
+                              .set(space.children[value]);
+                        },
+                        selectedIndex: space.children.isEmpty
+                            ? null
+                            : selectedRoom.value,
                       ),
                     );
                   },

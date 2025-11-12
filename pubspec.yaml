@@ -40,17 +40,19 @@ dependencies:
       url: https://github.com/google/flutter-desktop-embedding
       path: plugins/window_size
   flutter_chat_core: ^2.0.0
-  flyer_chat_image_message: ^2.0.0
-  flyer_chat_system_message: ^2.0.0
-  flutter_link_previewer: ^4.0.0
-  flyer_chat_text_message: ^2.0.0
+  flyer_chat_image_message: ^2.2.2
+  flyer_chat_system_message: ^2.1.13
+  flyer_chat_text_message: ^2.5.2
+  flyer_chat_file_message: ^2.3.1
   flutter_chat_ui:
     git:
       url: https://github.com/Henry-Hiles/flutter_chat_ui
       path: packages/flutter_chat_ui
+  flutter_link_previewer: ^4.1.2
   matrix: ^3.0.2
   sqflite_common_ffi: ^2.3.6
   color_hash: ^1.0.1
+  scaled_app: ^2.3.0
   
 dev_dependencies:
   build_runner: ^2.4.11

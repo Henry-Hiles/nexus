@@ -1,14 +1,14 @@
-import "dart:io";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/widgets/room_chat.dart";
 import "package:nexus/widgets/sidebar.dart";
+import "package:scaled_app/scaled_app.dart";
 import "package:window_manager/window_manager.dart";
 import "package:flutter/material.dart";
 import "package:dynamic_system_colors/dynamic_system_colors.dart";
 import "package:window_size/window_size.dart";
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  ScaledWidgetsFlutterBinding.ensureInitialized(scaleFactor: (_) => 1.4);
 
   await windowManager.ensureInitialized();
   await windowManager.waitUntilReadyToShow(
@@ -48,28 +48,7 @@ class App extends StatelessWidget {
               builder: (context) => Row(
                 children: [
                   if (isDesktop) Sidebar(),
-                  Expanded(
-                    child: Scaffold(
-                      appBar: AppBar(
-                        leading: isDesktop
-                            ? null
-                            : DrawerButton(
-                                onPressed: () =>
-                                    Scaffold.of(context).openDrawer(),
-                              ),
-                        actionsPadding: EdgeInsets.symmetric(horizontal: 8),
-                        title: Text("Some Chat Name"),
-                        actions: [
-                          if (!(Platform.isAndroid || Platform.isIOS))
-                            IconButton(
-                              onPressed: () => exit(0),
-                              icon: Icon(Icons.close),
-                            ),
-                        ],
-                      ),
-                      body: RoomChat(),
-                    ),
-                  ),
+                  Expanded(child: RoomChat(isDesktop: isDesktop)),
                 ],
               ),
             ),
