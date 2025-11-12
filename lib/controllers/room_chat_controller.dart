@@ -1,3 +1,4 @@
+import "package:collection/collection.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart" as chat;
 import "package:flutter_riverpod/flutter_riverpod.dart";
@@ -10,18 +11,30 @@ class RoomChatController extends AsyncNotifier<ChatController> {
   @override
   Future<ChatController> build() async {
     final timeline = await room.getTimeline();
+    room.client.onTimelineEvent.stream.listen((event) async {
+      if (event.roomId != room.id) return;
+      final message = await toMessage(event);
+      if (message != null) {
+        await insertMessage(message);
+      }
+    });
 
-    final controller = InMemoryChatController(
+    return InMemoryChatController(
       messages: (await Future.wait(
         timeline.events.map(toMessage),
       )).toList().reversed.nonNulls.toList(),
     );
-    return controller;
   }
 
   Future<void> insertMessage(Message message) async {
     final controller = await future;
-    return controller.insertMessage(message);
+    final oldMessage = controller.messages.firstWhereOrNull(
+      (element) => element.metadata?["txnId"] == message.metadata?["txnId"],
+    );
+
+    return oldMessage == null
+        ? controller.insertMessage(message)
+        : controller.updateMessage(oldMessage, message);
   }
 
   Future<void> updateMessage(Message message, Message newMessage) async {
@@ -36,6 +49,7 @@ class RoomChatController extends AsyncNotifier<ChatController> {
     final metadata = {
       "eventType": event.type,
       "displayName": event.senderFromMemoryOrFallback.displayName,
+      "txnId": event.transactionId,
     };
     return event.redacted
         ? Message.text(
@@ -101,14 +115,6 @@ class RoomChatController extends AsyncNotifier<ChatController> {
   }
 
   Future<void> send(String message) async {
-    insertMessage(
-      Message.text(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        authorId: room.client.userID!,
-        text: message,
-      ),
-    );
-
     await room.sendTextEvent(message);
   }
 
