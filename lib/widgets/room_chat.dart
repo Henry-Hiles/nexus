@@ -38,7 +38,7 @@ class RoomChat extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final replyToMessageId = useState<String?>(null);
+    final replyToMessage = useState<Message?>(null);
     final urlRegex = RegExp(r"https?://[^\s\]\(\)]+");
     final theme = Theme.of(context);
     return ref
@@ -98,7 +98,7 @@ class RoomChat extends HookConsumerWidget {
                           }) => showContextMenu(
                             context: context,
                             globalPosition: details.globalPosition,
-                            onTap: () => replyToMessageId.value = message.id,
+                            onTap: () => replyToMessage.value = message,
                           ),
                       onMessageLongPress:
                           (
@@ -109,13 +109,72 @@ class RoomChat extends HookConsumerWidget {
                           }) => showContextMenu(
                             context: context,
                             globalPosition: details.globalPosition,
-                            onTap: () => replyToMessageId.value = message.id,
+                            onTap: () => replyToMessage.value = message,
                           ),
                       builders: Builders(
-                        composerBuilder: (_) => Composer(
-                          sendIconColor: theme.colorScheme.primary,
-                          sendOnEnter: true,
-                          autofocus: true,
+                        composerBuilder: (_) => Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            if (replyToMessage.value != null)
+                              ColoredBox(
+                                color: theme.colorScheme.surfaceContainer,
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 4,
+                                  ),
+                                  child: Row(
+                                    spacing: 8,
+                                    children: [
+                                      Avatar(
+                                        userId: replyToMessage.value!.authorId,
+                                        headers: headers,
+                                        size: 16,
+                                      ),
+                                      Text(
+                                        replyToMessage
+                                                .value!
+                                                .metadata?["displayName"] ??
+                                            replyToMessage.value!.authorId,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .labelMedium
+                                            ?.copyWith(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                      ),
+                                      Expanded(
+                                        child: (replyToMessage.value as dynamic)
+                                            ? Text(
+                                                (replyToMessage.value
+                                                        as TextMessage)
+                                                    .text,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: Theme.of(
+                                                  context,
+                                                ).textTheme.labelMedium,
+                                                maxLines: 1,
+                                              )
+                                            : SizedBox(),
+                                      ),
+                                      IconButton(
+                                        onPressed: () =>
+                                            replyToMessage.value = null,
+                                        icon: Icon(Icons.close),
+                                        iconSize: 20,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            Composer(
+                              sigmaX: 0,
+                              sigmaY: 0,
+                              sendIconColor: theme.colorScheme.primary,
+                              sendOnEnter: true,
+                              autofocus: true,
+                            ),
+                          ],
                         ),
                         unsupportedMessageBuilder:
                             (
@@ -224,8 +283,8 @@ class RoomChat extends HookConsumerWidget {
                       onMessageSend: (message) {
                         ref
                             .watch(controllerProvider.notifier)
-                            .send(message, replyTo: replyToMessageId.value);
-                        replyToMessageId.value = null;
+                            .send(message, replyTo: replyToMessage.value);
+                        replyToMessage.value = null;
                       },
                       resolveUser: ref
                           .watch(controllerProvider.notifier)
