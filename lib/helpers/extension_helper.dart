@@ -1,3 +1,4 @@
+import "package:flutter/material.dart";
 import "package:flutter/widgets.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
@@ -117,4 +118,10 @@ extension ToMessage on Event {
       ),
     };
   }
+}
+
+extension ToTheme on ColorScheme {
+  ThemeData get theme => ThemeData.from(
+    colorScheme: this,
+  ).copyWith(appBarTheme: AppBarTheme(titleSpacing: 0));
 }

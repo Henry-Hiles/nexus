@@ -58,9 +58,11 @@ class RoomChat extends HookConsumerWidget {
               appBar: RoomAppbar(
                 room,
                 isDesktop: isDesktop,
-                onOpenDrawer: Scaffold.of(context).openDrawer,
-                onOpenMemberList: () =>
-                    memberListOpened.value = !memberListOpened.value,
+                onOpenDrawer: (_) => Scaffold.of(context).openDrawer(),
+                onOpenMemberList: (thisContext) {
+                  memberListOpened.value = !memberListOpened.value;
+                  Scaffold.of(thisContext).openEndDrawer();
+                },
               ),
               body: Row(
                 children: [
@@ -245,9 +247,11 @@ class RoomChat extends HookConsumerWidget {
                         ),
                   ),
 
-                  if (memberListOpened.value == true) MemberList(room.roomData),
+                  if (memberListOpened.value == true && isDesktop)
+                    MemberList(room.roomData),
                 ],
               ),
+              endDrawer: isDesktop ? null : MemberList(room.roomData),
             );
           },
         );

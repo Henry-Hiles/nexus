@@ -11,43 +11,56 @@ class MemberList extends ConsumerWidget {
   const MemberList(this.room, {super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => ColoredBox(
-    color: Theme.of(context).colorScheme.surfaceContainerLow,
-    child: SizedBox(
-      width: 240,
-      child: ref
-          .watch(MembersController.provider(room))
-          .betterWhen(
-            data: (members) => ListView(
-              children: [
-                ...members
-                    .where(
-                      (membership) =>
-                          membership.content["membership"] ==
-                          Membership.join.name,
-                    )
-                    .map(
-                      (member) => ListTile(
-                        leading: AvatarOrHash(
-                          ref
-                              .watch(
-                                AvatarController.provider(
-                                  member.content["avatar_url"].toString(),
-                                ),
-                              )
-                              .whenOrNull(data: (data) => data),
-                          member.content["displayname"].toString(),
-                          headers: room.client.headers,
-                        ),
-                        title: Text(
-                          member.content["displayname"].toString(),
-                          overflow: TextOverflow.ellipsis,
-                        ),
+  Widget build(BuildContext context, WidgetRef ref) => Drawer(
+    shape: Border(),
+    child: ref
+        .watch(MembersController.provider(room))
+        .betterWhen(
+          data: (members) => ListView(
+            children: [
+              AppBar(
+                scrolledUnderElevation: 0,
+                backgroundColor: Theme.of(
+                  context,
+                ).colorScheme.surfaceContainerLow,
+                leading: Icon(Icons.people),
+                title: Text("Members"),
+                actionsPadding: EdgeInsets.only(right: 4),
+                actions: [
+                  if (Scaffold.of(context).hasEndDrawer)
+                    IconButton(
+                      onPressed: Scaffold.of(context).closeEndDrawer,
+                      icon: Icon(Icons.close),
+                    ),
+                ],
+              ),
+              ...members
+                  .where(
+                    (membership) =>
+                        membership.content["membership"] ==
+                        Membership.join.name,
+                  )
+                  .map(
+                    (member) => ListTile(
+                      leading: AvatarOrHash(
+                        ref
+                            .watch(
+                              AvatarController.provider(
+                                member.content["avatar_url"].toString(),
+                              ),
+                            )
+                            .whenOrNull(data: (data) => data),
+                        member.content["displayname"].toString(),
+                        headers: room.client.headers,
+                      ),
+                      title: Text(
+                        member.content["displayname"].toString(),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
-              ],
-            ),
+                  ),
+            ],
           ),
-    ),
+        ),
   );
 }

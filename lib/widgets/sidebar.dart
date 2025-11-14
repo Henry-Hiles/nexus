@@ -61,22 +61,15 @@ class Sidebar extends HookConsumerWidget {
                     return Scaffold(
                       backgroundColor: Colors.transparent,
                       appBar: AppBar(
-                        title: Row(
-                          children: [
-                            AvatarOrHash(
-                              space.avatar,
-                              fallback: space.icon,
-                              space.title,
-                              headers: space.client.headers,
-                            ),
-                            SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                space.title,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
+                        leading: AvatarOrHash(
+                          space.avatar,
+                          fallback: space.icon,
+                          space.title,
+                          headers: space.client.headers,
+                        ),
+                        title: Text(
+                          space.title,
+                          overflow: TextOverflow.ellipsis,
                         ),
                         backgroundColor: Colors.transparent,
                       ),

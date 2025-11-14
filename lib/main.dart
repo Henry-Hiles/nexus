@@ -1,4 +1,5 @@
 import "package:flutter_riverpod/flutter_riverpod.dart";
+import "package:nexus/helpers/extension_helper.dart";
 import "package:nexus/widgets/room_chat.dart";
 import "package:nexus/widgets/sidebar.dart";
 import "package:scaled_app/scaled_app.dart";
@@ -31,18 +32,16 @@ class App extends StatelessWidget {
 
         return MaterialApp(
           debugShowCheckedModeBanner: false,
-          theme: ThemeData.from(
-            colorScheme:
-                lightDynamic ?? ColorScheme.fromSeed(seedColor: Colors.indigo),
-          ),
-          darkTheme: ThemeData.from(
-            colorScheme:
-                darkDynamic ??
-                ColorScheme.fromSeed(
-                  seedColor: Colors.indigo,
-                  brightness: Brightness.dark,
-                ),
-          ),
+          theme:
+              (lightDynamic ?? ColorScheme.fromSeed(seedColor: Colors.indigo))
+                  .theme,
+          darkTheme:
+              (darkDynamic ??
+                      ColorScheme.fromSeed(
+                        seedColor: Colors.indigo,
+                        brightness: Brightness.dark,
+                      ))
+                  .theme,
           home: Scaffold(
             body: Builder(
               builder: (context) => Row(

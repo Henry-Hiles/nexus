@@ -8,8 +8,8 @@ import "package:nexus/widgets/avatar_or_hash.dart";
 class RoomAppbar extends StatelessWidget implements PreferredSizeWidget {
   final bool isDesktop;
   final FullRoom room;
-  final VoidCallback onOpenMemberList;
-  final VoidCallback onOpenDrawer;
+  final void Function(BuildContext context) onOpenMemberList;
+  final void Function(BuildContext context) onOpenDrawer;
   const RoomAppbar(
     this.room, {
     required this.isDesktop,
@@ -23,39 +23,37 @@ class RoomAppbar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   AppBar build(BuildContext context) => AppBar(
-    leading: isDesktop ? null : DrawerButton(onPressed: onOpenDrawer),
+    leading: isDesktop
+        ? AvatarOrHash(
+            room.avatar,
+            room.title,
+            height: 32,
+            fallback: Icon(Icons.numbers),
+            headers: room.roomData.client.headers,
+          )
+        : DrawerButton(onPressed: () => onOpenDrawer(context)),
+    scrolledUnderElevation: 0,
+    backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
     actionsPadding: EdgeInsets.symmetric(horizontal: 8),
-    title: Row(
+    title: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        AvatarOrHash(
-          room.avatar,
-          room.title,
-          height: 32,
-          fallback: Icon(Icons.numbers),
-          headers: room.roomData.client.headers,
-        ),
-        SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(room.title, overflow: TextOverflow.ellipsis),
-
-              Text(
-                room.roomData.topic,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ],
+        Text(room.title, overflow: TextOverflow.ellipsis),
+        Text(
+          room.roomData.topic,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: Theme.of(context).textTheme.labelMedium?.copyWith(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
         ),
       ],
     ),
     actions: [
-      IconButton(onPressed: onOpenMemberList, icon: Icon(Icons.people)),
+      IconButton(
+        onPressed: () => onOpenMemberList(context),
+        icon: Icon(Icons.people),
+      ),
       if (!(Platform.isAndroid || Platform.isIOS))
         IconButton(onPressed: () => exit(0), icon: Icon(Icons.close)),
     ],

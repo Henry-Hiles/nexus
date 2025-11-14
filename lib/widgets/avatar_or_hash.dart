@@ -26,6 +26,7 @@ class AvatarOrHash extends StatelessWidget {
       borderRadius: BorderRadius.all(Radius.circular(4)),
       child: SizedBox(
         height: height,
+        width: height,
         child: avatar == null
             ? fallback ?? box
             : Image.network(
