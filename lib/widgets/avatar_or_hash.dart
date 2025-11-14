@@ -5,11 +5,13 @@ class AvatarOrHash extends StatelessWidget {
   final Uri? avatar;
   final String title;
   final Widget? fallback;
+  final double height;
   final Map<String, String> headers;
   const AvatarOrHash(
     this.avatar,
     this.title, {
     this.fallback,
+    this.height = 24,
     required this.headers,
     super.key,
   });
@@ -23,8 +25,7 @@ class AvatarOrHash extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.all(Radius.circular(4)),
       child: SizedBox(
-        width: 24,
-        height: 24,
+        height: height,
         child: avatar == null
             ? fallback ?? box
             : Image.network(

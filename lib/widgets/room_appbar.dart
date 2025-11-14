@@ -19,30 +19,10 @@ class RoomAppbar extends StatelessWidget implements PreferredSizeWidget {
   });
 
   @override
-  Size get preferredSize => Size.fromHeight(AppBar().preferredSize.height + 16);
+  Size get preferredSize => AppBar().preferredSize;
 
   @override
   AppBar build(BuildContext context) => AppBar(
-    bottom: PreferredSize(
-      preferredSize: Size.zero, // Does this even matter??
-      child: Row(
-        children: [
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.all(8).copyWith(top: 0),
-              child: Text(
-                room.roomData.topic,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    ),
     leading: isDesktop ? null : DrawerButton(onPressed: onOpenDrawer),
     actionsPadding: EdgeInsets.symmetric(horizontal: 8),
     title: Row(
@@ -50,11 +30,28 @@ class RoomAppbar extends StatelessWidget implements PreferredSizeWidget {
         AvatarOrHash(
           room.avatar,
           room.title,
+          height: 32,
           fallback: Icon(Icons.numbers),
           headers: room.roomData.client.headers,
         ),
         SizedBox(width: 12),
-        Expanded(child: Text(room.title, overflow: TextOverflow.ellipsis)),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(room.title, overflow: TextOverflow.ellipsis),
+
+              Text(
+                room.roomData.topic,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+        ),
       ],
     ),
     actions: [
