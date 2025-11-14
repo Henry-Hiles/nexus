@@ -4,7 +4,7 @@ import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/current_room_controller.dart";
 import "package:nexus/controllers/spaces_controller.dart";
 import "package:nexus/helpers/extension_helper.dart";
-import "package:nexus/widgets/room_avatar.dart";
+import "package:nexus/widgets/avatar_or_hash.dart";
 
 class Sidebar extends HookConsumerWidget {
   const Sidebar({super.key});
@@ -38,7 +38,12 @@ class Sidebar extends HookConsumerWidget {
                   destinations: spaces
                       .map(
                         (space) => NavigationRailDestination(
-                          icon: RoomAvatar(space.avatar, space.title),
+                          icon: AvatarOrHash(
+                            space.avatar,
+                            fallback: space.icon,
+                            space.title,
+                            headers: space.client.headers,
+                          ),
                           label: Text(space.title),
                           padding: EdgeInsets.only(top: 4),
                         ),
@@ -58,7 +63,12 @@ class Sidebar extends HookConsumerWidget {
                       appBar: AppBar(
                         title: Row(
                           children: [
-                            RoomAvatar(space.avatar, space.title),
+                            AvatarOrHash(
+                              space.avatar,
+                              fallback: space.icon,
+                              space.title,
+                              headers: space.client.headers,
+                            ),
                             SizedBox(width: 12),
                             Expanded(
                               child: Text(
@@ -80,12 +90,13 @@ class Sidebar extends HookConsumerWidget {
                         destinations: space.children
                             .map(
                               (room) => NavigationRailDestination(
-                                icon: RoomAvatar(
+                                icon: AvatarOrHash(
                                   room.avatar,
                                   room.title,
                                   fallback: selectedSpace.value == 1
                                       ? null
                                       : Icon(Icons.numbers),
+                                  headers: space.client.headers,
                                 ),
                                 label: Text(room.title),
                               ),

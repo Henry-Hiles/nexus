@@ -10,7 +10,13 @@ import "package:nexus/helpers/extension_helper.dart";
 class TopWidget extends ConsumerWidget {
   final Message message;
   final Map<String, String> headers;
-  const TopWidget(this.message, {required this.headers, super.key});
+  final MessageGroupStatus? groupStatus;
+  const TopWidget(
+    this.message, {
+    required this.headers,
+    required this.groupStatus,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => Column(
@@ -32,16 +38,14 @@ class TopWidget extends ConsumerWidget {
                               (message as TextMessage).text.length - 20,
                               replyMessage.text.length,
                             ),
-                            40,
+                            5,
                           ),
                           replyMessage.text.length,
                         ),
                       )
                     : replyMessage.text;
                 return InkWell(
-                  onTap: () => showAboutDialog(
-                    context: context,
-                  ), // TODO: Scroll to message
+                  onTap: () => showAboutDialog(context: context),
                   child: Container(
                     decoration: BoxDecoration(
                       border: Border(
@@ -62,11 +66,14 @@ class TopWidget extends ConsumerWidget {
                             headers: headers,
                             size: 16,
                           ),
-                          Text(
-                            replyMessage.metadata?["displayName"] ??
-                                replyMessage.authorId,
-                            style: Theme.of(context).textTheme.labelMedium
-                                ?.copyWith(fontWeight: FontWeight.bold),
+                          Flexible(
+                            child: Text(
+                              replyMessage.metadata?["displayName"] ??
+                                  replyMessage.authorId,
+                              style: Theme.of(context).textTheme.labelMedium
+                                  ?.copyWith(fontWeight: FontWeight.bold),
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                           Flexible(
                             child: Text(
@@ -85,23 +92,27 @@ class TopWidget extends ConsumerWidget {
             ),
         SizedBox(height: 12),
       ],
-      InkWell(
-        onTap: () =>
-            showAboutDialog(context: context), // TODO: Show user profile
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          spacing: 8,
-          children: [
-            Avatar(userId: message.authorId, headers: headers),
-            Text(
-              message.metadata?["displayName"] ?? message.authorId,
-              style: Theme.of(
-                context,
-              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-            ),
-          ],
+      if (groupStatus?.isFirst != false)
+        InkWell(
+          onTap: () =>
+              showAboutDialog(context: context), // TODO: Show user profile
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            spacing: 8,
+            children: [
+              Avatar(userId: message.authorId, headers: headers),
+              Flexible(
+                child: Text(
+                  message.metadata?["displayName"] ?? message.authorId,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
       SizedBox(height: 4),
     ],
   );

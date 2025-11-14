@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$FullRoom {
 
- Room get roomData; String get title; Image? get avatar;
+ Room get roomData; String get title; Uri? get avatar;
 /// Create a copy of FullRoom
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -45,7 +45,7 @@ abstract mixin class $FullRoomCopyWith<$Res>  {
   factory $FullRoomCopyWith(FullRoom value, $Res Function(FullRoom) _then) = _$FullRoomCopyWithImpl;
 @useResult
 $Res call({
- Room roomData, String title, Image? avatar
+ Room roomData, String title, Uri? avatar
 });
 
 
@@ -67,7 +67,7 @@ class _$FullRoomCopyWithImpl<$Res>
 roomData: null == roomData ? _self.roomData : roomData // ignore: cast_nullable_to_non_nullable
 as Room,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,avatar: freezed == avatar ? _self.avatar : avatar // ignore: cast_nullable_to_non_nullable
-as Image?,
+as Uri?,
   ));
 }
 
@@ -152,7 +152,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( Room roomData,  String title,  Image? avatar)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( Room roomData,  String title,  Uri? avatar)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _FullRoom() when $default != null:
 return $default(_that.roomData,_that.title,_that.avatar);case _:
@@ -173,7 +173,7 @@ return $default(_that.roomData,_that.title,_that.avatar);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( Room roomData,  String title,  Image? avatar)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( Room roomData,  String title,  Uri? avatar)  $default,) {final _that = this;
 switch (_that) {
 case _FullRoom():
 return $default(_that.roomData,_that.title,_that.avatar);case _:
@@ -193,7 +193,7 @@ return $default(_that.roomData,_that.title,_that.avatar);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( Room roomData,  String title,  Image? avatar)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( Room roomData,  String title,  Uri? avatar)?  $default,) {final _that = this;
 switch (_that) {
 case _FullRoom() when $default != null:
 return $default(_that.roomData,_that.title,_that.avatar);case _:
@@ -213,7 +213,7 @@ class _FullRoom implements FullRoom {
 
 @override final  Room roomData;
 @override final  String title;
-@override final  Image? avatar;
+@override final  Uri? avatar;
 
 /// Create a copy of FullRoom
 /// with the given fields replaced by the non-null parameter values.
@@ -245,7 +245,7 @@ abstract mixin class _$FullRoomCopyWith<$Res> implements $FullRoomCopyWith<$Res>
   factory _$FullRoomCopyWith(_FullRoom value, $Res Function(_FullRoom) _then) = __$FullRoomCopyWithImpl;
 @override @useResult
 $Res call({
- Room roomData, String title, Image? avatar
+ Room roomData, String title, Uri? avatar
 });
 
 
@@ -267,7 +267,7 @@ class __$FullRoomCopyWithImpl<$Res>
 roomData: null == roomData ? _self.roomData : roomData // ignore: cast_nullable_to_non_nullable
 as Room,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,avatar: freezed == avatar ? _self.avatar : avatar // ignore: cast_nullable_to_non_nullable
-as Image?,
+as Uri?,
   ));
 }
 

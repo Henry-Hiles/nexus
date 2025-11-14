@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Space {
 
- String get title; Widget? get avatar; List<FullRoom> get children; bool get fake;
+ String get title; List<FullRoom> get children; Client get client; bool get fake; Uri? get avatar; Icon? get icon;
 /// Create a copy of Space
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $SpaceCopyWith<Space> get copyWith => _$SpaceCopyWithImpl<Space>(this as Space, 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Space&&(identical(other.title, title) || other.title == title)&&(identical(other.avatar, avatar) || other.avatar == avatar)&&const DeepCollectionEquality().equals(other.children, children)&&(identical(other.fake, fake) || other.fake == fake));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Space&&(identical(other.title, title) || other.title == title)&&const DeepCollectionEquality().equals(other.children, children)&&(identical(other.client, client) || other.client == client)&&(identical(other.fake, fake) || other.fake == fake)&&(identical(other.avatar, avatar) || other.avatar == avatar)&&(identical(other.icon, icon) || other.icon == icon));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,title,avatar,const DeepCollectionEquality().hash(children),fake);
+int get hashCode => Object.hash(runtimeType,title,const DeepCollectionEquality().hash(children),client,fake,avatar,icon);
 
 @override
 String toString() {
-  return 'Space(title: $title, avatar: $avatar, children: $children, fake: $fake)';
+  return 'Space(title: $title, children: $children, client: $client, fake: $fake, avatar: $avatar, icon: $icon)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $SpaceCopyWith<$Res>  {
   factory $SpaceCopyWith(Space value, $Res Function(Space) _then) = _$SpaceCopyWithImpl;
 @useResult
 $Res call({
- String title, Widget? avatar, List<FullRoom> children, bool fake
+ String title, List<FullRoom> children, Client client, bool fake, Uri? avatar, Icon? icon
 });
 
 
@@ -62,13 +62,15 @@ class _$SpaceCopyWithImpl<$Res>
 
 /// Create a copy of Space
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? title = null,Object? avatar = freezed,Object? children = null,Object? fake = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? title = null,Object? children = null,Object? client = null,Object? fake = null,Object? avatar = freezed,Object? icon = freezed,}) {
   return _then(_self.copyWith(
 title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
-as String,avatar: freezed == avatar ? _self.avatar : avatar // ignore: cast_nullable_to_non_nullable
-as Widget?,children: null == children ? _self.children : children // ignore: cast_nullable_to_non_nullable
-as List<FullRoom>,fake: null == fake ? _self.fake : fake // ignore: cast_nullable_to_non_nullable
-as bool,
+as String,children: null == children ? _self.children : children // ignore: cast_nullable_to_non_nullable
+as List<FullRoom>,client: null == client ? _self.client : client // ignore: cast_nullable_to_non_nullable
+as Client,fake: null == fake ? _self.fake : fake // ignore: cast_nullable_to_non_nullable
+as bool,avatar: freezed == avatar ? _self.avatar : avatar // ignore: cast_nullable_to_non_nullable
+as Uri?,icon: freezed == icon ? _self.icon : icon // ignore: cast_nullable_to_non_nullable
+as Icon?,
   ));
 }
 
@@ -153,10 +155,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String title,  Widget? avatar,  List<FullRoom> children,  bool fake)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String title,  List<FullRoom> children,  Client client,  bool fake,  Uri? avatar,  Icon? icon)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Space() when $default != null:
-return $default(_that.title,_that.avatar,_that.children,_that.fake);case _:
+return $default(_that.title,_that.children,_that.client,_that.fake,_that.avatar,_that.icon);case _:
   return orElse();
 
 }
@@ -174,10 +176,10 @@ return $default(_that.title,_that.avatar,_that.children,_that.fake);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String title,  Widget? avatar,  List<FullRoom> children,  bool fake)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String title,  List<FullRoom> children,  Client client,  bool fake,  Uri? avatar,  Icon? icon)  $default,) {final _that = this;
 switch (_that) {
 case _Space():
-return $default(_that.title,_that.avatar,_that.children,_that.fake);case _:
+return $default(_that.title,_that.children,_that.client,_that.fake,_that.avatar,_that.icon);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -194,10 +196,10 @@ return $default(_that.title,_that.avatar,_that.children,_that.fake);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String title,  Widget? avatar,  List<FullRoom> children,  bool fake)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String title,  List<FullRoom> children,  Client client,  bool fake,  Uri? avatar,  Icon? icon)?  $default,) {final _that = this;
 switch (_that) {
 case _Space() when $default != null:
-return $default(_that.title,_that.avatar,_that.children,_that.fake);case _:
+return $default(_that.title,_that.children,_that.client,_that.fake,_that.avatar,_that.icon);case _:
   return null;
 
 }
@@ -209,11 +211,10 @@ return $default(_that.title,_that.avatar,_that.children,_that.fake);case _:
 
 
 class _Space implements Space {
-  const _Space({required this.title, required this.avatar, required final  List<FullRoom> children, this.fake = false}): _children = children;
+  const _Space({required this.title, required final  List<FullRoom> children, required this.client, this.fake = false, this.avatar, this.icon}): _children = children;
   
 
 @override final  String title;
-@override final  Widget? avatar;
  final  List<FullRoom> _children;
 @override List<FullRoom> get children {
   if (_children is EqualUnmodifiableListView) return _children;
@@ -221,7 +222,10 @@ class _Space implements Space {
   return EqualUnmodifiableListView(_children);
 }
 
+@override final  Client client;
 @override@JsonKey() final  bool fake;
+@override final  Uri? avatar;
+@override final  Icon? icon;
 
 /// Create a copy of Space
 /// with the given fields replaced by the non-null parameter values.
@@ -233,16 +237,16 @@ _$SpaceCopyWith<_Space> get copyWith => __$SpaceCopyWithImpl<_Space>(this, _$ide
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Space&&(identical(other.title, title) || other.title == title)&&(identical(other.avatar, avatar) || other.avatar == avatar)&&const DeepCollectionEquality().equals(other._children, _children)&&(identical(other.fake, fake) || other.fake == fake));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Space&&(identical(other.title, title) || other.title == title)&&const DeepCollectionEquality().equals(other._children, _children)&&(identical(other.client, client) || other.client == client)&&(identical(other.fake, fake) || other.fake == fake)&&(identical(other.avatar, avatar) || other.avatar == avatar)&&(identical(other.icon, icon) || other.icon == icon));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,title,avatar,const DeepCollectionEquality().hash(_children),fake);
+int get hashCode => Object.hash(runtimeType,title,const DeepCollectionEquality().hash(_children),client,fake,avatar,icon);
 
 @override
 String toString() {
-  return 'Space(title: $title, avatar: $avatar, children: $children, fake: $fake)';
+  return 'Space(title: $title, children: $children, client: $client, fake: $fake, avatar: $avatar, icon: $icon)';
 }
 
 
@@ -253,7 +257,7 @@ abstract mixin class _$SpaceCopyWith<$Res> implements $SpaceCopyWith<$Res> {
   factory _$SpaceCopyWith(_Space value, $Res Function(_Space) _then) = __$SpaceCopyWithImpl;
 @override @useResult
 $Res call({
- String title, Widget? avatar, List<FullRoom> children, bool fake
+ String title, List<FullRoom> children, Client client, bool fake, Uri? avatar, Icon? icon
 });
 
 
@@ -270,13 +274,15 @@ class __$SpaceCopyWithImpl<$Res>
 
 /// Create a copy of Space
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? title = null,Object? avatar = freezed,Object? children = null,Object? fake = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? title = null,Object? children = null,Object? client = null,Object? fake = null,Object? avatar = freezed,Object? icon = freezed,}) {
   return _then(_Space(
 title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
-as String,avatar: freezed == avatar ? _self.avatar : avatar // ignore: cast_nullable_to_non_nullable
-as Widget?,children: null == children ? _self._children : children // ignore: cast_nullable_to_non_nullable
-as List<FullRoom>,fake: null == fake ? _self.fake : fake // ignore: cast_nullable_to_non_nullable
-as bool,
+as String,children: null == children ? _self._children : children // ignore: cast_nullable_to_non_nullable
+as List<FullRoom>,client: null == client ? _self.client : client // ignore: cast_nullable_to_non_nullable
+as Client,fake: null == fake ? _self.fake : fake // ignore: cast_nullable_to_non_nullable
+as bool,avatar: freezed == avatar ? _self.avatar : avatar // ignore: cast_nullable_to_non_nullable
+as Uri?,icon: freezed == icon ? _self.icon : icon // ignore: cast_nullable_to_non_nullable
+as Icon?,
   ));
 }
 

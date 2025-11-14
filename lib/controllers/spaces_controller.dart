@@ -30,24 +30,27 @@ class SpacesController extends AsyncNotifier<List<Space>> {
 
     return [
       Space(
+        client: client,
         title: "Home",
         children: topLevelRooms,
-        avatar: Icon(Icons.home),
+        icon: Icon(Icons.home),
         fake: true,
       ),
       Space(
+        client: client,
         title: "Direct Messages",
         children: await Future.wait(
           client.rooms
               .where((room) => room.isDirectChat)
               .map((room) => room.fullRoom),
         ),
-        avatar: Icon(Icons.person),
+        icon: Icon(Icons.person),
         fake: true,
       ),
       ...(await Future.wait(
         topLevelSpaces.map(
           (space) async => Space(
+            client: client,
             title: space.title,
             avatar: space.avatar,
             children: await Future.wait(

@@ -1,5 +1,4 @@
 import "dart:io";
-
 import "package:flutter/foundation.dart";
 import "package:matrix/matrix.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
@@ -29,6 +28,8 @@ class ClientController extends AsyncNotifier<Client> {
     if (client.accessToken == null) {
       await client.login(
         LoginType.mLoginPassword,
+        initialDeviceDisplayName: "Nexus Client",
+        deviceId: "temp", // TODO
         identifier: AuthenticationUserIdentifier(user: "quadradical"),
         password: File("./password.txt").readAsStringSync(),
       );

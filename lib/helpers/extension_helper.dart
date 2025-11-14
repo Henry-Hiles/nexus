@@ -21,23 +21,15 @@ extension BetterWhen<T> on AsyncValue<T> {
 }
 
 extension GetFullRoom on Room {
-  Future<FullRoom> get fullRoom async {
-    return FullRoom(
-      roomData: this,
-      title: getLocalizedDisplayname(),
-      avatar: await avatar?.asImage(client),
-    );
-  }
+  Future<FullRoom> get fullRoom async => FullRoom(
+    roomData: this,
+    title: getLocalizedDisplayname(),
+    avatar: await avatar?.getThumbnailUri(client, width: 24, height: 24),
+  );
 }
 
-extension GetImage on Uri {
-  Future<Image?> asImage(Client client) async {
-    final thumb = await getThumbnailUri(client, width: 24, height: 24);
-    return Image.network(
-      thumb.toString(),
-      headers: {"authorization": "Bearer ${client.accessToken}"},
-    );
-  }
+extension GetHeaders on Client {
+  Map<String, String> get headers => {"authorization": "Bearer $accessToken"};
 }
 
 extension ToMessage on Event {
