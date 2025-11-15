@@ -33,7 +33,6 @@ class RoomAppbar extends StatelessWidget implements PreferredSizeWidget {
           )
         : DrawerButton(onPressed: () => onOpenDrawer(context)),
     scrolledUnderElevation: 0,
-    backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
     actionsPadding: EdgeInsets.symmetric(horizontal: 8),
     title: Column(
       crossAxisAlignment: CrossAxisAlignment.start,

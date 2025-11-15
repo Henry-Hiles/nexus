@@ -44,9 +44,10 @@
             pkgs.mkShell {
               packages = with pkgs; [
                 jdk17
-                rustc
+                cargo
                 flutter
                 android.platform-tools
+                (pkgs.writeShellScriptBin "rustup" (builtins.readFile ./nix/fake-rustup.sh))
               ];
               env = rec {
                 LD_LIBRARY_PATH = "${pkgs.lib.makeLibraryPath (with pkgs; [ sqlite ])}:$LD_LIBRARY_PATH";

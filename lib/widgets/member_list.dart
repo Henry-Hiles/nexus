@@ -20,9 +20,6 @@ class MemberList extends ConsumerWidget {
             children: [
               AppBar(
                 scrolledUnderElevation: 0,
-                backgroundColor: Theme.of(
-                  context,
-                ).colorScheme.surfaceContainerLow,
                 leading: Icon(Icons.people),
                 title: Text("Members"),
                 actionsPadding: EdgeInsets.only(right: 4),
