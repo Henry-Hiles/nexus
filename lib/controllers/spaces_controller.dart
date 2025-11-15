@@ -1,13 +1,14 @@
 import "package:collection/collection.dart";
+import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/material.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client_controller.dart";
 import "package:nexus/helpers/extension_helper.dart";
 import "package:nexus/models/space.dart";
 
-class SpacesController extends AsyncNotifier<List<Space>> {
+class SpacesController extends AsyncNotifier<IList<Space>> {
   @override
-  Future<List<Space>> build() async {
+  Future<IList<Space>> build() async {
     final client = await ref.watch(ClientController.provider.future);
 
     final topLevel = await Future.wait(
@@ -28,7 +29,7 @@ class SpacesController extends AsyncNotifier<List<Space>> {
     final topLevelSpaces = topLevel.where((r) => r.roomData.isSpace).toList();
     final topLevelRooms = topLevel.where((r) => !r.roomData.isSpace).toList();
 
-    return [
+    return IList([
       Space(
         client: client,
         title: "Home",
@@ -66,10 +67,10 @@ class SpacesController extends AsyncNotifier<List<Space>> {
           ),
         ),
       )),
-    ];
+    ]);
   }
 
-  static final provider = AsyncNotifierProvider<SpacesController, List<Space>>(
+  static final provider = AsyncNotifierProvider<SpacesController, IList<Space>>(
     SpacesController.new,
   );
 }

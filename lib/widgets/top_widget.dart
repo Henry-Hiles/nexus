@@ -1,5 +1,4 @@
 import "dart:math";
-
 import "package:flutter/material.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:flutter_chat_ui/flutter_chat_ui.dart";
@@ -29,13 +28,18 @@ class TopWidget extends ConsumerWidget {
               loading: SizedBox.shrink,
               data: (replyMessage) {
                 if (replyMessage == null) return SizedBox.shrink();
+
+                // Black magic to limit reply preview length
                 final replyText = message is TextMessage
                     ? replyMessage.text.substring(
                         0,
                         min(
                           max(
                             min(
-                              (message as TextMessage).text.length - 20,
+                              max(
+                                (message as TextMessage).text.length - 20,
+                                message.metadata?["displayName"].length,
+                              ),
                               replyMessage.text.length,
                             ),
                             5,

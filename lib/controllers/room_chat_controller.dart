@@ -3,7 +3,7 @@ import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart" as chat;
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:matrix/matrix.dart";
-import "package:nexus/controllers/timeline_controller.dart";
+import "package:nexus/controllers/events_controller.dart";
 import "package:nexus/helpers/extension_helper.dart";
 
 class RoomChatController extends AsyncNotifier<ChatController> {
@@ -12,7 +12,7 @@ class RoomChatController extends AsyncNotifier<ChatController> {
 
   @override
   Future<ChatController> build() async {
-    final timeline = await ref.watch(TimelineController.provider(room).future);
+    final response = await ref.watch(EventsController.provider(room).future);
 
     ref.onDispose(
       room.client.onTimelineEvent.stream.listen((event) async {
@@ -26,8 +26,10 @@ class RoomChatController extends AsyncNotifier<ChatController> {
 
     return InMemoryChatController(
       messages: (await Future.wait(
-        timeline.events.map((event) => event.toMessage()),
-      )).toList().reversed.nonNulls.toList(),
+        response.chunk.map(
+          (event) => Event.fromMatrixEvent(event, room).toMessage(),
+        ),
+      )).nonNulls.toList(),
     );
   }
 
@@ -46,13 +48,22 @@ class RoomChatController extends AsyncNotifier<ChatController> {
   }
 
   Future<void> loadOlder() async {
-    await ref.watch(TimelineController.provider(room).notifier).prev();
+    final controller = await future;
+    final response = await ref
+        .watch(EventsController.provider(room).notifier)
+        .prev();
+    await controller.insertAllMessages(
+      (await Future.wait(
+        response.chunk.map(
+          (event) => Event.fromMatrixEvent(event, room).toMessage(),
+        ),
+      )).nonNulls.toList().reversed.toList(),
+      index: 0,
+    );
   }
 
-  Future<void> updateMessage(Message message, Message newMessage) async {
-    final controller = await future;
-    return controller.updateMessage(message, newMessage);
-  }
+  Future<void> updateMessage(Message message, Message newMessage) async =>
+      (await future).updateMessage(message, newMessage);
 
   Future<void> send(String message, {Message? replyTo}) async =>
       await room.sendTextEvent(

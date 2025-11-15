@@ -39,7 +39,9 @@ extension ToMessage on Event {
     final metadata = {
       "formatted": formattedText.isEmpty ? body : formattedText,
       "eventType": type,
-      "displayName": senderFromMemoryOrFallback.displayName,
+      "displayName":
+          senderFromMemoryOrFallback.displayName ??
+          senderFromMemoryOrFallback.id,
       "txnId": transactionId,
     };
 

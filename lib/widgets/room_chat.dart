@@ -24,7 +24,12 @@ import "package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 
 class RoomChat extends HookConsumerWidget {
   final bool isDesktop;
-  const RoomChat({required this.isDesktop, super.key});
+  final bool showMembersByDefault;
+  const RoomChat({
+    required this.isDesktop,
+    required this.showMembersByDefault,
+    super.key,
+  });
 
   void showContextMenu({
     required BuildContext context,
@@ -48,8 +53,7 @@ class RoomChat extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final replyToMessage = useState<Message?>(null);
-    final memberListOpened = useState<bool>(isDesktop);
-    final urlRegex = RegExp(r"https?://[^\s\]\(\)]+");
+    final memberListOpened = useState<bool>(showMembersByDefault);
     final theme = Theme.of(context);
     return ref
         .watch(CurrentRoomController.provider)
@@ -105,14 +109,13 @@ class RoomChat extends HookConsumerWidget {
                                   onTap: () => replyToMessage.value = message,
                                 ),
                             builders: Builders(
-                              chatAnimatedListBuilder: (context, itemBuilder) {
-                                return ChatAnimatedList(
-                                  itemBuilder: itemBuilder,
-                                  onEndReached: ref
-                                      .watch(controllerProvider.notifier)
-                                      .loadOlder,
-                                );
-                              },
+                              chatAnimatedListBuilder: (_, itemBuilder) =>
+                                  ChatAnimatedList(
+                                    itemBuilder: itemBuilder,
+                                    onEndReached: ref
+                                        .watch(controllerProvider.notifier)
+                                        .loadOlder,
+                                  ),
                               composerBuilder: (_) => ChatBox(
                                 replyToMessage: replyToMessage.value,
                                 onDismiss: () => replyToMessage.value = null,
@@ -133,14 +136,20 @@ class RoomChat extends HookConsumerWidget {
                                           return SizedBox.shrink();
                                         }
                                         if (element.localName == "code") {
-                                          return SizedBox(
-                                            width: 400,
-                                            child: CodeField(
-                                              name: element.className
-                                                  .replaceAll("language-", ""),
-                                              codes: element.text,
-                                            ),
-                                          );
+                                          if (element.parent?.localName ==
+                                              "pre") {
+                                            return SizedBox(
+                                              width: 400,
+                                              child: CodeField(
+                                                name: element.className
+                                                    .replaceAll(
+                                                      "language-",
+                                                      "",
+                                                    ),
+                                                codes: element.text,
+                                              ),
+                                            );
+                                          }
                                         }
                                         if (element.localName == "img") {
                                           final src = Uri.tryParse(
@@ -204,11 +213,7 @@ class RoomChat extends HookConsumerWidget {
                                   ),
                               linkPreviewBuilder: (_, message, isSentByMe) =>
                                   LinkPreview(
-                                    text:
-                                        urlRegex
-                                            .firstMatch(message.text)
-                                            ?.group(0) ??
-                                        "",
+                                    text: message.text,
                                     backgroundColor: isSentByMe
                                         ? theme.colorScheme.inversePrimary
                                         : theme.colorScheme.surfaceContainerLow,
@@ -306,11 +311,13 @@ class RoomChat extends HookConsumerWidget {
                         ),
                   ),
 
-                  if (memberListOpened.value == true && isDesktop)
+                  if (memberListOpened.value == true && showMembersByDefault)
                     MemberList(room.roomData),
                 ],
               ),
-              endDrawer: isDesktop ? null : MemberList(room.roomData),
+              endDrawer: showMembersByDefault
+                  ? null
+                  : MemberList(room.roomData),
             );
           },
         );

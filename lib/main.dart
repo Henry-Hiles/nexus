@@ -29,6 +29,7 @@ class App extends StatelessWidget {
     builder: (lightDynamic, darkDynamic) => LayoutBuilder(
       builder: (context, constraints) {
         final isDesktop = constraints.maxWidth > 650;
+        final showMembersByDefault = constraints.maxWidth > 1000;
 
         return MaterialApp(
           debugShowCheckedModeBanner: false,
@@ -47,7 +48,12 @@ class App extends StatelessWidget {
               builder: (context) => Row(
                 children: [
                   if (isDesktop) Sidebar(),
-                  Expanded(child: RoomChat(isDesktop: isDesktop)),
+                  Expanded(
+                    child: RoomChat(
+                      isDesktop: isDesktop,
+                      showMembersByDefault: showMembersByDefault,
+                    ),
+                  ),
                 ],
               ),
             ),
