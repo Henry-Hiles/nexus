@@ -17,6 +17,7 @@ import "package:nexus/widgets/chat_box.dart";
 import "package:nexus/widgets/member_list.dart";
 import "package:nexus/widgets/room_appbar.dart";
 import "package:nexus/widgets/top_widget.dart";
+import "package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart";
 
 class RoomChat extends HookConsumerWidget {
   final bool isDesktop;
@@ -122,26 +123,24 @@ class RoomChat extends HookConsumerWidget {
                                     required bool isSentByMe,
                                     MessageGroupStatus? groupStatus,
                                   }) => FlyerChatTextMessage(
+                                    customWidget: HtmlWidget(
+                                      message.metadata?["formatted"],
+                                      customWidgetBuilder: (element) =>
+                                          element.localName == "mx-reply"
+                                          ? SizedBox.shrink()
+                                          : null,
+                                      onTapUrl: (url) => ref
+                                          .watch(LaunchHelper.provider)
+                                          .launchUrl(Uri.parse(url)),
+                                    ),
                                     topWidget: TopWidget(
                                       message,
                                       headers: room.roomData.client.headers,
                                       groupStatus: groupStatus,
                                     ),
-                                    message: message.copyWith(
-                                      text: message.text.replaceAllMapped(
-                                        urlRegex,
-                                        (match) =>
-                                            "[${match.group(0)}](${match.group(0)})",
-                                      ),
-                                    ),
+                                    message: message,
                                     showTime: true,
                                     index: index,
-                                    onLinkTap: (url, _) => ref
-                                        .watch(LaunchHelper.provider)
-                                        .launchUrl(Uri.parse(url)),
-                                    linksDecoration: TextDecoration.underline,
-                                    sentLinksColor: Colors.blue,
-                                    receivedLinksColor: Colors.blue,
                                   ),
                               linkPreviewBuilder: (_, message, isSentByMe) =>
                                   LinkPreview(

@@ -1,12 +1,10 @@
 import "package:flutter/material.dart";
-import "package:flutter/widgets.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:matrix/matrix.dart";
 import "package:nexus/models/full_room.dart";
 import "package:nexus/widgets/error_dialog.dart";
 import "package:nexus/widgets/loading.dart";
-import "package:html2md/html2md.dart";
 
 extension BetterWhen<T> on AsyncValue<T> {
   Widget betterWhen({
@@ -39,6 +37,7 @@ extension ToMessage on Event {
         ? relationshipEventId
         : null;
     final metadata = {
+      "formatted": formattedText.isEmpty ? body : formattedText,
       "eventType": type,
       "displayName": senderFromMemoryOrFallback.displayName,
       "txnId": transactionId,
@@ -49,34 +48,34 @@ extension ToMessage on Event {
         metadata: metadata,
         id: eventId,
         authorId: senderId,
-        text: "~~This message has been redacted.~~",
+        text: "<s>This message has been redacted.</s>",
         deletedAt: redactedBecause?.originServerTs,
       );
     }
 
-    final formatted = convert(
-      formattedText.isEmpty ? body : formattedText,
-      ignore: replyId == null ? null : ["mx-reply"],
-    );
-
-    final asText = Message.text(
-      metadata: metadata,
-      id: eventId,
-      authorId: senderId,
-      text: formatted,
-      replyToMessageId: replyId,
-      deliveredAt: originServerTs,
-    );
+    final asText =
+        Message.text(
+              metadata: metadata,
+              id: eventId,
+              authorId: senderId,
+              text: body,
+              replyToMessageId: replyId,
+              deliveredAt: originServerTs,
+            )
+            as TextMessage;
 
     if (mustBeText) return asText;
 
     return switch (type) {
+      EventTypes.Encrypted => asText.copyWith(
+        text: "Unable to decrypt message.",
+      ),
       EventTypes.Message => switch (messageType) {
         MessageTypes.Image => Message.image(
           metadata: metadata,
           id: eventId,
           authorId: senderId,
-          text: formatted,
+          text: text,
           source: (await getAttachmentUri()).toString(),
           replyToMessageId: replyId,
           deliveredAt: originServerTs,
@@ -85,7 +84,7 @@ extension ToMessage on Event {
           metadata: metadata,
           id: eventId,
           authorId: senderId,
-          text: formatted,
+          text: text,
           replyToMessageId: replyId,
           source: (await getAttachmentUri()).toString(),
           deliveredAt: originServerTs,

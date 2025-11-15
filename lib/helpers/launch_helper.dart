@@ -6,16 +6,16 @@ class LaunchHelper {
   final Ref ref;
   LaunchHelper(this.ref);
 
-  Future<void> launchUrl(Uri url, {bool useWebview = false}) async {
+  Future<bool> launchUrl(Uri url, {bool useWebview = false}) async {
     try {
-      await ul.launchUrl(
+      return await ul.launchUrl(
         url,
         mode: useWebview
             ? ul.LaunchMode.inAppBrowserView
             : ul.LaunchMode.externalApplication,
       );
     } on PlatformException catch (_) {
-      // Ignore missing intent handler error
+      return false;
     }
   }
 
