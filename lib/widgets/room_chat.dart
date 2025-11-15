@@ -1,3 +1,4 @@
+import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
@@ -8,6 +9,7 @@ import "package:flyer_chat_file_message/flyer_chat_file_message.dart";
 import "package:flyer_chat_image_message/flyer_chat_image_message.dart";
 import "package:flyer_chat_system_message/flyer_chat_system_message.dart";
 import "package:flyer_chat_text_message/flyer_chat_text_message.dart";
+import "package:gpt_markdown/custom_widgets/code_field.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/current_room_controller.dart";
 import "package:nexus/controllers/room_chat_controller.dart";
@@ -16,6 +18,7 @@ import "package:nexus/helpers/launch_helper.dart";
 import "package:nexus/widgets/chat_box.dart";
 import "package:nexus/widgets/member_list.dart";
 import "package:nexus/widgets/room_appbar.dart";
+import "package:nexus/widgets/spoiler_text.dart";
 import "package:nexus/widgets/top_widget.dart";
 import "package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart";
 
@@ -125,10 +128,67 @@ class RoomChat extends HookConsumerWidget {
                                   }) => FlyerChatTextMessage(
                                     customWidget: HtmlWidget(
                                       message.metadata?["formatted"],
-                                      customWidgetBuilder: (element) =>
-                                          element.localName == "mx-reply"
-                                          ? SizedBox.shrink()
-                                          : null,
+                                      customWidgetBuilder: (element) {
+                                        if (element.localName == "mx-reply") {
+                                          return SizedBox.shrink();
+                                        }
+                                        if (element.localName == "code") {
+                                          return SizedBox(
+                                            width: 400,
+                                            child: CodeField(
+                                              name: element.className
+                                                  .replaceAll("language-", ""),
+                                              codes: element.text,
+                                            ),
+                                          );
+                                        }
+                                        if (element.localName == "img") {
+                                          final src = Uri.tryParse(
+                                            element.attributes["src"] ?? "",
+                                          );
+                                          if (src?.scheme != "mxc") {
+                                            return SizedBox.shrink();
+                                          }
+
+                                          // TODO: Should do something like:
+                                          // return Image.network(
+                                          //   src!.getThumbnailUri(
+                                          //     room.roomData.client,
+                                          //   ),
+                                          // );
+
+                                          return SizedBox.shrink();
+                                        }
+                                        if (element.attributes.keys.contains(
+                                          "data-mx-spoiler",
+                                        )) {
+                                          return SpoilerText(
+                                            text: element.text,
+                                          );
+                                        }
+                                        return null;
+                                      },
+                                      customStylesBuilder: (element) => {
+                                        "width": "auto",
+                                        ...Map.fromEntries(
+                                          element.attributes
+                                              .mapTo<MapEntry<String, String>?>(
+                                                (key, value) => switch (key) {
+                                                  "data-mx-color" => MapEntry(
+                                                    "color",
+                                                    value,
+                                                  ),
+                                                  "data-mx-bg-color" =>
+                                                    MapEntry(
+                                                      "background-color",
+                                                      value,
+                                                    ),
+                                                  _ => null,
+                                                },
+                                              )
+                                              .nonNulls,
+                                        ),
+                                      },
                                       onTapUrl: (url) => ref
                                           .watch(LaunchHelper.provider)
                                           .launchUrl(Uri.parse(url)),
