@@ -7,6 +7,7 @@ import "package:nexus/helpers/launch_helper.dart";
 import "package:nexus/models/homeserver.dart";
 import "package:nexus/widgets/appbar.dart";
 import "package:nexus/widgets/divider_text.dart";
+import "package:nexus/widgets/loading.dart";
 
 class LoginPage extends HookConsumerWidget {
   const LoginPage({super.key});
@@ -17,13 +18,6 @@ class LoginPage extends HookConsumerWidget {
     final allowLogin = useState(false);
     Future<void> setHomeserver(Uri? homeserver) async {
       isChecking.value = true;
-      final messenger = ScaffoldMessenger.of(context);
-      final snackbar = messenger.showSnackBar(
-        SnackBar(
-          content: Text("Checking homeserver..."),
-          duration: Duration(days: 1),
-        ),
-      );
       final succeeded = homeserver == null
           ? false
           : await ref
@@ -34,11 +28,10 @@ class LoginPage extends HookConsumerWidget {
                       : Uri.https(homeserver.path),
                 );
 
-      snackbar.close();
       if (succeeded) {
         allowLogin.value = true;
-      } else {
-        messenger.showSnackBar(
+      } else if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
               "Homeserver verification failed. Is your homeserver down?",
@@ -158,7 +151,9 @@ class LoginPage extends HookConsumerWidget {
                     .launchUrl(Uri.https("servers.joinmatrix.org")),
                 child: Text("See more homeservers..."),
               ),
-              if (allowLogin.value) ...[
+              if (isChecking.value)
+                Padding(padding: EdgeInsets.only(top: 32), child: Loading())
+              else if (allowLogin.value) ...[
                 DividerText("Then, sign in:"),
                 SizedBox(height: 4),
                 TextField(decoration: InputDecoration(label: Text("Username"))),
