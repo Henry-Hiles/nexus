@@ -38,26 +38,27 @@
           };
 
           devShells.default =
-            let
-              android = pkgs.callPackage ./nix/android.nix { };
-            in
+            # let
+            #   android = pkgs.callPackage ./nix/android.nix { };
+            # in
             pkgs.mkShell {
               packages = with pkgs; [
-                jdk17
+                # jdk17
                 cargo
                 flutter
-                android.platform-tools
+                # android.platform-tools
                 (pkgs.writeShellScriptBin "rustup" (builtins.readFile ./nix/fake-rustup.sh))
               ];
-              env = rec {
-                LD_LIBRARY_PATH = "${pkgs.lib.makeLibraryPath (with pkgs; [ sqlite ])}:$LD_LIBRARY_PATH";
+              env = {
+                # env = rec {
+                LD_LIBRARY_PATH = "${pkgs.lib.makeLibraryPath (with pkgs; [ sqlite ])}";
 
-                ANDROID_HOME = "${android.androidsdk}/libexec/android-sdk";
-                ANDROID_SDK_ROOT = ANDROID_HOME;
-                JAVA_HOME = pkgs.jdk17;
+                #   ANDROID_HOME = "${android.androidsdk}/libexec/android-sdk";
+                #   ANDROID_SDK_ROOT = ANDROID_HOME;
+                #   JAVA_HOME = pkgs.jdk17;
 
-                TOOLS = "${ANDROID_HOME}/build-tools/${"36.0.0"}";
-                GRADLE_OPTS = "-Dorg.gradle.project.android.aapt2FromMavenOverride=${TOOLS}/aapt2";
+                #   TOOLS = "${ANDROID_HOME}/build-tools/${"36.0.0"}";
+                #   GRADLE_OPTS = "-Dorg.gradle.project.android.aapt2FromMavenOverride=${TOOLS}/aapt2";
               };
             };
         };
