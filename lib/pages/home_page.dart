@@ -1,0 +1,32 @@
+import "package:flutter/material.dart";
+import "package:nexus/widgets/room_chat.dart";
+import "package:nexus/widgets/sidebar.dart";
+
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
+
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, constraints) {
+      final isDesktop = constraints.maxWidth > 650;
+      final showMembersByDefault = constraints.maxWidth > 1000;
+
+      return Scaffold(
+        body: Builder(
+          builder: (context) => Row(
+            children: [
+              if (isDesktop) Sidebar(),
+              Expanded(
+                child: RoomChat(
+                  isDesktop: isDesktop,
+                  showMembersByDefault: showMembersByDefault,
+                ),
+              ),
+            ],
+          ),
+        ),
+        drawer: isDesktop ? null : Sidebar(),
+      );
+    },
+  );
+}

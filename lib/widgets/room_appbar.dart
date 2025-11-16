@@ -1,8 +1,7 @@
-import "dart:io";
-
 import "package:flutter/material.dart";
 import "package:nexus/helpers/extension_helper.dart";
 import "package:nexus/models/full_room.dart";
+import "package:nexus/widgets/appbar.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 
 class RoomAppbar extends StatelessWidget implements PreferredSizeWidget {
@@ -22,7 +21,7 @@ class RoomAppbar extends StatelessWidget implements PreferredSizeWidget {
   Size get preferredSize => AppBar().preferredSize;
 
   @override
-  AppBar build(BuildContext context) => AppBar(
+  Widget build(BuildContext context) => Appbar(
     leading: isDesktop
         ? AvatarOrHash(
             room.avatar,
@@ -33,7 +32,6 @@ class RoomAppbar extends StatelessWidget implements PreferredSizeWidget {
           )
         : DrawerButton(onPressed: () => onOpenDrawer(context)),
     scrolledUnderElevation: 0,
-    actionsPadding: EdgeInsets.symmetric(horizontal: 8),
     title: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -54,8 +52,6 @@ class RoomAppbar extends StatelessWidget implements PreferredSizeWidget {
         onPressed: () => onOpenMemberList(context),
         icon: Icon(Icons.people),
       ),
-      if (!(Platform.isAndroid || Platform.isIOS))
-        IconButton(onPressed: () => exit(0), icon: Icon(Icons.close)),
     ],
   );
 }

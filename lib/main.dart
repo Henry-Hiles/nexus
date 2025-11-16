@@ -1,7 +1,8 @@
 import "package:flutter_riverpod/flutter_riverpod.dart";
+import "package:nexus/controllers/client_controller.dart";
 import "package:nexus/helpers/extension_helper.dart";
-import "package:nexus/widgets/room_chat.dart";
-import "package:nexus/widgets/sidebar.dart";
+import "package:nexus/pages/home_page.dart";
+import "package:nexus/pages/homeserver_page.dart";
 import "package:scaled_app/scaled_app.dart";
 import "package:window_manager/window_manager.dart";
 import "package:flutter/material.dart";
@@ -21,46 +22,28 @@ void main() async {
   runApp(ProviderScope(child: const App()));
 }
 
-class App extends StatelessWidget {
+class App extends ConsumerWidget {
   const App({super.key});
 
   @override
-  Widget build(BuildContext context) => DynamicColorBuilder(
-    builder: (lightDynamic, darkDynamic) => LayoutBuilder(
-      builder: (context, constraints) {
-        final isDesktop = constraints.maxWidth > 650;
-        final showMembersByDefault = constraints.maxWidth > 1000;
-
-        return MaterialApp(
-          debugShowCheckedModeBanner: false,
-          theme:
-              (lightDynamic ?? ColorScheme.fromSeed(seedColor: Colors.indigo))
-                  .theme,
-          darkTheme:
-              (darkDynamic ??
-                      ColorScheme.fromSeed(
-                        seedColor: Colors.indigo,
-                        brightness: Brightness.dark,
-                      ))
-                  .theme,
-          home: Scaffold(
-            body: Builder(
-              builder: (context) => Row(
-                children: [
-                  if (isDesktop) Sidebar(),
-                  Expanded(
-                    child: RoomChat(
-                      isDesktop: isDesktop,
-                      showMembersByDefault: showMembersByDefault,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            drawer: isDesktop ? null : Sidebar(),
+  Widget build(BuildContext context, WidgetRef ref) => DynamicColorBuilder(
+    builder: (lightDynamic, darkDynamic) => MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: (lightDynamic ?? ColorScheme.fromSeed(seedColor: Colors.indigo))
+          .theme,
+      darkTheme:
+          (darkDynamic ??
+                  ColorScheme.fromSeed(
+                    seedColor: Colors.indigo,
+                    brightness: Brightness.dark,
+                  ))
+              .theme,
+      home: ref
+          .watch(ClientController.provider)
+          .betterWhen(
+            data: (client) =>
+                client.accessToken == null ? HomeserverPage() : HomePage(),
           ),
-        );
-      },
     ),
   );
 }

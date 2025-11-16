@@ -1,4 +1,3 @@
-import "dart:io";
 import "package:flutter/foundation.dart";
 import "package:matrix/matrix.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
@@ -13,6 +12,7 @@ class ClientController extends AsyncNotifier<Client> {
       "nexus",
       logLevel: kReleaseMode ? Level.warning : Level.verbose,
       importantStateEvents: {"im.ponies.room_emotes"},
+      supportedLoginTypes: {AuthenticationTypes.password},
       database: await MatrixSdkDatabase.init(
         "nexus",
         database: await databaseFactoryFfi.openDatabase(
@@ -22,18 +22,18 @@ class ClientController extends AsyncNotifier<Client> {
     );
 
     // TODO: Save info
-    if (client.homeserver == null) {
-      await client.checkHomeserver(Uri.https("federated.nexus"));
-    }
-    if (client.accessToken == null) {
-      await client.login(
-        LoginType.mLoginPassword,
-        initialDeviceDisplayName: "Nexus Client",
-        deviceId: "temp", // TODO
-        identifier: AuthenticationUserIdentifier(user: "quadradical"),
-        password: File("./password.txt").readAsStringSync(),
-      );
-    }
+    // if (client.homeserver == null) {
+    //   await client.checkHomeserver(Uri.https("federated.nexus"));
+    // }
+    // if (client.accessToken == null) {
+    //   await client.login(
+    //     LoginType.mLoginPassword,
+    //     initialDeviceDisplayName: "Nexus Client",
+    //     deviceId: "temp", // TODO
+    //     identifier: AuthenticationUserIdentifier(user: "quadradical"),
+    //     password: File("./password.txt").readAsStringSync(),
+    //   );
+    // }
 
     return client;
   }
