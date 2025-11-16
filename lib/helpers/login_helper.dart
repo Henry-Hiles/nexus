@@ -1,9 +1,9 @@
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client_controller.dart";
 
-class HomeserverHelper {
+class LoginHelper {
   final Ref ref;
-  HomeserverHelper(this.ref);
+  LoginHelper(this.ref);
 
   Future<bool> setHomeserver(Uri homeserverUrl) async {
     final client = await ref.watch(ClientController.provider.future);
@@ -15,5 +15,5 @@ class HomeserverHelper {
     }
   }
 
-  static final provider = Provider<HomeserverHelper>(HomeserverHelper.new);
+  static final provider = Provider<LoginHelper>(LoginHelper.new);
 }

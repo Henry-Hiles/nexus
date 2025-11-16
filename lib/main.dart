@@ -2,7 +2,7 @@ import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client_controller.dart";
 import "package:nexus/helpers/extension_helper.dart";
 import "package:nexus/pages/home_page.dart";
-import "package:nexus/pages/homeserver_page.dart";
+import "package:nexus/pages/login_page.dart";
 import "package:scaled_app/scaled_app.dart";
 import "package:window_manager/window_manager.dart";
 import "package:flutter/material.dart";
@@ -42,7 +42,7 @@ class App extends ConsumerWidget {
           .watch(ClientController.provider)
           .betterWhen(
             data: (client) =>
-                client.accessToken == null ? HomeserverPage() : HomePage(),
+                client.accessToken == null ? LoginPage() : HomePage(),
           ),
     ),
   );

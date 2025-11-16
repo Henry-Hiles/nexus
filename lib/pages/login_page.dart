@@ -1,11 +1,176 @@
 import "package:flutter/material.dart";
+import "package:flutter_hooks/flutter_hooks.dart";
+import "package:flutter_svg/flutter_svg.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
+import "package:nexus/helpers/login_helper.dart";
+import "package:nexus/helpers/launch_helper.dart";
+import "package:nexus/models/homeserver.dart";
 import "package:nexus/widgets/appbar.dart";
+import "package:nexus/widgets/divider_text.dart";
 
 class LoginPage extends HookConsumerWidget {
   const LoginPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) =>
-      Scaffold(appBar: Appbar());
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isChecking = useState(false);
+    final allowLogin = useState(false);
+    Future<void> setHomeserver(Uri? homeserver) async {
+      isChecking.value = true;
+      final messenger = ScaffoldMessenger.of(context);
+      final snackbar = messenger.showSnackBar(
+        SnackBar(
+          content: Text("Checking homeserver..."),
+          duration: Duration(days: 1),
+        ),
+      );
+      final succeeded = homeserver == null
+          ? false
+          : await ref
+                .watch(LoginHelper.provider)
+                .setHomeserver(
+                  homeserver.hasScheme
+                      ? homeserver
+                      : Uri.https(homeserver.path),
+                );
+
+      snackbar.close();
+      if (succeeded) {
+        allowLogin.value = true;
+      } else {
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text(
+              "Homeserver verification failed. Is your homeserver down?",
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onErrorContainer,
+              ),
+            ),
+            backgroundColor: Theme.of(context).colorScheme.errorContainer,
+          ),
+        );
+      }
+      isChecking.value = false;
+    }
+
+    final homeserverUrl = useTextEditingController();
+
+    return Scaffold(
+      appBar: Appbar(),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints.tight(Size.fromWidth(500)),
+          child: ListView(
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 48),
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SvgPicture.asset("assets/icon.svg"),
+                  SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Nexus",
+                        style: Theme.of(context).textTheme.displayMedium,
+                      ),
+                      Text(
+                        "A Simple Matrix Client",
+                        style: Theme.of(context).textTheme.headlineMedium,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              Padding(
+                padding: EdgeInsetsGeometry.symmetric(vertical: 12),
+                child: Divider(),
+              ),
+
+              DividerText("Enter a homeserver domain:"),
+              Row(
+                spacing: 8,
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: homeserverUrl,
+                      decoration: InputDecoration(
+                        labelText: "Homeserver URL (e.g. matrix.org)",
+                      ),
+                    ),
+                  ),
+                  IconButton.filled(
+                    onPressed: isChecking.value
+                        ? null
+                        : () => setHomeserver(Uri.tryParse(homeserverUrl.text)),
+                    icon: Icon(Icons.check),
+                  ),
+                ],
+              ),
+
+              DividerText("Or, choose from some popular homeservers:"),
+              ...(<Homeserver>[
+                Homeserver(
+                  name: "Matrix.org",
+                  description:
+                      "The Matrix.org Foundation offers the matrix.org homeserver as an easy entry point for anyone wanting to try out Matrix.",
+                  url: Uri.https("matrix.org"),
+                  iconUrl:
+                      "https://raw.githubusercontent.com/element-hq/logos/refs/heads/master/matrix/matrix-favicon${Theme.brightnessOf(context) == Brightness.dark ? "-white" : ""}.png",
+                ),
+                Homeserver(
+                  name: "Federated Nexus",
+                  description:
+                      "Federated Nexus is a community resource hosting multiple FOSS (especially federated) services, including Matrix and Forgejo. By the same developers who made Nexus client.",
+                  url: Uri.https("federated.nexus"),
+                  iconUrl: "https://federated.nexus/images/icon.png",
+                ),
+                Homeserver(
+                  name: "envs.net",
+                  description:
+                      "envs.net is a minimalist, non-commercial shared linux system and will always be free to use.",
+                  url: Uri.https("envs.net"),
+                  iconUrl: "https://envs.net/favicon.ico",
+                ),
+              ].map(
+                (homeserver) => Card(
+                  child: ListTile(
+                    title: Text(homeserver.name),
+                    leading: Image.network(homeserver.iconUrl, height: 32),
+                    subtitle: Text(homeserver.description),
+                    onTap: isChecking.value
+                        ? null
+                        : () => setHomeserver(homeserver.url),
+                    trailing: IconButton(
+                      onPressed: () => ref
+                          .watch(LaunchHelper.provider)
+                          .launchUrl(homeserver.url),
+                      icon: Icon(Icons.info_outline),
+                    ),
+                  ),
+                ),
+              )),
+              SizedBox(height: 8),
+              TextButton(
+                onPressed: () => ref
+                    .watch(LaunchHelper.provider)
+                    .launchUrl(Uri.https("servers.joinmatrix.org")),
+                child: Text("See more homeservers..."),
+              ),
+              if (allowLogin.value) ...[
+                DividerText("Then, sign in:"),
+                SizedBox(height: 4),
+                TextField(decoration: InputDecoration(label: Text("Username"))),
+                SizedBox(height: 12),
+                TextField(decoration: InputDecoration(label: Text("Password"))),
+                SizedBox(height: 12),
+                ElevatedButton(onPressed: () {}, child: Text("Sign in")),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
