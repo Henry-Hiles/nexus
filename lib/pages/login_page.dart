@@ -2,7 +2,7 @@ import "package:flutter/material.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:flutter_svg/flutter_svg.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
-import "package:nexus/helpers/login_helper.dart";
+import "package:nexus/controllers/client_controller.dart";
 import "package:nexus/helpers/launch_helper.dart";
 import "package:nexus/models/homeserver.dart";
 import "package:nexus/widgets/appbar.dart";
@@ -14,14 +14,17 @@ class LoginPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isChecking = useState(false);
+    final theme = Theme.of(context);
+
+    final isLoading = useState(false);
     final allowLogin = useState(false);
+
     Future<void> setHomeserver(Uri? homeserver) async {
-      isChecking.value = true;
+      isLoading.value = true;
       final succeeded = homeserver == null
           ? false
           : await ref
-                .watch(LoginHelper.provider)
+                .watch(ClientController.provider.notifier)
                 .setHomeserver(
                   homeserver.hasScheme
                       ? homeserver
@@ -35,18 +38,18 @@ class LoginPage extends HookConsumerWidget {
           SnackBar(
             content: Text(
               "Homeserver verification failed. Is your homeserver down?",
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onErrorContainer,
-              ),
+              style: TextStyle(color: theme.colorScheme.onErrorContainer),
             ),
-            backgroundColor: Theme.of(context).colorScheme.errorContainer,
+            backgroundColor: theme.colorScheme.errorContainer,
           ),
         );
       }
-      isChecking.value = false;
+      isLoading.value = false;
     }
 
     final homeserverUrl = useTextEditingController();
+    final username = useTextEditingController();
+    final password = useTextEditingController();
 
     return Scaffold(
       appBar: Appbar(),
@@ -64,13 +67,10 @@ class LoginPage extends HookConsumerWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        "Nexus",
-                        style: Theme.of(context).textTheme.displayMedium,
-                      ),
+                      Text("Nexus", style: theme.textTheme.displayMedium),
                       Text(
                         "A Simple Matrix Client",
-                        style: Theme.of(context).textTheme.headlineMedium,
+                        style: theme.textTheme.headlineMedium,
                       ),
                     ],
                   ),
@@ -94,7 +94,7 @@ class LoginPage extends HookConsumerWidget {
                     ),
                   ),
                   IconButton.filled(
-                    onPressed: isChecking.value
+                    onPressed: isLoading.value
                         ? null
                         : () => setHomeserver(Uri.tryParse(homeserverUrl.text)),
                     icon: Icon(Icons.check),
@@ -132,7 +132,7 @@ class LoginPage extends HookConsumerWidget {
                     title: Text(homeserver.name),
                     leading: Image.network(homeserver.iconUrl, height: 32),
                     subtitle: Text(homeserver.description),
-                    onTap: isChecking.value
+                    onTap: isLoading.value
                         ? null
                         : () => setHomeserver(homeserver.url),
                     trailing: IconButton(
@@ -151,16 +151,46 @@ class LoginPage extends HookConsumerWidget {
                     .launchUrl(Uri.https("servers.joinmatrix.org")),
                 child: Text("See more homeservers..."),
               ),
-              if (isChecking.value)
+              if (isLoading.value)
                 Padding(padding: EdgeInsets.only(top: 32), child: Loading())
               else if (allowLogin.value) ...[
                 DividerText("Then, sign in:"),
                 SizedBox(height: 4),
-                TextField(decoration: InputDecoration(label: Text("Username"))),
+                TextField(
+                  decoration: InputDecoration(label: Text("Username")),
+                  controller: username,
+                ),
                 SizedBox(height: 12),
-                TextField(decoration: InputDecoration(label: Text("Password"))),
+                TextField(
+                  decoration: InputDecoration(label: Text("Password")),
+                  controller: password,
+                  obscureText: true,
+                ),
                 SizedBox(height: 12),
-                ElevatedButton(onPressed: () {}, child: Text("Sign in")),
+                ElevatedButton(
+                  onPressed: () async {
+                    isLoading.value = true;
+                    final succeeded = await ref
+                        .watch(ClientController.provider.notifier)
+                        .login(username.text, password.text);
+
+                    if (!succeeded && context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            "Login failed. Is your password right?",
+                            style: TextStyle(
+                              color: theme.colorScheme.onErrorContainer,
+                            ),
+                          ),
+                          backgroundColor: theme.colorScheme.errorContainer,
+                        ),
+                      );
+                      isLoading.value = false;
+                    }
+                  },
+                  child: Text("Sign In"),
+                ),
               ],
             ],
           ),
