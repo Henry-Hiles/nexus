@@ -29,7 +29,7 @@ class RoomChatController extends AsyncNotifier<ChatController> {
         response.chunk.map(
           (event) => Event.fromMatrixEvent(event, room).toMessage(),
         ),
-      )).nonNulls.toList(),
+      )).nonNulls.toList().reversed.toList(),
     );
   }
 

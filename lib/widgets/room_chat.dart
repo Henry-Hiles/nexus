@@ -9,13 +9,13 @@ import "package:flyer_chat_file_message/flyer_chat_file_message.dart";
 import "package:flyer_chat_image_message/flyer_chat_image_message.dart";
 import "package:flyer_chat_system_message/flyer_chat_system_message.dart";
 import "package:flyer_chat_text_message/flyer_chat_text_message.dart";
-import "package:gpt_markdown/custom_widgets/code_field.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/current_room_controller.dart";
 import "package:nexus/controllers/room_chat_controller.dart";
 import "package:nexus/helpers/extension_helper.dart";
 import "package:nexus/helpers/launch_helper.dart";
 import "package:nexus/widgets/chat_box.dart";
+import "package:nexus/widgets/code_block.dart";
 import "package:nexus/widgets/member_list.dart";
 import "package:nexus/widgets/room_appbar.dart";
 import "package:nexus/widgets/spoiler_text.dart";
@@ -138,16 +138,10 @@ class RoomChat extends HookConsumerWidget {
                                         if (element.localName == "code") {
                                           if (element.parent?.localName ==
                                               "pre") {
-                                            return SizedBox(
-                                              width: 400,
-                                              child: CodeField(
-                                                name: element.className
-                                                    .replaceAll(
-                                                      "language-",
-                                                      "",
-                                                    ),
-                                                codes: element.text,
-                                              ),
+                                            return CodeBlock(
+                                              element.text,
+                                              lang: element.className
+                                                  .replaceAll("language-", ""),
                                             );
                                           }
                                         }
