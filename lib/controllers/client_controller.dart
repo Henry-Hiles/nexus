@@ -1,24 +1,50 @@
+import "dart:convert";
+
 import "package:flutter/foundation.dart";
 import "package:matrix/matrix.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
+import "package:nexus/controllers/secure_storage_controller.dart";
+import "package:nexus/models/session_backup.dart";
 import "package:path/path.dart";
 import "package:path_provider/path_provider.dart";
 import "package:sqflite_common_ffi/sqflite_ffi.dart";
 
 class ClientController extends AsyncNotifier<Client> {
+  static const sessionBackupKey = "sessionBackup";
   @override
-  Future<Client> build() async => Client(
-    "nexus",
-    logLevel: kReleaseMode ? Level.warning : Level.verbose,
-    importantStateEvents: {"im.ponies.room_emotes"},
-    supportedLoginTypes: {AuthenticationTypes.password},
-    database: await MatrixSdkDatabase.init(
+  Future<Client> build() async {
+    final client = Client(
       "nexus",
-      database: await databaseFactoryFfi.openDatabase(
-        join((await getApplicationSupportDirectory()).path, "database.db"),
+      logLevel: kReleaseMode ? Level.warning : Level.verbose,
+      importantStateEvents: {"im.ponies.room_emotes"},
+      supportedLoginTypes: {AuthenticationTypes.password},
+      database: await MatrixSdkDatabase.init(
+        "nexus",
+        database: await databaseFactoryFfi.openDatabase(
+          join((await getApplicationSupportDirectory()).path, "database.db"),
+        ),
       ),
-    ),
-  );
+    );
+
+    final backupJson = await ref
+        .watch(SecureStorageController.provider.notifier)
+        .get(sessionBackupKey);
+
+    if (backupJson != null) {
+      final backup = SessionBackup.fromJson(json.decode(backupJson));
+
+      await client.init(
+        waitForFirstSync: false,
+        newToken: backup.accessToken,
+        newHomeserver: backup.homeserver,
+        newUserID: backup.userID,
+        newDeviceID: backup.deviceID,
+        newDeviceName: backup.deviceName,
+      );
+    }
+
+    return client;
+  }
 
   Future<bool> setHomeserver(Uri homeserverUrl) async {
     final client = await future;
@@ -33,13 +59,28 @@ class ClientController extends AsyncNotifier<Client> {
   Future<bool> login(String username, String password) async {
     final client = await future;
     try {
-      await client.login(
+      final deviceName =
+          "Nexus Client login at ${DateTime.now().toIso8601String()}";
+      final details = await MatrixApi(homeserver: client.homeserver).login(
         LoginType.mLoginPassword,
-        initialDeviceDisplayName:
-            "Nexus Client login at ${DateTime.now().toIso8601String()}",
+        initialDeviceDisplayName: deviceName,
         identifier: AuthenticationUserIdentifier(user: username),
         password: password,
       );
+      await ref
+          .watch(SecureStorageController.provider.notifier)
+          .set(
+            sessionBackupKey,
+            json.encode(
+              SessionBackup(
+                accessToken: details.accessToken,
+                homeserver: client.homeserver!,
+                userID: details.userId,
+                deviceID: details.deviceId,
+                deviceName: deviceName,
+              ).toJson(),
+            ),
+          );
       ref.invalidateSelf();
       return true;
     } catch (_) {
