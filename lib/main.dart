@@ -3,14 +3,13 @@ import "package:nexus/controllers/client_controller.dart";
 import "package:nexus/helpers/extension_helper.dart";
 import "package:nexus/pages/home_page.dart";
 import "package:nexus/pages/login_page.dart";
-import "package:scaled_app/scaled_app.dart";
 import "package:window_manager/window_manager.dart";
 import "package:flutter/material.dart";
 import "package:dynamic_system_colors/dynamic_system_colors.dart";
 import "package:window_size/window_size.dart";
 
 void main() async {
-  ScaledWidgetsFlutterBinding.ensureInitialized(scaleFactor: (size) => 1);
+  WidgetsFlutterBinding.ensureInitialized();
 
   await windowManager.ensureInitialized();
   await windowManager.waitUntilReadyToShow(

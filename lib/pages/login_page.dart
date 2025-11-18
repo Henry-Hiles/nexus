@@ -55,24 +55,26 @@ class LoginPage extends HookConsumerWidget {
       appBar: Appbar(),
       body: Center(
         child: ConstrainedBox(
-          constraints: BoxConstraints.tight(Size.fromWidth(500)),
+          constraints: BoxConstraints(maxWidth: 600),
           child: ListView(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 48),
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 64),
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   SvgPicture.asset("assets/icon.svg"),
                   SizedBox(width: 12),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Nexus", style: theme.textTheme.displayMedium),
-                      Text(
-                        "A Simple Matrix Client",
-                        style: theme.textTheme.headlineMedium,
-                      ),
-                    ],
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Nexus", style: theme.textTheme.displayMedium),
+                        Text(
+                          "A Simple Matrix Client",
+                          style: theme.textTheme.headlineMedium,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),

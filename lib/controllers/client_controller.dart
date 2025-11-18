@@ -40,7 +40,7 @@ class ClientController extends AsyncNotifier<Client> {
         identifier: AuthenticationUserIdentifier(user: username),
         password: password,
       );
-      //TODO: refresh
+      ref.invalidateSelf();
       return true;
     } catch (_) {
       return false;

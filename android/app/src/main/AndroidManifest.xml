@@ -10,7 +10,9 @@
         android:label="Nexus"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
-        android:roundIcon="@mipmap/nexus_round">
+        android:roundIcon="@mipmap/nexus_round"
+		android:allowBackup="false"
+    	android:fullBackupContent="false">
         <activity
             android:name=".MainActivity"
             android:exported="true"
