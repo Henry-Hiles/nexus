@@ -4,6 +4,7 @@ import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/current_room_controller.dart";
 import "package:nexus/controllers/spaces_controller.dart";
 import "package:nexus/helpers/extension_helper.dart";
+import "package:nexus/pages/settings_page.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 
 class Sidebar extends HookConsumerWidget {
@@ -50,6 +51,16 @@ class Sidebar extends HookConsumerWidget {
                       )
                       .toList(),
                   selectedIndex: selectedSpace.value,
+                  trailingAtBottom: true,
+                  trailing: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                    child: IconButton(
+                      onPressed: () => Navigator.of(
+                        context,
+                      ).push(MaterialPageRoute(builder: (_) => SettingsPage())),
+                      icon: Icon(Icons.settings),
+                    ),
+                  ),
                 ),
               ),
           Expanded(

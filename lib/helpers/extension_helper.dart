@@ -20,11 +20,14 @@ extension BetterWhen<T> on AsyncValue<T> {
 }
 
 extension GetFullRoom on Room {
-  Future<FullRoom> get fullRoom async => FullRoom(
-    roomData: this,
-    title: getLocalizedDisplayname(),
-    avatar: await avatar?.getThumbnailUri(client, width: 24, height: 24),
-  );
+  Future<FullRoom> get fullRoom async {
+    await loadHeroUsers();
+    return FullRoom(
+      roomData: this,
+      title: getLocalizedDisplayname(),
+      avatar: await avatar?.getThumbnailUri(client, width: 24, height: 24),
+    );
+  }
 }
 
 extension GetHeaders on Client {
@@ -45,15 +48,7 @@ extension ToMessage on Event {
       "txnId": transactionId,
     };
 
-    if (redacted) {
-      return Message.text(
-        metadata: metadata,
-        id: eventId,
-        authorId: senderId,
-        text: "<s>This message has been redacted.</s>",
-        deletedAt: redactedBecause?.originServerTs,
-      );
-    }
+    if (redacted) return null;
 
     final asText =
         Message.text(

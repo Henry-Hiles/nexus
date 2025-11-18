@@ -2,6 +2,7 @@ analyzer:
   errors:
     invalid_annotation_target: ignore
   exclude:
+    - "build/**"
     - "**/*.g.dart"
     - "**/*.freezed.dart"
 include: package:flutter_lints/flutter.yaml

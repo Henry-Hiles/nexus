@@ -1,4 +1,5 @@
 import "dart:convert";
+import "dart:io";
 
 import "package:flutter/foundation.dart";
 import "package:matrix/matrix.dart";
@@ -59,8 +60,7 @@ class ClientController extends AsyncNotifier<Client> {
   Future<bool> login(String username, String password) async {
     final client = await future;
     try {
-      final deviceName =
-          "Nexus Client login at ${DateTime.now().toIso8601String()}";
+      final deviceName = "Nexus Client login on ${Platform.localHostname}";
       final details = await MatrixApi(homeserver: client.homeserver).login(
         LoginType.mLoginPassword,
         initialDeviceDisplayName: deviceName,
