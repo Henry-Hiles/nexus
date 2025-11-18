@@ -1,3 +1,4 @@
+import "package:collection/collection.dart";
 import "package:flutter/material.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
@@ -72,11 +73,18 @@ class Sidebar extends HookConsumerWidget {
                     return Scaffold(
                       backgroundColor: Colors.transparent,
                       appBar: AppBar(
-                        leading: AvatarOrHash(
-                          space.avatar,
-                          fallback: space.icon,
-                          space.title,
-                          headers: space.client.headers,
+                        leading: Badge(
+                          isLabelVisible:
+                              space.children.firstWhereOrNull(
+                                (room) => room.roomData.isUnread,
+                              ) !=
+                              null,
+                          child: AvatarOrHash(
+                            space.avatar,
+                            fallback: space.icon,
+                            space.title,
+                            headers: space.client.headers,
+                          ),
                         ),
                         title: Text(
                           space.title,
@@ -94,15 +102,18 @@ class Sidebar extends HookConsumerWidget {
                         destinations: space.children
                             .map(
                               (room) => NavigationRailDestination(
-                                icon: AvatarOrHash(
-                                  room.avatar,
-                                  room.title,
-                                  fallback: selectedSpace.value == 1
-                                      ? null
-                                      : Icon(Icons.numbers),
-                                  headers: space.client.headers,
-                                ),
                                 label: Text(room.title),
+                                icon: Badge(
+                                  isLabelVisible: room.roomData.isUnread,
+                                  child: AvatarOrHash(
+                                    room.avatar,
+                                    room.title,
+                                    fallback: selectedSpace.value == 1
+                                        ? null
+                                        : Icon(Icons.numbers),
+                                    headers: space.client.headers,
+                                  ),
+                                ),
                               ),
                             )
                             .toList(),

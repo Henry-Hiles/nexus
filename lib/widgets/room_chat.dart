@@ -62,6 +62,7 @@ class RoomChat extends HookConsumerWidget {
             final controllerProvider = RoomChatController.provider(
               room.roomData,
             );
+            final notifier = ref.watch(controllerProvider.notifier);
             return Scaffold(
               appBar: RoomAppbar(
                 room,
@@ -112,9 +113,8 @@ class RoomChat extends HookConsumerWidget {
                               chatAnimatedListBuilder: (_, itemBuilder) =>
                                   ChatAnimatedList(
                                     itemBuilder: itemBuilder,
-                                    onEndReached: ref
-                                        .watch(controllerProvider.notifier)
-                                        .loadOlder,
+                                    onEndReached: notifier.loadOlder,
+                                    onStartReached: () => notifier.markRead(),
                                   ),
                               composerBuilder: (_) => ChatBox(
                                 replyToMessage: replyToMessage.value,
@@ -217,9 +217,8 @@ class RoomChat extends HookConsumerWidget {
                                     ),
                                     linkPreviewData: message.linkPreviewData,
                                     onLinkPreviewDataFetched:
-                                        (linkPreviewData) => ref
-                                            .watch(controllerProvider.notifier)
-                                            .updateMessage(
+                                        (linkPreviewData) =>
+                                            notifier.updateMessage(
                                               message,
                                               message.copyWith(
                                                 linkPreviewData:
@@ -292,14 +291,13 @@ class RoomChat extends HookConsumerWidget {
                                   : SizedBox.shrink(),
                             ),
                             onMessageSend: (message) {
-                              ref
-                                  .watch(controllerProvider.notifier)
-                                  .send(message, replyTo: replyToMessage.value);
+                              notifier.send(
+                                message,
+                                replyTo: replyToMessage.value,
+                              );
                               replyToMessage.value = null;
                             },
-                            resolveUser: ref
-                                .watch(controllerProvider.notifier)
-                                .resolveUser,
+                            resolveUser: notifier.resolveUser,
                             chatController: controller,
                           ),
                         ),
