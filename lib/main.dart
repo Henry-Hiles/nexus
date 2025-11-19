@@ -28,6 +28,7 @@ class App extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => DynamicColorBuilder(
     builder: (lightDynamic, darkDynamic) => MaterialApp(
       debugShowCheckedModeBanner: false,
+      // Use indigo to work around bugs in theme generation
       theme: (lightDynamic ?? ColorScheme.fromSeed(seedColor: Colors.indigo))
           .theme,
       darkTheme:
