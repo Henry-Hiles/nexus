@@ -37,7 +37,7 @@ class CodeBlock extends StatelessWidget {
                 ],
               ),
               ColoredBox(
-                color: theme.colorScheme.surfaceContainer,
+                color: theme.colorScheme.surfaceContainerHigh,
                 child: Container(
                   constraints: BoxConstraints(minWidth: 250),
                   padding: EdgeInsets.all(8),
