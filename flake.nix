@@ -52,9 +52,11 @@
               ];
 
               env = rec {
-                LD_LIBRARY_PATH = "${pkgs.lib.makeLibraryPath ([
-                  pkgs.sqlite
-                ])}";
+                LD_LIBRARY_PATH = "${
+                  pkgs.lib.makeLibraryPath ([
+                    pkgs.sqlite
+                  ])
+                }:./build/linux/x64/debug/plugins/flutter_vodozemac";
 
                 ANDROID_HOME = "${android.androidsdk}/libexec/android-sdk";
                 ANDROID_SDK_ROOT = ANDROID_HOME;

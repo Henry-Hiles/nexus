@@ -1,7 +1,7 @@
 import "dart:convert";
 import "dart:io";
-
 import "package:flutter/foundation.dart";
+import "package:flutter_vodozemac/flutter_vodozemac.dart";
 import "package:matrix/matrix.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/secure_storage_controller.dart";
@@ -14,6 +14,7 @@ class ClientController extends AsyncNotifier<Client> {
   static const sessionBackupKey = "sessionBackup";
   @override
   Future<Client> build() async {
+    await init();
     final client = Client(
       "nexus",
       logLevel: kReleaseMode ? Level.warning : Level.verbose,
