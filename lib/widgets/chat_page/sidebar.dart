@@ -7,6 +7,7 @@ import "package:nexus/controllers/spaces_controller.dart";
 import "package:nexus/helpers/extension_helper.dart";
 import "package:nexus/pages/settings_page.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
+import "package:nexus/widgets/chat_page/unread.dart";
 
 class Sidebar extends HookConsumerWidget {
   const Sidebar({super.key});
@@ -40,12 +41,8 @@ class Sidebar extends HookConsumerWidget {
                   destinations: spaces
                       .map(
                         (space) => NavigationRailDestination(
-                          icon: Badge(
-                            smallSize: 8,
-                            backgroundColor: Theme.of(
-                              context,
-                            ).colorScheme.primary,
-                            isLabelVisible:
+                          icon: Unread(
+                            isUnread:
                                 space.children.firstWhereOrNull(
                                   (room) => room.roomData.hasNewMessages,
                                 ) !=
@@ -107,8 +104,8 @@ class Sidebar extends HookConsumerWidget {
                             .map(
                               (room) => NavigationRailDestination(
                                 label: Text(room.title),
-                                icon: Badge(
-                                  isLabelVisible: room.roomData.hasNewMessages,
+                                icon: Unread(
+                                  isUnread: room.roomData.hasNewMessages,
                                   child: AvatarOrHash(
                                     room.avatar,
                                     room.title,
