@@ -1,9 +1,9 @@
 import "package:flutter/material.dart";
-import "package:nexus/widgets/room_chat.dart";
-import "package:nexus/widgets/sidebar.dart";
+import "package:nexus/widgets/chat/room_chat.dart";
+import "package:nexus/widgets/chat/sidebar.dart";
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+class ChatPage extends StatelessWidget {
+  const ChatPage({super.key});
 
   @override
   Widget build(BuildContext context) => LayoutBuilder(

@@ -14,12 +14,12 @@ import "package:nexus/controllers/current_room_controller.dart";
 import "package:nexus/controllers/room_chat_controller.dart";
 import "package:nexus/helpers/extension_helper.dart";
 import "package:nexus/helpers/launch_helper.dart";
-import "package:nexus/widgets/chat_box.dart";
-import "package:nexus/widgets/code_block.dart";
-import "package:nexus/widgets/member_list.dart";
-import "package:nexus/widgets/room_appbar.dart";
-import "package:nexus/widgets/spoiler_text.dart";
-import "package:nexus/widgets/top_widget.dart";
+import "package:nexus/widgets/chat/chat_box.dart";
+import "package:nexus/widgets/chat/code_block.dart";
+import "package:nexus/widgets/chat/member_list.dart";
+import "package:nexus/widgets/chat/room_appbar.dart";
+import "package:nexus/widgets/chat/spoiler_text.dart";
+import "package:nexus/widgets/chat/top_widget.dart";
 import "package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart";
 
 class RoomChat extends HookConsumerWidget {
