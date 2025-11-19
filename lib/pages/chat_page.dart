@@ -1,6 +1,6 @@
 import "package:flutter/material.dart";
-import "package:nexus/widgets/chat/room_chat.dart";
-import "package:nexus/widgets/chat/sidebar.dart";
+import "package:nexus/widgets/chat_page/room_chat.dart";
+import "package:nexus/widgets/chat_page/sidebar.dart";
 
 class ChatPage extends StatelessWidget {
   const ChatPage({super.key});

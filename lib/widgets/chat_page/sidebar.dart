@@ -40,11 +40,22 @@ class Sidebar extends HookConsumerWidget {
                   destinations: spaces
                       .map(
                         (space) => NavigationRailDestination(
-                          icon: AvatarOrHash(
-                            space.avatar,
-                            fallback: space.icon,
-                            space.title,
-                            headers: space.client.headers,
+                          icon: Badge(
+                            smallSize: 8,
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.primary,
+                            isLabelVisible:
+                                space.children.firstWhereOrNull(
+                                  (room) => room.roomData.hasNewMessages,
+                                ) !=
+                                null,
+                            child: AvatarOrHash(
+                              space.avatar,
+                              fallback: space.icon,
+                              space.title,
+                              headers: space.client.headers,
+                            ),
                           ),
                           label: Text(space.title),
                           padding: EdgeInsets.only(top: 4),
@@ -73,18 +84,11 @@ class Sidebar extends HookConsumerWidget {
                     return Scaffold(
                       backgroundColor: Colors.transparent,
                       appBar: AppBar(
-                        leading: Badge(
-                          isLabelVisible:
-                              space.children.firstWhereOrNull(
-                                (room) => room.roomData.isUnread,
-                              ) !=
-                              null,
-                          child: AvatarOrHash(
-                            space.avatar,
-                            fallback: space.icon,
-                            space.title,
-                            headers: space.client.headers,
-                          ),
+                        leading: AvatarOrHash(
+                          space.avatar,
+                          fallback: space.icon,
+                          space.title,
+                          headers: space.client.headers,
                         ),
                         title: Text(
                           space.title,
@@ -104,7 +108,7 @@ class Sidebar extends HookConsumerWidget {
                               (room) => NavigationRailDestination(
                                 label: Text(room.title),
                                 icon: Badge(
-                                  isLabelVisible: room.roomData.isUnread,
+                                  isLabelVisible: room.roomData.hasNewMessages,
                                   child: AvatarOrHash(
                                     room.avatar,
                                     room.title,

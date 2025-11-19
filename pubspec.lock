@@ -1589,7 +1589,7 @@ packages:
     source: hosted
     version: "15.0.2"
   vodozemac:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: vodozemac
       sha256: "39144e20740807731871c9248d811ed5a037b21d0aa9ffcfa630954de74139d9"
