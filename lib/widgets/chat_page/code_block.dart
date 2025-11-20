@@ -27,12 +27,10 @@ class CodeBlock extends StatelessWidget {
                       style: TextStyle(fontFamily: "monospace"),
                     ),
                   ),
-                  TextButton(
+                  TextButton.icon(
                     onPressed: () {},
-                    child: Row(
-                      spacing: 4,
-                      children: [Icon(Icons.copy), Text("Copy")],
-                    ),
+                    icon: Icon(Icons.copy),
+                    label: Text("Copy"),
                   ),
                 ],
               ),
