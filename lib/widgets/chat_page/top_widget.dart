@@ -8,12 +8,14 @@ import "package:nexus/helpers/extension_helper.dart";
 
 class TopWidget extends ConsumerWidget {
   final Message message;
+  final bool alwaysShow;
   final Map<String, String> headers;
   final MessageGroupStatus? groupStatus;
   const TopWidget(
     this.message, {
     required this.headers,
     required this.groupStatus,
+    this.alwaysShow = false,
     super.key,
   });
 
@@ -96,7 +98,7 @@ class TopWidget extends ConsumerWidget {
             ),
         SizedBox(height: 12),
       ],
-      if (groupStatus?.isFirst != false)
+      if (alwaysShow || groupStatus?.isFirst != false)
         InkWell(
           onTap: () =>
               showAboutDialog(context: context), // TODO: Show user profile

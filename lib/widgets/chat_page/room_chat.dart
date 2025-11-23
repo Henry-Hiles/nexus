@@ -250,6 +250,7 @@ class RoomChat extends HookConsumerWidget {
                                       message,
                                       headers: room.roomData.client.headers,
                                       groupStatus: groupStatus,
+                                      alwaysShow: true,
                                     ),
                                     message: message,
                                     index: index,
