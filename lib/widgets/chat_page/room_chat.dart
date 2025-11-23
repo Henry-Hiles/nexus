@@ -112,7 +112,8 @@ class RoomChat extends HookConsumerWidget {
                             builders: Builders(
                               chatAnimatedListBuilder: (_, itemBuilder) =>
                                   ChatAnimatedList(
-                                    itemBuilder: itemBuilder,
+                                    itemBuilder:
+                                        itemBuilder, // TODO: Load earlier
                                     onEndReached: notifier.loadOlder,
                                     onStartReached: () => notifier.markRead(),
                                   ),
@@ -130,7 +131,14 @@ class RoomChat extends HookConsumerWidget {
                                     MessageGroupStatus? groupStatus,
                                   }) => FlyerChatTextMessage(
                                     customWidget: HtmlWidget(
-                                      message.metadata?["formatted"],
+                                      message.metadata?["formatted"].replaceAllMapped(
+                                        RegExp(
+                                          r'(?<!href="|">)(https?:\/\/[^\s<]+)',
+                                          caseSensitive: false,
+                                        ),
+                                        (m) =>
+                                            "<a href=\"${m.group(0)!}\">${m.group(0)!}</a>",
+                                      ),
                                       customWidgetBuilder: (element) {
                                         if (element.localName == "mx-reply") {
                                           return SizedBox.shrink();
