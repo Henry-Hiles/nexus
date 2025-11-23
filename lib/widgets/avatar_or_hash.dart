@@ -25,23 +25,29 @@ class AvatarOrHash extends StatelessWidget {
       color: ColorHash(title).color,
       child: Center(child: Text(title[0])),
     );
-    return Center(
-      child: ClipRRect(
-        borderRadius: BorderRadius.all(Radius.circular(4)),
-        child: Badge(
-          isLabelVisible: hasBadge,
-          smallSize: 10,
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          child: avatar == null
-              ? fallback ?? box
-              : Image.network(
-                  avatar.toString(),
-                  headers: headers,
-                  width: height,
-                  height: height,
-                  fit: BoxFit.contain,
-                  errorBuilder: (_, _, _) => box,
-                ),
+    return SizedBox(
+      width: height,
+      height: height,
+      child: Center(
+        child: ClipRRect(
+          borderRadius: BorderRadius.all(Radius.circular(4)),
+          child: Badge(
+            isLabelVisible: hasBadge,
+            smallSize: 10,
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            child: SizedBox(
+              width: height,
+              height: height,
+              child: avatar == null
+                  ? fallback ?? box
+                  : Image.network(
+                      avatar.toString(),
+                      headers: headers,
+                      fit: BoxFit.contain,
+                      errorBuilder: (_, _, _) => box,
+                    ),
+            ),
+          ),
         ),
       ),
     );
