@@ -35,6 +35,7 @@ key.properties
 
 # Generated Files
 *.g.dart
+*.freezed.dart
 
 # Devel Password
 password.txt
