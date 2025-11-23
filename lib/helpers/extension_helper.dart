@@ -40,12 +40,23 @@ extension ToMessage on Event {
         ? relationshipEventId
         : null;
     final sender = (await fetchSenderUser()) ?? senderFromMemoryOrFallback;
+
+    final newContent = content["m.new_content"] as Map<String, Object?>?;
     final metadata = {
-      "formatted": formattedText.isEmpty ? body : formattedText,
+      "formatted":
+          newContent?["formatted_body"] ??
+          newContent?["body"] ??
+          (formattedText.isEmpty ? this.body : formattedText),
       "eventType": type,
       "displayName": sender.displayName ?? sender.id,
       "txnId": transactionId,
     };
+
+    final editedAt = relationshipType == RelationshipTypes.edit
+        ? originServerTs
+        : null;
+    final body = newContent?["body"] as String? ?? this.body;
+    final eventId = relationshipEventId ?? this.eventId;
 
     if (redacted) return null;
 
@@ -57,6 +68,7 @@ extension ToMessage on Event {
               text: body,
               replyToMessageId: replyId,
               deliveredAt: originServerTs,
+              editedAt: editedAt,
             )
             as TextMessage;
 

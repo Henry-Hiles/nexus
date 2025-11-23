@@ -19,17 +19,28 @@ class RoomChatController extends AsyncNotifier<ChatController> {
         if (event.roomId != room.id) return;
         final message = await event.toMessage();
         if (message != null) {
-          await insertMessage(message);
+          if (event.relationshipType == RelationshipTypes.edit) {
+            final controller = await future;
+            final oldMessage = controller.messages.firstWhereOrNull(
+              (element) => element.id == event.relationshipEventId,
+            );
+            if (oldMessage == null) return;
+            await updateMessage(oldMessage, message);
+          } else {
+            await insertMessage(message);
+          }
         }
       }).cancel,
     );
-
     return InMemoryChatController(
-      messages: (await Future.wait(
-        response.chunk.map(
-          (event) => Event.fromMatrixEvent(event, room).toMessage(),
-        ),
-      )).nonNulls.toList().reversed.toList(),
+      messages: {
+        for (var msg in (await Future.wait(
+          response.chunk.map(
+            (event) => Event.fromMatrixEvent(event, room).toMessage(),
+          ),
+        )).nonNulls.toList().reversed.toList())
+          msg.id: msg,
+      }.values.toList(),
     );
   }
 

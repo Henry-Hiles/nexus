@@ -136,13 +136,16 @@ class RoomChat extends HookConsumerWidget {
                                   }) => FlyerChatTextMessage(
                                     customWidget: HtmlWidget(
                                       message.metadata?["formatted"].replaceAllMapped(
-                                        RegExp(
-                                          r'(?<!href="|">)(https?:\/\/[^\s<]+)',
-                                          caseSensitive: false,
-                                        ),
-                                        (m) =>
-                                            "<a href=\"${m.group(0)!}\">${m.group(0)!}</a>",
-                                      ),
+                                            RegExp(
+                                              r'(?<!href="|">)(https?:\/\/[^\s<]+)',
+                                              caseSensitive: false,
+                                            ),
+                                            (m) =>
+                                                "<a href=\"${m.group(0)!}\">${m.group(0)!}</a>",
+                                          ) +
+                                          ((message.editedAt != null)
+                                              ? "<sub edited>(edited)</sub>"
+                                              : ""),
                                       customWidgetBuilder: (element) {
                                         if (element.localName == "mx-reply") {
                                           return SizedBox.shrink();
@@ -193,11 +196,17 @@ class RoomChat extends HookConsumerWidget {
                                                     "color",
                                                     value,
                                                   ),
+
                                                   "data-mx-bg-color" =>
                                                     MapEntry(
                                                       "background-color",
                                                       value,
                                                     ),
+
+                                                  "edited" => MapEntry(
+                                                    "display",
+                                                    "block",
+                                                  ),
                                                   _ => null,
                                                 },
                                               )
