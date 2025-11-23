@@ -21,6 +21,7 @@ import "package:nexus/widgets/chat_page/room_appbar.dart";
 import "package:nexus/widgets/chat_page/spoiler_text.dart";
 import "package:nexus/widgets/chat_page/top_widget.dart";
 import "package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart";
+import "package:nexus/widgets/loading.dart";
 
 class RoomChat extends HookConsumerWidget {
   final bool isDesktop;
@@ -110,12 +111,15 @@ class RoomChat extends HookConsumerWidget {
                                   onTap: () => replyToMessage.value = message,
                                 ),
                             builders: Builders(
+                              loadMoreBuilder: (_) => Loading(),
                               chatAnimatedListBuilder: (_, itemBuilder) =>
                                   ChatAnimatedList(
                                     itemBuilder:
                                         itemBuilder, // TODO: Load earlier
                                     onEndReached: notifier.loadOlder,
-                                    onStartReached: () => notifier.markRead(),
+                                    onStartReached: () async {
+                                      notifier.markRead();
+                                    },
                                   ),
                               composerBuilder: (_) => ChatBox(
                                 replyToMessage: replyToMessage.value,

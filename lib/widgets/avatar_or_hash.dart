@@ -29,12 +29,13 @@ class AvatarOrHash extends StatelessWidget {
       width: height,
       height: height,
       child: Center(
-        child: ClipRRect(
-          borderRadius: BorderRadius.all(Radius.circular(4)),
-          child: Badge(
-            isLabelVisible: hasBadge,
-            smallSize: 10,
-            backgroundColor: Theme.of(context).colorScheme.primary,
+        child: Badge(
+          isLabelVisible: hasBadge,
+          label: SizedBox.shrink(),
+          offset: Offset(8, -8),
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          child: ClipRRect(
+            borderRadius: BorderRadius.all(Radius.circular(4)),
             child: SizedBox(
               width: height,
               height: height,

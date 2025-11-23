@@ -65,6 +65,7 @@ extension ToMessage on Event {
     return switch (type) {
       EventTypes.Encrypted => asText.copyWith(
         text: "Unable to decrypt message.",
+        metadata: {"formatted": "Unable to decrypt message.", ...metadata},
       ),
       EventTypes.Message => switch (messageType) {
         MessageTypes.Image => Message.image(
