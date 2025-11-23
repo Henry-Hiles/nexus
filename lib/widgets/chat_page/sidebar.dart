@@ -66,11 +66,31 @@ class Sidebar extends HookConsumerWidget {
                   trailingAtBottom: true,
                   trailing: Padding(
                     padding: EdgeInsets.symmetric(vertical: 16),
-                    child: IconButton(
-                      onPressed: () => Navigator.of(
-                        context,
-                      ).push(MaterialPageRoute(builder: (_) => SettingsPage())),
-                      icon: Icon(Icons.settings),
+                    child: Column(
+                      spacing: 8,
+                      children: [
+                        IconButton(
+                          onPressed: () => Navigator.of(context).push(
+                            // TODO: join or create room/space
+                            MaterialPageRoute(builder: (_) => SettingsPage()),
+                          ),
+                          icon: Icon(Icons.add),
+                        ),
+                        IconButton(
+                          onPressed: () => Navigator.of(context).push(
+                            // TODO: explore public rooms/spaces
+                            MaterialPageRoute(builder: (_) => SettingsPage()),
+                          ),
+                          icon: Icon(Icons.explore),
+                        ),
+                        IconButton(
+                          onPressed: () => Navigator.of(context).push(
+                            // TODO: explore public rooms/spaces
+                            MaterialPageRoute(builder: (_) => SettingsPage()),
+                          ),
+                          icon: Icon(Icons.settings),
+                        ),
+                      ],
                     ),
                   ),
                 ),
