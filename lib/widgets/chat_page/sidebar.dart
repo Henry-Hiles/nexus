@@ -1,8 +1,9 @@
 import "package:collection/collection.dart";
 import "package:flutter/material.dart";
-import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/current_room_controller.dart";
+import "package:nexus/controllers/selected_room_controller.dart";
+import "package:nexus/controllers/selected_space_controller.dart";
 import "package:nexus/controllers/spaces_controller.dart";
 import "package:nexus/helpers/extension_helper.dart";
 import "package:nexus/pages/settings_page.dart";
@@ -14,8 +15,13 @@ class Sidebar extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final selectedSpace = useState(0);
-    final selectedRoom = useState(0);
+    final selectedSpaceProvider = SelectedSpaceController.provider;
+    final selectedSpace = ref.watch(selectedSpaceProvider);
+    final selectedSpaceNotifier = ref.watch(selectedSpaceProvider.notifier);
+
+    final selectedRoomController = SelectedRoomController.provider;
+    final selectedRoom = ref.watch(selectedRoomController);
+    final selectedRoomNotifier = ref.watch(selectedRoomController.notifier);
 
     return Drawer(
       shape: Border(),
@@ -32,11 +38,11 @@ class Sidebar extends HookConsumerWidget {
                 data: (spaces) => NavigationRail(
                   scrollable: true,
                   onDestinationSelected: (value) {
-                    selectedSpace.value = value;
-                    selectedRoom.value = 0;
+                    selectedRoomNotifier.set(0);
+                    selectedSpaceNotifier.set(value);
                     ref
                         .watch(CurrentRoomController.provider.notifier)
-                        .set(spaces[selectedSpace.value].children[0]);
+                        .set(spaces[value].children[0]);
                   },
                   destinations: spaces
                       .map(
@@ -59,7 +65,7 @@ class Sidebar extends HookConsumerWidget {
                         ),
                       )
                       .toList(),
-                  selectedIndex: selectedSpace.value,
+                  selectedIndex: selectedSpace,
                   trailingAtBottom: true,
                   trailing: Padding(
                     padding: EdgeInsets.symmetric(vertical: 16),
@@ -77,7 +83,7 @@ class Sidebar extends HookConsumerWidget {
                 .watch(SpacesController.provider)
                 .betterWhen(
                   data: (spaces) {
-                    final space = spaces[selectedSpace.value];
+                    final space = spaces[selectedSpace];
                     return Scaffold(
                       backgroundColor: Colors.transparent,
                       appBar: AppBar(
@@ -99,7 +105,7 @@ class Sidebar extends HookConsumerWidget {
                         extended: true,
                         selectedIndex: space.children.isEmpty
                             ? null
-                            : selectedRoom.value,
+                            : selectedRoom,
                         destinations: space.children
                             .map(
                               (room) => NavigationRailDestination(
@@ -109,7 +115,7 @@ class Sidebar extends HookConsumerWidget {
                                   child: AvatarOrHash(
                                     room.avatar,
                                     room.title,
-                                    fallback: selectedSpace.value == 1
+                                    fallback: selectedSpace == 1
                                         ? null
                                         : Icon(Icons.numbers),
                                     headers: space.client.headers,
@@ -119,7 +125,7 @@ class Sidebar extends HookConsumerWidget {
                             )
                             .toList(),
                         onDestinationSelected: (value) {
-                          selectedRoom.value = value;
+                          selectedRoomNotifier.set(value);
                           ref
                               .watch(CurrentRoomController.provider.notifier)
                               .set(space.children[value]);

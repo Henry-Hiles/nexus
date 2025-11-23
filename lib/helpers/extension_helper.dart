@@ -39,12 +39,11 @@ extension ToMessage on Event {
     final replyId = relationshipType == RelationshipTypes.reply
         ? relationshipEventId
         : null;
+    final sender = (await fetchSenderUser()) ?? senderFromMemoryOrFallback;
     final metadata = {
       "formatted": formattedText.isEmpty ? body : formattedText,
       "eventType": type,
-      "displayName":
-          senderFromMemoryOrFallback.displayName ??
-          senderFromMemoryOrFallback.id,
+      "displayName": sender.displayName ?? sender.id,
       "txnId": transactionId,
     };
 
