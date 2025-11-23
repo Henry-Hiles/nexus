@@ -8,7 +8,6 @@ import "package:nexus/controllers/spaces_controller.dart";
 import "package:nexus/helpers/extension_helper.dart";
 import "package:nexus/pages/settings_page.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
-import "package:nexus/widgets/chat_page/unread.dart";
 
 class Sidebar extends HookConsumerWidget {
   const Sidebar({super.key});
@@ -47,18 +46,16 @@ class Sidebar extends HookConsumerWidget {
                   destinations: spaces
                       .map(
                         (space) => NavigationRailDestination(
-                          icon: Unread(
-                            isUnread:
+                          icon: AvatarOrHash(
+                            space.avatar,
+                            fallback: space.icon,
+                            space.title,
+                            headers: space.client.headers,
+                            hasBadge:
                                 space.children.firstWhereOrNull(
                                   (room) => room.roomData.hasNewMessages,
                                 ) !=
                                 null,
-                            child: AvatarOrHash(
-                              space.avatar,
-                              fallback: space.icon,
-                              space.title,
-                              headers: space.client.headers,
-                            ),
                           ),
                           label: Text(space.title),
                           padding: EdgeInsets.only(top: 4),
@@ -110,16 +107,14 @@ class Sidebar extends HookConsumerWidget {
                             .map(
                               (room) => NavigationRailDestination(
                                 label: Text(room.title),
-                                icon: Unread(
-                                  isUnread: room.roomData.hasNewMessages,
-                                  child: AvatarOrHash(
-                                    room.avatar,
-                                    room.title,
-                                    fallback: selectedSpace == 1
-                                        ? null
-                                        : Icon(Icons.numbers),
-                                    headers: space.client.headers,
-                                  ),
+                                icon: AvatarOrHash(
+                                  hasBadge: room.roomData.hasNewMessages,
+                                  room.avatar,
+                                  room.title,
+                                  fallback: selectedSpace == 1
+                                      ? null
+                                      : Icon(Icons.numbers),
+                                  headers: space.client.headers,
                                 ),
                               ),
                             )

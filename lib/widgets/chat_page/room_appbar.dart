@@ -26,7 +26,7 @@ class RoomAppbar extends StatelessWidget implements PreferredSizeWidget {
         ? AvatarOrHash(
             room.avatar,
             room.title,
-            height: 32,
+            height: 24,
             fallback: Icon(Icons.numbers),
             headers: room.roomData.client.headers,
           )
