@@ -33,14 +33,7 @@ class RoomChatController extends AsyncNotifier<ChatController> {
       }).cancel,
     );
     return InMemoryChatController(
-      messages: {
-        for (var msg in (await Future.wait(
-          response.chunk.map(
-            (event) => Event.fromMatrixEvent(event, room).toMessage(),
-          ),
-        )).nonNulls.toList().reversed.toList())
-          msg.id: msg,
-      }.values.toList(),
+      messages: await response.chunk.toMessages(room),
     );
   }
 
@@ -63,12 +56,9 @@ class RoomChatController extends AsyncNotifier<ChatController> {
     final response = await ref
         .watch(EventsController.provider(room).notifier)
         .prev();
+
     await controller.insertAllMessages(
-      (await Future.wait(
-        response.chunk.map(
-          (event) => Event.fromMatrixEvent(event, room).toMessage(),
-        ),
-      )).nonNulls.toList().reversed.toList(),
+      await response.chunk.toMessages(room),
       index: 0,
     );
   }

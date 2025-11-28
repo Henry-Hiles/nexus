@@ -56,7 +56,9 @@ extension ToMessage on Event {
         ? originServerTs
         : null;
     final body = newContent?["body"] as String? ?? this.body;
-    final eventId = relationshipEventId ?? this.eventId;
+    final eventId = editedAt == null
+        ? this.eventId
+        : relationshipEventId ?? this.eventId;
 
     if (redacted) return null;
 
@@ -139,4 +141,16 @@ extension ToTheme on ColorScheme {
       border: OutlineInputBorder(),
     ),
   );
+}
+
+extension ToMessages on List<MatrixEvent> {
+  Future<List<Message>> toMessages(Room room) async {
+    final messages = await Future.wait(
+      map((event) => Event.fromMatrixEvent(event, room).toMessage()),
+    );
+
+    return {
+      for (var msg in messages.nonNulls.toList().reversed.toList()) msg.id: msg,
+    }.values.toList();
+  }
 }

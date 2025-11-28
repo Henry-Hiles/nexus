@@ -32,25 +32,27 @@ class TopWidget extends ConsumerWidget {
                 if (replyMessage == null) return SizedBox.shrink();
 
                 // Black magic to limit reply preview length
-                final replyText = message is TextMessage
+                final smallerText = message is TextMessage
                     ? replyMessage.text.substring(
                         0,
                         min(
                           max(
-                            min(
-                              max(
-                                (message as TextMessage).text.length - 20,
-                                message.metadata?["displayName"].length,
-                              ),
-                              replyMessage.text.length,
+                            max(
+                              (message as TextMessage).text.length - 20,
+                              message.metadata?["displayName"].length,
                             ),
                             5,
                           ),
                           replyMessage.text.length,
                         ),
                       )
-                    : replyMessage.text;
+                    : null;
+                final replyText = (smallerText == null)
+                    ? replyMessage.text
+                    : "$smallerText...";
+
                 return InkWell(
+                  // TODO: Scroll to original message
                   onTap: () => showAboutDialog(context: context),
                   child: Container(
                     decoration: BoxDecoration(
