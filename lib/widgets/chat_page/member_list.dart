@@ -3,7 +3,8 @@ import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:matrix/matrix.dart";
 import "package:nexus/controllers/avatar_controller.dart";
 import "package:nexus/controllers/members_controller.dart";
-import "package:nexus/helpers/extension_helper.dart";
+import "package:nexus/helpers/extensions/better_when.dart";
+import "package:nexus/helpers/extensions/get_headers.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 
 class MemberList extends ConsumerWidget {

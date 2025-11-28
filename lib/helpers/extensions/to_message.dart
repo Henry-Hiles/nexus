@@ -1,38 +1,5 @@
-import "package:flutter/material.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
-import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:matrix/matrix.dart";
-import "package:nexus/models/full_room.dart";
-import "package:nexus/widgets/error_dialog.dart";
-import "package:nexus/widgets/loading.dart";
-
-extension BetterWhen<T> on AsyncValue<T> {
-  Widget betterWhen({
-    required Widget Function(T value) data,
-    Widget Function() loading = Loading.new,
-    bool skipLoadingOnRefresh = false,
-  }) => when(
-    data: data,
-    error: (error, stackTrace) => ErrorDialog(error, stackTrace),
-    loading: loading,
-    skipLoadingOnRefresh: skipLoadingOnRefresh,
-  );
-}
-
-extension GetFullRoom on Room {
-  Future<FullRoom> get fullRoom async {
-    await loadHeroUsers();
-    return FullRoom(
-      roomData: this,
-      title: getLocalizedDisplayname(),
-      avatar: await avatar?.getThumbnailUri(client, width: 24, height: 24),
-    );
-  }
-}
-
-extension GetHeaders on Client {
-  Map<String, String> get headers => {"authorization": "Bearer $accessToken"};
-}
 
 extension ToMessage on Event {
   Future<Message?> toMessage({bool mustBeText = false}) async {
@@ -127,30 +94,5 @@ extension ToMessage on Event {
         replyToMessageId: replyId,
       ),
     };
-  }
-}
-
-extension ToTheme on ColorScheme {
-  ThemeData get theme => ThemeData.from(colorScheme: this).copyWith(
-    cardTheme: CardThemeData(color: primaryContainer),
-    appBarTheme: AppBarTheme(
-      titleSpacing: 0,
-      backgroundColor: surfaceContainerLow,
-    ),
-    inputDecorationTheme: const InputDecorationTheme(
-      border: OutlineInputBorder(),
-    ),
-  );
-}
-
-extension ToMessages on List<MatrixEvent> {
-  Future<List<Message>> toMessages(Room room) async {
-    final messages = await Future.wait(
-      map((event) => Event.fromMatrixEvent(event, room).toMessage()),
-    );
-
-    return {
-      for (var msg in messages.nonNulls.toList().reversed.toList()) msg.id: msg,
-    }.values.toList();
   }
 }

@@ -5,7 +5,8 @@ import "package:nexus/controllers/current_room_controller.dart";
 import "package:nexus/controllers/selected_room_controller.dart";
 import "package:nexus/controllers/selected_space_controller.dart";
 import "package:nexus/controllers/spaces_controller.dart";
-import "package:nexus/helpers/extension_helper.dart";
+import "package:nexus/helpers/extensions/better_when.dart";
+import "package:nexus/helpers/extensions/get_headers.dart";
 import "package:nexus/pages/settings_page.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 

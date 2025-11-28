@@ -50,7 +50,10 @@ dependencies:
     git:
       url: https://github.com/Henry-Hiles/flutter_chat_ui
       path: packages/flutter_chat_ui
-  flutter_link_previewer: ^4.1.2
+  flutter_link_previewer:
+    git:
+      url: https://github.com/Henry-Hiles/flutter_chat_ui
+      path: packages/flutter_link_previewer
   matrix: ^3.0.2
   sqflite_common_ffi: ^2.3.6
   color_hash: ^1.0.1

@@ -4,7 +4,8 @@ import "package:flutter_chat_core/flutter_chat_core.dart" as chat;
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:matrix/matrix.dart";
 import "package:nexus/controllers/events_controller.dart";
-import "package:nexus/helpers/extension_helper.dart";
+import "package:nexus/helpers/extensions/to_message.dart";
+import "package:nexus/helpers/extensions/to_messages.dart";
 
 class RoomChatController extends AsyncNotifier<ChatController> {
   final Room room;
@@ -32,6 +33,7 @@ class RoomChatController extends AsyncNotifier<ChatController> {
         }
       }).cancel,
     );
+
     return InMemoryChatController(
       messages: await response.chunk.toMessages(room),
     );

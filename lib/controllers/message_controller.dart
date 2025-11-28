@@ -1,7 +1,7 @@
 import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/current_room_controller.dart";
-import "package:nexus/helpers/extension_helper.dart";
+import "package:nexus/helpers/extensions/to_message.dart";
 
 class MessageController extends AsyncNotifier<TextMessage?> {
   final String id;

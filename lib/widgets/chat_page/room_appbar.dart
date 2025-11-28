@@ -1,5 +1,5 @@
 import "package:flutter/material.dart";
-import "package:nexus/helpers/extension_helper.dart";
+import "package:nexus/helpers/extensions/get_headers.dart";
 import "package:nexus/models/full_room.dart";
 import "package:nexus/widgets/appbar.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";

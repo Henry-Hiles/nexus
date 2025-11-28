@@ -12,7 +12,8 @@ import "package:flyer_chat_text_message/flyer_chat_text_message.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/current_room_controller.dart";
 import "package:nexus/controllers/room_chat_controller.dart";
-import "package:nexus/helpers/extension_helper.dart";
+import "package:nexus/helpers/extensions/better_when.dart";
+import "package:nexus/helpers/extensions/get_headers.dart";
 import "package:nexus/helpers/launch_helper.dart";
 import "package:nexus/widgets/chat_page/chat_box.dart";
 import "package:nexus/widgets/chat_page/code_block.dart";
@@ -36,20 +37,34 @@ class RoomChat extends HookConsumerWidget {
     required BuildContext context,
     required Offset globalPosition,
     required VoidCallback onTap,
-  }) => showMenu(
-    context: context,
-    position: RelativeRect.fromRect(
-      Rect.fromPoints(globalPosition, globalPosition),
-      Offset.zero & (context.findRenderObject() as RenderBox).size,
-    ),
-    color: Theme.of(context).colorScheme.surfaceContainerHighest,
-    items: [
-      PopupMenuItem(
-        onTap: onTap,
-        child: ListTile(leading: Icon(Icons.reply), title: Text("Reply")),
+  }) {
+    final overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+
+    showMenu(
+      context: context,
+      position: RelativeRect.fromLTRB(
+        globalPosition.dx,
+        globalPosition.dy,
+        overlay.size.width - globalPosition.dx,
+        overlay.size.height - globalPosition.dy,
       ),
-    ],
-  );
+      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+      items: [
+        PopupMenuItem(
+          onTap: onTap,
+          child: ListTile(leading: Icon(Icons.reply), title: Text("Reply")),
+        ),
+        PopupMenuItem(
+          onTap: onTap,
+          child: ListTile(leading: Icon(Icons.edit), title: Text("Edit")),
+        ),
+        PopupMenuItem(
+          onTap: onTap,
+          child: ListTile(leading: Icon(Icons.delete), title: Text("Delete")),
+        ),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -143,14 +158,15 @@ class RoomChat extends HookConsumerWidget {
                                     MessageGroupStatus? groupStatus,
                                   }) => FlyerChatTextMessage(
                                     customWidget: HtmlWidget(
-                                      message.metadata?["formatted"].replaceAllMapped(
-                                            RegExp(
-                                              r'(?<!href="|">)(https?:\/\/[^\s<]+)',
-                                              caseSensitive: false,
-                                            ),
-                                            (m) =>
-                                                "<a href=\"${m.group(0)!}\">${m.group(0)!}</a>",
-                                          ) +
+                                      message.metadata?["formatted"]
+                                              .replaceAllMapped(
+                                                RegExp(
+                                                  regexLink,
+                                                  caseSensitive: false,
+                                                ),
+                                                (m) =>
+                                                    "<a href=\"${m.group(0)!}\">${m.group(0)!}</a>",
+                                              ) +
                                           ((message.editedAt != null)
                                               ? "<sub edited>(edited)</sub>"
                                               : ""),

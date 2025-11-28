@@ -3,7 +3,7 @@ import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/material.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client_controller.dart";
-import "package:nexus/helpers/extension_helper.dart";
+import "package:nexus/helpers/extensions/get_full_room.dart";
 import "package:nexus/models/space.dart";
 
 class SpacesController extends AsyncNotifier<IList<Space>> {

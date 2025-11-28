@@ -4,7 +4,7 @@ import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:flutter_chat_ui/flutter_chat_ui.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/message_controller.dart";
-import "package:nexus/helpers/extension_helper.dart";
+import "package:nexus/helpers/extensions/better_when.dart";
 
 class TopWidget extends ConsumerWidget {
   final Message message;

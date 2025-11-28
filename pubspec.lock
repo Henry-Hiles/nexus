@@ -459,7 +459,7 @@ packages:
     description:
       path: "packages/flutter_chat_ui"
       ref: HEAD
-      resolved-ref: f6718923519db812762ff27eb402f70076d8676c
+      resolved-ref: bedc5d90130ad8a15b13f34f67b5b371e82cde7d
       url: "https://github.com/Henry-Hiles/flutter_chat_ui"
     source: git
     version: "2.9.1"
@@ -482,10 +482,11 @@ packages:
   flutter_link_previewer:
     dependency: "direct main"
     description:
-      name: flutter_link_previewer
-      sha256: "62520ee224515f826dd40e4ccbb95e6d65ac060fbcf94d4620ce840ee1a15b83"
-      url: "https://pub.dev"
-    source: hosted
+      path: "packages/flutter_link_previewer"
+      ref: HEAD
+      resolved-ref: bedc5d90130ad8a15b13f34f67b5b371e82cde7d
+      url: "https://github.com/Henry-Hiles/flutter_chat_ui"
+    source: git
     version: "4.1.2"
   flutter_lints:
     dependency: "direct dev"
