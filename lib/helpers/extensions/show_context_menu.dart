@@ -3,7 +3,7 @@ import "package:flutter/material.dart";
 extension ShowContextMenu on BuildContext {
   void showContextMenu({
     required Offset globalPosition,
-    required VoidCallback onTap,
+    required List<PopupMenuEntry> children,
   }) {
     final overlay = Overlay.of(this).context.findRenderObject() as RenderBox;
 
@@ -16,20 +16,7 @@ extension ShowContextMenu on BuildContext {
         overlay.size.height - globalPosition.dy,
       ),
       color: Theme.of(this).colorScheme.surfaceContainerHighest,
-      items: [
-        PopupMenuItem(
-          onTap: onTap,
-          child: ListTile(leading: Icon(Icons.reply), title: Text("Reply")),
-        ),
-        PopupMenuItem(
-          onTap: onTap,
-          child: ListTile(leading: Icon(Icons.edit), title: Text("Edit")),
-        ),
-        PopupMenuItem(
-          onTap: onTap,
-          child: ListTile(leading: Icon(Icons.delete), title: Text("Delete")),
-        ),
-      ],
+      items: children,
     );
   }
 }

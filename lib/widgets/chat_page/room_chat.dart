@@ -39,6 +39,22 @@ class RoomChat extends HookConsumerWidget {
     final replyToMessage = useState<Message?>(null);
     final memberListOpened = useState<bool>(showMembersByDefault);
     final theme = Theme.of(context);
+
+    List<PopupMenuEntry> getMessageOptions(Message message) => [
+      PopupMenuItem(
+        onTap: () => replyToMessage.value = message,
+        child: ListTile(leading: Icon(Icons.reply), title: Text("Reply")),
+      ),
+      PopupMenuItem(
+        onTap: () {},
+        child: ListTile(leading: Icon(Icons.edit), title: Text("Edit")),
+      ),
+      PopupMenuItem(
+        onTap: () {},
+        child: ListTile(leading: Icon(Icons.delete), title: Text("Delete")),
+      ),
+    ];
+
     return ref
         .watch(CurrentRoomController.provider)
         .betterWhen(
@@ -87,7 +103,7 @@ class RoomChat extends HookConsumerWidget {
                                   required index,
                                 }) => context.showContextMenu(
                                   globalPosition: details.globalPosition,
-                                  onTap: () => replyToMessage.value = message,
+                                  children: getMessageOptions(message),
                                 ),
                             onMessageLongPress:
                                 (
@@ -97,7 +113,7 @@ class RoomChat extends HookConsumerWidget {
                                   required index,
                                 }) => context.showContextMenu(
                                   globalPosition: details.globalPosition,
-                                  onTap: () => replyToMessage.value = message,
+                                  children: getMessageOptions(message),
                                 ),
                             builders: Builders(
                               loadMoreBuilder: (_) => Loading(),
