@@ -60,6 +60,14 @@ class RoomChat extends HookConsumerWidget {
         .watch(CurrentRoomController.provider)
         .betterWhen(
           data: (room) {
+            if (room == null) {
+              return Center(
+                child: Text(
+                  "Nothing to see here...",
+                  style: theme.textTheme.headlineMedium,
+                ),
+              );
+            }
             final controllerProvider = RoomChatController.provider(
               room.roomData,
             );

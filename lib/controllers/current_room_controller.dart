@@ -3,9 +3,9 @@ import "package:nexus/controllers/spaces_controller.dart";
 import "package:nexus/helpers/extension_helper.dart";
 import "package:nexus/models/full_room.dart";
 
-class CurrentRoomController extends AsyncNotifier<FullRoom> {
+class CurrentRoomController extends AsyncNotifier<FullRoom?> {
   @override
-  Future<FullRoom> build() async => (await ref.watch(
+  Future<FullRoom?> build() async => (await ref.watch(
     SpacesController.provider.future,
   ))[0].children[0].roomData.fullRoom;
 
@@ -15,7 +15,7 @@ class CurrentRoomController extends AsyncNotifier<FullRoom> {
   }
 
   static final provider =
-      AsyncNotifierProvider<CurrentRoomController, FullRoom>(
+      AsyncNotifierProvider<CurrentRoomController, FullRoom?>(
         CurrentRoomController.new,
       );
 }

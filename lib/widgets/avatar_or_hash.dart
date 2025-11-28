@@ -31,9 +31,8 @@ class AvatarOrHash extends StatelessWidget {
       child: Center(
         child: Badge(
           isLabelVisible: hasBadge,
-          label: SizedBox.shrink(),
-          offset: Offset(8, -8),
-          backgroundColor: Theme.of(context).colorScheme.primary,
+          smallSize: 8,
+          backgroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
           child: ClipRRect(
             borderRadius: BorderRadius.all(Radius.circular(4)),
             child: SizedBox(

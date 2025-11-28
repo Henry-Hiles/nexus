@@ -10,6 +10,8 @@ class MessageController extends AsyncNotifier<TextMessage?> {
   @override
   Future<TextMessage?> build() async {
     final room = await ref.watch(CurrentRoomController.provider.future);
+    if (room == null) return null;
+
     final event = await room.roomData.getEventById(id);
     return (await event?.toMessage(mustBeText: true)) as TextMessage;
   }
