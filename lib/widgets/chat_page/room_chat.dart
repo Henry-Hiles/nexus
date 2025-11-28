@@ -14,6 +14,7 @@ import "package:nexus/controllers/current_room_controller.dart";
 import "package:nexus/controllers/room_chat_controller.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
 import "package:nexus/helpers/extensions/get_headers.dart";
+import "package:nexus/helpers/extensions/show_context_menu.dart";
 import "package:nexus/helpers/launch_helper.dart";
 import "package:nexus/widgets/chat_page/chat_box.dart";
 import "package:nexus/widgets/chat_page/code_block.dart";
@@ -32,39 +33,6 @@ class RoomChat extends HookConsumerWidget {
     required this.showMembersByDefault,
     super.key,
   });
-
-  void showContextMenu({
-    required BuildContext context,
-    required Offset globalPosition,
-    required VoidCallback onTap,
-  }) {
-    final overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
-
-    showMenu(
-      context: context,
-      position: RelativeRect.fromLTRB(
-        globalPosition.dx,
-        globalPosition.dy,
-        overlay.size.width - globalPosition.dx,
-        overlay.size.height - globalPosition.dy,
-      ),
-      color: Theme.of(context).colorScheme.surfaceContainerHighest,
-      items: [
-        PopupMenuItem(
-          onTap: onTap,
-          child: ListTile(leading: Icon(Icons.reply), title: Text("Reply")),
-        ),
-        PopupMenuItem(
-          onTap: onTap,
-          child: ListTile(leading: Icon(Icons.edit), title: Text("Edit")),
-        ),
-        PopupMenuItem(
-          onTap: onTap,
-          child: ListTile(leading: Icon(Icons.delete), title: Text("Delete")),
-        ),
-      ],
-    );
-  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -117,8 +85,7 @@ class RoomChat extends HookConsumerWidget {
                                   message, {
                                   required details,
                                   required index,
-                                }) => showContextMenu(
-                                  context: context,
+                                }) => context.showContextMenu(
                                   globalPosition: details.globalPosition,
                                   onTap: () => replyToMessage.value = message,
                                 ),
@@ -128,8 +95,7 @@ class RoomChat extends HookConsumerWidget {
                                   message, {
                                   required details,
                                   required index,
-                                }) => showContextMenu(
-                                  context: context,
+                                }) => context.showContextMenu(
                                   globalPosition: details.globalPosition,
                                   onTap: () => replyToMessage.value = message,
                                 ),
