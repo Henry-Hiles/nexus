@@ -18,17 +18,27 @@ class RoomChatController extends AsyncNotifier<ChatController> {
     ref.onDispose(
       room.client.onTimelineEvent.stream.listen((event) async {
         if (event.roomId != room.id) return;
-        final message = await event.toMessage();
-        if (message != null) {
-          if (event.relationshipType == RelationshipTypes.edit) {
-            final controller = await future;
-            final oldMessage = controller.messages.firstWhereOrNull(
-              (element) => element.id == event.relationshipEventId,
-            );
-            if (oldMessage == null) return;
-            await updateMessage(oldMessage, message);
-          } else {
-            await insertMessage(message);
+
+        if (event.type == EventTypes.Redaction) {
+          final controller = await future;
+          await controller.removeMessage(
+            controller.messages.firstWhere(
+              (message) => message.id == event.redacts,
+            ),
+          );
+        } else {
+          final message = await event.toMessage();
+          if (message != null) {
+            if (event.relationshipType == RelationshipTypes.edit) {
+              final controller = await future;
+              final oldMessage = controller.messages.firstWhereOrNull(
+                (element) => element.id == event.relationshipEventId,
+              );
+              if (oldMessage == null) return;
+              await updateMessage(oldMessage, message);
+            } else {
+              await insertMessage(message);
+            }
           }
         }
       }).cancel,
@@ -51,6 +61,12 @@ class RoomChatController extends AsyncNotifier<ChatController> {
     return oldMessage == null
         ? controller.insertMessage(message)
         : controller.updateMessage(oldMessage, message);
+  }
+
+  Future<void> deleteMessage(Message message, {String? reason}) async {
+    final controller = await future;
+    await controller.removeMessage(message);
+    await room.redactEvent(message.id, reason: reason);
   }
 
   Future<void> loadOlder() async {

@@ -23,6 +23,7 @@ import "package:nexus/widgets/chat_page/room_appbar.dart";
 import "package:nexus/widgets/chat_page/spoiler_text.dart";
 import "package:nexus/widgets/chat_page/top_widget.dart";
 import "package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart";
+import "package:nexus/widgets/form_text_input.dart";
 import "package:nexus/widgets/loading.dart";
 
 class RoomChat extends HookConsumerWidget {
@@ -40,21 +41,6 @@ class RoomChat extends HookConsumerWidget {
     final memberListOpened = useState<bool>(showMembersByDefault);
     final theme = Theme.of(context);
 
-    List<PopupMenuEntry> getMessageOptions(Message message) => [
-      PopupMenuItem(
-        onTap: () => replyToMessage.value = message,
-        child: ListTile(leading: Icon(Icons.reply), title: Text("Reply")),
-      ),
-      PopupMenuItem(
-        onTap: () {},
-        child: ListTile(leading: Icon(Icons.edit), title: Text("Edit")),
-      ),
-      PopupMenuItem(
-        onTap: () {},
-        child: ListTile(leading: Icon(Icons.delete), title: Text("Delete")),
-      ),
-    ];
-
     return ref
         .watch(CurrentRoomController.provider)
         .betterWhen(
@@ -71,6 +57,76 @@ class RoomChat extends HookConsumerWidget {
               room.roomData,
             );
             final notifier = ref.watch(controllerProvider.notifier);
+
+            List<PopupMenuEntry> getMessageOptions(Message message) => [
+              PopupMenuItem(
+                onTap: () => replyToMessage.value = message,
+                child: ListTile(
+                  leading: Icon(Icons.reply),
+                  title: Text("Reply"),
+                ),
+              ),
+              if (message.authorId == room.roomData.client.userID)
+                PopupMenuItem(
+                  onTap: () {},
+                  child: ListTile(
+                    leading: Icon(Icons.edit),
+                    title: Text("Edit"),
+                  ),
+                ),
+              if (message.authorId == room.roomData.client.userID ||
+                  room.roomData.canRedact)
+                PopupMenuItem(
+                  onTap: () => showDialog(
+                    context: context,
+                    builder: (context) => HookBuilder(
+                      builder: (_) {
+                        final deleteReasonController =
+                            useTextEditingController();
+                        return AlertDialog(
+                          title: Text("Delete Message"),
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                "Are you sure you want to delete this message? This can not be reversed.",
+                              ),
+                              SizedBox(height: 12),
+                              FormTextInput(
+                                required: false,
+                                capitalize: true,
+                                controller: deleteReasonController,
+                                title: "Reason for deletion (optional)",
+                              ),
+                            ],
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: Navigator.of(context).pop,
+                              child: Text("Cancel"),
+                            ),
+                            TextButton(
+                              onPressed: () async {
+                                notifier.deleteMessage(
+                                  message,
+                                  reason: deleteReasonController.text,
+                                );
+                                Navigator.of(context).pop();
+                              },
+                              child: Text("Delete"),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+                  child: ListTile(
+                    leading: Icon(Icons.delete),
+                    title: Text("Delete"),
+                  ),
+                ),
+            ];
+
             return Scaffold(
               appBar: RoomAppbar(
                 room,
