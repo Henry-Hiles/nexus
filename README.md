@@ -101,3 +101,18 @@ Light Mode | Dark Mode
         - [ ] Password
     - [ ] About
     - [x] Log Out
+
+## Development
+Fork and clone the project, then:
+- With Nix: Either use direnv, or `nix flake develop`
+- Without Nix: Install flutter, rust, the libsecret dev packages (must be in `PKG_CONFIG_PATH`), and sqlite (must be in `LD_LIBRARY_PATH`).
+
+Build generated files, and watch for new changes:
+```sh
+flutter pub run build_runner watch --delete-conflicting-outputs
+```
+Run `flutter run` to run the app.
+
+## Community
+
+Come chat in the [Federated Nexus Community](https://matrix.to/#/#space:federated.nexus) for questions or help with developing or using Nexus Client.
