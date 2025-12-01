@@ -105,7 +105,7 @@ Light Mode | Dark Mode
 ## Development
 Fork and clone the project, then:
 - With Nix: Either use direnv, or `nix flake develop`
-- Without Nix: Install flutter, rust, the libsecret dev packages (must be in `PKG_CONFIG_PATH`), and sqlite (must be in `LD_LIBRARY_PATH`).
+- Without Nix: Install Flutter, Rust, the libsecret dev package for your distro (must be in `PKG_CONFIG_PATH`), and sqlite (must be in `LD_LIBRARY_PATH`).
 
 Build generated files, and watch for new changes:
 ```sh
