@@ -13,7 +13,8 @@ extension ToMessage on Event {
       "formatted":
           newContent?["formatted_body"] ??
           newContent?["body"] ??
-          (formattedText.isEmpty ? this.body : formattedText),
+          content["formatted_body"] ??
+          this.body,
       "eventType": type,
       "displayName": sender.displayName ?? sender.id,
       "txnId": transactionId,
