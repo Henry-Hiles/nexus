@@ -88,6 +88,7 @@ extension ToMessage on Event {
             "${senderFromMemoryOrFallback.calcDisplayname()} joined the room.",
       ),
       EventTypes.Redaction => null,
+      EventTypes.Reaction => null,
       _ => Message.unsupported(
         metadata: metadata,
         id: eventId,
