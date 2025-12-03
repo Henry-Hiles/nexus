@@ -10,7 +10,7 @@ abstract class Space with _$Space {
     required String title,
     required List<FullRoom> children,
     required Client client,
-    @Default(false) bool fake,
+    Room? roomData,
     Uri? avatar,
     Icon? icon,
   }) = _Space;

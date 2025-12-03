@@ -3,6 +3,7 @@ import "package:nexus/helpers/extensions/get_headers.dart";
 import "package:nexus/models/full_room.dart";
 import "package:nexus/widgets/appbar.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
+import "package:nexus/widgets/chat_page/room_menu.dart";
 
 class RoomAppbar extends StatelessWidget implements PreferredSizeWidget {
   final bool isDesktop;
@@ -48,10 +49,12 @@ class RoomAppbar extends StatelessWidget implements PreferredSizeWidget {
       ],
     ),
     actions: [
+      IconButton(onPressed: () {}, icon: Icon(Icons.push_pin)),
       IconButton(
         onPressed: () => onOpenMemberList(context),
         icon: Icon(Icons.people),
       ),
+      RoomMenu(room.roomData),
     ],
   );
 }

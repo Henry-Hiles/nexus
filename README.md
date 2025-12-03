@@ -79,7 +79,7 @@ A simple and user-friendly Matrix client made with Flutter and the Matrix Dart S
     -   [ ] Creating
 -   [ ] Threads
 -   [ ] Profile popouts
--   [ ] Copy link to [message, room, space]
+-   [x] Copy link to [room, space]
 -   [ ] Reporting
 -   [ ] Notifications using UnifiedPush
 -   [ ] Group calls using [MSC4195](https://github.com/matrix-org/matrix-spec-proposals/pull/4195)

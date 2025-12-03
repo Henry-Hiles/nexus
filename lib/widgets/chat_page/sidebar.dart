@@ -9,6 +9,7 @@ import "package:nexus/helpers/extensions/better_when.dart";
 import "package:nexus/helpers/extensions/get_headers.dart";
 import "package:nexus/pages/settings_page.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
+import "package:nexus/widgets/chat_page/room_menu.dart";
 
 class Sidebar extends HookConsumerWidget {
   const Sidebar({super.key});
@@ -116,6 +117,9 @@ class Sidebar extends HookConsumerWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                         backgroundColor: Colors.transparent,
+                        actions: [
+                          if (space.roomData != null) RoomMenu(space.roomData!),
+                        ],
                       ),
                       body: NavigationRail(
                         scrollable: true,
