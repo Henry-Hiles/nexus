@@ -1,9 +1,9 @@
-import "package:collection/collection.dart";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/material.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client_controller.dart";
 import "package:nexus/helpers/extensions/get_full_room.dart";
+import "package:nexus/helpers/extensions/room_to_children.dart";
 import "package:nexus/models/space.dart";
 
 class SpacesController extends AsyncNotifier<IList<Space>> {
@@ -60,16 +60,7 @@ class SpacesController extends AsyncNotifier<IList<Space>> {
             avatar: space.avatar,
             id: space.roomData.id,
             roomData: space.roomData,
-            children: await Future.wait(
-              space.roomData.spaceChildren
-                  .map(
-                    (child) => client.rooms.firstWhereOrNull(
-                      (room) => room.id == child.roomId,
-                    ),
-                  )
-                  .nonNulls
-                  .map((room) => room.fullRoom),
-            ),
+            children: await space.roomData.getAllChildren(client),
           ),
         ),
       )),

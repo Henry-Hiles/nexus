@@ -36,7 +36,7 @@ A simple and user-friendly Matrix client made with Flutter and the Matrix Dart S
         -   [ ] From space
         -   [ ] Exploring
     -   [x] Leaving
-    -   [ ] Subspaces
+    -   [x] Subspaces
 -   [x] Messages
     -   [x] Sending
         -   [x] Plain text
