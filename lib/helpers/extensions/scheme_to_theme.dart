@@ -1,6 +1,6 @@
 import "package:flutter/material.dart";
 
-extension ToTheme on ColorScheme {
+extension SchemeToTheme on ColorScheme {
   ThemeData get theme => ThemeData.from(colorScheme: this).copyWith(
     cardTheme: CardThemeData(color: primaryContainer),
     appBarTheme: AppBarTheme(

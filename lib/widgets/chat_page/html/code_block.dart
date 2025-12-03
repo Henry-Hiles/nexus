@@ -39,7 +39,10 @@ class CodeBlock extends StatelessWidget {
                 child: Container(
                   constraints: BoxConstraints(minWidth: 250),
                   padding: EdgeInsets.all(8),
-                  child: SelectableText(code),
+                  child: SelectableText(
+                    code,
+                    style: TextStyle(fontFamily: "monospace"),
+                  ),
                 ),
               ),
             ],

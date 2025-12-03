@@ -1,4 +1,3 @@
-import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
@@ -15,14 +14,11 @@ import "package:nexus/controllers/room_chat_controller.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
 import "package:nexus/helpers/extensions/get_headers.dart";
 import "package:nexus/helpers/extensions/show_context_menu.dart";
-import "package:nexus/helpers/launch_helper.dart";
 import "package:nexus/widgets/chat_page/chat_box.dart";
-import "package:nexus/widgets/chat_page/code_block.dart";
+import "package:nexus/widgets/chat_page/html/html.dart";
 import "package:nexus/widgets/chat_page/member_list.dart";
 import "package:nexus/widgets/chat_page/room_appbar.dart";
-import "package:nexus/widgets/chat_page/spoiler_text.dart";
 import "package:nexus/widgets/chat_page/top_widget.dart";
-import "package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart";
 import "package:nexus/widgets/form_text_input.dart";
 import "package:nexus/widgets/loading.dart";
 
@@ -175,8 +171,7 @@ class RoomChat extends HookConsumerWidget {
                               loadMoreBuilder: (_) => Loading(),
                               chatAnimatedListBuilder: (_, itemBuilder) =>
                                   ChatAnimatedList(
-                                    itemBuilder:
-                                        itemBuilder, // TODO: Load earlier
+                                    itemBuilder: itemBuilder,
                                     onEndReached: notifier.loadOlder,
                                     onStartReached: () async {
                                       notifier.markRead();
@@ -195,7 +190,7 @@ class RoomChat extends HookConsumerWidget {
                                     required bool isSentByMe,
                                     MessageGroupStatus? groupStatus,
                                   }) => FlyerChatTextMessage(
-                                    customWidget: HtmlWidget(
+                                    customWidget: Html(
                                       message.metadata?["formatted"]
                                               .replaceAllMapped(
                                                 RegExp(
@@ -208,76 +203,6 @@ class RoomChat extends HookConsumerWidget {
                                           ((message.editedAt != null)
                                               ? "<sub edited>(edited)</sub>"
                                               : ""),
-                                      customWidgetBuilder: (element) {
-                                        if (element.localName == "mx-reply") {
-                                          return SizedBox.shrink();
-                                        }
-                                        if (element.localName == "code") {
-                                          if (element.parent?.localName ==
-                                              "pre") {
-                                            return CodeBlock(
-                                              element.text,
-                                              lang: element.className
-                                                  .replaceAll("language-", ""),
-                                            );
-                                          }
-                                        }
-                                        if (element.localName == "img") {
-                                          final src = Uri.tryParse(
-                                            element.attributes["src"] ?? "",
-                                          );
-                                          if (src?.scheme != "mxc") {
-                                            return SizedBox.shrink();
-                                          }
-
-                                          // TODO: Should do something like:
-                                          // return Image.network(
-                                          //   src!.getThumbnailUri(
-                                          //     room.roomData.client,
-                                          //   ),
-                                          // );
-
-                                          return SizedBox.shrink();
-                                        }
-                                        if (element.attributes.keys.contains(
-                                          "data-mx-spoiler",
-                                        )) {
-                                          return SpoilerText(
-                                            text: element.text,
-                                          );
-                                        }
-                                        return null;
-                                      },
-                                      customStylesBuilder: (element) => {
-                                        "width": "auto",
-                                        ...Map.fromEntries(
-                                          element.attributes
-                                              .mapTo<MapEntry<String, String>?>(
-                                                (key, value) => switch (key) {
-                                                  "data-mx-color" => MapEntry(
-                                                    "color",
-                                                    value,
-                                                  ),
-
-                                                  "data-mx-bg-color" =>
-                                                    MapEntry(
-                                                      "background-color",
-                                                      value,
-                                                    ),
-
-                                                  "edited" => MapEntry(
-                                                    "display",
-                                                    "block",
-                                                  ),
-                                                  _ => null,
-                                                },
-                                              )
-                                              .nonNulls,
-                                        ),
-                                      },
-                                      onTapUrl: (url) => ref
-                                          .watch(LaunchHelper.provider)
-                                          .launchUrl(Uri.parse(url)),
                                     ),
                                     topWidget: TopWidget(
                                       message,

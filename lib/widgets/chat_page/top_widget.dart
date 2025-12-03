@@ -5,6 +5,7 @@ import "package:flutter_chat_ui/flutter_chat_ui.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/message_controller.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
+import "package:nexus/widgets/chat_page/quoted.dart";
 
 class TopWidget extends ConsumerWidget {
   final Message message;
@@ -54,45 +55,34 @@ class TopWidget extends ConsumerWidget {
                 return InkWell(
                   // TODO: Scroll to original message
                   onTap: () => showAboutDialog(context: context),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border(
-                        left: BorderSide(
-                          width: 4,
-                          color: Theme.of(context).dividerColor,
+                  child: Quoted(
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      spacing: 8,
+                      children: [
+                        Avatar(
+                          userId: replyMessage.authorId,
+                          headers: headers,
+                          size: 16,
                         ),
-                      ),
-                    ),
-                    child: Padding(
-                      padding: EdgeInsets.only(left: 8),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        spacing: 8,
-                        children: [
-                          Avatar(
-                            userId: replyMessage.authorId,
-                            headers: headers,
-                            size: 16,
+                        Flexible(
+                          child: Text(
+                            replyMessage.metadata?["displayName"] ??
+                                replyMessage.authorId,
+                            style: Theme.of(context).textTheme.labelMedium
+                                ?.copyWith(fontWeight: FontWeight.bold),
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          Flexible(
-                            child: Text(
-                              replyMessage.metadata?["displayName"] ??
-                                  replyMessage.authorId,
-                              style: Theme.of(context).textTheme.labelMedium
-                                  ?.copyWith(fontWeight: FontWeight.bold),
-                              overflow: TextOverflow.ellipsis,
-                            ),
+                        ),
+                        Flexible(
+                          child: Text(
+                            replyText,
+                            overflow: TextOverflow.ellipsis,
+                            style: Theme.of(context).textTheme.labelMedium,
+                            maxLines: 1,
                           ),
-                          Flexible(
-                            child: Text(
-                              replyText,
-                              overflow: TextOverflow.ellipsis,
-                              style: Theme.of(context).textTheme.labelMedium,
-                              maxLines: 1,
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 );

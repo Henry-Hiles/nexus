@@ -1,7 +1,7 @@
 import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:matrix/matrix.dart";
 
-extension ToMessage on Event {
+extension EventToMessage on Event {
   Future<Message?> toMessage({bool mustBeText = false}) async {
     final replyId = relationshipType == RelationshipTypes.reply
         ? relationshipEventId

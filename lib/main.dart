@@ -1,7 +1,7 @@
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client_controller.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
-import "package:nexus/helpers/extensions/to_theme.dart";
+import "package:nexus/helpers/extensions/scheme_to_theme.dart";
 import "package:nexus/pages/chat_page.dart";
 import "package:nexus/pages/login_page.dart";
 import "package:window_manager/window_manager.dart";
