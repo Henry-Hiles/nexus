@@ -1,12 +1,22 @@
+import "package:collection/collection.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
+import "package:nexus/controllers/key_controller.dart";
+import "package:nexus/controllers/spaces_controller.dart";
+import "package:nexus/models/space.dart";
 
-class SelectedSpaceController extends Notifier<int> {
+class SelectedSpaceController extends AsyncNotifier<Space> {
   @override
-  int build() => 0;
+  Future<Space> build() async {
+    final spaces = await ref.watch(SpacesController.provider.future);
+    final selectedSpaceId = ref.watch(
+      KeyController.provider(KeyController.spaceKey),
+    );
 
-  void set(int value) => state = value;
+    return spaces.firstWhereOrNull((space) => space.id == selectedSpaceId) ??
+        spaces.first;
+  }
 
-  static final provider = NotifierProvider<SelectedSpaceController, int>(
+  static final provider = AsyncNotifierProvider<SelectedSpaceController, Space>(
     SelectedSpaceController.new,
   );
 }

@@ -11,6 +11,10 @@ class SpacesController extends AsyncNotifier<IList<Space>> {
   Future<IList<Space>> build() async {
     final client = await ref.watch(ClientController.provider.future);
 
+    ref.onDispose(
+      client.onSync.stream.listen((_) => ref.invalidateSelf()).cancel,
+    );
+
     final topLevel = await Future.wait(
       client.rooms
           .where((room) => !room.isDirectChat)
@@ -33,12 +37,14 @@ class SpacesController extends AsyncNotifier<IList<Space>> {
       Space(
         client: client,
         title: "Home",
+        id: "home",
         children: topLevelRooms,
         icon: Icon(Icons.home),
       ),
       Space(
         client: client,
         title: "Direct Messages",
+        id: "dms",
         children: await Future.wait(
           client.rooms
               .where((room) => room.isDirectChat)
@@ -52,6 +58,7 @@ class SpacesController extends AsyncNotifier<IList<Space>> {
             client: client,
             title: space.title,
             avatar: space.avatar,
+            id: space.roomData.id,
             roomData: space.roomData,
             children: await Future.wait(
               space.roomData.spaceChildren

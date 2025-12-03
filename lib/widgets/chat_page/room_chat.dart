@@ -1,4 +1,3 @@
-import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:flutter_chat_ui/flutter_chat_ui.dart";
@@ -9,7 +8,7 @@ import "package:flyer_chat_image_message/flyer_chat_image_message.dart";
 import "package:flyer_chat_system_message/flyer_chat_system_message.dart";
 import "package:flyer_chat_text_message/flyer_chat_text_message.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
-import "package:nexus/controllers/current_room_controller.dart";
+import "package:nexus/controllers/selected_room_controller.dart";
 import "package:nexus/controllers/room_chat_controller.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
 import "package:nexus/helpers/extensions/get_headers.dart";
@@ -38,7 +37,7 @@ class RoomChat extends HookConsumerWidget {
     final theme = Theme.of(context);
 
     return ref
-        .watch(CurrentRoomController.provider)
+        .watch(SelectedRoomController.provider)
         .betterWhen(
           data: (room) {
             if (room == null) {
@@ -291,13 +290,12 @@ class RoomChat extends HookConsumerWidget {
                                     index, {
                                     required bool isSentByMe,
                                     MessageGroupStatus? groupStatus,
-                                  }) => kDebugMode
-                                  ? Text(
-                                      "${message.authorId} sent ${message.metadata?["eventType"]}",
-                                      style: theme.textTheme.labelSmall
-                                          ?.copyWith(color: Colors.grey),
-                                    )
-                                  : SizedBox.shrink(),
+                                  }) => Text(
+                                    "${message.authorId} sent ${message.metadata?["eventType"]}",
+                                    style: theme.textTheme.labelSmall?.copyWith(
+                                      color: Colors.grey,
+                                    ),
+                                  ),
                             ),
                             onMessageSend: (message) {
                               notifier.send(

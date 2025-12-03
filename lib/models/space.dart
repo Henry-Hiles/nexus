@@ -8,6 +8,7 @@ part "space.freezed.dart";
 abstract class Space with _$Space {
   const factory Space({
     required String title,
+    required String id,
     required List<FullRoom> children,
     required Client client,
     Room? roomData,

@@ -64,6 +64,7 @@ dependencies:
   json_annotation: ^4.9.0
   vodozemac: ^0.4.0
   clipboard: ^2.0.2
+  shared_preferences: ^2.5.3
   
 dev_dependencies:
   build_runner: ^2.4.11

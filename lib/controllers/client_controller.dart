@@ -11,6 +11,7 @@ import "package:nexus/models/session_backup.dart";
 
 class ClientController extends AsyncNotifier<Client> {
   static const sessionBackupKey = "sessionBackup";
+
   @override
   Future<Client> build() async {
     if (!voz.isInitialized()) await voz_fl.init();
@@ -42,10 +43,6 @@ class ClientController extends AsyncNotifier<Client> {
         newDeviceName: backup.deviceName,
       );
     }
-
-    ref.onDispose(
-      client.onRoomState.stream.listen((_) => ref.notifyListeners()).cancel,
-    );
 
     return client;
   }

@@ -1,3 +1,4 @@
+import "package:flutter/foundation.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:matrix/matrix.dart";
 
@@ -28,7 +29,7 @@ extension EventToMessage on Event {
         ? this.eventId
         : relationshipEventId ?? this.eventId;
 
-    if (redacted) return null;
+    if (redacted && !mustBeText) return null;
 
     final asText =
         Message.text(
@@ -88,13 +89,15 @@ extension EventToMessage on Event {
             "${senderFromMemoryOrFallback.calcDisplayname()} joined the room.",
       ),
       EventTypes.Redaction => null,
-      EventTypes.Reaction => null,
-      _ => Message.unsupported(
-        metadata: metadata,
-        id: eventId,
-        authorId: senderId,
-        replyToMessageId: replyId,
-      ),
+      _ =>
+        kDebugMode
+            ? Message.unsupported(
+                metadata: metadata,
+                id: eventId,
+                authorId: senderId,
+                replyToMessageId: replyId,
+              )
+            : null,
     };
   }
 }
