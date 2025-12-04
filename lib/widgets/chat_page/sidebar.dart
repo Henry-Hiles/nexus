@@ -44,7 +44,7 @@ class Sidebar extends HookConsumerWidget {
                     (space) => space.id == selectedSpace,
                   );
                   final selectedIndex = indexOfSelected == -1
-                      ? null
+                      ? 0
                       : indexOfSelected;
 
                   return NavigationRail(
@@ -116,7 +116,9 @@ class Sidebar extends HookConsumerWidget {
                       (room) => room.roomData.id == selectedRoom,
                     );
                     final selectedIndex = indexOfSelected == -1
-                        ? null
+                        ? space.children.isEmpty
+                              ? null
+                              : 0
                         : indexOfSelected;
 
                     return Scaffold(
