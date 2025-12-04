@@ -50,7 +50,7 @@ class Sidebar extends HookConsumerWidget {
                   return NavigationRail(
                     scrollable: true,
                     onDestinationSelected: (value) {
-                      selectedSpaceNotifier.set(spaces[value].roomData?.id);
+                      selectedSpaceNotifier.set(spaces[value].id);
                       selectedRoomNotifier.set(
                         spaces[value].children.firstOrNull?.roomData.id,
                       );
@@ -151,7 +151,7 @@ class Sidebar extends HookConsumerWidget {
                                   hasBadge: room.roomData.hasNewMessages,
                                   room.avatar,
                                   room.title,
-                                  fallback: selectedSpace == 1
+                                  fallback: selectedSpace == "dms"
                                       ? null
                                       : Icon(Icons.numbers),
                                   headers: space.client.headers,

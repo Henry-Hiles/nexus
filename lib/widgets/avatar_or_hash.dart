@@ -1,6 +1,5 @@
 import "package:color_hash/color_hash.dart";
 import "package:flutter/material.dart";
-import "package:flutter/widgets.dart";
 
 class AvatarOrHash extends StatelessWidget {
   final Uri? avatar;
