@@ -65,7 +65,7 @@ A simple and user-friendly Matrix client made with Flutter and the Matrix Dart S
                 -   [ ] Plain text
                 -   [ ] Matrix URIs
                 -   [ ] Matrix.to links
-        -   [ ] Custom emojis/stickers
+        -   [x] Custom emojis/stickers
         -   [ ] Encrypted messages
         -   [x] History loading
             -   [x] Backwards

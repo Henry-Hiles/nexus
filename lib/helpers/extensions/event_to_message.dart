@@ -50,8 +50,8 @@ extension EventToMessage on Event {
         text: "Unable to decrypt message.",
         metadata: {"formatted": "Unable to decrypt message.", ...metadata},
       ),
-      EventTypes.Message => switch (messageType) {
-        MessageTypes.Image => Message.image(
+      (EventTypes.Sticker || EventTypes.Message) => switch (messageType) {
+        (MessageTypes.Sticker || MessageTypes.Image) => Message.image(
           metadata: metadata,
           id: eventId,
           authorId: senderId,

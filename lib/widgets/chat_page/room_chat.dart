@@ -200,6 +200,7 @@ class RoomChat extends HookConsumerWidget {
                                           ((message.editedAt != null)
                                               ? "<sub edited>(edited)</sub>"
                                               : ""),
+                                      client: room.roomData.client,
                                     ),
                                     topWidget: TopWidget(
                                       message,
