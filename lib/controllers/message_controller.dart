@@ -9,7 +9,9 @@ class MessageController extends AsyncNotifier<TextMessage?> {
 
   @override
   Future<TextMessage?> build() async {
-    final room = await ref.watch(SelectedRoomController.provider.future);
+    final room = await ref.watch(
+      SelectedRoomController.provider.selectAsync((a) => a),
+    );
     if (room == null) return null;
 
     final event = await room.roomData.getEventById(id);

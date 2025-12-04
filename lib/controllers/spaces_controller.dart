@@ -15,23 +15,25 @@ class SpacesController extends AsyncNotifier<IList<Space>> {
       client.onSync.stream.listen((_) => ref.invalidateSelf()).cancel,
     );
 
-    final topLevel = await Future.wait(
-      client.rooms
-          .where((room) => !room.isDirectChat)
-          .where(
-            (room) => client.rooms
-                .where((room) => room.isSpace)
-                .every(
-                  (match) => match.spaceChildren.every(
-                    (child) => child.roomId != room.id,
+    final topLevel = IList(
+      await Future.wait(
+        client.rooms
+            .where((room) => !room.isDirectChat)
+            .where(
+              (room) => client.rooms
+                  .where((room) => room.isSpace)
+                  .every(
+                    (match) => match.spaceChildren.every(
+                      (child) => child.roomId != room.id,
+                    ),
                   ),
-                ),
-          )
-          .map((room) => room.fullRoom),
+            )
+            .map((room) => room.fullRoom),
+      ),
     );
 
-    final topLevelSpaces = topLevel.where((r) => r.roomData.isSpace).toList();
-    final topLevelRooms = topLevel.where((r) => !r.roomData.isSpace).toList();
+    final topLevelSpaces = topLevel.where((r) => r.roomData.isSpace).toIList();
+    final topLevelRooms = topLevel.where((r) => !r.roomData.isSpace).toIList();
 
     return IList([
       Space(
@@ -45,10 +47,12 @@ class SpacesController extends AsyncNotifier<IList<Space>> {
         client: client,
         title: "Direct Messages",
         id: "dms",
-        children: await Future.wait(
-          client.rooms
-              .where((room) => room.isDirectChat)
-              .map((room) => room.fullRoom),
+        children: IList(
+          await Future.wait(
+            client.rooms
+                .where((room) => room.isDirectChat)
+                .map((room) => room.fullRoom),
+          ),
         ),
         icon: Icon(Icons.person),
       ),
@@ -60,7 +64,7 @@ class SpacesController extends AsyncNotifier<IList<Space>> {
             avatar: space.avatar,
             id: space.roomData.id,
             roomData: space.roomData,
-            children: await space.roomData.getAllChildren(client),
+            children: IList(await space.roomData.getAllChildren(client)),
           ),
         ),
       )),

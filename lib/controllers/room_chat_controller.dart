@@ -82,8 +82,10 @@ class RoomChatController extends AsyncNotifier<ChatController> {
   }
 
   Future<void> markRead() async {
+    if (!room.hasNewMessages) return;
     final controller = await future;
     final id = controller.messages.last.id;
+
     await room.setReadMarker(id, mRead: id);
   }
 

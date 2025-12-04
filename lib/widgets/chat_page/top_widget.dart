@@ -48,7 +48,9 @@ class TopWidget extends ConsumerWidget {
                         ),
                       )
                     : null;
-                final replyText = (smallerText == null)
+                final replyText =
+                    (smallerText == null ||
+                        smallerText.length == replyMessage.text.length)
                     ? replyMessage.text
                     : "$smallerText...";
 

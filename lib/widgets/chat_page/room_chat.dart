@@ -172,9 +172,7 @@ class RoomChat extends HookConsumerWidget {
                                   ChatAnimatedList(
                                     itemBuilder: itemBuilder,
                                     onEndReached: notifier.loadOlder,
-                                    onStartReached: () async {
-                                      notifier.markRead();
-                                    },
+                                    onStartReached: notifier.markRead,
                                   ),
                               composerBuilder: (_) => ChatBox(
                                 replyToMessage: replyToMessage.value,

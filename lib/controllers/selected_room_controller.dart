@@ -6,14 +6,6 @@ import "package:nexus/models/full_room.dart";
 
 class SelectedRoomController extends AsyncNotifier<FullRoom?> {
   @override
-  bool updateShouldNotify(
-    AsyncValue<FullRoom?> previous,
-    AsyncValue<FullRoom?> next,
-  ) =>
-      previous.value?.avatar != next.value?.avatar ||
-      previous.value?.title != next.value?.title;
-
-  @override
   Future<FullRoom?> build() async {
     final space = await ref.watch(SelectedSpaceController.provider.future);
     final selectedRoomId = ref.watch(

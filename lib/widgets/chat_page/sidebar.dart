@@ -97,7 +97,6 @@ class Sidebar extends HookConsumerWidget {
                           ),
                           IconButton(
                             onPressed: () => Navigator.of(context).push(
-                              // TODO: explore public rooms/spaces
                               MaterialPageRoute(builder: (_) => SettingsPage()),
                             ),
                             icon: Icon(Icons.settings),

@@ -19,8 +19,6 @@ class Html extends ConsumerWidget {
         return SpoilerText(text: element.text);
       }
       return switch (element.localName) {
-        "mx-reply" => SizedBox.shrink(),
-
         "code" => CodeBlock(
           element.text,
           lang: element.className.replaceAll("language-", ""),
