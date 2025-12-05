@@ -1,6 +1,5 @@
 import "package:flutter/foundation.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
-import "package:flutter_link_previewer/flutter_link_previewer.dart";
 import "package:matrix/matrix.dart";
 
 extension EventToMessage on Event {
@@ -32,11 +31,7 @@ extension EventToMessage on Event {
 
     if (redacted && !mustBeText) return null;
 
-    // TODO: Why does the SDK not return og:title and og:description?
-    // TODO: It's maybe because spec isn't clear on this, the example
-    // TODO: has all the info we need, but the table only shows
-    // TODO: `matrix:image:size` and `og:image`, the same as the SDK
-    // TODO: returns. I could maybe PR a fix to the SDK.
+    // TODO: Use server-generated preview if enabled when https://github.com/famedly/matrix-dart-sdk/issues/2195 is fixed.
 
     // final match = Uri.tryParse(
     //   RegExp(regexLink, caseSensitive: false).firstMatch(body)?.group(0) ?? "",
@@ -44,7 +39,7 @@ extension EventToMessage on Event {
 
     // final preview = match == null
     //     ? null
-    //     : await room.client.getUrlPreviewAuthed(match);
+    // : await room.client.getUrlPreview(match);
 
     final asText =
         Message.text(
