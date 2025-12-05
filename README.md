@@ -71,6 +71,7 @@ A simple and user-friendly Matrix client made with Flutter and the Matrix Dart S
             -   [x] Backwards
             -   [ ] Forwards
             -   [ ] Fix bug with message order for out-of-chunk edits (would be easy if we had https://forgejo.ellis.link/continuwuation/continuwuity/pulls/847)
+                -   I left a bounty on this, hopefully it can get resolved quickly
     -   [x] Editing
     -   [x] Deleting
 -   [ ] Reactions: Waiting on https://github.com/flyerhq/flutter_chat_ui/pull/838
