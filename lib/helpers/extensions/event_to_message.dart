@@ -96,7 +96,13 @@ extension EventToMessage on Event {
         id: eventId,
         authorId: senderId,
         text:
-            "${senderFromMemoryOrFallback.calcDisplayname()} joined the room.",
+            "${content["displayname"]} ${switch (Membership.values.firstWhere((membership) => membership.name == content["membership"])) {
+              Membership.invite => "was invited to",
+              Membership.join => "joined",
+              Membership.leave => "left",
+              Membership.knock => "asked to join",
+              Membership.ban => "was banned from",
+            }} the room.",
       ),
       EventTypes.Redaction => null,
       _ =>
