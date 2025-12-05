@@ -1,3 +1,4 @@
+import "package:collection/collection.dart";
 import "package:flutter/foundation.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:matrix/matrix.dart";
@@ -96,12 +97,13 @@ extension EventToMessage on Event {
         id: eventId,
         authorId: senderId,
         text:
-            "${content["displayname"]} ${switch (Membership.values.firstWhere((membership) => membership.name == content["membership"])) {
+            "${content["displayname"]} ${switch (Membership.values.firstWhereOrNull((membership) => membership.name == content["membership"])) {
               Membership.invite => "was invited to",
               Membership.join => "joined",
               Membership.leave => "left",
               Membership.knock => "asked to join",
               Membership.ban => "was banned from",
+              _ => "did something relating to",
             }} the room.",
       ),
       EventTypes.Redaction => null,
