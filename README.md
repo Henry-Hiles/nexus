@@ -59,7 +59,7 @@ A simple and user-friendly Matrix client made with Flutter and the Matrix Dart S
         -   [x] Attachments
             -   [ ] Downloading attachments
             -   [ ] Opening attachments in their own view
-        -   [ ] Mentions
+        -   [x] Mentions
             -   [x] Users
             -   [x] Rooms
                 -   [ ] Plain text
@@ -70,8 +70,6 @@ A simple and user-friendly Matrix client made with Flutter and the Matrix Dart S
         -   [x] History loading
             -   [x] Backwards
             -   [ ] Forwards
-            -   [ ] Fix bug with message order for out-of-chunk edits (would be easy if we had https://forgejo.ellis.link/continuwuation/continuwuity/pulls/847)
-                -   I left a bounty on this, hopefully it can get resolved quickly
     -   [x] Editing
     -   [x] Deleting
 -   [ ] Reactions: Waiting on https://github.com/flyerhq/flutter_chat_ui/pull/838
@@ -102,6 +100,12 @@ A simple and user-friendly Matrix client made with Flutter and the Matrix Dart S
         -   [ ] Password
     -   [ ] About
     -   [x] Log Out
+
+## Known Bugs
+
+-   Sometimes we have errors on scrolling due to out of chunk edits. This will be easy to fix once https://forgejo.ellis.link/continuwuation/continuwuity/pulls/847 is complete and merged. I left a bounty on this, so hopefully it can get resolved quickly.
+-   Sometimes the app refreshes, I believe due to SpacesController invalidating. This needs investigation as to why it happens.
+-   Sometimes links don't parse properly, this is apparent in the Maunium Ping Room. We might possibly need a regex change.
 
 ## Development
 
