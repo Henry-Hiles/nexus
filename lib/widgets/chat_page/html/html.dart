@@ -41,7 +41,9 @@ class Html extends ConsumerWidget {
               ? InlineCustomWidget(
                   child: ActionChip(
                     label: Text(
-                      element.text,
+                      element.text
+                          .replaceFirst("https://matrix.to/#/", "")
+                          .replaceFirst("http://matrix.to/#/", ""),
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Theme.of(context).colorScheme.onPrimary,
