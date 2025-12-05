@@ -29,10 +29,13 @@ class Html extends ConsumerWidget {
       final width = int.tryParse(element.attributes["width"] ?? "");
 
       return switch (element.localName) {
-        "code" => CodeBlock(
-          element.text,
-          lang: element.className.replaceAll("language-", ""),
-        ),
+        "code" =>
+          element.parent?.localName == "pre"
+              ? CodeBlock(
+                  element.text,
+                  lang: element.className.replaceAll("language-", ""),
+                )
+              : null,
 
         "blockquote" => Quoted(Html(element.innerHtml, client: client)),
 
