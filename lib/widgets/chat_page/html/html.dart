@@ -36,6 +36,26 @@ class Html extends ConsumerWidget {
 
         "blockquote" => Quoted(Html(element.innerHtml, client: client)),
 
+        "a" =>
+          Uri.tryParse(element.attributes["href"] ?? "")?.host == "matrix.to"
+              ? InlineCustomWidget(
+                  child: ActionChip(
+                    label: Text(
+                      element.text,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.onPrimary,
+                      ),
+                    ),
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    onPressed: () {
+                      // TODO: Open room or join room dialog, or user popover
+                      showAboutDialog(context: context);
+                    },
+                  ),
+                )
+              : null,
+
         "img" =>
           element.attributes["src"] == null
               ? null
@@ -90,7 +110,6 @@ class Html extends ConsumerWidget {
             "h5" ||
             "h6" ||
             "p" ||
-            "a" ||
             "ul" ||
             "ol" ||
             "sup" ||

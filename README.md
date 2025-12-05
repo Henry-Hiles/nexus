@@ -60,11 +60,11 @@ A simple and user-friendly Matrix client made with Flutter and the Matrix Dart S
             -   [ ] Downloading attachments
             -   [ ] Opening attachments in their own view
         -   [ ] Mentions
-            -   [ ] Users
-            -   [ ] Rooms
+            -   [x] Users
+            -   [x] Rooms
                 -   [ ] Plain text
                 -   [ ] Matrix URIs
-                -   [ ] Matrix.to links
+                -   [x] Matrix.to links
         -   [x] Custom emojis/stickers
         -   [ ] Encrypted messages
         -   [x] History loading
