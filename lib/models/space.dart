@@ -17,16 +17,4 @@ abstract class Space with _$Space {
     Uri? avatar,
     Icon? icon,
   }) = _Space;
-
-  @override
-  bool operator ==(Object other) =>
-      other.runtimeType == runtimeType &&
-      other is Space &&
-      other.title == title &&
-      other.id == id &&
-      other.icon == icon &&
-      other.avatar == avatar;
-
-  @override
-  int get hashCode => Object.hash(runtimeType, title, id, icon, avatar);
 }

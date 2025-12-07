@@ -177,7 +177,7 @@ class RoomChat extends HookConsumerWidget {
                               composerBuilder: (_) => ChatBox(
                                 replyToMessage: replyToMessage.value,
                                 onDismiss: () => replyToMessage.value = null,
-                                headers: room.roomData.client.headers,
+                                room: room.roomData,
                               ),
                               textMessageBuilder:
                                   (
@@ -296,13 +296,6 @@ class RoomChat extends HookConsumerWidget {
                                     ),
                                   ),
                             ),
-                            onMessageSend: (message) {
-                              notifier.send(
-                                message,
-                                replyTo: replyToMessage.value,
-                              );
-                              replyToMessage.value = null;
-                            },
                             resolveUser: notifier.resolveUser,
                             chatController: controller,
                           ),

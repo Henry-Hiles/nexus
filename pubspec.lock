@@ -575,6 +575,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.17.0"
+  fluttertagger:
+    dependency: "direct main"
+    description:
+      name: fluttertagger
+      sha256: "3df0132bdd431a7279da78ea70500ea1e767fa093f43f32785b757c10c6a0fcc"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.3.1"
   flyer_chat_file_message:
     dependency: "direct main"
     description:
@@ -912,6 +920,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.2"
+  mention_tag_text_field:
+    dependency: "direct main"
+    description:
+      name: mention_tag_text_field
+      sha256: ba7b9d8003e0f340a65c6dcdb7770f4340f653ae1612a9e31e11d12f7f1dd80f
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.9"
   meta:
     dependency: transitive
     description:

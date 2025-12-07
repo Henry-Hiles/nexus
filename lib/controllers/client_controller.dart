@@ -10,6 +10,11 @@ import "package:nexus/controllers/secure_storage_controller.dart";
 import "package:nexus/models/session_backup.dart";
 
 class ClientController extends AsyncNotifier<Client> {
+  @override
+  bool updateShouldNotify(
+    AsyncValue<Client> previous,
+    AsyncValue<Client> next,
+  ) => previous.hasValue != next.hasValue;
   static const sessionBackupKey = "sessionBackup";
 
   @override
@@ -81,7 +86,7 @@ class ClientController extends AsyncNotifier<Client> {
               ).toJson(),
             ),
           );
-      ref.invalidateSelf();
+      ref.invalidateSelf(asReload: true);
       return true;
     } catch (_) {
       return false;

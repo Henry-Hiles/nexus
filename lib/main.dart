@@ -1,3 +1,4 @@
+import "package:flutter/foundation.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client_controller.dart";
 import "package:nexus/controllers/shared_prefs_controller.dart";
@@ -13,7 +14,23 @@ import "package:window_size/window_size.dart";
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
+final class Logger extends ProviderObserver {
+  @override
+  void didUpdateProvider(
+    ProviderObserverContext context,
+    Object? previousValue,
+    Object? newValue,
+  ) {
+    print('''{
+  "provider": "${context.provider}",
+  "changed": ${previousValue != newValue}
+  "type": ${previousValue.runtimeType}
+}''');
+  }
+}
+
 void showError(Object error, [StackTrace? stackTrace]) {
+  if (error.toString().contains("ParentDataWidget")) return;
   if (error.toString().contains("DioException")) return;
   if (error.toString().contains("UTF-16")) return;
 
@@ -43,7 +60,9 @@ void main() async {
 
   setWindowMinSize(const Size.square(500));
 
-  runApp(ProviderScope(child: const App()));
+  runApp(
+    ProviderScope(observers: [if (kDebugMode) Logger()], child: const App()),
+  );
 }
 
 class App extends ConsumerWidget {

@@ -97,7 +97,7 @@ extension EventToMessage on Event {
         id: eventId,
         authorId: senderId,
         text:
-            "${content["displayname"]} ${switch (Membership.values.firstWhereOrNull((membership) => membership.name == content["membership"])) {
+            "${sender.displayName} ${switch (Membership.values.firstWhereOrNull((membership) => membership.name == content["membership"])) {
               Membership.invite => "was invited to",
               Membership.join => "joined",
               Membership.leave => "left",

@@ -85,7 +85,9 @@ class Html extends ConsumerWidget {
                               headers: client.headers,
                               errorBuilder: (_, error, _) => Text(
                                 "Image Failed to Load",
-                                style: TextStyle(color: Colors.red),
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.error,
+                                ),
                               ),
                               height: height.toDouble(),
                               width: width?.toDouble(),
