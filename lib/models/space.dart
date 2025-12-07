@@ -15,6 +15,6 @@ abstract class Space with _$Space {
     required Client client,
     Room? roomData,
     Uri? avatar,
-    Icon? icon,
+    IconData? icon,
   }) = _Space;
 }

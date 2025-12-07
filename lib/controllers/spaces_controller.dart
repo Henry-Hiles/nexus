@@ -41,7 +41,7 @@ class SpacesController extends AsyncNotifier<IList<Space>> {
         title: "Home",
         id: "home",
         children: topLevelRooms,
-        icon: Icon(Icons.home),
+        icon: Icons.home,
       ),
       Space(
         client: client,
@@ -54,7 +54,7 @@ class SpacesController extends AsyncNotifier<IList<Space>> {
                 .map((room) => room.fullRoom),
           ),
         ),
-        icon: Icon(Icons.person),
+        icon: Icons.person,
       ),
       ...(await Future.wait(
         topLevelSpaces.map(

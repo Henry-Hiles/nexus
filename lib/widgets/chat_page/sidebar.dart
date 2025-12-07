@@ -60,7 +60,9 @@ class Sidebar extends HookConsumerWidget {
                           (space) => NavigationRailDestination(
                             icon: AvatarOrHash(
                               space.avatar,
-                              fallback: space.icon,
+                              fallback: space.icon == null
+                                  ? null
+                                  : Icon(space.icon),
                               space.title,
                               headers: space.client.headers,
                               hasBadge:
@@ -126,7 +128,9 @@ class Sidebar extends HookConsumerWidget {
                       appBar: AppBar(
                         leading: AvatarOrHash(
                           space.avatar,
-                          fallback: space.icon,
+                          fallback: space.icon == null
+                              ? null
+                              : Icon(space.icon),
                           space.title,
                           headers: space.client.headers,
                         ),

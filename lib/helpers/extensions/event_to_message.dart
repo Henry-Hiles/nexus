@@ -25,7 +25,7 @@ extension EventToMessage on Event {
     final editedAt = relationshipType == RelationshipTypes.edit
         ? originServerTs
         : null;
-    final body = newContent?["body"] as String? ?? this.body;
+    final body = (newContent?["body"] ?? content["body"]).toString();
     final eventId = editedAt == null
         ? this.eventId
         : relationshipEventId ?? this.eventId;

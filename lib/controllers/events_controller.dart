@@ -18,10 +18,8 @@ class EventsController extends AsyncNotifier<GetRoomEventsResponse> {
     return response;
   }
 
-  Future<GetRoomEventsResponse> prev() async {
-    final resp = await build(from: ref.read(FromController.provider(room)));
-    return resp;
-  }
+  Future<GetRoomEventsResponse> prev() async =>
+      build(from: ref.read(FromController.provider(room)));
 
   static final provider = AsyncNotifierProvider.autoDispose
       .family<EventsController, GetRoomEventsResponse, Room>(

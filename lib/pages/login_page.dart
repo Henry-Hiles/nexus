@@ -132,7 +132,11 @@ class LoginPage extends HookConsumerWidget {
                 (homeserver) => Card(
                   child: ListTile(
                     title: Text(homeserver.name),
-                    leading: Image.network(homeserver.iconUrl, height: 32),
+                    leading: Image.network(
+                      homeserver.iconUrl,
+                      errorBuilder: (_, _, _) => SizedBox.shrink(),
+                      height: 32,
+                    ),
                     subtitle: Text(homeserver.description),
                     onTap: isLoading.value
                         ? null

@@ -9,17 +9,15 @@ class MessageController extends AsyncNotifier<TextMessage?> {
 
   @override
   Future<TextMessage?> build() async {
-    final room = await ref.watch(
-      SelectedRoomController.provider.selectAsync((a) => a),
-    );
+    final room = await ref.watch(SelectedRoomController.provider.future);
     if (room == null) return null;
 
     final event = await room.roomData.getEventById(id);
     return (await event?.toMessage(mustBeText: true)) as TextMessage?;
   }
 
-  static final provider =
-      AsyncNotifierProvider.family<MessageController, TextMessage?, String>(
+  static final provider = AsyncNotifierProvider.family
+      .autoDispose<MessageController, TextMessage?, String>(
         MessageController.new,
       );
 }

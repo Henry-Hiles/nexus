@@ -3,6 +3,7 @@ import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart" as chat;
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:matrix/matrix.dart";
+import "package:nexus/controllers/avatar_controller.dart";
 import "package:nexus/controllers/events_controller.dart";
 import "package:nexus/helpers/extensions/event_to_message.dart";
 import "package:nexus/helpers/extensions/list_to_messages.dart";
@@ -13,7 +14,9 @@ class RoomChatController extends AsyncNotifier<ChatController> {
 
   @override
   Future<ChatController> build() async {
-    final response = await ref.watch(EventsController.provider(room).future);
+    final response = await ref.watch(
+      EventsController.provider(room).selectAsync((a) => a),
+    );
 
     ref.onDispose(
       room.client.onTimelineEvent.stream.listen((event) async {
@@ -75,10 +78,10 @@ class RoomChatController extends AsyncNotifier<ChatController> {
         .watch(EventsController.provider(room).notifier)
         .prev();
 
-    await controller.insertAllMessages(
-      await response.chunk.toMessages(room),
-      index: 0,
-    );
+    final messages = await response.chunk.toMessages(room);
+
+    await controller.insertAllMessages(messages, index: 0);
+    ref.notifyListeners();
   }
 
   Future<void> markRead() async {
@@ -92,30 +95,22 @@ class RoomChatController extends AsyncNotifier<ChatController> {
   Future<void> updateMessage(Message message, Message newMessage) async =>
       (await future).updateMessage(message, newMessage);
 
-  Future<void> send(Message message, {Message? replyTo}) async {
-    final controller = await future;
-    controller.insertMessage(message);
-
-    if (message is TextMessage) {
-      await room.sendTextEvent(
-        message.text,
+  Future<void> send(String message, {Message? replyTo}) async =>
+      room.sendTextEvent(
+        message,
         inReplyTo: replyTo == null ? null : await room.getEventById(replyTo.id),
       );
-    }
-    // TODO: Handle other types of message
-  }
 
   Future<chat.User> resolveUser(String id) async {
     final user = await room.client.getUserProfile(id);
     return chat.User(
       id: id,
       name: user.displayname,
-      imageSource: (await user.avatarUrl?.getThumbnailUri(
-        // TODO: Fix use of account avatar not room avatar
-        room.client,
-        width: 24,
-        height: 24,
-      ))?.toString(),
+      imageSource: user.avatarUrl == null
+          ? null
+          : (await ref.watch(
+              AvatarController.provider(user.avatarUrl!.toString()).future,
+            )).toString(),
     );
   }
 

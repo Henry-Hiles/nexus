@@ -20,17 +20,15 @@ final class Logger extends ProviderObserver {
     ProviderObserverContext context,
     Object? previousValue,
     Object? newValue,
-  ) {
-    print('''{
-  "provider": "${context.provider}",
-  "changed": ${previousValue != newValue}
-  "type": ${previousValue.runtimeType}
-}''');
-  }
+  ) => debugPrint("""
+Time: ${DateTime.now().toIso8601String()}
+Provider: ${context.provider}
+Previous Value: ${previousValue is AsyncData ? previousValue.value : previousValue}
+New Value: ${newValue is AsyncData ? newValue.value : newValue}
+}""");
 }
 
 void showError(Object error, [StackTrace? stackTrace]) {
-  if (error.toString().contains("ParentDataWidget")) return;
   if (error.toString().contains("DioException")) return;
   if (error.toString().contains("UTF-16")) return;
 

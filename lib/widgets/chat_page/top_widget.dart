@@ -3,8 +3,10 @@ import "package:flutter/material.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:flutter_chat_ui/flutter_chat_ui.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
+import "package:nexus/controllers/avatar_controller.dart";
 import "package:nexus/controllers/message_controller.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
+import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/widgets/chat_page/quoted.dart";
 
 class TopWidget extends ConsumerWidget {
@@ -62,11 +64,18 @@ class TopWidget extends ConsumerWidget {
                       mainAxisSize: MainAxisSize.min,
                       spacing: 8,
                       children: [
-                        Avatar(
-                          userId: replyMessage.authorId,
-                          headers: headers,
-                          size: 16,
-                        ),
+                        ref
+                            .watch(
+                              AvatarController.provider(replyMessage.authorId),
+                            )
+                            .betterWhen(
+                              data: (avatar) => AvatarOrHash(
+                                avatar,
+                                replyMessage.metadata?["displayName"] ??
+                                    replyMessage.authorId,
+                                headers: headers,
+                              ),
+                            ),
                         Flexible(
                           child: Text(
                             replyMessage.metadata?["displayName"] ??

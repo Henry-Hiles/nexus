@@ -10,9 +10,7 @@ class ThumbnailController extends AsyncNotifier<String?> {
   @override
   Future<String?> build({String? from}) async {
     final client = await ref.watch(ClientController.provider.future);
-    final uri = await Uri.tryParse(data.uri)?.getDownloadUri(
-      client,
-    ); // TODO: Should use thumb when c10y fixes animated thumbs
+    final uri = await Uri.tryParse(data.uri)?.getDownloadUri(client);
 
     return uri.toString();
   }

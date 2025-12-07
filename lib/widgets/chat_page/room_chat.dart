@@ -135,177 +135,197 @@ class RoomChat extends HookConsumerWidget {
               body: Row(
                 children: [
                   Expanded(
-                    child: ref
-                        .watch(controllerProvider)
-                        .betterWhen(
-                          data: (controller) => Chat(
-                            currentUserId: room.roomData.client.userID!,
-                            theme: ChatTheme.fromThemeData(theme).copyWith(
-                              colors: ChatColors.fromThemeData(theme).copyWith(
-                                primary: theme.colorScheme.primaryContainer,
-                                onPrimary: theme.colorScheme.onPrimaryContainer,
-                              ),
-                            ),
-                            onMessageSecondaryTap:
-                                (
-                                  context,
-                                  message, {
-                                  required details,
-                                  required index,
-                                }) => context.showContextMenu(
-                                  globalPosition: details.globalPosition,
-                                  children: getMessageOptions(message),
-                                ),
-                            onMessageLongPress:
-                                (
-                                  context,
-                                  message, {
-                                  required details,
-                                  required index,
-                                }) => context.showContextMenu(
-                                  globalPosition: details.globalPosition,
-                                  children: getMessageOptions(message),
-                                ),
-                            builders: Builders(
-                              loadMoreBuilder: (_) => Loading(),
-                              chatAnimatedListBuilder: (_, itemBuilder) =>
-                                  ChatAnimatedList(
-                                    itemBuilder: itemBuilder,
-                                    onEndReached: notifier.loadOlder,
-                                    onStartReached: notifier.markRead,
-                                  ),
-                              composerBuilder: (_) => ChatBox(
-                                replyToMessage: replyToMessage.value,
-                                onDismiss: () => replyToMessage.value = null,
-                                room: room.roomData,
-                              ),
-                              textMessageBuilder:
-                                  (
-                                    context,
-                                    message,
-                                    index, {
-                                    required bool isSentByMe,
-                                    MessageGroupStatus? groupStatus,
-                                  }) => FlyerChatTextMessage(
-                                    customWidget: Html(
-                                      message.metadata?["formatted"]
-                                              .replaceAllMapped(
-                                                RegExp(
-                                                  regexLink,
-                                                  caseSensitive: false,
-                                                ),
-                                                (m) =>
-                                                    "<a href=\"${m.group(0)!}\">${m.group(0)!}</a>",
-                                              ) +
-                                          ((message.editedAt != null)
-                                              ? "<sub edited>(edited)</sub>"
-                                              : ""),
-                                      client: room.roomData.client,
-                                    ),
-                                    topWidget: TopWidget(
-                                      message,
-                                      headers: room.roomData.client.headers,
-                                      groupStatus: groupStatus,
-                                    ),
-                                    message: message,
-                                    showTime: true,
-                                    index: index,
-                                  ),
-                              linkPreviewBuilder: (_, message, isSentByMe) =>
-                                  LinkPreview(
-                                    text: message.text,
-                                    backgroundColor: isSentByMe
-                                        ? theme.colorScheme.inversePrimary
-                                        : theme.colorScheme.surfaceContainerLow,
-                                    insidePadding: EdgeInsets.symmetric(
-                                      vertical: 8,
-                                      horizontal: 16,
-                                    ),
-                                    linkPreviewData: message.linkPreviewData,
-                                    onLinkPreviewDataFetched:
-                                        (linkPreviewData) =>
-                                            notifier.updateMessage(
-                                              message,
-                                              message.copyWith(
-                                                linkPreviewData:
-                                                    linkPreviewData,
-                                              ),
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: ref
+                              .watch(controllerProvider)
+                              .betterWhen(
+                                data: (controller) => Chat(
+                                  currentUserId: room.roomData.client.userID!,
+                                  theme: ChatTheme.fromThemeData(theme)
+                                      .copyWith(
+                                        colors: ChatColors.fromThemeData(theme)
+                                            .copyWith(
+                                              primary: theme
+                                                  .colorScheme
+                                                  .primaryContainer,
+                                              onPrimary: theme
+                                                  .colorScheme
+                                                  .onPrimaryContainer,
                                             ),
-                                  ),
-                              imageMessageBuilder:
-                                  (
-                                    _,
-                                    message,
-                                    index, {
-                                    required bool isSentByMe,
-                                    MessageGroupStatus? groupStatus,
-                                  }) => FlyerChatImageMessage(
-                                    topWidget: TopWidget(
-                                      message,
-                                      headers: room.roomData.client.headers,
-                                      groupStatus: groupStatus,
-                                      alwaysShow: true,
-                                    ),
-                                    message: message,
-                                    index: index,
-                                    headers: room.roomData.client.headers,
-                                  ),
-                              fileMessageBuilder:
-                                  (
-                                    _,
-                                    message,
-                                    index, {
-                                    required bool isSentByMe,
-                                    MessageGroupStatus? groupStatus,
-                                  }) => InkWell(
-                                    onTap: () => showAboutDialog(
-                                      context: context,
-                                    ), // TODO: Download
-                                    child: FlyerChatFileMessage(
-                                      topWidget: TopWidget(
-                                        message,
-                                        headers: room.roomData.client.headers,
-                                        groupStatus: groupStatus,
                                       ),
-                                      message: message,
-                                      index: index,
+                                  onMessageSecondaryTap:
+                                      (
+                                        context,
+                                        message, {
+                                        required details,
+                                        required index,
+                                      }) => context.showContextMenu(
+                                        globalPosition: details.globalPosition,
+                                        children: getMessageOptions(message),
+                                      ),
+                                  onMessageLongPress:
+                                      (
+                                        context,
+                                        message, {
+                                        required details,
+                                        required index,
+                                      }) => context.showContextMenu(
+                                        globalPosition: details.globalPosition,
+                                        children: getMessageOptions(message),
+                                      ),
+                                  builders: Builders(
+                                    loadMoreBuilder: (_) => Loading(),
+                                    chatAnimatedListBuilder: (_, itemBuilder) =>
+                                        ChatAnimatedList(
+                                          itemBuilder: itemBuilder,
+                                          onEndReached: notifier.loadOlder,
+                                          onStartReached: notifier.markRead,
+                                          bottomPadding: 72,
+                                        ),
+                                    composerBuilder: (_) => ChatBox(
+                                      replyToMessage: replyToMessage.value,
+                                      onDismiss: () =>
+                                          replyToMessage.value = null,
+                                      room: room.roomData,
                                     ),
+                                    textMessageBuilder:
+                                        (
+                                          context,
+                                          message,
+                                          index, {
+                                          required bool isSentByMe,
+                                          MessageGroupStatus? groupStatus,
+                                        }) => FlyerChatTextMessage(
+                                          customWidget: Html(
+                                            message.metadata?["formatted"]
+                                                    .replaceAllMapped(
+                                                      RegExp(
+                                                        regexLink,
+                                                        caseSensitive: false,
+                                                      ),
+                                                      (m) =>
+                                                          "<a href=\"${m.group(0)!}\">${m.group(0)!}</a>",
+                                                    ) +
+                                                ((message.editedAt != null)
+                                                    ? "<sub edited>(edited)</sub>"
+                                                    : ""),
+                                            client: room.roomData.client,
+                                          ),
+                                          topWidget: TopWidget(
+                                            message,
+                                            headers:
+                                                room.roomData.client.headers,
+                                            groupStatus: groupStatus,
+                                          ),
+                                          message: message,
+                                          showTime: true,
+                                          index: index,
+                                        ),
+                                    linkPreviewBuilder:
+                                        (_, message, isSentByMe) => LinkPreview(
+                                          text: message.text,
+                                          backgroundColor: isSentByMe
+                                              ? theme.colorScheme.inversePrimary
+                                              : theme
+                                                    .colorScheme
+                                                    .surfaceContainerLow,
+                                          insidePadding: EdgeInsets.symmetric(
+                                            vertical: 8,
+                                            horizontal: 16,
+                                          ),
+                                          linkPreviewData:
+                                              message.linkPreviewData,
+                                          onLinkPreviewDataFetched:
+                                              (linkPreviewData) =>
+                                                  notifier.updateMessage(
+                                                    message,
+                                                    message.copyWith(
+                                                      linkPreviewData:
+                                                          linkPreviewData,
+                                                    ),
+                                                  ),
+                                        ),
+                                    imageMessageBuilder:
+                                        (
+                                          _,
+                                          message,
+                                          index, {
+                                          required bool isSentByMe,
+                                          MessageGroupStatus? groupStatus,
+                                        }) => FlyerChatImageMessage(
+                                          topWidget: TopWidget(
+                                            message,
+                                            headers:
+                                                room.roomData.client.headers,
+                                            groupStatus: groupStatus,
+                                            alwaysShow: true,
+                                          ),
+                                          message: message,
+                                          index: index,
+                                          headers: room.roomData.client.headers,
+                                        ),
+                                    fileMessageBuilder:
+                                        (
+                                          _,
+                                          message,
+                                          index, {
+                                          required bool isSentByMe,
+                                          MessageGroupStatus? groupStatus,
+                                        }) => InkWell(
+                                          onTap: () => showAboutDialog(
+                                            context: context,
+                                          ), // TODO: Download
+                                          child: FlyerChatFileMessage(
+                                            topWidget: TopWidget(
+                                              message,
+                                              headers:
+                                                  room.roomData.client.headers,
+                                              groupStatus: groupStatus,
+                                            ),
+                                            message: message,
+                                            index: index,
+                                          ),
+                                        ),
+                                    systemMessageBuilder:
+                                        (
+                                          _,
+                                          message,
+                                          index, {
+                                          required bool isSentByMe,
+                                          MessageGroupStatus? groupStatus,
+                                        }) => FlyerChatSystemMessage(
+                                          message: message,
+                                          index: index,
+                                        ),
+                                    unsupportedMessageBuilder:
+                                        (
+                                          _,
+                                          message,
+                                          index, {
+                                          required bool isSentByMe,
+                                          MessageGroupStatus? groupStatus,
+                                        }) => Text(
+                                          "${message.authorId} sent ${message.metadata?["eventType"]}",
+                                          style: theme.textTheme.labelSmall
+                                              ?.copyWith(color: Colors.grey),
+                                        ),
                                   ),
-                              systemMessageBuilder:
-                                  (
-                                    _,
-                                    message,
-                                    index, {
-                                    required bool isSentByMe,
-                                    MessageGroupStatus? groupStatus,
-                                  }) => FlyerChatSystemMessage(
-                                    message: message,
-                                    index: index,
-                                  ),
-                              unsupportedMessageBuilder:
-                                  (
-                                    _,
-                                    message,
-                                    index, {
-                                    required bool isSentByMe,
-                                    MessageGroupStatus? groupStatus,
-                                  }) => Text(
-                                    "${message.authorId} sent ${message.metadata?["eventType"]}",
-                                    style: theme.textTheme.labelSmall?.copyWith(
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                            ),
-                            resolveUser: notifier.resolveUser,
-                            chatController: controller,
-                          ),
+                                  resolveUser: notifier.resolveUser,
+                                  chatController: controller,
+                                ),
+                              ),
                         ),
+                      ],
+                    ),
                   ),
 
                   if (memberListOpened.value == true && showMembersByDefault)
                     MemberList(room.roomData),
                 ],
               ),
+
               endDrawer: showMembersByDefault
                   ? null
                   : MemberList(room.roomData),
