@@ -1,10 +1,11 @@
 import "package:collection/collection.dart";
+import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:matrix/matrix.dart";
 import "package:nexus/helpers/extensions/get_full_room.dart";
 import "package:nexus/models/full_room.dart";
 
 extension RoomToChildren on Room {
-  Future<List<FullRoom>> getAllChildren(Client client) async {
+  Future<IList<FullRoom>> getAllChildren(Client client) async {
     final direct = await Future.wait(
       spaceChildren
           .map(
@@ -21,6 +22,6 @@ extension RoomToChildren on Room {
             ? await child.roomData.getAllChildren(client)
             : [child],
       ),
-    )).expand((list) => list).toList();
+    )).expand((list) => list).toIList();
   }
 }

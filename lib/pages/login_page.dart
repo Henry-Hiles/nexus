@@ -19,6 +19,8 @@ class LoginPage extends HookConsumerWidget {
     final isLoading = useState(false);
     final allowLogin = useState(false);
 
+    final launch = ref.watch(LaunchHelper.provider).launchUrl;
+
     Future<void> setHomeserver(Uri? homeserver) async {
       isLoading.value = true;
       final succeeded = homeserver == null
@@ -142,9 +144,7 @@ class LoginPage extends HookConsumerWidget {
                         ? null
                         : () => setHomeserver(homeserver.url),
                     trailing: IconButton(
-                      onPressed: () => ref
-                          .watch(LaunchHelper.provider)
-                          .launchUrl(homeserver.url),
+                      onPressed: () => launch(homeserver.url),
                       icon: Icon(Icons.info_outline),
                     ),
                   ),
@@ -152,9 +152,7 @@ class LoginPage extends HookConsumerWidget {
               )),
               SizedBox(height: 8),
               TextButton(
-                onPressed: () => ref
-                    .watch(LaunchHelper.provider)
-                    .launchUrl(Uri.https("servers.joinmatrix.org")),
+                onPressed: () => launch(Uri.https("servers.joinmatrix.org")),
                 child: Text("See more homeservers..."),
               ),
               if (isLoading.value)
