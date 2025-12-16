@@ -6,6 +6,8 @@ import "package:nexus/helpers/extensions/better_when.dart";
 import "package:nexus/helpers/extensions/scheme_to_theme.dart";
 import "package:nexus/pages/chat_page.dart";
 import "package:nexus/pages/login_page.dart";
+import "package:nexus/pages/settings_page.dart";
+import "package:nexus/widgets/appbar.dart";
 import "package:nexus/widgets/error_dialog.dart";
 import "package:window_manager/window_manager.dart";
 import "package:flutter/material.dart";
@@ -59,7 +61,13 @@ void main() async {
   setWindowMinSize(const Size.square(500));
 
   runApp(
-    ProviderScope(observers: [if (kDebugMode) Logger()], child: const App()),
+    ProviderScope(
+      observers: [
+        // Change false to true if you want debug information on provider reloads
+        if (false && kDebugMode) Logger(),
+      ],
+      child: const App(),
+    ),
   );
 }
 
@@ -81,16 +89,43 @@ class App extends ConsumerWidget {
                     brightness: Brightness.dark,
                   ))
               .theme,
-      home: ref
-          .watch(SharedPrefsController.provider)
-          .betterWhen(
-            data: (_) => ref
-                .watch(ClientController.provider)
-                .betterWhen(
-                  data: (client) =>
-                      client.accessToken == null ? LoginPage() : ChatPage(),
-                ),
-          ),
+      home: Builder(
+        builder: (context) => ref
+            .watch(SharedPrefsController.provider)
+            .betterWhen(
+              data: (_) => ref
+                  .watch(ClientController.provider)
+                  .betterWhen(
+                    data: (client) =>
+                        client.accessToken == null ? LoginPage() : ChatPage(),
+                    loading: () => Scaffold(
+                      body: Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          spacing: 16,
+                          children: [
+                            Text(
+                              "Syncing...",
+                              style: Theme.of(context).textTheme.headlineMedium,
+                            ),
+                            CircularProgressIndicator(),
+                          ],
+                        ),
+                      ),
+                      appBar: Appbar(
+                        actions: [
+                          IconButton(
+                            onPressed: () => Navigator.of(context).push(
+                              MaterialPageRoute(builder: (_) => SettingsPage()),
+                            ),
+                            icon: Icon(Icons.settings),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+            ),
+      ),
     ),
   );
 }

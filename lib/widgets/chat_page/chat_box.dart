@@ -2,11 +2,18 @@ import "dart:io";
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
+import "package:flutter_chat_ui/flutter_chat_ui.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:fluttertagger/fluttertagger.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:matrix/matrix.dart";
+import "package:nexus/controllers/avatar_controller.dart";
+import "package:nexus/controllers/members_controller.dart";
 import "package:nexus/controllers/room_chat_controller.dart";
+import "package:nexus/helpers/extensions/better_when.dart";
+import "package:nexus/helpers/extensions/get_headers.dart";
+import "package:nexus/widgets/avatar_or_hash.dart";
+import "package:nexus/widgets/loading.dart";
 
 class ChatBox extends HookConsumerWidget {
   final Message? replyToMessage;
@@ -23,6 +30,8 @@ class ChatBox extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final controller = useRef(FlutterTaggerController());
+    final triggerCharacter = useState("");
+    final query = useState("");
 
     Future<void> send() => ref
         .watch(RoomChatController.provider(room).notifier)
@@ -54,105 +63,184 @@ class ChatBox extends HookConsumerWidget {
         padding: EdgeInsetsGeometry.all(12),
         child: ClipRRect(
           borderRadius: BorderRadius.all(Radius.circular(12)),
-          child: Container(
-            color: theme.colorScheme.surfaceContainerHighest,
-            padding: EdgeInsets.symmetric(horizontal: 8),
-            child: // TODO: This doesn't work?
-            room.canSendDefaultMessages
-                ? Row(
+          child: Column(
+            children: [
+              if (replyToMessage != null)
+                Container(
+                  color: theme.colorScheme.surfaceContainerHigh,
+                  padding: EdgeInsets.symmetric(horizontal: 8),
+                  child: Row(
                     spacing: 8,
                     children: [
-                      PopupMenuButton(
-                        itemBuilder: (context) => [],
-                        icon: Icon(Icons.add),
+                      SizedBox(width: 4),
+                      Avatar(
+                        userId: replyToMessage!.authorId,
+                        headers: room.client.headers,
+                        size: 16,
                       ),
-                      Expanded(
-                        child: FlutterTagger(
-                          overlay: SizedBox(),
-                          controller: controller.value,
-                          onSearch: (query, triggerCharacter) {
-                            triggerCharacter == "#";
-                            if (controller.value.tags.isEmpty) {
-                              controller.value.addTag(
-                                id: "id",
-                                name: "name",
-                              ); // TODO: RM
-                            }
-                          },
-                          triggerCharacterAndStyles: {
-                            "@": style,
-                            "#": style,
-                            ":": style,
-                          },
-                          builder: (context, key) => TextFormField(
-                            maxLines: 12,
-                            minLines: 1,
-                            decoration: InputDecoration(
-                              hintText: "Your message here...",
-                              border: InputBorder.none,
-                            ),
-                            controller: controller.value,
-                            key: key,
-                            autofocus: true,
-                            focusNode: node,
-                          ),
+                      Text(
+                        replyToMessage!.metadata?["displayName"] ??
+                            replyToMessage!.authorId,
+                        style: theme.textTheme.labelMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                      IconButton(onPressed: send, icon: Icon(Icons.send)),
+                      Expanded(
+                        child: (replyToMessage is TextMessage)
+                            ? Text(
+                                (replyToMessage as TextMessage).text,
+                                overflow: TextOverflow.ellipsis,
+                                style: theme.textTheme.labelMedium,
+                                maxLines: 1,
+                              )
+                            : SizedBox(),
+                      ),
+                      IconButton(
+                        onPressed: onDismiss,
+                        icon: Icon(Icons.close),
+                        iconSize: 20,
+                      ),
                     ],
-                  )
-                : Text("You don't have permission to send messages here..."),
-            // Composer(
-            //     textEditingController: controller.value,
-            //     key: key,
-            //     sigmaY: 0,
-            //     sendIconColor: theme.colorScheme.primary,
-            //     sendOnEnter: true,
-            //     topWidget: replyToMessage == null
-            //         ? null
-            //         : ColoredBox(
-            //             color: theme.colorScheme.surfaceContainer,
-            //             child: Padding(
-            //               padding: EdgeInsets.symmetric(
-            //                 horizontal: 16,
-            //                 vertical: 4,
-            //               ),
-            //               child: Row(
-            //                 spacing: 8,
-            //                 children: [
-            //                   Avatar(
-            //                     userId: replyToMessage!.authorId,
-            //                     headers: room.client.headers,
-            //                     size: 16,
-            //                   ),
-            //                   Text(
-            //                     replyToMessage!.metadata?["displayName"] ??
-            //                         replyToMessage!.authorId,
-            //                     style: theme.textTheme.labelMedium?.copyWith(
-            //                       fontWeight: FontWeight.bold,
-            //                     ),
-            //                   ),
-            //                   Expanded(
-            //                     child: (replyToMessage is TextMessage)
-            //                         ? Text(
-            //                             (replyToMessage as TextMessage).text,
-            //                             overflow: TextOverflow.ellipsis,
-            //                             style: theme.textTheme.labelMedium,
-            //                             maxLines: 1,
-            //                           )
-            //                         : SizedBox(),
-            //                   ),
-            //                   IconButton(
-            //                     onPressed: onDismiss,
-            //                     icon: Icon(Icons.close),
-            //                     iconSize: 20,
-            //                   ),
-            //                 ],
-            //               ),
-            //             ),
-            //           ),
-            //     autofocus: true,
-            //   ),
+                  ),
+                ),
+              Container(
+                color: theme.colorScheme.surfaceContainerHighest,
+                padding: EdgeInsets.symmetric(horizontal: 8),
+                child: room.canSendDefaultMessages
+                    ? Row(
+                        spacing: 8,
+                        children: [
+                          PopupMenuButton(
+                            itemBuilder: (context) => [],
+                            icon: Icon(Icons.add),
+                          ),
+                          Expanded(
+                            child: FlutterTagger(
+                              triggerStrategy: TriggerStrategy.eager,
+                              overlay: Padding(
+                                padding: EdgeInsets.all(8),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(12),
+                                  ),
+                                  child: Container(
+                                    color:
+                                        theme.colorScheme.surfaceContainerHigh,
+                                    padding: EdgeInsets.all(8),
+                                    child: switch (triggerCharacter.value) {
+                                      "@" =>
+                                        ref
+                                            .watch(
+                                              MembersController.provider(room),
+                                            )
+                                            .betterWhen(
+                                              data: (members) => ListView(
+                                                children:
+                                                    (query.value.isEmpty
+                                                            ? members
+                                                            : members.where(
+                                                                (member) =>
+                                                                    member
+                                                                        .senderId
+                                                                        .contains(
+                                                                          query
+                                                                              .value,
+                                                                        ) ||
+                                                                    (member.content["displayname"]
+                                                                                as String?)
+                                                                            ?.contains(
+                                                                              query.value,
+                                                                            ) ==
+                                                                        true,
+                                                              ))
+                                                        .map(
+                                                          (member) => ListTile(
+                                                            leading: AvatarOrHash(
+                                                              ref
+                                                                  .watch(
+                                                                    AvatarController.provider(
+                                                                      member
+                                                                          .content["avatar_url"]
+                                                                          .toString(),
+                                                                    ),
+                                                                  )
+                                                                  .whenOrNull(
+                                                                    data:
+                                                                        (
+                                                                          data,
+                                                                        ) =>
+                                                                            data,
+                                                                  ),
+                                                              member
+                                                                  .content["displayname"]
+                                                                  .toString(),
+                                                              headers: room
+                                                                  .client
+                                                                  .headers,
+                                                            ),
+                                                            title: Text(
+                                                              member.content["displayname"]
+                                                                      as String? ??
+                                                                  member
+                                                                      .senderId,
+                                                            ),
+                                                            onTap: () => controller
+                                                                .value
+                                                                .addTag(
+                                                                  id: "member",
+                                                                  name: member
+                                                                      .senderId
+                                                                      .substring(
+                                                                        1,
+                                                                      )
+                                                                      .split(
+                                                                        ":",
+                                                                      )
+                                                                      .first,
+                                                                ),
+                                                          ),
+                                                        )
+                                                        .toList(),
+                                              ),
+                                            ),
+                                      "#" => Text("Todo"),
+                                      _ => Loading(),
+                                    },
+                                  ),
+                                ),
+                              ),
+                              controller: controller.value,
+                              onSearch: (newQuery, newTriggerCharacter) {
+                                triggerCharacter.value = newTriggerCharacter;
+                                query.value = newQuery;
+                              },
+                              triggerCharacterAndStyles: {
+                                "@": style,
+                                "#": style,
+                                ":": style,
+                              },
+                              builder: (context, key) => TextFormField(
+                                maxLines: 12,
+                                minLines: 1,
+                                decoration: InputDecoration(
+                                  hintText: "Your message here...",
+                                  border: InputBorder.none,
+                                ),
+                                controller: controller.value,
+                                key: key,
+                                autofocus: true,
+                                focusNode: node,
+                              ),
+                            ),
+                          ),
+                          IconButton(onPressed: send, icon: Icon(Icons.send)),
+                        ],
+                      )
+                    : Text(
+                        "You don't have permission to send messages here...",
+                      ),
+              ),
+            ],
           ),
         ),
       ),
