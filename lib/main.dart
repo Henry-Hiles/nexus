@@ -9,6 +9,7 @@ import "package:nexus/pages/login_page.dart";
 import "package:nexus/pages/settings_page.dart";
 import "package:nexus/widgets/appbar.dart";
 import "package:nexus/widgets/error_dialog.dart";
+import "package:nexus/widgets/loading.dart";
 import "package:window_manager/window_manager.dart";
 import "package:flutter/material.dart";
 import "package:dynamic_system_colors/dynamic_system_colors.dart";
@@ -108,7 +109,7 @@ class App extends ConsumerWidget {
                               "Syncing...",
                               style: Theme.of(context).textTheme.headlineMedium,
                             ),
-                            CircularProgressIndicator(),
+                            Loading(),
                           ],
                         ),
                       ),
