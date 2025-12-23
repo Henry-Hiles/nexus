@@ -103,7 +103,6 @@ A simple and user-friendly Matrix client made with Flutter and the Matrix Dart S
 
 ## Known Bugs
 
--   Sometimes we have errors on scrolling due to out of chunk edits. This will be easy to fix once https://forgejo.ellis.link/continuwuation/continuwuity/pulls/847 is complete and merged. I left a bounty on this, so hopefully it can get resolved quickly.
 -   Sometimes the app refreshes, I believe due to some controllers invalidating. This needs investigation as to why it happens.
 -   Sometimes links don't parse properly, this is apparent in the Maunium Ping Room. We might possibly need a regex change.
 

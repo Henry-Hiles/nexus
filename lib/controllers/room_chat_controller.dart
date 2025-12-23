@@ -30,18 +30,17 @@ class RoomChatController extends AsyncNotifier<ChatController> {
             ),
           );
         } else {
-          final message = await event.toMessage();
+          final message = await event.toMessage(includeEdits: true);
+          if (event.relationshipType == RelationshipTypes.edit) {
+            final controller = await future;
+            final oldMessage = controller.messages.firstWhereOrNull(
+              (element) => element.id == event.relationshipEventId,
+            );
+            if (oldMessage == null || message == null) return;
+            return await updateMessage(oldMessage, message);
+          }
           if (message != null) {
-            if (event.relationshipType == RelationshipTypes.edit) {
-              final controller = await future;
-              final oldMessage = controller.messages.firstWhereOrNull(
-                (element) => element.id == event.relationshipEventId,
-              );
-              if (oldMessage == null) return;
-              await updateMessage(oldMessage, message);
-            } else {
-              await insertMessage(message);
-            }
+            return await insertMessage(message);
           }
         }
       }).cancel,

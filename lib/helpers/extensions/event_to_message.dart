@@ -4,33 +4,39 @@ import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:matrix/matrix.dart";
 
 extension EventToMessage on Event {
-  Future<Message?> toMessage({bool mustBeText = false}) async {
+  Future<Message?> toMessage({
+    bool mustBeText = false,
+    bool includeEdits = false,
+  }) async {
     final replyId = relationshipType == RelationshipTypes.reply
         ? relationshipEventId
         : null;
-    final sender = (await fetchSenderUser()) ?? senderFromMemoryOrFallback;
 
-    final newContent = content["m.new_content"] as Map<String, Object?>?;
+    final newEvent = (unsigned?["m.relations"] as Map?)?["m.replace"];
+    final event = newEvent == null ? this : Event.fromJson(newEvent, room);
+
+    final newContent = event.content["m.new_content"] as Map?;
     final metadata = {
       "formatted":
           newContent?["formatted_body"] ??
           newContent?["body"] ??
-          content["formatted_body"] ??
-          this.body,
-      "eventType": type,
-      "displayName": sender.displayName ?? sender.id,
+          event.content["formatted_body"] ??
+          event.content["body"],
+      "eventType": event.type,
+      "displayName":
+          event.senderFromMemoryOrFallback.displayName ??
+          event.senderFromMemoryOrFallback.id,
       "txnId": transactionId,
     };
 
-    final editedAt = relationshipType == RelationshipTypes.edit
-        ? originServerTs
+    final editedAt = event.relationshipType == RelationshipTypes.edit
+        ? event.originServerTs
         : null;
-    final body = (newContent?["body"] ?? content["body"]).toString();
-    final eventId = editedAt == null
-        ? this.eventId
-        : relationshipEventId ?? this.eventId;
 
-    if (redacted && !mustBeText) return null;
+    if ((redacted && !mustBeText) ||
+        (!includeEdits && (relationshipType == RelationshipTypes.edit))) {
+      return null;
+    }
 
     // TODO: Use server-generated preview if enabled when https://github.com/famedly/matrix-dart-sdk/issues/2195 is fixed.
 
@@ -47,7 +53,7 @@ extension EventToMessage on Event {
               metadata: metadata,
               id: eventId,
               authorId: senderId,
-              text: body,
+              text: redacted ? "This message has been deleted..." : event.body,
               replyToMessageId: replyId,
               deliveredAt: originServerTs,
               editedAt: editedAt,
@@ -66,7 +72,7 @@ extension EventToMessage on Event {
           metadata: metadata,
           id: eventId,
           authorId: senderId,
-          text: text,
+          text: event.text,
           source: (await getAttachmentUri()).toString(),
           replyToMessageId: replyId,
           deliveredAt: originServerTs,
@@ -75,18 +81,19 @@ extension EventToMessage on Event {
           metadata: metadata,
           id: eventId,
           authorId: senderId,
-          text: text,
+          text: event.text,
           replyToMessageId: replyId,
-          source: (await getAttachmentUri()).toString(),
+          source: (await event.getAttachmentUri()).toString(),
           deliveredAt: originServerTs,
+          // TODO: See if we can figure out duration
           duration: Duration(hours: 1),
         ),
         MessageTypes.File => Message.file(
-          name: content["filename"].toString(),
+          name: event.content["filename"].toString(),
           metadata: metadata,
           id: eventId,
           authorId: senderId,
-          source: (await getAttachmentUri()).toString(),
+          source: (await event.getAttachmentUri()).toString(),
           replyToMessageId: replyId,
           deliveredAt: originServerTs,
         ),
@@ -97,7 +104,7 @@ extension EventToMessage on Event {
         id: eventId,
         authorId: senderId,
         text:
-            "${sender.displayName} ${switch (Membership.values.firstWhereOrNull((membership) => membership.name == content["membership"])) {
+            "${event.senderFromMemoryOrFallback.displayName} ${switch (Membership.values.firstWhereOrNull((membership) => membership.name == event.content["membership"])) {
               Membership.invite => "was invited to",
               Membership.join => "joined",
               Membership.leave => "left",
