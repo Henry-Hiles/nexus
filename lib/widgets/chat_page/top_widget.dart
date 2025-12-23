@@ -3,8 +3,6 @@ import "package:flutter/material.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:flutter_chat_ui/flutter_chat_ui.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
-import "package:nexus/controllers/message_controller.dart";
-import "package:nexus/helpers/extensions/better_when.dart";
 import "package:nexus/widgets/chat_page/quoted.dart";
 
 class TopWidget extends ConsumerWidget {
@@ -24,74 +22,71 @@ class TopWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      if (message.replyToMessageId != null) ...[
-        ref
-            .watch(MessageController.provider(message.replyToMessageId!))
-            .betterWhen(
-              loading: SizedBox.shrink,
-              data: (replyMessage) {
-                if (replyMessage == null) return SizedBox.shrink();
+      Builder(
+        builder: (_) {
+          final replyMessage = message.metadata?["reply"] as TextMessage?;
 
-                // Black magic to limit reply preview length
-                final smallerText = message is TextMessage
-                    ? replyMessage.text.substring(
-                        0,
-                        min(
-                          max(
-                            max(
-                              (message as TextMessage).text.length - 20,
-                              message.metadata?["displayName"].length,
-                            ),
-                            5,
-                          ),
-                          replyMessage.text.length,
-                        ),
-                      )
-                    : null;
-                final replyText =
-                    (smallerText == null ||
-                        smallerText.length == replyMessage.text.length)
-                    ? replyMessage.text
-                    : "$smallerText...";
-
-                return InkWell(
-                  // TODO: Scroll to original message
-                  onTap: () => showAboutDialog(context: context),
-                  child: Quoted(
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      spacing: 8,
-                      children: [
-                        Avatar(
-                          userId: replyMessage.authorId,
-                          headers: headers,
-                          size: 16,
-                        ),
-                        Flexible(
-                          child: Text(
-                            replyMessage.metadata?["displayName"] ??
-                                replyMessage.authorId,
-                            style: Theme.of(context).textTheme.labelMedium
-                                ?.copyWith(fontWeight: FontWeight.bold),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        Flexible(
-                          child: Text(
-                            replyText,
-                            overflow: TextOverflow.ellipsis,
-                            style: Theme.of(context).textTheme.labelMedium,
-                            maxLines: 1,
-                          ),
-                        ),
-                      ],
+          if (replyMessage == null) return SizedBox.shrink();
+          final smallerText = message is TextMessage
+              ? replyMessage.text.substring(
+                  0,
+                  min(
+                    max(
+                      max(
+                        (message as TextMessage).text.length - 20,
+                        message.metadata?["displayName"].length,
+                      ),
+                      5,
                     ),
+                    replyMessage.text.length,
                   ),
-                );
-              },
+                )
+              : null;
+          final replyText =
+              (smallerText == null ||
+                  smallerText.length == replyMessage.text.length)
+              ? replyMessage.text
+              : "$smallerText...";
+
+          return Padding(
+            padding: EdgeInsets.only(bottom: 12),
+            child: InkWell(
+              // TODO: Scroll to original message
+              onTap: () => showAboutDialog(context: context),
+              child: Quoted(
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  spacing: 8,
+                  children: [
+                    Avatar(
+                      userId: replyMessage.authorId,
+                      headers: headers,
+                      size: 16,
+                    ),
+                    Flexible(
+                      child: Text(
+                        replyMessage.metadata?["displayName"] ??
+                            replyMessage.authorId,
+                        style: Theme.of(context).textTheme.labelMedium
+                            ?.copyWith(fontWeight: FontWeight.bold),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Flexible(
+                      child: Text(
+                        replyText,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.labelMedium,
+                        maxLines: 1,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-        SizedBox(height: 12),
-      ],
+          );
+        },
+      ),
       if (alwaysShow || groupStatus?.isFirst != false)
         InkWell(
           onTap: () =>

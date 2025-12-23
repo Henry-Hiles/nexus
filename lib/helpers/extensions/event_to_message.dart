@@ -15,13 +15,18 @@ extension EventToMessage on Event {
     final newEvent = (unsigned?["m.relations"] as Map?)?["m.replace"];
     final event = newEvent == null ? this : Event.fromJson(newEvent, room);
 
+    final replyEvent = replyId == null
+        ? null
+        : await room.getEventById(replyId);
+
     final newContent = event.content["m.new_content"] as Map?;
     final metadata = {
       "formatted":
           newContent?["formatted_body"] ??
           newContent?["body"] ??
           event.content["formatted_body"] ??
-          event.content["body"],
+          event.body,
+      "reply": await replyEvent?.toMessage(mustBeText: true),
       "eventType": event.type,
       "displayName":
           event.senderFromMemoryOrFallback.displayName ??
