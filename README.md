@@ -101,10 +101,6 @@ A simple and user-friendly Matrix client made with Flutter and the Matrix Dart S
     -   [ ] About
     -   [x] Log Out
 
-## Known Bugs
-
--   Sometimes links don't parse properly, this is apparent in the Maunium Ping Room. We might possibly need a regex change.
-
 ## Development
 
 Fork and clone the project, then:

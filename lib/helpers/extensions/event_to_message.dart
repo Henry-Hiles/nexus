@@ -8,9 +8,7 @@ extension EventToMessage on Event {
     bool mustBeText = false,
     bool includeEdits = false,
   }) async {
-    final replyId = relationshipType == RelationshipTypes.reply
-        ? relationshipEventId
-        : null;
+    final replyId = inReplyToEventId();
 
     final newEvent = (unsigned?["m.relations"] as Map?)?["m.replace"];
     final event = newEvent == null ? this : Event.fromJson(newEvent, room);
