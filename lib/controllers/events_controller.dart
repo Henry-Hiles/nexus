@@ -14,7 +14,9 @@ class EventsController extends AsyncNotifier<GetRoomEventsResponse> {
       from: from,
       limit: 32,
     );
-    ref.watch(FromController.provider(room).notifier).set(response.end);
+    if (ref.mounted) {
+      ref.watch(FromController.provider(room).notifier).set(response.end);
+    }
     return response;
   }
 

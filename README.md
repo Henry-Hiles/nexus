@@ -103,7 +103,6 @@ A simple and user-friendly Matrix client made with Flutter and the Matrix Dart S
 
 ## Known Bugs
 
--   Sometimes the app refreshes, I believe due to some controllers invalidating. This needs investigation as to why it happens.
 -   Sometimes links don't parse properly, this is apparent in the Maunium Ping Room. We might possibly need a regex change.
 
 ## Development

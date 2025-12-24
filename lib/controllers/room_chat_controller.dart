@@ -14,9 +14,7 @@ class RoomChatController extends AsyncNotifier<ChatController> {
 
   @override
   Future<ChatController> build() async {
-    final response = await ref.watch(
-      EventsController.provider(room).selectAsync((a) => a),
-    );
+    final response = await ref.watch(EventsController.provider(room).future);
 
     ref.onDispose(
       room.client.onTimelineEvent.stream.listen((event) async {

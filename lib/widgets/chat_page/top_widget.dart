@@ -87,7 +87,9 @@ class TopWidget extends ConsumerWidget {
           );
         },
       ),
-      if (alwaysShow || groupStatus?.isFirst != false)
+      if (alwaysShow ||
+          groupStatus?.isFirst != false ||
+          message.metadata?["reply"] != null)
         InkWell(
           onTap: () =>
               showAboutDialog(context: context), // TODO: Show user profile
