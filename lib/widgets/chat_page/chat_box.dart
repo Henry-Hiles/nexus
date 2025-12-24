@@ -2,7 +2,6 @@ import "dart:io";
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
-import "package:flutter_chat_ui/flutter_chat_ui.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:fluttertagger/fluttertagger.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
@@ -35,17 +34,22 @@ class ChatBox extends HookConsumerWidget {
 
     Future<void> send() => ref
         .watch(RoomChatController.provider(room).notifier)
-        .send(controller.value.text);
+        .send(controller.value.text, replyTo: replyToMessage);
 
     final node = useFocusNode(
       onKeyEvent: (_, event) {
-        if (event is KeyDownEvent &&
-            event.logicalKey == LogicalKeyboardKey.enter &&
-            !(Platform.isAndroid || Platform.isIOS) ^
-                HardwareKeyboard.instance.isShiftPressed) {
-          send();
-          return KeyEventResult.handled;
+        if (event is! KeyDownEvent || Platform.isAndroid || Platform.isIOS) {
+          if (event.logicalKey == LogicalKeyboardKey.enter &&
+              !HardwareKeyboard.instance.isShiftPressed) {
+            send();
+            return KeyEventResult.handled;
+          }
+          if (event.logicalKey == LogicalKeyboardKey.escape) {
+            onDismiss();
+            return KeyEventResult.handled;
+          }
         }
+
         return KeyEventResult.ignored;
       },
     );
@@ -73,10 +77,17 @@ class ChatBox extends HookConsumerWidget {
                     spacing: 8,
                     children: [
                       SizedBox(width: 4),
-                      Avatar(
-                        userId: replyToMessage!.authorId,
+                      AvatarOrHash(
+                        ref
+                            .watch(
+                              AvatarController.provider(
+                                replyToMessage!.metadata!["avatarUrl"],
+                              ),
+                            )
+                            .whenOrNull(data: (data) => data),
+                        replyToMessage!.metadata!["displayName"].toString(),
                         headers: room.client.headers,
-                        size: 16,
+                        height: 16,
                       ),
                       Text(
                         replyToMessage!.metadata?["displayName"] ??

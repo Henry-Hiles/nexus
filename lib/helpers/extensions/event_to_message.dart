@@ -17,6 +17,8 @@ extension EventToMessage on Event {
         ? null
         : await room.getEventById(replyId);
 
+    final sender =
+        await event.fetchSenderUser() ?? event.senderFromMemoryOrFallback;
     final newContent = event.content["m.new_content"] as Map?;
     final metadata = {
       "formatted":
@@ -26,9 +28,8 @@ extension EventToMessage on Event {
           event.body,
       "reply": await replyEvent?.toMessage(mustBeText: true),
       "eventType": event.type,
-      "displayName":
-          event.senderFromMemoryOrFallback.displayName ??
-          event.senderFromMemoryOrFallback.id,
+      "avatarUrl": sender.avatarUrl.toString(),
+      "displayName": sender.displayName ?? sender.id,
       "txnId": transactionId,
     };
 
@@ -107,7 +108,7 @@ extension EventToMessage on Event {
         id: eventId,
         authorId: senderId,
         text:
-            "${event.senderFromMemoryOrFallback.displayName} ${switch (Membership.values.firstWhereOrNull((membership) => membership.name == event.content["membership"])) {
+            "${event.asUser.displayName ?? event.asUser.id} ${switch (Membership.values.firstWhereOrNull((membership) => membership.name == event.content["membership"])) {
               Membership.invite => "was invited to",
               Membership.join => "joined",
               Membership.leave => "left",

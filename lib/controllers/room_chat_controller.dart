@@ -22,11 +22,12 @@ class RoomChatController extends AsyncNotifier<ChatController> {
 
         if (event.type == EventTypes.Redaction) {
           final controller = await future;
-          await controller.removeMessage(
-            controller.messages.firstWhere(
-              (message) => message.id == event.redacts,
-            ),
+          final message = controller.messages.firstWhereOrNull(
+            (message) => message.id == event.redacts,
           );
+          if (message == null) return;
+
+          await controller.removeMessage(message);
         } else {
           final message = await event.toMessage(includeEdits: true);
           if (event.relationshipType == RelationshipTypes.edit) {
