@@ -65,6 +65,7 @@ void main() async {
     ProviderScope(
       observers: [
         // Change false to true if you want debug information on provider reloads
+        // ignore: dead_code
         if (false && kDebugMode) Logger(),
       ],
       child: const App(),
