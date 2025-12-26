@@ -10,7 +10,7 @@ import "package:nexus/models/image_data.dart";
 import "package:nexus/widgets/chat_page/html/mention_chip.dart";
 import "package:nexus/widgets/chat_page/html/spoiler_text.dart";
 import "package:nexus/widgets/chat_page/html/code_block.dart";
-import "package:nexus/widgets/chat_page/quoted.dart";
+import "package:nexus/widgets/chat_page/html/quoted.dart";
 import "package:nexus/widgets/error_dialog.dart";
 
 class Html extends ConsumerWidget {
@@ -23,7 +23,7 @@ class Html extends ConsumerWidget {
     html,
     customWidgetBuilder: (element) {
       if (element.attributes.keys.contains("data-mx-spoiler")) {
-        return SpoilerText(text: element.text);
+        return InlineCustomWidget(child: SpoilerText(text: element.text));
       }
 
       final height = int.tryParse(element.attributes["height"] ?? "") ?? 300;
@@ -42,7 +42,7 @@ class Html extends ConsumerWidget {
 
         "a" =>
           Uri.tryParse(element.attributes["href"] ?? "")?.host == "matrix.to"
-              ? MentionChip(element.text)
+              ? InlineCustomWidget(child: MentionChip(element.text))
               : null,
 
         "img" =>

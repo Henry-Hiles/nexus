@@ -262,6 +262,18 @@ class RoomChat extends HookConsumerWidget {
                                             groupStatus: groupStatus,
                                             alwaysShow: true,
                                           ),
+                                          errorBuilder:
+                                              (context, error, stackTrace) =>
+                                                  Center(
+                                                    child: Text(
+                                                      "Image Failed to Load",
+                                                      style: TextStyle(
+                                                        color: Theme.of(
+                                                          context,
+                                                        ).colorScheme.error,
+                                                      ),
+                                                    ),
+                                                  ),
                                           message: message,
                                           index: index,
                                           headers: room.roomData.client.headers,
