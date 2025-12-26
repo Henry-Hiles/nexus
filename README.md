@@ -85,12 +85,12 @@ A simple and user-friendly Matrix client made with Flutter and the Matrix Dart S
 -   [ ] Invites
     -   [ ] Viewing / accepting
     -   [ ] Spam filtering
--   [ ] Devices
-    -   [ ] Viewing devices
-    -   [ ] Verifying devices
 -   [ ] Settings
     -   [ ] Light/Dark mode
     -   [ ] Dynamic Theming
+    -   [ ] Devices
+        -   [ ] Viewing devices
+        -   [ ] Verifying devices
     -   [ ] URL preview: Server / Client / None
     -   [ ] Account changes
         -   [ ] Display name
