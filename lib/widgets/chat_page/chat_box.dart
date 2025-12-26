@@ -54,7 +54,7 @@ class ChatBox extends HookConsumerWidget {
 
         return KeyEventResult.ignored;
       },
-    );
+    )..requestFocus();
 
     final style = TextStyle(
       color: theme.colorScheme.primary,

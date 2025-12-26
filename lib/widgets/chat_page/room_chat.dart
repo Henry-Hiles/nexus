@@ -35,6 +35,7 @@ class RoomChat extends HookConsumerWidget {
     final replyToMessage = useState<Message?>(null);
     final memberListOpened = useState<bool>(showMembersByDefault);
     final theme = Theme.of(context);
+    final danger = theme.colorScheme.error;
 
     return ref
         .watch(SelectedRoomController.provider)
@@ -120,6 +121,37 @@ class RoomChat extends HookConsumerWidget {
                     title: Text("Delete"),
                   ),
                 ),
+              PopupMenuItem(
+                onTap: () => showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: Text("Report"),
+                    content: Text(
+                      "Report this message to your server administrators, who can take action like banning that user or blocking that server from federating.",
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: Navigator.of(context).pop,
+                        child: Text("Cancel"),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          room.roomData.client.reportEvent(
+                            room.roomData.id,
+                            message.id,
+                          );
+                          Navigator.of(context).pop();
+                        },
+                        child: Text("Report"),
+                      ),
+                    ],
+                  ),
+                ),
+                child: ListTile(
+                  leading: Icon(Icons.report, color: danger),
+                  title: Text("Report", style: TextStyle(color: danger)),
+                ),
+              ),
             ];
 
             return Scaffold(
