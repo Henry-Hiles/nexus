@@ -7,6 +7,7 @@ import "package:nexus/controllers/avatar_controller.dart";
 import "package:nexus/controllers/events_controller.dart";
 import "package:nexus/helpers/extensions/event_to_message.dart";
 import "package:nexus/helpers/extensions/list_to_messages.dart";
+import "package:fluttertagger/fluttertagger.dart" as tagger;
 
 class RoomChatController extends AsyncNotifier<ChatController> {
   final Room room;
@@ -93,11 +94,27 @@ class RoomChatController extends AsyncNotifier<ChatController> {
   Future<void> updateMessage(Message message, Message newMessage) async =>
       (await future).updateMessage(message, newMessage);
 
-  Future<void> send(String message, {Message? replyTo}) async =>
-      room.sendTextEvent(
-        message,
-        inReplyTo: replyTo == null ? null : await room.getEventById(replyTo.id),
+  Future<void> send(
+    String message, {
+    required Iterable<tagger.Tag> tags,
+    Message? replyTo,
+  }) async {
+    var taggedMessage = message;
+
+    for (final tag in tags) {
+      final escaped = RegExp.escape(tag.id.substring(1));
+      final pattern = RegExp(r"@@(" + escaped + r")#[^#]*#");
+      taggedMessage = taggedMessage.replaceAllMapped(
+        pattern,
+        (m) => "@${m.group(1)}",
       );
+    }
+
+    await room.sendTextEvent(
+      taggedMessage,
+      inReplyTo: replyTo == null ? null : await room.getEventById(replyTo.id),
+    );
+  }
 
   Future<chat.User> resolveUser(String id) async {
     final user = await room.client.getUserProfile(id);
