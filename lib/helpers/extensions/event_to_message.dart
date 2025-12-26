@@ -25,7 +25,7 @@ extension EventToMessage on Event {
           newContent?["formatted_body"] ??
           newContent?["body"] ??
           event.content["formatted_body"] ??
-          event.body,
+          event.content["body"],
       "reply": await replyEvent?.toMessage(mustBeText: true),
       "eventType": event.type,
       "avatarUrl": sender.avatarUrl.toString(),

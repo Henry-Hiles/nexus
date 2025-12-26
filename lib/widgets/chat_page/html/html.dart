@@ -7,6 +7,7 @@ import "package:nexus/controllers/thumbnail_controller.dart";
 import "package:nexus/helpers/extensions/get_headers.dart";
 import "package:nexus/helpers/launch_helper.dart";
 import "package:nexus/models/image_data.dart";
+import "package:nexus/widgets/chat_page/html/mention_chip.dart";
 import "package:nexus/widgets/chat_page/html/spoiler_text.dart";
 import "package:nexus/widgets/chat_page/html/code_block.dart";
 import "package:nexus/widgets/chat_page/quoted.dart";
@@ -41,24 +42,7 @@ class Html extends ConsumerWidget {
 
         "a" =>
           Uri.tryParse(element.attributes["href"] ?? "")?.host == "matrix.to"
-              ? InlineCustomWidget(
-                  child: ActionChip(
-                    label: Text(
-                      element.text
-                          .replaceFirst("https://matrix.to/#/", "")
-                          .replaceFirst("http://matrix.to/#/", ""),
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.onPrimary,
-                      ),
-                    ),
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    onPressed: () {
-                      // TODO: Open room or join room dialog, or user popover
-                      showAboutDialog(context: context);
-                    },
-                  ),
-                )
+              ? MentionChip(element.text)
               : null,
 
         "img" =>

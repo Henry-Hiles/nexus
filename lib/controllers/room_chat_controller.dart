@@ -102,11 +102,12 @@ class RoomChatController extends AsyncNotifier<ChatController> {
     var taggedMessage = message;
 
     for (final tag in tags) {
-      final escaped = RegExp.escape(tag.id.substring(1));
-      final pattern = RegExp(r"@@(" + escaped + r")#[^#]*#");
+      final escaped = RegExp.escape(tag.id);
+      final pattern = RegExp(r"@+(" + escaped + r")(#[^#]*#)?");
+
       taggedMessage = taggedMessage.replaceAllMapped(
         pattern,
-        (m) => "@${m.group(1)}",
+        (match) => match.group(1)!,
       );
     }
 

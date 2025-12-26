@@ -43,9 +43,9 @@ A simple and user-friendly Matrix client made with Flutter and the Matrix Dart S
         -   [x] HTML/Markdown
         -   [x] Replies
         -   [ ] Attachments
-        -   [ ] Mentions
-            -   [ ] Users
-            -   [ ] Rooms
+        -   [x] Mentions
+            -   [x] Users
+            -   [x] Rooms
         -   [ ] Custom emojis/stickers
         -   [ ] GIFs, maybe through Tenor or something
         -   [ ] Encrypted messages
