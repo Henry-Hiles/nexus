@@ -2,8 +2,7 @@ import "dart:convert";
 import "dart:io";
 import "package:flutter/foundation.dart";
 import "package:nexus/controllers/database_controller.dart";
-import "package:vodozemac/vodozemac.dart" as voz;
-import "package:flutter_vodozemac/flutter_vodozemac.dart" as voz_fl;
+import "package:flutter_vodozemac/flutter_vodozemac.dart";
 import "package:matrix/matrix.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/secure_storage_controller.dart";
@@ -19,8 +18,6 @@ class ClientController extends AsyncNotifier<Client> {
 
   @override
   Future<Client> build() async {
-    if (!voz.isInitialized()) await voz_fl.init();
-
     final client = Client(
       "nexus",
       logLevel: kReleaseMode ? Level.warning : Level.verbose,
@@ -29,6 +26,10 @@ class ClientController extends AsyncNotifier<Client> {
       database: await MatrixSdkDatabase.init(
         "nexus",
         database: await ref.watch(DatabaseController.provider.future),
+      ),
+      nativeImplementations: NativeImplementationsIsolate(
+        compute,
+        vodozemacInit: init,
       ),
     );
 
