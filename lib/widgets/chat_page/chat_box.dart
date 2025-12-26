@@ -12,6 +12,7 @@ import "package:nexus/controllers/room_chat_controller.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
 import "package:nexus/helpers/extensions/get_headers.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
+import "package:nexus/widgets/chat_page/reply_preview.dart";
 import "package:nexus/widgets/loading.dart";
 
 class ChatBox extends HookConsumerWidget {
@@ -69,51 +70,11 @@ class ChatBox extends HookConsumerWidget {
           borderRadius: BorderRadius.all(Radius.circular(12)),
           child: Column(
             children: [
-              if (replyToMessage != null)
-                Container(
-                  color: theme.colorScheme.surfaceContainerHigh,
-                  padding: EdgeInsets.symmetric(horizontal: 8),
-                  child: Row(
-                    spacing: 8,
-                    children: [
-                      SizedBox(width: 4),
-                      AvatarOrHash(
-                        ref
-                            .watch(
-                              AvatarController.provider(
-                                replyToMessage!.metadata!["avatarUrl"],
-                              ),
-                            )
-                            .whenOrNull(data: (data) => data),
-                        replyToMessage!.metadata!["displayName"].toString(),
-                        headers: room.client.headers,
-                        height: 16,
-                      ),
-                      Text(
-                        replyToMessage!.metadata?["displayName"] ??
-                            replyToMessage!.authorId,
-                        style: theme.textTheme.labelMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Expanded(
-                        child: (replyToMessage is TextMessage)
-                            ? Text(
-                                (replyToMessage as TextMessage).text,
-                                overflow: TextOverflow.ellipsis,
-                                style: theme.textTheme.labelMedium,
-                                maxLines: 1,
-                              )
-                            : SizedBox(),
-                      ),
-                      IconButton(
-                        onPressed: onDismiss,
-                        icon: Icon(Icons.close),
-                        iconSize: 20,
-                      ),
-                    ],
-                  ),
-                ),
+              ReplyPreview(
+                replyToMessage: replyToMessage,
+                onDismiss: onDismiss,
+                room: room,
+              ),
               Container(
                 color: theme.colorScheme.surfaceContainerHighest,
                 padding: EdgeInsets.symmetric(horizontal: 8),
