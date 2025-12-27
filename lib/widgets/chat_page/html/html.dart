@@ -41,9 +41,9 @@ class Html extends ConsumerWidget {
         "blockquote" => Quoted(Html(element.innerHtml, client: client)),
 
         "a" =>
-          Uri.tryParse(element.attributes["href"] ?? "")?.host == "matrix.to"
-              ? InlineCustomWidget(child: MentionChip(element.text))
-              : null,
+          element.attributes["href"]?.parseIdentifierIntoParts() == null
+              ? null
+              : InlineCustomWidget(child: MentionChip(element.text)),
 
         "img" =>
           element.attributes["src"] == null
