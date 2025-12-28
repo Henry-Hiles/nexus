@@ -25,8 +25,10 @@ extension EventToMessage on Event {
           newContent?["formatted_body"] ??
           newContent?["body"] ??
           event.content["formatted_body"] ??
-          event.content["body"],
+          event.content["body"] ??
+          "",
       "reply": await replyEvent?.toMessage(mustBeText: true),
+      "body": newContent?["body"] ?? event.content["body"],
       "eventType": event.type,
       "avatarUrl": sender.avatarUrl.toString(),
       "displayName": sender.displayName ?? sender.id,
@@ -69,7 +71,7 @@ extension EventToMessage on Event {
     return switch (type) {
       EventTypes.Encrypted => asText.copyWith(
         text: "Unable to decrypt message.",
-        metadata: {"formatted": "Unable to decrypt message.", ...metadata},
+        metadata: {...metadata, "formatted": "Unable to decrypt message."},
       ),
       (EventTypes.Sticker || EventTypes.Message) => switch (messageType) {
         (MessageTypes.Sticker || MessageTypes.Image) => Message.image(

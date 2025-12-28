@@ -7,15 +7,18 @@ import "package:fluttertagger/fluttertagger.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:matrix/matrix.dart";
 import "package:nexus/controllers/room_chat_controller.dart";
+import "package:nexus/models/relation_type.dart";
 import "package:nexus/widgets/chat_page/mention_overlay.dart";
-import "package:nexus/widgets/chat_page/reply_preview.dart";
+import "package:nexus/widgets/chat_page/relation_preview.dart";
 
 class ChatBox extends HookConsumerWidget {
-  final Message? replyToMessage;
+  final Message? relatedMessage;
+  final RelationType relationType;
   final VoidCallback onDismiss;
   final Room room;
   const ChatBox({
-    required this.replyToMessage,
+    required this.relatedMessage,
+    required this.relationType,
     required this.onDismiss,
     required this.room,
     super.key,
@@ -28,14 +31,25 @@ class ChatBox extends HookConsumerWidget {
     final triggerCharacter = useState("");
     final query = useState("");
 
+    if (relationType == RelationType.edit &&
+        relatedMessage is TextMessage &&
+        controller.value.text.isEmpty) {
+      final text = (relatedMessage as TextMessage).text;
+      controller.value.text = relatedMessage?.replyToMessageId == null
+          ? text
+          : text.split("\n\n").sublist(1).join("\n\n");
+    }
+
     void send() {
       ref
           .watch(RoomChatController.provider(room).notifier)
           .send(
             controller.value.formattedText,
-            replyTo: replyToMessage,
+            relation: relatedMessage,
+            relationType: relationType,
             tags: controller.value.tags,
           );
+      onDismiss();
       controller.value.text = "";
     }
 
@@ -71,8 +85,9 @@ class ChatBox extends HookConsumerWidget {
           borderRadius: BorderRadius.all(Radius.circular(12)),
           child: Column(
             children: [
-              ReplyPreview(
-                replyToMessage: replyToMessage,
+              RelationPreview(
+                relatedMessage: relatedMessage,
+                relationType: relationType,
                 onDismiss: onDismiss,
                 room: room,
               ),

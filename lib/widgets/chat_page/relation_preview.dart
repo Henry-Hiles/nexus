@@ -4,14 +4,17 @@ import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:matrix/matrix.dart";
 import "package:nexus/controllers/avatar_controller.dart";
 import "package:nexus/helpers/extensions/get_headers.dart";
+import "package:nexus/models/relation_type.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 
-class ReplyPreview extends ConsumerWidget {
-  final Message? replyToMessage;
+class RelationPreview extends ConsumerWidget {
+  final Message? relatedMessage;
+  final RelationType relationType;
   final VoidCallback onDismiss;
   final Room room;
-  const ReplyPreview({
-    required this.replyToMessage,
+  const RelationPreview({
+    required this.relatedMessage,
+    required this.relationType,
     required this.onDismiss,
     required this.room,
     super.key,
@@ -19,9 +22,9 @@ class ReplyPreview extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    if (relatedMessage == null) return SizedBox.shrink();
     final theme = Theme.of(context);
 
-    if (replyToMessage == null) return SizedBox.shrink();
     return Container(
       color: theme.colorScheme.surfaceContainerHigh,
       padding: EdgeInsets.symmetric(horizontal: 8),
@@ -29,34 +32,40 @@ class ReplyPreview extends ConsumerWidget {
         spacing: 8,
         children: [
           SizedBox(width: 4),
+          if (relationType == RelationType.edit)
+            Text(
+              "Editing message:",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
           AvatarOrHash(
             ref
                 .watch(
                   AvatarController.provider(
-                    replyToMessage!.metadata!["avatarUrl"],
+                    relatedMessage!.metadata!["avatarUrl"],
                   ),
                 )
                 .whenOrNull(data: (data) => data),
-            replyToMessage!.metadata!["displayName"].toString(),
+            relatedMessage!.metadata!["displayName"].toString(),
             headers: room.client.headers,
             height: 16,
           ),
           Text(
-            replyToMessage!.metadata?["displayName"] ??
-                replyToMessage!.authorId,
+            relatedMessage!.metadata?["displayName"] ??
+                relatedMessage!.authorId,
             style: theme.textTheme.labelMedium?.copyWith(
               fontWeight: FontWeight.bold,
             ),
           ),
           Expanded(
-            child: (replyToMessage is TextMessage)
-                ? Text(
-                    (replyToMessage as TextMessage).text,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.labelMedium,
-                    maxLines: 1,
-                  )
-                : SizedBox(),
+            child: Text(
+              (relatedMessage is TextMessage)
+                  ? (relatedMessage as TextMessage).text
+                  : relatedMessage?.metadata?["body"] ??
+                        relatedMessage?.metadata?["eventType"],
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.labelMedium,
+              maxLines: 1,
+            ),
           ),
           IconButton(
             onPressed: onDismiss,

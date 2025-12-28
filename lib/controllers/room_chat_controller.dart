@@ -8,6 +8,7 @@ import "package:nexus/controllers/events_controller.dart";
 import "package:nexus/helpers/extensions/event_to_message.dart";
 import "package:nexus/helpers/extensions/list_to_messages.dart";
 import "package:fluttertagger/fluttertagger.dart" as tagger;
+import "package:nexus/models/relation_type.dart";
 
 class RoomChatController extends AsyncNotifier<ChatController> {
   final Room room;
@@ -37,7 +38,10 @@ class RoomChatController extends AsyncNotifier<ChatController> {
               (element) => element.id == event.relationshipEventId,
             );
             if (oldMessage == null || message == null) return;
-            return await updateMessage(oldMessage, message);
+            return await updateMessage(
+              oldMessage,
+              message.copyWith(id: oldMessage.id),
+            );
           }
           if (message != null) {
             return await insertMessage(message);
@@ -97,7 +101,8 @@ class RoomChatController extends AsyncNotifier<ChatController> {
   Future<void> send(
     String message, {
     required Iterable<tagger.Tag> tags,
-    Message? replyTo,
+    required RelationType relationType,
+    Message? relation,
   }) async {
     var taggedMessage = message;
 
@@ -113,7 +118,10 @@ class RoomChatController extends AsyncNotifier<ChatController> {
 
     await room.sendTextEvent(
       taggedMessage,
-      inReplyTo: replyTo == null ? null : await room.getEventById(replyTo.id),
+      editEventId: relationType == RelationType.edit ? relation?.id : null,
+      inReplyTo: (relationType == RelationType.reply && relation != null)
+          ? await room.getEventById(relation.id)
+          : null,
     );
   }
 

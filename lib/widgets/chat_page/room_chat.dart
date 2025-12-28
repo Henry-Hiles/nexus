@@ -13,6 +13,7 @@ import "package:nexus/controllers/room_chat_controller.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
 import "package:nexus/helpers/extensions/get_headers.dart";
 import "package:nexus/helpers/extensions/show_context_menu.dart";
+import "package:nexus/models/relation_type.dart";
 import "package:nexus/widgets/chat_page/chat_box.dart";
 import "package:nexus/widgets/chat_page/html/html.dart";
 import "package:nexus/widgets/chat_page/member_list.dart";
@@ -34,6 +35,7 @@ class RoomChat extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final replyToMessage = useState<Message?>(null);
     final memberListOpened = useState<bool>(showMembersByDefault);
+    final relationType = useState(RelationType.reply);
     final theme = Theme.of(context);
     final danger = theme.colorScheme.error;
 
@@ -56,7 +58,10 @@ class RoomChat extends HookConsumerWidget {
 
             List<PopupMenuEntry> getMessageOptions(Message message) => [
               PopupMenuItem(
-                onTap: () => replyToMessage.value = message,
+                onTap: () {
+                  replyToMessage.value = message;
+                  relationType.value = RelationType.reply;
+                },
                 child: ListTile(
                   leading: Icon(Icons.reply),
                   title: Text("Reply"),
@@ -64,7 +69,10 @@ class RoomChat extends HookConsumerWidget {
               ),
               if (message.authorId == room.roomData.client.userID)
                 PopupMenuItem(
-                  onTap: () {},
+                  onTap: () {
+                    replyToMessage.value = message;
+                    relationType.value = RelationType.edit;
+                  },
                   child: ListTile(
                     leading: Icon(Icons.edit),
                     title: Text("Edit"),
@@ -217,7 +225,8 @@ class RoomChat extends HookConsumerWidget {
                                           bottomPadding: 72,
                                         ),
                                     composerBuilder: (_) => ChatBox(
-                                      replyToMessage: replyToMessage.value,
+                                      relationType: relationType.value,
+                                      relatedMessage: replyToMessage.value,
                                       onDismiss: () =>
                                           replyToMessage.value = null,
                                       room: room.roomData,
@@ -231,7 +240,8 @@ class RoomChat extends HookConsumerWidget {
                                           MessageGroupStatus? groupStatus,
                                         }) => FlyerChatTextMessage(
                                           customWidget: Html(
-                                            message.metadata?["formatted"]
+                                            (message.metadata?["formatted"]
+                                                        as String)
                                                     .replaceAllMapped(
                                                       RegExp(
                                                         regexLink,
@@ -239,7 +249,8 @@ class RoomChat extends HookConsumerWidget {
                                                       ),
                                                       (m) =>
                                                           "<a href=\"${m.group(0)!}\">${m.group(0)!}</a>",
-                                                    ) +
+                                                    )
+                                                    .replaceAll("\n", "<br/>") +
                                                 ((message.editedAt != null)
                                                     ? "<sub edited>(edited)</sub>"
                                                     : ""),
