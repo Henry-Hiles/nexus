@@ -103,10 +103,31 @@ A simple and user-friendly Matrix client made with Flutter and the Matrix Dart S
 
 ## Development
 
-Fork and clone the project, then:
+First, clone and open the repo:
+
+```sh
+git clone https://git.federated.nexus/Henry-Hiles/nexus
+cd nexus
+```
+
+### Prerequisites
+
+#### Linux
 
 -   With Nix: Either use direnv, or `nix flake develop`
 -   Without Nix: Install Flutter, Rust, the libsecret dev package for your distro (must be in `PKG_CONFIG_PATH`), and sqlite (must be in `LD_LIBRARY_PATH`).
+
+#### Windows / MacOS
+
+I don't really know... Probably just install Rust, Flutter, and Git.
+
+###
+
+Get dependencies:
+
+```sh
+flutter pub get
+```
 
 Build generated files, and watch for new changes:
 
@@ -114,7 +135,11 @@ Build generated files, and watch for new changes:
 flutter pub run build_runner watch --delete-conflicting-outputs
 ```
 
-Run `flutter run` to run the app.
+Run the app:
+
+```sh
+flutter run
+```
 
 ## Community
 
