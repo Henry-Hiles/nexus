@@ -68,7 +68,7 @@ dependencies:
   simple_secure_storage: ^0.3.6
   json_annotation: ^4.9.0
   vodozemac: ^0.4.0
-  clipboard: ^3.0.10
+  clipboard: ^3.0.8
   shared_preferences: ^2.5.3
   mention_tag_text_field: ^0.0.9
   fluttertagger: ^2.3.1
