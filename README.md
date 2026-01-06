@@ -70,7 +70,7 @@ A simple and user-friendly Matrix client made with Flutter and the Matrix Dart S
         -   [x] History loading
             -   [x] Backwards
             -   [ ] Forwards
-    -   [ ] Editing
+    -   [x] Editing
     -   [x] Deleting
 -   [ ] Reactions: Waiting on https://github.com/flyerhq/flutter_chat_ui/pull/838
 -   [ ] Pins
