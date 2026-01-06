@@ -64,7 +64,7 @@ class SpacesController extends AsyncNotifier<IList<Space>> {
             avatar: space.avatar,
             id: space.roomData.id,
             roomData: space.roomData,
-            children: IList(await space.roomData.getAllChildren(client)),
+            children: IList(await space.roomData.getAllChildren()),
           ),
         ),
       )),

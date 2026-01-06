@@ -28,7 +28,7 @@ A simple and user-friendly Matrix client made with Flutter and the Matrix Dart S
 -   [x] Rooms / Spaces
     -   [x] Displaying and choosing
     -   [x] Reading, showing unread
-        -   [ ] Mark as read button on rooms and spaces
+        -   [x] Mark as read button on rooms and spaces
     -   [ ] Searching
     -   [ ] Creating (Rooms, Spaces, and DMs)
     -   [ ] Joining

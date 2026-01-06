@@ -2,6 +2,7 @@ import "package:clipboard/clipboard.dart";
 import "package:flutter/material.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:matrix/matrix.dart";
+import "package:nexus/helpers/extensions/room_to_children.dart";
 import "package:nexus/widgets/form_text_input.dart";
 
 class RoomMenu extends StatelessWidget {
@@ -12,6 +13,15 @@ class RoomMenu extends StatelessWidget {
   Widget build(BuildContext context) {
     final danger = Theme.of(context).colorScheme.error;
 
+    void markRead(String roomId) async {
+      for (final child in await room.getAllChildren()) {
+        await child.roomData.setReadMarker(
+          child.roomData.lastEvent?.eventId,
+          mRead: child.roomData.lastEvent?.eventId,
+        );
+      }
+    }
+
     return PopupMenuButton(
       itemBuilder: (_) => [
         PopupMenuItem(
@@ -20,6 +30,13 @@ class RoomMenu extends StatelessWidget {
             await FlutterClipboard.copy(link.toString());
           },
           child: ListTile(leading: Icon(Icons.link), title: Text("Copy Link")),
+        ),
+        PopupMenuItem(
+          onTap: () => markRead(room.id),
+          child: ListTile(
+            leading: Icon(Icons.check),
+            title: Text("Mark as Read"),
+          ),
         ),
         PopupMenuItem(
           onTap: () => showDialog(
