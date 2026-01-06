@@ -120,7 +120,8 @@ extension EventToMessage on Event {
       ),
       EventTypes.Redaction => null,
       _ =>
-        kDebugMode
+        // Turn this on for debugging purposes
+        false
             ? Message.unsupported(
                 metadata: metadata,
                 id: eventId,
