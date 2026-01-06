@@ -60,7 +60,7 @@ class RoomChatController extends AsyncNotifier<ChatController> {
     );
 
     return InMemoryChatController(
-      messages: await response.chunk.toMessages(room),
+      messages: await response.events.toMessages(room),
     );
   }
 
@@ -85,14 +85,22 @@ class RoomChatController extends AsyncNotifier<ChatController> {
   }
 
   Future<void> loadOlder() async {
+    final currentEvents = await future;
+    await ref.watch(EventsController.provider(room).notifier).prev();
+    final newEvents = await ref.watch(EventsController.provider(room).future);
+
     final controller = await future;
-    final response = await ref
-        .watch(EventsController.provider(room).notifier)
-        .prev();
-
-    final messages = await response.chunk.toMessages(room);
-
-    await controller.insertAllMessages(messages, index: 0);
+    await controller.insertAllMessages(
+      await newEvents.events
+          .where(
+            (event) => !currentEvents.messages.any(
+              (existingEvent) => existingEvent.id == event.eventId,
+            ),
+          )
+          .toList()
+          .toMessages(room),
+      index: 0,
+    );
     ref.notifyListeners();
   }
 
