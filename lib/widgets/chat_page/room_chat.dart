@@ -201,12 +201,15 @@ class RoomChat extends HookConsumerWidget {
                                       (
                                         context,
                                         message, {
-                                        required details,
                                         required index,
-                                      }) => context.showContextMenu(
-                                        globalPosition: details.globalPosition,
-                                        children: getMessageOptions(message),
-                                      ),
+                                        TapUpDetails? details,
+                                      }) => details?.globalPosition == null
+                                      ? null
+                                      : context.showContextMenu(
+                                          globalPosition:
+                                              details!.globalPosition,
+                                          children: getMessageOptions(message),
+                                        ),
                                   onMessageLongPress:
                                       (
                                         context,
@@ -246,11 +249,18 @@ class RoomChat extends HookConsumerWidget {
                                                         as String)
                                                     .replaceAllMapped(
                                                       RegExp(
-                                                        regexLink,
+                                                        "(<a\\b[^>]*>.*?<\\/a>)|(\\bhttps?:\\/\\/[^\\s<]+)",
                                                         caseSensitive: false,
                                                       ),
-                                                      (m) =>
-                                                          "<a href=\"${m.group(0)!}\">${m.group(0)!}</a>",
+                                                      (m) {
+                                                        // If it's already an <a> tag, leave it unchanged
+                                                        if (m.group(1) != null)
+                                                          return m.group(1)!;
+
+                                                        // Otherwise, wrap the bare URL
+                                                        final url = m.group(2)!;
+                                                        return "<a href=\"$url\">$url</a>";
+                                                      },
                                                     )
                                                     .replaceAll("\n", "<br/>") +
                                                 ((message.editedAt != null)

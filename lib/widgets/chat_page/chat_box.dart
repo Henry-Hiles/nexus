@@ -123,11 +123,7 @@ class ChatBox extends HookConsumerWidget {
                           triggerCharacter.value = newTriggerCharacter;
                           query.value = newQuery;
                         },
-                        triggerCharacterAndStyles: {
-                          "@": style,
-                          "#": style,
-                          ":": style,
-                        },
+                        triggerCharacterAndStyles: {"@": style, "#": style},
                         builder: (context, key) => TextFormField(
                           enabled: room.canSendDefaultMessages,
                           maxLines: 12,

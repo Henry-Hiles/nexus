@@ -128,9 +128,8 @@ class RoomChatController extends AsyncNotifier<ChatController> {
     await room.sendTextEvent(
       taggedMessage,
       editEventId: relationType == RelationType.edit ? relation?.id : null,
-      displayPendingEvent: relationType != RelationType.edit,
-      inReplyTo: (relationType == RelationType.reply)
-          ? await room.getEventById(relation!.id)
+      inReplyTo: (relationType == RelationType.reply && relation != null)
+          ? await room.getEventById(relation.id)
           : null,
     );
   }

@@ -197,10 +197,10 @@ packages:
     dependency: "direct main"
     description:
       name: clipboard
-      sha256: "619f4e9e946cfd637ac994f49af356bb590ab88b0c4aded03204ee566fd69d9e"
+      sha256: c668fd6ce6715b5054766a3217c88bcf56f993c373ec95121a49c9415a67aa99
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.8"
+    version: "3.0.10"
   clock:
     dependency: transitive
     description:
@@ -213,10 +213,10 @@ packages:
     dependency: transitive
     description:
       name: code_builder
-      sha256: "11654819532ba94c34de52ff5feb52bd81cba1de00ef2ed622fd50295f9d4243"
+      sha256: "6a6cab2ba4680d6423f34a9b972a4c9a94ebe1b62ecec4e1a1f2cba91fd1319d"
       url: "https://pub.dev"
     source: hosted
-    version: "4.11.0"
+    version: "4.11.1"
   collection:
     dependency: "direct main"
     description:
@@ -301,10 +301,10 @@ packages:
     dependency: transitive
     description:
       name: custom_lint_visitor
-      sha256: "91f2a81e9f0abb4b9f3bb529f78b6227ce6050300d1ae5b1e2c69c66c7a566d8"
+      sha256: e466d17856197cf9bce7ca03804d784fddab809db7bda787f3d2799ac89faadd
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.0+8.4.0"
+    version: "1.0.0+9.0.0"
   dart_style:
     dependency: transitive
     description:
@@ -451,10 +451,10 @@ packages:
     description:
       path: "packages/flutter_chat_ui"
       ref: HEAD
-      resolved-ref: "6cfbadbf364251dd3c6a986e20c9d97636ad3412"
+      resolved-ref: "82a10e471e7b38ee709b7555b47916903c8d64a4"
       url: "https://github.com/Henry-Hiles/flutter_chat_ui"
     source: git
-    version: "2.9.1"
+    version: "2.11.1"
   flutter_hooks:
     dependency: "direct main"
     description:
@@ -476,10 +476,10 @@ packages:
     description:
       path: "packages/flutter_link_previewer"
       ref: HEAD
-      resolved-ref: "6cfbadbf364251dd3c6a986e20c9d97636ad3412"
+      resolved-ref: "82a10e471e7b38ee709b7555b47916903c8d64a4"
       url: "https://github.com/Henry-Hiles/flutter_chat_ui"
     source: git
-    version: "4.1.2"
+    version: "4.2.0"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -596,18 +596,18 @@ packages:
     description:
       path: "packages/flyer_chat_text_message"
       ref: HEAD
-      resolved-ref: "6cfbadbf364251dd3c6a986e20c9d97636ad3412"
+      resolved-ref: "82a10e471e7b38ee709b7555b47916903c8d64a4"
       url: "https://github.com/Henry-Hiles/flutter_chat_ui"
     source: git
-    version: "2.5.2"
+    version: "2.6.0"
   freezed:
     dependency: "direct dev"
     description:
       name: freezed
-      sha256: "13065f10e135263a4f5a4391b79a8efc5fb8106f8dd555a9e49b750b45393d77"
+      sha256: "03dd9b7423ff0e31b7e01b2204593e5e1ac5ee553b6ea9d8184dff4a26b9fb07"
       url: "https://pub.dev"
     source: hosted
-    version: "3.2.3"
+    version: "3.2.4"
   freezed_annotation:
     dependency: "direct main"
     description:
@@ -1164,10 +1164,10 @@ packages:
     dependency: transitive
     description:
       name: scrollview_observer
-      sha256: c2f713509f18f88f637b2084b47a90c91fb1ef066d5d82d2cf3194d8509dc6ab
+      sha256: "6e40ced415145c449a691d892157a3b854b751f024aed20d9aebda04c21444a3"
       url: "https://pub.dev"
     source: hosted
-    version: "1.26.2"
+    version: "1.26.3"
   sdp_transform:
     dependency: transitive
     description:
@@ -1401,10 +1401,10 @@ packages:
     dependency: "direct main"
     description:
       name: sqflite_common_ffi
-      sha256: "9faa2fedc5385ef238ce772589f7718c24cdddd27419b609bb9c6f703ea27988"
+      sha256: "8d7b8749a516cbf6e9057f9b480b716ad14fc4f3d3873ca6938919cc626d9025"
       url: "https://pub.dev"
     source: hosted
-    version: "2.3.6"
+    version: "2.3.7+1"
   sqlite3:
     dependency: transitive
     description:

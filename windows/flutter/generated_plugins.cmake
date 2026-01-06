@@ -3,6 +3,7 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  clipboard
   dynamic_system_colors
   file_selector_windows
   screen_retriever_windows
