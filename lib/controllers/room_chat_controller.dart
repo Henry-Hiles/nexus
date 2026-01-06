@@ -40,7 +40,16 @@ class RoomChatController extends AsyncNotifier<ChatController> {
             if (oldMessage == null || message == null) return;
             return await updateMessage(
               oldMessage,
-              message.copyWith(id: oldMessage.id),
+              message.copyWith(
+                id: oldMessage.id,
+                replyToMessageId: oldMessage.replyToMessageId,
+                metadata: {
+                  ...(oldMessage.metadata ?? {}),
+                  ...((message.metadata ?? {}).filterMap(
+                    (key, value) => value == null ? null : MapEntry(key, value),
+                  )),
+                },
+              ),
             );
           }
           if (message != null) {
@@ -119,8 +128,9 @@ class RoomChatController extends AsyncNotifier<ChatController> {
     await room.sendTextEvent(
       taggedMessage,
       editEventId: relationType == RelationType.edit ? relation?.id : null,
-      inReplyTo: (relationType == RelationType.reply && relation != null)
-          ? await room.getEventById(relation.id)
+      displayPendingEvent: relationType != RelationType.edit,
+      inReplyTo: (relationType == RelationType.reply)
+          ? await room.getEventById(relation!.id)
           : null,
     );
   }

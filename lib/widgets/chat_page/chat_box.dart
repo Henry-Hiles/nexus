@@ -35,9 +35,13 @@ class ChatBox extends HookConsumerWidget {
         relatedMessage is TextMessage &&
         controller.value.text.isEmpty) {
       final text = (relatedMessage as TextMessage).text;
-      controller.value.text = relatedMessage?.replyToMessageId == null
+      final splitText = relatedMessage?.replyToMessageId == null
           ? text
           : text.split("\n\n").sublist(1).join("\n\n");
+      final notEmpty = splitText.isEmpty ? text : splitText;
+      controller.value.text = notEmpty.startsWith("* ")
+          ? notEmpty.substring(2)
+          : notEmpty;
     }
 
     void send() {

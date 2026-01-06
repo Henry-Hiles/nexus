@@ -67,6 +67,7 @@ class RoomChat extends HookConsumerWidget {
                   title: Text("Reply"),
                 ),
               ),
+              // Should check if is state event (has state_key), if so, don't show edit option
               if (message.authorId == room.roomData.client.userID)
                 PopupMenuItem(
                   onTap: () {
