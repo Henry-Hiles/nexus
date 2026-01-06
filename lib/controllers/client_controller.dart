@@ -2,7 +2,8 @@ import "dart:convert";
 import "dart:io";
 import "package:flutter/foundation.dart";
 import "package:nexus/controllers/database_controller.dart";
-import "package:flutter_vodozemac/flutter_vodozemac.dart";
+import "package:vodozemac/vodozemac.dart" as vod;
+import "package:flutter_vodozemac/flutter_vodozemac.dart" as fl_vod;
 import "package:matrix/matrix.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/secure_storage_controller.dart";
@@ -18,6 +19,7 @@ class ClientController extends AsyncNotifier<Client> {
 
   @override
   Future<Client> build() async {
+    if (!vod.isInitialized()) fl_vod.init();
     final client = Client(
       "nexus",
       logLevel: kReleaseMode ? Level.warning : Level.verbose,
@@ -29,7 +31,7 @@ class ClientController extends AsyncNotifier<Client> {
       ),
       nativeImplementations: NativeImplementationsIsolate(
         compute,
-        vodozemacInit: init,
+        vodozemacInit: fl_vod.init,
       ),
     );
 
