@@ -1,6 +1,7 @@
 import "dart:convert";
 import "dart:io";
 import "package:flutter/foundation.dart";
+import "package:matrix/encryption.dart";
 import "package:nexus/controllers/database_controller.dart";
 import "package:vodozemac/vodozemac.dart" as vod;
 import "package:flutter_vodozemac/flutter_vodozemac.dart" as fl_vod;
@@ -25,6 +26,7 @@ class ClientController extends AsyncNotifier<Client> {
       logLevel: kReleaseMode ? Level.warning : Level.verbose,
       importantStateEvents: {"im.ponies.room_emotes"},
       supportedLoginTypes: {AuthenticationTypes.password},
+      verificationMethods: {KeyVerificationMethod.emoji},
       database: await MatrixSdkDatabase.init(
         "nexus",
         database: await ref.watch(DatabaseController.provider.future),
@@ -50,6 +52,12 @@ class ClientController extends AsyncNotifier<Client> {
         newDeviceID: backup.deviceID,
         newDeviceName: backup.deviceName,
       );
+    }
+
+    if (client.userID != null) {
+      //   client.encryption?.keyVerificationManager.addRequest(
+      //     KeyVerification(encryption: client.encryption!, userId: client.userID!),
+      //   );
     }
 
     return client;

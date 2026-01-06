@@ -12,6 +12,11 @@ environment:
   sdk: "^3.9.2"
 
 dependency_overrides:
+  vodozemac:
+    git:
+      url: https://github.com/famedly/dart-vodozemac
+      ref: krille/use-specced-olm-session-config
+      path: dart
   analyzer: ^8.4.0
   source_gen: ^4.0.2
 
