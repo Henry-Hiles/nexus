@@ -254,8 +254,10 @@ class RoomChat extends HookConsumerWidget {
                                                       ),
                                                       (m) {
                                                         // If it's already an <a> tag, leave it unchanged
-                                                        if (m.group(1) != null)
+                                                        if (m.group(1) !=
+                                                            null) {
                                                           return m.group(1)!;
+                                                        }
 
                                                         // Otherwise, wrap the bare URL
                                                         final url = m.group(2)!;
