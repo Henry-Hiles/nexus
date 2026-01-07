@@ -17,7 +17,7 @@ A simple and user-friendly Matrix client made with Flutter and the Matrix Dart S
 
 -   [ ] Platform Support
     -   [x] Linux
-    -   [x] Windows (untested, if you are interested in helping to test, open an issue)
+    -   [ ] Windows: Waiting on https://github.com/samuelezedi/flutter_clipboard/issues/21
     -   [ ] MacOS
     -   [ ] Android
     -   [ ] iOS
