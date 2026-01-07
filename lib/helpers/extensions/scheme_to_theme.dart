@@ -7,6 +7,10 @@ extension SchemeToTheme on ColorScheme {
       titleSpacing: 0,
       backgroundColor: surfaceContainerLow,
     ),
+    textTheme: ThemeData(
+      fontFamilyFallback: ["sans"],
+      brightness: brightness,
+    ).textTheme,
     inputDecorationTheme: const InputDecorationTheme(
       border: OutlineInputBorder(),
     ),
