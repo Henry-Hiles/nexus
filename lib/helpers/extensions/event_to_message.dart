@@ -121,6 +121,7 @@ extension EventToMessage on Event {
       _ =>
         // Turn this on for debugging purposes
         false
+            // ignore: dead_code
             ? Message.unsupported(
                 metadata: metadata,
                 id: eventId,
