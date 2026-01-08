@@ -119,7 +119,7 @@ cd nexus
 
 #### Windows / MacOS
 
-Install Rust, Flutter, and Git.
+I don't really know. You will need Flutter and Rust, and otherwise I guess just keep installing stuff until there aren't any errors.
 
 ###
 
