@@ -27,6 +27,12 @@ jobs:
           flutter pub run build_runner build --delete-conflicting-outputs
           flutter build windows --release
 
+       name: "Upload exe zip"
+        uses: "actions/upload-artifact@v4"
+        with:
+          name: "windows-portable"
+          path: "build/windows/x64/runner/Release/"
+
       - name: "Install Inno Setup"
         run: choco install innosetup -y
 
