@@ -1,4 +1,4 @@
-name: "Build Windows EXE"
+name: "Build Windows Installer"
 
 on:
   workflow_dispatch:
@@ -20,15 +20,21 @@ jobs:
           targets: "x86_64-pc-windows-msvc"
 
       - name: "Install Flutter dependencies"
-        run: "flutter pub get"
+        run: flutter pub get
 
-      - name: "Build Windows EXE"
+      - name: "Run build_runner & build Windows EXE"
         run: |
           flutter pub run build_runner build --delete-conflicting-outputs
           flutter build windows --release
 
-      - name: "Upload Windows build"
+      - name: "Install Inno Setup"
+        run: choco install innosetup -y
+
+      - name: "Build Inno Setup installer"
+        run: iscc installer.iss
+
+      - name: "Upload installer artifact"
         uses: "actions/upload-artifact@v4"
         with:
-          name: "windows-exe"
-          path: "build/windows/x64/runner/Release/nexus.exe"
+          name: "windows-installer"
+          path: "dist/*.exe"
