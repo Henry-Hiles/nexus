@@ -15,8 +15,8 @@ class MembersController extends AsyncNotifier<IList<MatrixEvent>> {
         [],
   );
 
-  static final provider =
-      AsyncNotifierProvider.family<MembersController, IList<MatrixEvent>, Room>(
+  static final provider = AsyncNotifierProvider.family
+      .autoDispose<MembersController, IList<MatrixEvent>, Room>(
         MembersController.new,
       );
 }
