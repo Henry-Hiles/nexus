@@ -38,6 +38,8 @@ A simple and user-friendly Matrix client made with Flutter and the Matrix Dart S
     -   [x] Leaving
     -   [x] Subspaces
 -   [x] Messages
+    -   [x] Encryption
+        -   [ ] Restoring crypto identity from passphrase/key or verification
     -   [x] Sending
         -   [x] Plain text
         -   [x] HTML/Markdown
@@ -48,7 +50,6 @@ A simple and user-friendly Matrix client made with Flutter and the Matrix Dart S
             -   [x] Rooms
         -   [ ] Custom emojis/stickers
         -   [ ] GIFs, maybe through Tenor or something
-        -   [ ] Encrypted messages
     -   [x] Recieving
         -   [x] Plain text
         -   [x] HTML
@@ -66,7 +67,6 @@ A simple and user-friendly Matrix client made with Flutter and the Matrix Dart S
                 -   [x] Matrix URIs
                 -   [x] Matrix.to links
         -   [x] Custom emojis/stickers
-        -   [ ] Encrypted messages
         -   [x] History loading
             -   [x] Backwards
             -   [ ] Forwards
