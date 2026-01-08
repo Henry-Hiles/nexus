@@ -27,7 +27,7 @@ jobs:
           flutter pub run build_runner build --delete-conflicting-outputs
           flutter build windows --release
 
-       name: "Upload exe zip"
+      - name: "Upload exe zip"
         uses: "actions/upload-artifact@v4"
         with:
           name: "windows-portable"
