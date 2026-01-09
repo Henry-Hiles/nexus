@@ -22,8 +22,6 @@ class MentionOverlay extends ConsumerWidget {
     super.key,
   });
 
-  // TODO: Don't embed mentions
-
   @override
   Widget build(BuildContext context, WidgetRef ref) => Padding(
     padding: EdgeInsets.all(8),
