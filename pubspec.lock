@@ -365,10 +365,10 @@ packages:
     dependency: transitive
     description:
       name: ffi
-      sha256: "289279317b4b16eb2bb7e271abccd4bf84ec9bdcbe999e278a94b804f5630418"
+      sha256: d07d37192dbf97461359c1518788f203b0c9102cfd2c35a716b823741219542c
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.4"
+    version: "2.1.5"
   file:
     dependency: transitive
     description:
@@ -443,7 +443,7 @@ packages:
     description:
       path: "packages/flutter_chat_ui"
       ref: HEAD
-      resolved-ref: "82a10e471e7b38ee709b7555b47916903c8d64a4"
+      resolved-ref: "03be67c8c81c8f637672ee03dd8f082d2c223627"
       url: "https://github.com/Henry-Hiles/flutter_chat_ui"
     source: git
     version: "2.11.1"
@@ -468,7 +468,7 @@ packages:
     description:
       path: "packages/flutter_link_previewer"
       ref: HEAD
-      resolved-ref: "82a10e471e7b38ee709b7555b47916903c8d64a4"
+      resolved-ref: "03be67c8c81c8f637672ee03dd8f082d2c223627"
       url: "https://github.com/Henry-Hiles/flutter_chat_ui"
     source: git
     version: "4.2.0"
@@ -636,7 +636,7 @@ packages:
     description:
       path: "packages/flyer_chat_text_message"
       ref: HEAD
-      resolved-ref: "82a10e471e7b38ee709b7555b47916903c8d64a4"
+      resolved-ref: "03be67c8c81c8f637672ee03dd8f082d2c223627"
       url: "https://github.com/Henry-Hiles/flutter_chat_ui"
     source: git
     version: "2.6.0"
@@ -740,10 +740,10 @@ packages:
     dependency: transitive
     description:
       name: idb_shim
-      sha256: "071f3b05032fa62e60ca15db9939f8afbaf403b37e67747ac88f858c3e999228"
+      sha256: b26b2ad126be411d0072d1dfc4d97ebe02121a863e4eadc635b511b9bc138489
       url: "https://pub.dev"
     source: hosted
-    version: "2.6.7+1"
+    version: "2.7.1+2"
   image:
     dependency: transitive
     description:
@@ -1212,10 +1212,10 @@ packages:
     dependency: transitive
     description:
       name: sembast
-      sha256: c8063c3146c3c8d5f5b04230de7682c768440a575fbda2634f14d22f263197c3
+      sha256: "139cf71496105de32e7a08a4e3a1ead0f81c4a616ec9703ed07e8f0d10cdd505"
       url: "https://pub.dev"
     source: hosted
-    version: "3.8.5+2"
+    version: "3.8.6"
   shared_preferences:
     dependency: "direct main"
     description:
@@ -1618,10 +1618,10 @@ packages:
     dependency: transitive
     description:
       name: watcher
-      sha256: f52385d4f73589977c80797e60fe51014f7f2b957b5e9a62c3f6ada439889249
+      sha256: "1398c9f081a753f9226febe8900fce8f7d0a67163334e1c94a2438339d79d635"
       url: "https://pub.dev"
     source: hosted
-    version: "1.2.0"
+    version: "1.2.1"
   web:
     dependency: transitive
     description:
@@ -1720,5 +1720,5 @@ packages:
     source: hosted
     version: "2.2.3"
 sdks:
-  dart: ">=3.9.2 <4.0.0"
+  dart: ">=3.10.0 <4.0.0"
   flutter: ">=3.35.0"
