@@ -36,7 +36,7 @@ class RoomAppbar extends StatelessWidget implements PreferredSizeWidget {
     title: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(room.title, overflow: TextOverflow.ellipsis),
+        Text(room.title, overflow: TextOverflow.ellipsis, maxLines: 1),
         if (room.roomData.topic.isNotEmpty)
           Text(
             room.roomData.topic,

@@ -15,7 +15,9 @@ class ClientController extends AsyncNotifier<Client> {
   bool updateShouldNotify(
     AsyncValue<Client> previous,
     AsyncValue<Client> next,
-  ) => previous.hasValue != next.hasValue;
+  ) =>
+      previous.hasValue != next.hasValue ||
+      previous.value?.accessToken != next.value?.accessToken;
   static const sessionBackupKey = "sessionBackup";
 
   @override

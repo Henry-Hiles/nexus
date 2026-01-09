@@ -108,7 +108,7 @@ class MentionOverlay extends ConsumerWidget {
                                 title: Text(room.title),
                                 subtitle: room.roomData.topic.isEmpty
                                     ? null
-                                    : Text(room.roomData.topic),
+                                    : Text(room.roomData.topic, maxLines: 1),
                                 onTap: () => addTag(
                                   id: "[#${room.roomData.getLocalizedDisplayname()}](https://matrix.to/#/${room.roomData.id})",
                                   name:
