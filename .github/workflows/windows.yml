@@ -37,7 +37,7 @@ jobs:
         run: choco install innosetup -y
 
       - name: "Build Inno Setup installer"
-        run: iscc installer.iss
+        run: iscc windows/installer.iss
 
       - name: "Upload installer artifact"
         uses: "actions/upload-artifact@v4"
