@@ -1,5 +1,7 @@
 import "dart:io";
+import "dart:ui";
 import "package:flutter/material.dart";
+import "package:window_manager/window_manager.dart";
 
 class Appbar extends StatelessWidget implements PreferredSizeWidget {
   final Widget? leading;
@@ -7,6 +9,7 @@ class Appbar extends StatelessWidget implements PreferredSizeWidget {
   final Color? backgroundColor;
   final double? scrolledUnderElevation;
   final List<Widget> actions;
+
   const Appbar({
     super.key,
     this.title,
@@ -17,19 +20,42 @@ class Appbar extends StatelessWidget implements PreferredSizeWidget {
   });
 
   @override
-  Size get preferredSize => AppBar().preferredSize;
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 
   @override
-  AppBar build(BuildContext context) => AppBar(
-    leading: leading,
-    backgroundColor: backgroundColor,
-    scrolledUnderElevation: scrolledUnderElevation,
-    actionsPadding: EdgeInsets.symmetric(horizontal: 8),
-    title: title,
-    actions: [
-      ...actions,
-      if (!(Platform.isAndroid || Platform.isIOS))
-        IconButton(onPressed: () => exit(0), icon: Icon(Icons.close)),
-    ],
-  );
+  Widget build(BuildContext context) {
+    Future<void> maximize() async {
+      final isMaximized = await windowManager.isMaximized();
+
+      if (isMaximized) {
+        return windowManager.unmaximize();
+      }
+
+      return windowManager.maximize();
+    }
+
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onDoubleTap: maximize,
+      onPanStart: (_) => windowManager.startDragging(),
+      child: AppBar(
+        leading: leading,
+        backgroundColor: backgroundColor,
+        scrolledUnderElevation: scrolledUnderElevation,
+        actionsPadding: const EdgeInsets.symmetric(horizontal: 8),
+        title: title,
+        actions: [
+          ...actions,
+          if (!(Platform.isAndroid || Platform.isIOS)) ...[
+            if (!Platform.isLinux)
+              IconButton(
+                onPressed: maximize,
+                icon: const Icon(Icons.fullscreen),
+              ),
+            IconButton(onPressed: () => exit(0), icon: const Icon(Icons.close)),
+          ],
+        ],
+      ),
+    );
+  }
 }

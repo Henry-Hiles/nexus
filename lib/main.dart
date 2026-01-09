@@ -1,3 +1,5 @@
+import "dart:io";
+
 import "package:flutter/foundation.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client_controller.dart";
@@ -58,10 +60,14 @@ void main() async {
     WindowOptions(titleBarStyle: TitleBarStyle.hidden),
   );
 
+  if (Platform.isLinux) {
+    setWindowMinSize(const Size.square(500));
+  } else {
+    await windowManager.setMinimumSize(Size.square(500));
+  }
+
   FlutterError.onError = (FlutterErrorDetails details) =>
       showError(details.exception.toString(), details.stack);
-
-  setWindowMinSize(const Size.square(500));
 
   runApp(
     ProviderScope(

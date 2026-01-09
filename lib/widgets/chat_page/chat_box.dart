@@ -45,6 +45,7 @@ class ChatBox extends HookConsumerWidget {
     }
 
     void send() {
+      if (controller.value.text.isEmpty) return;
       ref
           .watch(RoomChatController.provider(room).notifier)
           .send(
