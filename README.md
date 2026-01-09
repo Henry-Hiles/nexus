@@ -17,7 +17,7 @@ A simple and user-friendly Matrix client made with Flutter and the Matrix Dart S
 
 -   [ ] Platform Support
     -   [x] Linux
-    -   [x] Windows: Untested, waiting for testers
+    -   [x] Windows
     -   [ ] MacOS
     -   [ ] Android
     -   [ ] iOS
