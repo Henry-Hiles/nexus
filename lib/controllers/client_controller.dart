@@ -56,12 +56,6 @@ class ClientController extends AsyncNotifier<Client> {
       );
     }
 
-    if (client.userID != null) {
-      //   client.encryption?.keyVerificationManager.addRequest(
-      //     KeyVerification(encryption: client.encryption!, userId: client.userID!),
-      //   );
-    }
-
     return client;
   }
 
