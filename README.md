@@ -58,6 +58,7 @@ A simple and user-friendly Matrix client made with Flutter and the Matrix Dart S
             -   [ ] Jump to original message
         -   [x] Edits
         -   [x] Attachments
+            -   [x] Blurhashing
             -   [ ] Downloading attachments
             -   [ ] Opening attachments in their own view
         -   [x] Mentions
@@ -87,6 +88,7 @@ A simple and user-friendly Matrix client made with Flutter and the Matrix Dart S
     -   [ ] Spam filtering
 -   [ ] Settings
     -   [ ] Light/Dark mode
+    -   [ ] Show media by default
     -   [ ] Dynamic Theming
     -   [ ] Devices
         -   [ ] Viewing devices

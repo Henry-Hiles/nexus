@@ -80,6 +80,7 @@ extension EventToMessage on Event {
           source: (await getAttachmentUri()).toString(),
           replyToMessageId: replyId,
           deliveredAt: originServerTs,
+          blurhash: (event.content["info"] as Map?)?["xyz.amorgan.blurhash"],
         ),
         MessageTypes.Audio => Message.audio(
           metadata: metadata,
