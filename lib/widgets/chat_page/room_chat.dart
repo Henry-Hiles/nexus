@@ -244,8 +244,12 @@ class RoomChat extends HookConsumerWidget {
                                           required bool isSentByMe,
                                           MessageGroupStatus? groupStatus,
                                         }) => FlyerChatTextMessage(
-                                          customWidget: Html(
-                                            (message.metadata?["formatted"]
+                                          customWidget: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Html(
+                                                (message.metadata?["formatted"]
                                                         as String)
                                                     .replaceAllMapped(
                                                       RegExp(
@@ -264,11 +268,17 @@ class RoomChat extends HookConsumerWidget {
                                                         return "<a href=\"$url\">$url</a>";
                                                       },
                                                     )
-                                                    .replaceAll("\n", "<br/>") +
-                                                ((message.editedAt != null)
-                                                    ? "<sub edited>(edited)</sub>"
-                                                    : ""),
-                                            client: room.roomData.client,
+                                                    .replaceAll("\n", "<br/>"),
+                                                client: room.roomData.client,
+                                              ),
+                                              if (message.editedAt != null)
+                                                Text(
+                                                  "(edited)",
+                                                  style: theme
+                                                      .textTheme
+                                                      .labelSmall,
+                                                ),
+                                            ],
                                           ),
                                           topWidget: TopWidget(
                                             message,

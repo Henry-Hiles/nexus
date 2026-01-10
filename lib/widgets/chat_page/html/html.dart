@@ -142,8 +142,6 @@ class Html extends ConsumerWidget {
 
                 "data-mx-bg-color" => MapEntry("background-color", value),
 
-                "edited" => MapEntry("display", "block"),
-
                 _ => null,
               },
             )
