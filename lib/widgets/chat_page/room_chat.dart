@@ -1,9 +1,11 @@
+import "dart:async";
+
+import "package:dynamic_polls/dynamic_polls.dart";
 import "package:flutter/material.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:flutter_chat_ui/flutter_chat_ui.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:flutter_link_previewer/flutter_link_previewer.dart";
-import "package:flutter_polls/flutter_polls.dart";
 import "package:flyer_chat_file_message/flyer_chat_file_message.dart";
 import "package:flyer_chat_image_message/flyer_chat_image_message.dart";
 import "package:flyer_chat_system_message/flyer_chat_system_message.dart";
@@ -266,77 +268,72 @@ class RoomChat extends HookConsumerWidget {
                                                     return acc;
                                                   });
 
-                                          return Container(
-                                            decoration: BoxDecoration(
-                                              border: Border.all(
-                                                color: theme
-                                                    .colorScheme
-                                                    .primaryContainer,
-                                                width: 4,
+                                          return Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            spacing: 4,
+                                            children: [
+                                              TopWidget(
+                                                message,
+                                                headers: room
+                                                    .roomData
+                                                    .client
+                                                    .headers,
+                                                groupStatus: groupStatus,
                                               ),
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                            ),
-                                            padding: EdgeInsets.all(8),
-                                            width: 500,
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                TopWidget(
-                                                  message,
-                                                  headers: room
-                                                      .roomData
-                                                      .client
-                                                      .headers,
-                                                  groupStatus: groupStatus,
-                                                ),
-                                                FlutterPolls(
-                                                  votedCheckmark: const Icon(
-                                                    Icons
-                                                        .check_circle_outline_rounded,
-                                                    size: 16,
-                                                  ),
-                                                  pollId: message.id,
-                                                  onVoted:
-                                                      (
-                                                        pollOption,
-                                                        newTotalVotes,
-                                                      ) async {
-                                                        return true;
-                                                      },
-                                                  pollOptionsSplashColor: theme
-                                                      .colorScheme
-                                                      .primaryContainer,
-                                                  voteInProgressColor: theme
-                                                      .colorScheme
-                                                      .primaryContainer,
-                                                  leadingVotedProgessColor:
-                                                      theme
-                                                          .colorScheme
-                                                          .primaryContainer,
-                                                  votedBackgroundColor: theme
-                                                      .colorScheme
-                                                      .surfaceContainer,
-                                                  pollTitle: Text(
-                                                    poll.question.mText,
-                                                  ),
-                                                  pollOptions: poll.answers
-                                                      .map(
-                                                        (option) => PollOption(
-                                                          title: Text(
-                                                            option.mText,
+                                              DynamicPolls(
+                                                startDate: DateTime.now(),
+                                                endDate: DateTime.now(),
+                                                private:
+                                                    poll.kind ==
+                                                    PollKind.undisclosed,
+                                                allowReselection: true,
+                                                backgroundDecoration:
+                                                    BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.all(
+                                                            Radius.circular(16),
                                                           ),
-                                                          votes:
-                                                              responses[option
-                                                                  .id] ??
-                                                              0,
-                                                        ),
-                                                      )
-                                                      .toList(),
+                                                      border: Border.all(
+                                                        color: theme
+                                                            .colorScheme
+                                                            .primaryContainer,
+                                                        width: 4,
+                                                      ),
+                                                    ),
+                                                allStyle: Styles(
+                                                  titleStyle: TitleStyle(
+                                                    style: theme
+                                                        .textTheme
+                                                        .headlineSmall,
+                                                  ),
+                                                  optionStyle: OptionStyle(
+                                                    fillColor: theme
+                                                        .colorScheme
+                                                        .primaryContainer,
+                                                    selectedBorderColor: theme
+                                                        .colorScheme
+                                                        .primary,
+                                                    borderColor: theme
+                                                        .colorScheme
+                                                        .primary,
+                                                    unselectedBorderColor:
+                                                        Colors.transparent,
+                                                    textSelectColor: theme
+                                                        .colorScheme
+                                                        .primary,
+                                                  ),
                                                 ),
-                                              ],
-                                            ),
+                                                onOptionSelected:
+                                                    (int index) {},
+                                                title: poll.question.mText,
+                                                options: poll.answers
+                                                    .map(
+                                                      (option) => option.mText,
+                                                    )
+                                                    .toList(),
+                                              ),
+                                            ],
                                           );
                                         },
 

@@ -124,11 +124,11 @@ class LoginPage extends HookConsumerWidget {
                   iconUrl: "https://federated.nexus/images/icon.png",
                 ),
                 Homeserver(
-                  name: "envs.net",
+                  name: "Unredacted",
                   description:
-                      "envs.net is a minimalist, non-commercial shared linux system and will always be free to use.",
-                  url: Uri.https("envs.net"),
-                  iconUrl: "https://envs.net/favicon.ico",
+                      "Unredacted is a 501(c)(3) non-profit organization that builds Internet infrastructure and services to help people evade censorship and protect their right to privacy.",
+                  url: Uri.https("unredacted.org", "services/si/matrix"),
+                  iconUrl: "https://unredacted.org/favicon.ico",
                 ),
               ].map(
                 (homeserver) => Card(
