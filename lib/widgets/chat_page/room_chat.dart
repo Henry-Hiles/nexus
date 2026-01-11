@@ -3,11 +3,13 @@ import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:flutter_chat_ui/flutter_chat_ui.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:flutter_link_previewer/flutter_link_previewer.dart";
+import "package:flutter_polls/flutter_polls.dart";
 import "package:flyer_chat_file_message/flyer_chat_file_message.dart";
 import "package:flyer_chat_image_message/flyer_chat_image_message.dart";
 import "package:flyer_chat_system_message/flyer_chat_system_message.dart";
 import "package:flyer_chat_text_message/flyer_chat_text_message.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
+import "package:matrix/matrix.dart";
 import "package:nexus/controllers/selected_room_controller.dart";
 import "package:nexus/controllers/room_chat_controller.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
@@ -236,6 +238,108 @@ class RoomChat extends HookConsumerWidget {
                                           replyToMessage.value = null,
                                       room: room.roomData,
                                     ),
+                                    customMessageBuilder:
+                                        (
+                                          context,
+                                          message,
+                                          index, {
+                                          required bool isSentByMe,
+                                          MessageGroupStatus? groupStatus,
+                                        }) {
+                                          final poll =
+                                              message.metadata?["poll"]
+                                                  as PollStartContent;
+                                          final responses =
+                                              (message.metadata?["responses"]
+                                                      as Map<
+                                                        String,
+                                                        Set<String>
+                                                      >)
+                                                  .values
+                                                  .expand((set) => set)
+                                                  .fold(<String, int>{}, (
+                                                    acc,
+                                                    value,
+                                                  ) {
+                                                    acc[value] =
+                                                        (acc[value] ?? 0) + 1;
+                                                    return acc;
+                                                  });
+
+                                          return Container(
+                                            decoration: BoxDecoration(
+                                              border: Border.all(
+                                                color: theme
+                                                    .colorScheme
+                                                    .primaryContainer,
+                                                width: 4,
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                            ),
+                                            padding: EdgeInsets.all(8),
+                                            width: 500,
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                TopWidget(
+                                                  message,
+                                                  headers: room
+                                                      .roomData
+                                                      .client
+                                                      .headers,
+                                                  groupStatus: groupStatus,
+                                                ),
+                                                FlutterPolls(
+                                                  votedCheckmark: const Icon(
+                                                    Icons
+                                                        .check_circle_outline_rounded,
+                                                    size: 16,
+                                                  ),
+                                                  pollId: message.id,
+                                                  onVoted:
+                                                      (
+                                                        pollOption,
+                                                        newTotalVotes,
+                                                      ) async {
+                                                        return true;
+                                                      },
+                                                  pollOptionsSplashColor: theme
+                                                      .colorScheme
+                                                      .primaryContainer,
+                                                  voteInProgressColor: theme
+                                                      .colorScheme
+                                                      .primaryContainer,
+                                                  leadingVotedProgessColor:
+                                                      theme
+                                                          .colorScheme
+                                                          .primaryContainer,
+                                                  votedBackgroundColor: theme
+                                                      .colorScheme
+                                                      .surfaceContainer,
+                                                  pollTitle: Text(
+                                                    poll.question.mText,
+                                                  ),
+                                                  pollOptions: poll.answers
+                                                      .map(
+                                                        (option) => PollOption(
+                                                          title: Text(
+                                                            option.mText,
+                                                          ),
+                                                          votes:
+                                                              responses[option
+                                                                  .id] ??
+                                                              0,
+                                                        ),
+                                                      )
+                                                      .toList(),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        },
+
                                     textMessageBuilder:
                                         (
                                           context,

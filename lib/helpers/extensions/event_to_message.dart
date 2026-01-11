@@ -3,7 +3,8 @@ import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:matrix/matrix.dart";
 
 extension EventToMessage on Event {
-  Future<Message?> toMessage({
+  Future<Message?> toMessage(
+    Timeline timeline, {
     bool mustBeText = false,
     bool includeEdits = false,
   }) async {
@@ -25,7 +26,7 @@ extension EventToMessage on Event {
           event.content["formatted_body"] ??
           event.content["body"] ??
           "",
-      "reply": await replyEvent?.toMessage(mustBeText: true),
+      "reply": await replyEvent?.toMessage(mustBeText: true, timeline),
       "body": newContent?["body"] ?? event.content["body"],
       "eventType": event.type,
       "avatarUrl": sender.avatarUrl.toString(),
@@ -65,11 +66,20 @@ extension EventToMessage on Event {
             as TextMessage;
 
     if (mustBeText) return asText;
-
     return switch (type) {
       EventTypes.Encrypted => asText.copyWith(
         text: "Unable to decrypt message.",
         metadata: {...metadata, "formatted": "Unable to decrypt message."},
+      ),
+      PollEventContent.startType => Message.custom(
+        metadata: {
+          ...metadata,
+          "poll": event.parsedPollEventContent.pollStartContent,
+          "responses": event.getPollResponses(timeline),
+        },
+        id: eventId,
+        deliveredAt: originServerTs,
+        authorId: senderId,
       ),
       (EventTypes.Sticker || EventTypes.Message) => switch (messageType) {
         (MessageTypes.Sticker || MessageTypes.Image) => Message.image(

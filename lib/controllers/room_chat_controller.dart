@@ -16,7 +16,7 @@ class RoomChatController extends AsyncNotifier<ChatController> {
 
   @override
   Future<ChatController> build() async {
-    final response = await ref.watch(EventsController.provider(room).future);
+    final timeline = await ref.watch(EventsController.provider(room).future);
 
     ref.onDispose(
       room.client.onTimelineEvent.stream.listen((event) async {
@@ -31,7 +31,7 @@ class RoomChatController extends AsyncNotifier<ChatController> {
 
           await controller.removeMessage(message);
         } else {
-          final message = await event.toMessage(includeEdits: true);
+          final message = await event.toMessage(includeEdits: true, timeline);
           if (event.relationshipType == RelationshipTypes.edit) {
             final controller = await future;
             final oldMessage = controller.messages.firstWhereOrNull(
@@ -60,7 +60,7 @@ class RoomChatController extends AsyncNotifier<ChatController> {
     );
 
     return InMemoryChatController(
-      messages: await response.events.toMessages(room),
+      messages: await timeline.events.toMessages(room, timeline),
     );
   }
 
@@ -87,18 +87,18 @@ class RoomChatController extends AsyncNotifier<ChatController> {
   Future<void> loadOlder() async {
     final currentEvents = await future;
     await ref.watch(EventsController.provider(room).notifier).prev();
-    final newEvents = await ref.watch(EventsController.provider(room).future);
+    final timeline = await ref.watch(EventsController.provider(room).future);
 
     final controller = await future;
     await controller.insertAllMessages(
-      await newEvents.events
+      await timeline.events
           .where(
             (event) => !currentEvents.messages.any(
               (existingEvent) => existingEvent.id == event.eventId,
             ),
           )
           .toList()
-          .toMessages(room),
+          .toMessages(room, timeline),
       index: 0,
     );
     ref.notifyListeners();
