@@ -73,6 +73,7 @@ dependencies:
   flutter_secure_storage: ^10.0.0
   dynamic_polls: ^0.0.6
   flutter_hooks: ^0.21.3+1
+  cross_cache: ^1.1.0
   
 dev_dependencies:
   build_runner: ^2.4.11

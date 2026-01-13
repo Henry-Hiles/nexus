@@ -258,7 +258,7 @@ packages:
     source: hosted
     version: "1.15.0"
   cross_cache:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: cross_cache
       sha256: "4983a16603cc99b0a14de6a772fa8ee4533411f46f3c423f1386fea7566049c5"

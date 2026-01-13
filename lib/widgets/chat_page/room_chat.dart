@@ -1,5 +1,4 @@
-import "dart:async";
-
+import "package:cross_cache/cross_cache.dart";
 import "package:dynamic_polls/dynamic_polls.dart";
 import "package:flutter/material.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
@@ -12,6 +11,7 @@ import "package:flyer_chat_system_message/flyer_chat_system_message.dart";
 import "package:flyer_chat_text_message/flyer_chat_text_message.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:matrix/matrix.dart";
+import "package:nexus/controllers/cross_cache_controller.dart";
 import "package:nexus/controllers/selected_room_controller.dart";
 import "package:nexus/controllers/room_chat_controller.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
@@ -224,6 +224,39 @@ class RoomChat extends HookConsumerWidget {
                                         globalPosition: details.globalPosition,
                                         children: getMessageOptions(message),
                                       ),
+                                  onMessageTap:
+                                      (
+                                        context,
+                                        message, {
+                                        required details,
+                                        required index,
+                                      }) {
+                                        if (message is ImageMessage) {
+                                          showDialog(
+                                            context: context,
+                                            builder: (_) => Dialog(
+                                              backgroundColor:
+                                                  Colors.transparent,
+                                              insetPadding: EdgeInsets.all(64),
+                                              child: InteractiveViewer(
+                                                child: Image(
+                                                  image: CachedNetworkImage(
+                                                    message.source,
+                                                    ref.watch(
+                                                      CrossCacheController
+                                                          .provider,
+                                                    ),
+                                                    headers: room
+                                                        .roomData
+                                                        .client
+                                                        .headers,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      },
                                   builders: Builders(
                                     loadMoreBuilder: (_) => Loading(),
                                     chatAnimatedListBuilder: (_, itemBuilder) =>
@@ -432,6 +465,17 @@ class RoomChat extends HookConsumerWidget {
                                             groupStatus: groupStatus,
                                             alwaysShow: true,
                                           ),
+                                          customImageProvider:
+                                              CachedNetworkImage(
+                                                message.source,
+                                                ref.watch(
+                                                  CrossCacheController.provider,
+                                                ),
+                                                headers: room
+                                                    .roomData
+                                                    .client
+                                                    .headers,
+                                              ),
                                           errorBuilder:
                                               (context, error, stackTrace) =>
                                                   Center(
@@ -446,7 +490,6 @@ class RoomChat extends HookConsumerWidget {
                                                   ),
                                           message: message,
                                           index: index,
-                                          headers: room.roomData.client.headers,
                                         ),
                                     fileMessageBuilder:
                                         (

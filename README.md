@@ -60,7 +60,7 @@ A simple and user-friendly Matrix client made with Flutter and the Matrix Dart S
         -   [x] Attachments
             -   [x] Blurhashing
             -   [ ] Downloading attachments
-            -   [ ] Opening attachments in their own view
+            -   [x] Opening attachments in their own view
         -   [ ] Polls
         -   [x] Mentions
             -   [x] Users
