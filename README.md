@@ -74,7 +74,7 @@ A simple and user-friendly Matrix client made with Flutter and the Matrix Dart S
             -   [ ] Forwards
     -   [x] Editing
     -   [x] Deleting
--   [ ] Reactions: Waiting on https://github.com/flyerhq/flutter_chat_ui/pull/838
+-   [ ] Reactions: Waiting on https://github.com/flyerhq/flutter_chat_ui/pull/838 or me doing a custom impl
 -   [ ] Pins
     -   [ ] Displaying
     -   [ ] Creating
