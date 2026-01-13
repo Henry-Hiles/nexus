@@ -49,7 +49,7 @@ A simple and user-friendly Matrix client made with Flutter and the Matrix Dart S
             -   [x] Users
             -   [x] Rooms
         -   [ ] Custom emojis/stickers
-        -   [ ] GIFs, maybe through Tenor or something
+        -   [ ] GIFs using Giphy
     -   [x] Recieving
         -   [x] Plain text
         -   [x] HTML
