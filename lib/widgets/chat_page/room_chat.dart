@@ -281,6 +281,8 @@ class RoomChat extends HookConsumerWidget {
                                                     .headers,
                                                 groupStatus: groupStatus,
                                               ),
+
+                                              // TODO: Make this actually work
                                               DynamicPolls(
                                                 startDate: DateTime.now(),
                                                 endDate: DateTime.now(),
