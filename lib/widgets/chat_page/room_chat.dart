@@ -273,105 +273,105 @@ class RoomChat extends HookConsumerWidget {
                                           replyToMessage.value = null,
                                       room: room.roomData,
                                     ),
-                                    customMessageBuilder:
-                                        (
-                                          context,
-                                          message,
-                                          index, {
-                                          required bool isSentByMe,
-                                          MessageGroupStatus? groupStatus,
-                                        }) {
-                                          final poll =
-                                              message.metadata?["poll"]
-                                                  as PollStartContent;
-                                          final responses =
-                                              (message.metadata?["responses"]
-                                                      as Map<
-                                                        String,
-                                                        Set<String>
-                                                      >)
-                                                  .values
-                                                  .expand((set) => set)
-                                                  .fold(<String, int>{}, (
-                                                    acc,
-                                                    value,
-                                                  ) {
-                                                    acc[value] =
-                                                        (acc[value] ?? 0) + 1;
-                                                    return acc;
-                                                  });
 
-                                          return Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            spacing: 4,
-                                            children: [
-                                              TopWidget(
-                                                message,
-                                                headers: room
-                                                    .roomData
-                                                    .client
-                                                    .headers,
-                                                groupStatus: groupStatus,
-                                              ),
+                                    // customMessageBuilder:
+                                    //     (
+                                    //       context,
+                                    //       message,
+                                    //       index, {
+                                    //       required bool isSentByMe,
+                                    //       MessageGroupStatus? groupStatus,
+                                    //     }) {
+                                    //       final poll =
+                                    //           message.metadata?["poll"]
+                                    //               as PollStartContent;
+                                    //       final responses =
+                                    //           (message.metadata?["responses"]
+                                    //                   as Map<
+                                    //                     String,
+                                    //                     Set<String>
+                                    //                   >)
+                                    //               .values
+                                    //               .expand((set) => set)
+                                    //               .fold(<String, int>{}, (
+                                    //                 acc,
+                                    //                 value,
+                                    //               ) {
+                                    //                 acc[value] =
+                                    //                     (acc[value] ?? 0) + 1;
+                                    //                 return acc;
+                                    //               });
 
-                                              // TODO: Make this actually work
-                                              DynamicPolls(
-                                                startDate: DateTime.now(),
-                                                endDate: DateTime.now(),
-                                                private:
-                                                    poll.kind ==
-                                                    PollKind.undisclosed,
-                                                allowReselection: true,
-                                                backgroundDecoration:
-                                                    BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.all(
-                                                            Radius.circular(16),
-                                                          ),
-                                                      border: Border.all(
-                                                        color: theme
-                                                            .colorScheme
-                                                            .primaryContainer,
-                                                        width: 4,
-                                                      ),
-                                                    ),
-                                                allStyle: Styles(
-                                                  titleStyle: TitleStyle(
-                                                    style: theme
-                                                        .textTheme
-                                                        .headlineSmall,
-                                                  ),
-                                                  optionStyle: OptionStyle(
-                                                    fillColor: theme
-                                                        .colorScheme
-                                                        .primaryContainer,
-                                                    selectedBorderColor: theme
-                                                        .colorScheme
-                                                        .primary,
-                                                    borderColor: theme
-                                                        .colorScheme
-                                                        .primary,
-                                                    unselectedBorderColor:
-                                                        Colors.transparent,
-                                                    textSelectColor: theme
-                                                        .colorScheme
-                                                        .primary,
-                                                  ),
-                                                ),
-                                                onOptionSelected:
-                                                    (int index) {},
-                                                title: poll.question.mText,
-                                                options: poll.answers
-                                                    .map(
-                                                      (option) => option.mText,
-                                                    )
-                                                    .toList(),
-                                              ),
-                                            ],
-                                          );
-                                        },
+                                    //       return Column(
+                                    //         crossAxisAlignment:
+                                    //             CrossAxisAlignment.start,
+                                    //         spacing: 4,
+                                    //         children: [
+                                    //           TopWidget(
+                                    //             message,
+                                    //             headers: room
+                                    //                 .roomData
+                                    //                 .client
+                                    //                 .headers,
+                                    //             groupStatus: groupStatus,
+                                    //           ),
 
+                                    //           // TODO: Make this actually work
+                                    //           DynamicPolls(
+                                    //             startDate: DateTime.now(),
+                                    //             endDate: DateTime.now(),
+                                    //             private:
+                                    //                 poll.kind ==
+                                    //                 PollKind.undisclosed,
+                                    //             allowReselection: true,
+                                    //             backgroundDecoration:
+                                    //                 BoxDecoration(
+                                    //                   borderRadius:
+                                    //                       BorderRadius.all(
+                                    //                         Radius.circular(16),
+                                    //                       ),
+                                    //                   border: Border.all(
+                                    //                     color: theme
+                                    //                         .colorScheme
+                                    //                         .primaryContainer,
+                                    //                     width: 4,
+                                    //                   ),
+                                    //                 ),
+                                    //             allStyle: Styles(
+                                    //               titleStyle: TitleStyle(
+                                    //                 style: theme
+                                    //                     .textTheme
+                                    //                     .headlineSmall,
+                                    //               ),
+                                    //               optionStyle: OptionStyle(
+                                    //                 fillColor: theme
+                                    //                     .colorScheme
+                                    //                     .primaryContainer,
+                                    //                 selectedBorderColor: theme
+                                    //                     .colorScheme
+                                    //                     .primary,
+                                    //                 borderColor: theme
+                                    //                     .colorScheme
+                                    //                     .primary,
+                                    //                 unselectedBorderColor:
+                                    //                     Colors.transparent,
+                                    //                 textSelectColor: theme
+                                    //                     .colorScheme
+                                    //                     .primary,
+                                    //               ),
+                                    //             ),
+                                    //             onOptionSelected:
+                                    //                 (int index) {},
+                                    //             title: poll.question.mText,
+                                    //             options: poll.answers
+                                    //                 .map(
+                                    //                   (option) => option.mText,
+                                    //                 )
+                                    //                 .toList(),
+                                    //           ),
+                                    //         ],
+                                    //       );
+                                    //     },
                                     textMessageBuilder:
                                         (
                                           context,
