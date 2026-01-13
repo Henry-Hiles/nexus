@@ -61,7 +61,7 @@ A simple and user-friendly Matrix client made with Flutter and the Matrix Dart S
             -   [x] Blurhashing
             -   [ ] Downloading attachments
             -   [x] Opening attachments in their own view
-        -   [ ] Polls
+        -   [ ] Polls: Waiting on https://github.com/SwanFlutter/dynamic_polls/issues/1
         -   [x] Mentions
             -   [x] Users
             -   [x] Rooms
