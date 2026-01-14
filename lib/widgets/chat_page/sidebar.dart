@@ -256,9 +256,10 @@ class Sidebar extends HookConsumerWidget {
                             icon: Icon(Icons.add),
                           ),
                           IconButton(
-                            onPressed: () => Navigator.of(context).push(
-                              // TODO: explore public rooms/spaces
-                              MaterialPageRoute(builder: (_) => SettingsPage()),
+                            onPressed: () => showDialog(
+                              context: context,
+                              builder: (context) =>
+                                  AlertDialog(title: Text("To-do")),
                             ),
                             icon: Icon(Icons.explore),
                           ),
