@@ -97,6 +97,7 @@ class RoomChat extends HookConsumerWidget {
                           title: Text("Delete Message"),
                           content: Column(
                             mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 "Are you sure you want to delete this message? This can not be reversed.",

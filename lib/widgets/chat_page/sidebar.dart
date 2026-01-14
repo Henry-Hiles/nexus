@@ -1,6 +1,9 @@
 import "package:collection/collection.dart";
 import "package:flutter/material.dart";
+import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
+import "package:matrix/matrix.dart";
+import "package:nexus/controllers/client_controller.dart";
 import "package:nexus/controllers/key_controller.dart";
 import "package:nexus/controllers/selected_space_controller.dart";
 import "package:nexus/controllers/spaces_controller.dart";
@@ -9,6 +12,7 @@ import "package:nexus/helpers/extensions/get_headers.dart";
 import "package:nexus/pages/settings_page.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/widgets/chat_page/room_menu.dart";
+import "package:nexus/widgets/form_text_input.dart";
 
 class Sidebar extends HookConsumerWidget {
   const Sidebar({super.key});
@@ -83,11 +87,172 @@ class Sidebar extends HookConsumerWidget {
                       child: Column(
                         spacing: 8,
                         children: [
-                          IconButton(
-                            onPressed: () => Navigator.of(context).push(
-                              // TODO: join or create room/space
-                              MaterialPageRoute(builder: (_) => SettingsPage()),
-                            ),
+                          PopupMenuButton(
+                            itemBuilder: (_) => [
+                              PopupMenuItem(
+                                onTap: () => showDialog(
+                                  context: context,
+                                  builder: (alertContext) => HookBuilder(
+                                    builder: (_) {
+                                      final roomAlias =
+                                          useTextEditingController();
+                                      return AlertDialog(
+                                        title: Text("Join a Room"),
+                                        content: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              "Enter the room alias, ID, or a Matrix.to link.",
+                                            ),
+                                            SizedBox(height: 12),
+                                            FormTextInput(
+                                              required: false,
+                                              capitalize: true,
+                                              controller: roomAlias,
+                                              title: "#room:server",
+                                            ),
+                                          ],
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: Navigator.of(
+                                              context,
+                                            ).pop,
+                                            child: Text("Cancel"),
+                                          ),
+                                          TextButton(
+                                            onPressed: () async {
+                                              final parsed = roomAlias.text
+                                                  .parseIdentifierIntoParts();
+                                              final alias =
+                                                  parsed?.primaryIdentifier ??
+                                                  roomAlias.text;
+
+                                              Navigator.of(alertContext).pop();
+
+                                              final scaffoldMessenger =
+                                                  ScaffoldMessenger.of(context);
+
+                                              final snackbar = scaffoldMessenger
+                                                  .showSnackBar(
+                                                    SnackBar(
+                                                      content: Text(
+                                                        "Joining room...",
+                                                      ),
+                                                      duration: Duration(
+                                                        days: 999,
+                                                      ),
+                                                    ),
+                                                  );
+
+                                              final client = await ref.watch(
+                                                ClientController
+                                                    .provider
+                                                    .future,
+                                              );
+
+                                              try {
+                                                final id = await client
+                                                    .joinRoom(
+                                                      alias,
+                                                      via: parsed?.via.toList(),
+                                                    );
+
+                                                snackbar.close();
+
+                                                scaffoldMessenger.showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(
+                                                      "Room successfully joined.",
+                                                    ),
+                                                    action: SnackBarAction(
+                                                      label: "Open",
+                                                      onPressed: () async {
+                                                        final spaces = await ref
+                                                            .watch(
+                                                              SpacesController
+                                                                  .provider
+                                                                  .future,
+                                                            );
+
+                                                        final space = spaces
+                                                            .firstWhereOrNull(
+                                                              (space) =>
+                                                                  space.id ==
+                                                                  id,
+                                                            );
+
+                                                        await selectedSpaceNotifier.set(
+                                                          space?.id ??
+                                                              spaces
+                                                                  .firstWhere(
+                                                                    (space) =>
+                                                                        space.children.firstWhereOrNull(
+                                                                          (
+                                                                            child,
+                                                                          ) =>
+                                                                              child.roomData.id ==
+                                                                              id,
+                                                                        ) !=
+                                                                        null,
+                                                                  )
+                                                                  .id,
+                                                        );
+
+                                                        if (space == null) {
+                                                          await selectedRoomNotifier
+                                                              .set(id);
+                                                        }
+                                                      },
+                                                    ),
+                                                  ),
+                                                );
+                                              } catch (error) {
+                                                snackbar.close();
+                                                if (context.mounted) {
+                                                  scaffoldMessenger.showSnackBar(
+                                                    SnackBar(
+                                                      backgroundColor:
+                                                          Theme.of(context)
+                                                              .colorScheme
+                                                              .errorContainer,
+                                                      content: Text(
+                                                        error.toString(),
+                                                        style: TextStyle(
+                                                          color: Theme.of(context)
+                                                              .colorScheme
+                                                              .onErrorContainer,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  );
+                                                }
+                                              }
+                                            },
+                                            child: Text("Join"),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  ),
+                                ),
+                                child: ListTile(
+                                  title: Text(
+                                    "Join an existing room (or space)",
+                                  ),
+                                  leading: Icon(Icons.numbers),
+                                ),
+                              ),
+                              PopupMenuItem(
+                                onTap: () {},
+                                child: ListTile(
+                                  title: Text("Create a new room"),
+                                  leading: Icon(Icons.add),
+                                ),
+                              ),
+                            ],
                             icon: Icon(Icons.add),
                           ),
                           IconButton(

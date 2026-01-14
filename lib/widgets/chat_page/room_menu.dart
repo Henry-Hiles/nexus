@@ -80,6 +80,7 @@ class RoomMenu extends StatelessWidget {
                   title: Text("Report"),
                   content: Column(
                     mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         "Report this room to your server administrators, who can take action like banning this room.",
@@ -90,7 +91,7 @@ class RoomMenu extends StatelessWidget {
                         required: false,
                         capitalize: true,
                         controller: reasonController,
-                        title: "Reason for deletion (optional)",
+                        title: "Reason for report (optional)",
                       ),
                     ],
                   ),
