@@ -40,6 +40,7 @@ class MemberList extends ConsumerWidget {
                   )
                   .map(
                     (member) => ListTile(
+                      onTap: () {},
                       leading: AvatarOrHash(
                         ref
                             .watch(
