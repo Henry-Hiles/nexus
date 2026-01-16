@@ -500,9 +500,14 @@ class RoomChat extends HookConsumerWidget {
                                           required bool isSentByMe,
                                           MessageGroupStatus? groupStatus,
                                         }) => InkWell(
-                                          onTap: () => showAboutDialog(
+                                          onTap: () => showDialog(
                                             context: context,
-                                          ), // TODO: Download
+                                            builder: (_) => Dialog(
+                                              child: Text(
+                                                "TODO: Download Attachments", // TODO
+                                              ),
+                                            ),
+                                          ),
                                           child: FlyerChatFileMessage(
                                             topWidget: TopWidget(
                                               message,

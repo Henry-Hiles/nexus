@@ -51,8 +51,12 @@ class TopWidget extends ConsumerWidget {
           return Padding(
             padding: EdgeInsets.only(bottom: 12),
             child: InkWell(
-              // TODO: Scroll to original message
-              onTap: () => showAboutDialog(context: context),
+              onTap: () => showDialog(
+                context: context,
+                builder: (_) => Dialog(
+                  child: Text("TODO: Scroll to original message"),
+                ), // TODO
+              ),
               child: Quoted(
                 Row(
                   mainAxisSize: MainAxisSize.min,
@@ -91,8 +95,11 @@ class TopWidget extends ConsumerWidget {
           groupStatus?.isFirst != false ||
           message.metadata?["reply"] != null)
         InkWell(
-          onTap: () =>
-              showAboutDialog(context: context), // TODO: Show user profile
+          onTap: () => showDialog(
+            context: context,
+            builder: (_) =>
+                Dialog(child: Text("TODO: Show user profile")), // TODO
+          ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             spacing: 8,

@@ -15,9 +15,11 @@ class MentionChip extends StatelessWidget {
       ),
     ),
     backgroundColor: Theme.of(context).colorScheme.primary,
-    onPressed: () {
-      // TODO: Open room or join room dialog, or user popover
-      showAboutDialog(context: context);
-    },
+    onPressed: () => showDialog(
+      context: context,
+      builder: (_) => Dialog(
+        child: Text("TODO: Open room or join room dialog, or user popover"),
+      ), // TODO
+    ),
   );
 }
