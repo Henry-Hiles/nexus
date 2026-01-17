@@ -15,6 +15,7 @@ A simple and user-friendly Matrix client made with Flutter and the Matrix Dart S
 
 ## Progress
 
+-   [ ] Move from the Dart SDK to the Rust SDK with Dart bindings: Waiting on https://github.com/fzyzcjy/flutter_rust_bridge/discussions/2967#discussioncomment-15522205.
 -   [ ] Platform Support
     -   [x] Linux
     -   [x] Windows
