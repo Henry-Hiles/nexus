@@ -5,9 +5,9 @@ class Loading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const Center(
-        child: Padding(
-          padding: EdgeInsets.all(16),
-          child: CircularProgressIndicator(),
-        ),
-      );
+    child: Padding(
+      padding: EdgeInsets.all(16),
+      child: CircularProgressIndicator(),
+    ),
+  );
 }

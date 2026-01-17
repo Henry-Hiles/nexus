@@ -1192,6 +1192,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.0"
+  rust_lib_nexus:
+    dependency: "direct main"
+    description:
+      path: rust_builder
+      relative: true
+    source: path
+    version: "0.0.1"
   rxdart:
     dependency: transitive
     description:

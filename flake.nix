@@ -45,8 +45,11 @@
               packages = with pkgs; [
                 # jdk17
                 cargo
+                rustc
+                openssl_3
+                pkg-config
                 (flutter.override { extraPkgConfigPackages = [ pkgs.libsecret ]; })
-
+                flutter_rust_bridge_codegen
                 # android.platform-tools
                 (pkgs.writeShellScriptBin "rustup" (builtins.readFile ./nix/fake-rustup.sh))
               ];
@@ -56,7 +59,7 @@
                   pkgs.lib.makeLibraryPath ([
                     pkgs.sqlite
                   ])
-                }:./build/linux/x64/debug/plugins/flutter_vodozemac";
+                }:./build/linux/x64/debug/plugins/flutter_vodozemac:./build/linux/x64/debug/plugins/rust_lib_nexus";
 
                 # ANDROID_HOME = "${android.androidsdk}/libexec/android-sdk";
                 # ANDROID_SDK_ROOT = ANDROID_HOME;
