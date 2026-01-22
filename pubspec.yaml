@@ -12,11 +12,6 @@ environment:
   sdk: "^3.9.2"
 
 dependency_overrides:
-  vodozemac:
-    git:
-      url: https://github.com/famedly/dart-vodozemac
-      ref: krille/use-specced-olm-session-config
-      path: dart
   analyzer: ^8.4.0
   source_gen: ^4.0.2
   flutter_hooks: ^0.21.2
@@ -74,6 +69,10 @@ dependencies:
   dynamic_polls: ^0.0.6
   flutter_hooks: ^0.21.3+1
   cross_cache: ^1.1.0
+  ffi: ^2.1.5
+  hooks: ^1.0.0
+  code_assets: ^1.0.0
+  ffigen: ^20.1.1
   
 dev_dependencies:
   build_runner: ^2.4.11

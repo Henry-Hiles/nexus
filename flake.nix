@@ -32,6 +32,7 @@
           _module.args.pkgs = import nixpkgs {
             inherit system;
             config = {
+              permittedInsecurePackages = [ "olm-3.2.16" ];
               android_sdk.accept_license = true;
               allowUnfree = true;
             };
@@ -44,7 +45,11 @@
             pkgs.mkShell {
               packages = with pkgs; [
                 # jdk17
+                go
+                olm
+                git
                 cargo
+                clang
                 (flutter.override { extraPkgConfigPackages = [ pkgs.libsecret ]; })
 
                 # android.platform-tools
@@ -56,7 +61,7 @@
                   pkgs.lib.makeLibraryPath ([
                     pkgs.sqlite
                   ])
-                }:./build/linux/x64/debug/plugins/flutter_vodozemac";
+                }:./.dart_tool/hooks_runner/shared/nexus/build/gomuks";
 
                 # ANDROID_HOME = "${android.androidsdk}/libexec/android-sdk";
                 # ANDROID_SDK_ROOT = ANDROID_HOME;

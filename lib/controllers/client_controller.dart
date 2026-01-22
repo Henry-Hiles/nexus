@@ -1,14 +1,23 @@
 import "dart:convert";
+import "dart:ffi";
 import "dart:io";
+import "package:ffi/ffi.dart";
 import "package:flutter/foundation.dart";
 import "package:matrix/encryption.dart";
 import "package:nexus/controllers/database_controller.dart";
-import "package:vodozemac/vodozemac.dart" as vod;
-import "package:flutter_vodozemac/flutter_vodozemac.dart" as fl_vod;
+import "package:nexus/src/third_party/gomuks.g.dart";
 import "package:matrix/matrix.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/secure_storage_controller.dart";
 import "package:nexus/models/session_backup.dart";
+
+void gomuksCallback(Pointer<Char> command, int requestId, GomuksBuffer data) {
+  // Convert the C string to Dart
+  final cmdStr = command.cast<Utf8>().toDartString();
+  print("Received event: $cmdStr (requestId=$requestId)");
+
+  // Optionally inspect 'data' if you need
+}
 
 class ClientController extends AsyncNotifier<Client> {
   @override
@@ -22,7 +31,15 @@ class ClientController extends AsyncNotifier<Client> {
 
   @override
   Future<Client> build() async {
-    if (!vod.isInitialized()) fl_vod.init();
+    final handle = GomuksInit();
+
+    GomuksStart(
+      handle,
+      Pointer.fromFunction<Void Function(Pointer<Char>, Int64, GomuksBuffer)>(
+        gomuksCallback,
+      ),
+    );
+
     final client = Client(
       "nexus",
       logLevel: kReleaseMode ? Level.warning : Level.verbose,
@@ -32,10 +49,6 @@ class ClientController extends AsyncNotifier<Client> {
       database: await MatrixSdkDatabase.init(
         "nexus",
         database: await ref.watch(DatabaseController.provider.future),
-      ),
-      nativeImplementations: NativeImplementationsIsolate(
-        compute,
-        vodozemacInit: fl_vod.init,
       ),
     );
 
