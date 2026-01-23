@@ -1,1 +1,0 @@
-enum RelationType { edit, reply }
