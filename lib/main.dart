@@ -1,17 +1,11 @@
 import "dart:io";
-
 import "package:flutter/foundation.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client_controller.dart";
 import "package:nexus/controllers/shared_prefs_controller.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
 import "package:nexus/helpers/extensions/scheme_to_theme.dart";
-import "package:nexus/pages/chat_page.dart";
-import "package:nexus/pages/login_page.dart";
-import "package:nexus/pages/settings_page.dart";
-import "package:nexus/widgets/appbar.dart";
 import "package:nexus/widgets/error_dialog.dart";
-import "package:nexus/widgets/loading.dart";
 import "package:window_manager/window_manager.dart";
 import "package:flutter/material.dart";
 import "package:dynamic_system_colors/dynamic_system_colors.dart";
@@ -103,37 +97,46 @@ class App extends ConsumerWidget {
         builder: (context) => ref
             .watch(SharedPrefsController.provider)
             .betterWhen(
-              data: (_) => ref
-                  .watch(ClientController.provider)
-                  .betterWhen(
-                    data: (client) =>
-                        client.accessToken == null ? LoginPage() : ChatPage(),
-                    loading: () => Scaffold(
-                      body: Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          spacing: 16,
-                          children: [
-                            Text(
-                              "Syncing...",
-                              style: Theme.of(context).textTheme.headlineMedium,
-                            ),
-                            Loading(),
-                          ],
-                        ),
-                      ),
-                      appBar: Appbar(
-                        actions: [
-                          IconButton(
-                            onPressed: () => Navigator.of(context).push(
-                              MaterialPageRoute(builder: (_) => SettingsPage()),
-                            ),
-                            icon: Icon(Icons.settings),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+              data: (_) {
+                final response = ref
+                    .watch(ClientController.provider.notifier)
+                    .sendCommand("login", {
+                      "homeserver_url": "federated.nexus",
+                      "username": "quadradical",
+                      "password": "Quadmarad1!",
+                    });
+                debugPrint("$response");
+                return Placeholder();
+              },
+              // .betterWhen(
+              //   data: (client) =>
+              //       client.accessToken == null ? LoginPage() : ChatPage(),
+              //   loading: () => Scaffold(
+              //     body: Center(
+              //       child: Column(
+              //         mainAxisSize: MainAxisSize.min,
+              //         spacing: 16,
+              //         children: [
+              //           Text(
+              //             "Syncing...",
+              //             style: Theme.of(context).textTheme.headlineMedium,
+              //           ),
+              //           Loading(),
+              //         ],
+              //       ),
+              //     ),
+              //     appBar: Appbar(
+              //       actions: [
+              //         IconButton(
+              //           onPressed: () => Navigator.of(context).push(
+              //             MaterialPageRoute(builder: (_) => SettingsPage()),
+              //           ),
+              //           icon: Icon(Icons.settings),
+              //         ),
+              //       ],
+              //     ),
+              //   ),
+              // ),
             ),
       ),
     ),

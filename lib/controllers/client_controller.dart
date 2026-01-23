@@ -1,37 +1,36 @@
 import "dart:convert";
 import "dart:ffi";
-import "dart:io";
 import "package:ffi/ffi.dart";
 import "package:flutter/foundation.dart";
-import "package:matrix/encryption.dart";
-import "package:nexus/controllers/database_controller.dart";
+import "package:nexus/helpers/extensions/gomuks_buffer.dart";
+import "package:nexus/models/client_state.dart";
+import "package:nexus/models/sync_status.dart";
 import "package:nexus/src/third_party/gomuks.g.dart";
-import "package:matrix/matrix.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
-import "package:nexus/controllers/secure_storage_controller.dart";
-import "package:nexus/models/session_backup.dart";
 
 void gomuksCallback(Pointer<Char> command, int requestId, GomuksBuffer data) {
-  // Convert the C string to Dart
-  final cmdStr = command.cast<Utf8>().toDartString();
-  print("Received event: $cmdStr (requestId=$requestId)");
+  try {
+    final muksEventType = command.cast<Utf8>().toDartString();
+    final Map<String, dynamic> decodedMuksEvent = data.toJson();
 
-  // Optionally inspect 'data' if you need
+    switch (muksEventType) {
+      case "client_state":
+        final clientState = ClientState.fromJson(decodedMuksEvent);
+        debugPrint("Received event: $clientState");
+      case "sync_status":
+        final syncStatus = SyncStatus.fromJson(decodedMuksEvent);
+        debugPrint("Received event: $syncStatus");
+    }
+  } catch (error, stackTrace) {
+    debugPrintStack(stackTrace: stackTrace, label: error.toString());
+  }
 }
 
-class ClientController extends AsyncNotifier<Client> {
+class ClientController extends Notifier<int> {
   @override
-  bool updateShouldNotify(
-    AsyncValue<Client> previous,
-    AsyncValue<Client> next,
-  ) =>
-      previous.hasValue != next.hasValue ||
-      previous.value?.accessToken != next.value?.accessToken;
-  static const sessionBackupKey = "sessionBackup";
-
-  @override
-  Future<Client> build() async {
+  int build() {
     final handle = GomuksInit();
+    ref.onDispose(() => GomuksDestroy(handle));
 
     GomuksStart(
       handle,
@@ -40,80 +39,29 @@ class ClientController extends AsyncNotifier<Client> {
       ),
     );
 
-    final client = Client(
-      "nexus",
-      logLevel: kReleaseMode ? Level.warning : Level.verbose,
-      importantStateEvents: {"im.ponies.room_emotes"},
-      supportedLoginTypes: {AuthenticationTypes.password},
-      verificationMethods: {KeyVerificationMethod.emoji},
-      database: await MatrixSdkDatabase.init(
-        "nexus",
-        database: await ref.watch(DatabaseController.provider.future),
-      ),
-    );
-
-    final backupJson = await ref
-        .watch(SecureStorageController.provider.notifier)
-        .get(sessionBackupKey);
-
-    if (backupJson != null) {
-      final backup = SessionBackup.fromJson(json.decode(backupJson));
-
-      await client.init(
-        waitForFirstSync: false,
-        newToken: backup.accessToken,
-        newHomeserver: backup.homeserver,
-        newUserID: backup.userID,
-        newDeviceID: backup.deviceID,
-        newDeviceName: backup.deviceName,
-      );
-    }
-
-    return client;
+    return handle;
   }
 
-  Future<bool> setHomeserver(Uri homeserverUrl) async {
-    final client = await future;
+  (int requestId, Map<String, dynamic> response) sendCommand(
+    String command,
+    Map<String, dynamic> data,
+  ) {
+    final responsePtr = calloc<GomuksBuffer>();
     try {
-      await client.checkHomeserver(homeserverUrl);
-      return true;
-    } catch (_) {
-      return false;
-    }
-  }
-
-  Future<bool> login(String username, String password) async {
-    final client = await future;
-    try {
-      final deviceName = "Nexus Client login on ${Platform.localHostname}";
-      final details = await MatrixApi(homeserver: client.homeserver).login(
-        LoginType.mLoginPassword,
-        initialDeviceDisplayName: deviceName,
-        identifier: AuthenticationUserIdentifier(user: username),
-        password: password,
+      final requestId = GomuksSubmitCommand(
+        state,
+        command.toNativeUtf8().cast<Char>(),
+        data.toGomuksBuffer(),
+        responsePtr,
       );
-      await ref
-          .watch(SecureStorageController.provider.notifier)
-          .set(
-            sessionBackupKey,
-            json.encode(
-              SessionBackup(
-                accessToken: details.accessToken,
-                homeserver: client.homeserver!,
-                userID: details.userId,
-                deviceID: details.deviceId,
-                deviceName: deviceName,
-              ).toJson(),
-            ),
-          );
-      ref.invalidateSelf(asReload: true);
-      return true;
-    } catch (_) {
-      return false;
+
+      return (requestId, responsePtr.ref.toJson());
+    } finally {
+      calloc.free(responsePtr);
     }
   }
 
-  static final provider = AsyncNotifierProvider<ClientController, Client>(
+  static final provider = NotifierProvider<ClientController, int>(
     ClientController.new,
   );
 }
