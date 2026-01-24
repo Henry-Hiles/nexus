@@ -62,7 +62,7 @@
                   pkgs.lib.makeLibraryPath ([
                     pkgs.sqlite
                   ])
-                }:./.dart_tool/hooks_runner/shared/nexus/build/gomuks";
+                }:./build/native_assets/linux";
                 CPATH = lib.makeSearchPath "include" [ pkgs.glibc.dev ];
 
                 # ANDROID_HOME = "${android.androidsdk}/libexec/android-sdk";

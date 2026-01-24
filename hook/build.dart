@@ -3,7 +3,7 @@ import "package:hooks/hooks.dart";
 import "package:code_assets/code_assets.dart";
 
 Future<void> main(List<String> args) => build(args, (input, output) async {
-  final buildDir = input.packageRoot.resolve("build/");
+  final buildDir = input.packageRoot.resolve("src/");
   if (await File(buildDir.resolve("lock").toFilePath()).exists()) return;
 
   final targetOS = input.config.code.targetOS;
@@ -38,13 +38,16 @@ Future<void> main(List<String> args) => build(args, (input, output) async {
   }
 
   final generatedFile = "src/third_party/gomuks.g.dart";
-  output.assets.code.add(
-    CodeAsset(
-      package: "nexus",
-      name: generatedFile,
-      linkMode: DynamicLoadingBundled(),
-      file: libFile,
-    ),
-  );
-  output.dependencies.add(input.packageRoot.resolve("lib/$generatedFile"));
+  print("Adding $libFileName as asset...");
+  output
+    ..assets.code.add(
+      CodeAsset(
+        package: "nexus",
+        name: generatedFile,
+        linkMode: DynamicLoadingBundled(),
+        file: libFile,
+      ),
+    )
+    ..dependencies.add(libFile);
+  print("Done!");
 });

@@ -105,7 +105,8 @@ class App extends ConsumerWidget {
                       "username": "quadradical",
                       "password": "Quadmarad1!",
                     });
-                return Placeholder();
+
+                return Text(response.toString());
               },
               // .betterWhen(
               //   data: (client) =>

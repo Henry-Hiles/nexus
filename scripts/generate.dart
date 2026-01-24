@@ -4,7 +4,7 @@ import "package:path/path.dart";
 
 void main(List<String> args) async {
   final repoDir = Directory.fromUri(
-    Platform.script.resolve("../build/gomuks/source"),
+    Platform.script.resolve("../src/gomuks/source"),
   );
   if (await repoDir.exists()) await repoDir.delete(recursive: true);
   await repoDir.create(recursive: true);
