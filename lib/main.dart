@@ -97,17 +97,19 @@ class App extends ConsumerWidget {
         builder: (context) => ref
             .watch(SharedPrefsController.provider)
             .betterWhen(
-              data: (_) {
-                final response = ref
-                    .watch(ClientController.provider.notifier)
-                    .sendCommand("login", {
-                      "homeserver_url": "federated.nexus",
-                      "username": "quadradical",
-                      "password": "Quadmarad1!",
-                    });
-
-                return Text(response.toString());
-              },
+              data: (_) => ElevatedButton(
+                onPressed: () async {
+                  final response = ref
+                      .watch(ClientController.provider.notifier)
+                      .sendCommand("login", {
+                        "homeserver_url": "https://matrix.federated.nexus",
+                        "username": "quadradical",
+                        "password": "Quadfnrad1!",
+                      });
+                  print(response);
+                },
+                child: Text("foo"),
+              ),
               // .betterWhen(
               //   data: (client) =>
               //       client.accessToken == null ? LoginPage() : ChatPage(),

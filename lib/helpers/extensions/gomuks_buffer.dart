@@ -31,26 +31,27 @@ extension GomuksOwnedBufferToJson on GomuksOwnedBuffer {
   Map<String, dynamic> toJson() {
     final bytes = toBytes();
     if (bytes.isEmpty) return {};
-    return jsonDecode(utf8.decode(bytes));
+    final json = jsonDecode(utf8.decode(bytes));
+
+    if (json is Map<String, dynamic>?) return json ?? {};
+    throw json;
   }
 }
 
 extension JsonToGomuksBuffer on Map<String, dynamic> {
-  GomuksBorrowedBuffer toGomuksBuffer() {
+  Pointer<GomuksBorrowedBuffer> toGomuksBufferPtr() {
     final jsonString = json.encode(this);
     final bytes = utf8.encode(jsonString);
 
     final dataPtr = calloc<Uint8>(bytes.length);
     dataPtr.asTypedList(bytes.length).setAll(0, bytes);
 
-    final bufPtr = calloc<GomuksBorrowedBuffer>();
-    bufPtr.ref.base = dataPtr;
-    bufPtr.ref.length = bytes.length;
+    final ptr = calloc<GomuksBorrowedBuffer>();
 
-    final bufByValue = bufPtr.ref;
+    ptr.ref
+      ..base = dataPtr
+      ..length = bytes.length;
 
-    calloc.free(bufPtr);
-
-    return bufByValue;
+    return ptr;
   }
 }

@@ -37,20 +37,24 @@ class ClientController extends Notifier<int> {
 
     GomuksStart(
       handle,
-      Pointer.fromFunction<
-        Void Function(Pointer<Char>, Int64, GomuksBorrowedBuffer)
-      >(gomuksCallback),
+      NativeCallable<
+            Void Function(Pointer<Char>, Int64, GomuksBorrowedBuffer)
+          >.listener(gomuksCallback)
+          .nativeFunction,
     );
 
     return handle;
   }
 
   Map<String, dynamic> sendCommand(String command, Map<String, dynamic> data) {
+    final bufferPointer = data.toGomuksBufferPtr();
     final response = GomuksSubmitCommand(
       state,
       command.toNativeUtf8().cast<Char>(),
-      data.toGomuksBuffer(),
+      bufferPointer.ref,
     );
+
+    calloc.free(bufferPointer);
 
     return response.buf.toJson();
   }
