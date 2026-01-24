@@ -39,40 +39,26 @@
             };
           };
 
-          devShells.default =
-            let
-              # android = pkgs.callPackage ./nix/android.nix { };
-            in
-            pkgs.mkShell {
-              packages = with pkgs; [
-                # jdk17
-                go
-                olm
-                git
-                cargo
-                clang
-                (flutter.override { extraPkgConfigPackages = [ pkgs.libsecret ]; })
+          devShells.default = pkgs.mkShell {
+            packages = with pkgs; [
+              go
+              olm
+              git
+              clang
+              (flutter.override { extraPkgConfigPackages = [ pkgs.libsecret ]; })
 
-                # android.platform-tools
-                (pkgs.writeShellScriptBin "rustup" (builtins.readFile ./nix/fake-rustup.sh))
-              ];
+              (pkgs.writeShellScriptBin "rustup" (builtins.readFile ./nix/fake-rustup.sh))
+            ];
 
-              env = rec {
-                LD_LIBRARY_PATH = "${
-                  pkgs.lib.makeLibraryPath ([
-                    pkgs.sqlite
-                  ])
-                }:./build/native_assets/linux";
-                CPATH = lib.makeSearchPath "include" [ pkgs.glibc.dev ];
-
-                # ANDROID_HOME = "${android.androidsdk}/libexec/android-sdk";
-                # ANDROID_SDK_ROOT = ANDROID_HOME;
-                # JAVA_HOME = pkgs.jdk17;
-
-                # TOOLS = "${ANDROID_HOME}/build-tools/${"36.0.0"}";
-                # GRADLE_OPTS = "-Dorg.gradle.project.android.aapt2FromMavenOverride=${TOOLS}/aapt2";
-              };
+            env = {
+              LD_LIBRARY_PATH = "${
+                pkgs.lib.makeLibraryPath ([
+                  pkgs.sqlite
+                ])
+              }:./build/native_assets/linux";
+              CPATH = lib.makeSearchPath "include" [ pkgs.glibc.dev ];
             };
+          };
         };
     };
 }
