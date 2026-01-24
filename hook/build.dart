@@ -1,8 +1,11 @@
+import "dart:io";
 import "package:hooks/hooks.dart";
 import "package:code_assets/code_assets.dart";
-import "package:path/path.dart";
 
 Future<void> main(List<String> args) => build(args, (input, output) async {
+  final buildDir = input.packageRoot.resolve("build/");
+  if (await File(buildDir.resolve("lock").toFilePath()).exists()) return;
+
   final targetOS = input.config.code.targetOS;
   String libFileName;
   switch (targetOS) {
@@ -19,16 +22,29 @@ Future<void> main(List<String> args) => build(args, (input, output) async {
       throw UnsupportedError("Unsupported OS: $targetOS");
   }
 
-  final generatedFile = join("src", "third_party", "gomuks.g.dart");
+  final gomuksBuildDir = buildDir.resolve("gomuks/");
+  final libFile = gomuksBuildDir.resolve(libFileName);
+
+  print("Building Gomuks shared library $libFileName...");
+  final result = await Process.run("go", [
+    "build",
+    "-o",
+    libFile.path,
+    "-buildmode=c-shared",
+  ], workingDirectory: gomuksBuildDir.resolve("source/pkg/ffi/").toFilePath());
+
+  if (result.exitCode != 0) {
+    throw Exception("Failed to build Gomuks shared library\n${result.stderr}");
+  }
+
+  final generatedFile = "src/third_party/gomuks.g.dart";
   output.assets.code.add(
     CodeAsset(
       package: "nexus",
       name: generatedFile,
       linkMode: DynamicLoadingBundled(),
-      file: input.packageRoot.resolve(join("build", "gomuks", libFileName)),
+      file: libFile,
     ),
   );
-  output.dependencies.add(
-    input.packageRoot.resolve(join("lib", generatedFile)),
-  );
+  output.dependencies.add(input.packageRoot.resolve("lib/$generatedFile"));
 });
