@@ -1,4 +1,3 @@
-import "dart:convert";
 import "dart:ffi";
 import "package:ffi/ffi.dart";
 import "package:flutter/foundation.dart";
@@ -46,14 +45,14 @@ class ClientController extends Notifier<int> {
     return handle;
   }
 
-  void sendCommand(String command, Map<String, dynamic> data) {
-    // final response = GomuksSubmitCommand(
-    //   state,
-    //   command.toNativeUtf8().cast<Char>(),
-    //   data.toGomuksBuffer(),
-    // );
+  Map<String, dynamic> sendCommand(String command, Map<String, dynamic> data) {
+    final response = GomuksSubmitCommand(
+      state,
+      command.toNativeUtf8().cast<Char>(),
+      data.toGomuksBuffer(),
+    );
 
-    // return response.buf; TODO
+    return response.buf.toJson();
   }
 
   static final provider = NotifierProvider<ClientController, int>(
