@@ -5,21 +5,6 @@ import "dart:typed_data";
 import "package:ffi/ffi.dart";
 import "package:nexus/src/third_party/gomuks.g.dart";
 
-extension GomuksBufferX on GomuksBuffer {
-  /// Safely converts the Go buffer into a Dart `Uint8List`
-  Uint8List toBytes() {
-    if (base == nullptr || length <= 0) return Uint8List(0);
-    return base.asTypedList(length);
-  }
-
-  /// Decodes the bytes as JSON
-  Map<String, dynamic> toJson() {
-    final bytes = toBytes();
-    if (bytes.isEmpty) return {};
-    return jsonDecode(utf8.decode(bytes));
-  }
-}
-
 extension JsonToGomuksBuffer on Map<String, dynamic> {
   GomuksBuffer toGomuksBuffer() {
     final jsonString = json.encode(this);
