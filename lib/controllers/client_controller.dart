@@ -46,23 +46,14 @@ class ClientController extends Notifier<int> {
     return handle;
   }
 
-  (int requestId, Map<String, dynamic> response) sendCommand(
-    String command,
-    Map<String, dynamic> data,
-  ) {
-    final responsePtr = calloc<GomuksBuffer>();
-    try {
-      final requestId = GomuksSubmitCommand(
-        state,
-        command.toNativeUtf8().cast<Char>(),
-        data.toGomuksBuffer(),
-        responsePtr,
-      );
+  void sendCommand(String command, Map<String, dynamic> data) {
+    // final response = GomuksSubmitCommand(
+    //   state,
+    //   command.toNativeUtf8().cast<Char>(),
+    //   data.toGomuksBuffer(),
+    // );
 
-      return (requestId, responsePtr.ref.toJson());
-    } finally {
-      calloc.free(responsePtr);
-    }
+    // return response.buf; TODO
   }
 
   static final provider = NotifierProvider<ClientController, int>(
