@@ -20,9 +20,13 @@ void gomuksCallback(
       case "client_state":
         final clientState = ClientState.fromJson(decodedMuksEvent);
         debugPrint("Received event: $clientState");
+        break;
       case "sync_status":
         final syncStatus = SyncStatus.fromJson(decodedMuksEvent);
         debugPrint("Received event: $syncStatus");
+        break;
+      default:
+        debugPrint("Unhandled event: $muksEventType: $decodedMuksEvent");
     }
   } catch (error, stackTrace) {
     debugPrintStack(stackTrace: stackTrace, label: error.toString());
