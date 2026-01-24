@@ -8,7 +8,11 @@ import "package:nexus/models/sync_status.dart";
 import "package:nexus/src/third_party/gomuks.g.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 
-void gomuksCallback(Pointer<Char> command, int requestId, GomuksBuffer data) {
+void gomuksCallback(
+  Pointer<Char> command,
+  int requestId,
+  GomuksBorrowedBuffer data,
+) {
   try {
     final muksEventType = command.cast<Utf8>().toDartString();
     final Map<String, dynamic> decodedMuksEvent = data.toJson();
@@ -34,9 +38,9 @@ class ClientController extends Notifier<int> {
 
     GomuksStart(
       handle,
-      Pointer.fromFunction<Void Function(Pointer<Char>, Int64, GomuksBuffer)>(
-        gomuksCallback,
-      ),
+      Pointer.fromFunction<
+        Void Function(Pointer<Char>, Int64, GomuksBorrowedBuffer)
+      >(gomuksCallback),
     );
 
     return handle;

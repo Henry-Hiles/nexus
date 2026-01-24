@@ -76,7 +76,7 @@ void main(List<String> args) async {
     ),
     headers: Headers(
       entryPoints: [File(join(buildDir.path, "libgomuks.h")).uri],
-      // compilerOptions: ["-I${String.fromEnvironment("CPATH")}"],
+      compilerOptions: ["--no-warnings"],
     ),
     functions: Functions.includeAll,
   ).generate();

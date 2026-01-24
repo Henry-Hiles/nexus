@@ -5,6 +5,14 @@ import "dart:typed_data";
 import "package:ffi/ffi.dart";
 import "package:nexus/src/third_party/gomuks.g.dart";
 
+extension GomuksBufferToJson on GomuksBorrowedBuffer {
+  Map<String, dynamic> toJson() {
+    final bytes = toBytes();
+    if (bytes.isEmpty) return {};
+    return jsonDecode(utf8.decode(bytes));
+  }
+}
+
 extension JsonToGomuksBuffer on Map<String, dynamic> {
   GomuksBuffer toGomuksBuffer() {
     final jsonString = json.encode(this);
