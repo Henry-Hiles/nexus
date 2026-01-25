@@ -5,7 +5,7 @@ part "sync_status.g.dart";
 @freezed
 abstract class SyncStatus with _$SyncStatus {
   const factory SyncStatus({
-    required Type type,
+    required SyncStatusType type,
     required int errorCount,
     required int lastSync,
   }) = _SyncStatus;
@@ -15,4 +15,4 @@ abstract class SyncStatus with _$SyncStatus {
 }
 
 @JsonEnum(fieldRename: FieldRename.snake)
-enum Type { ok, waiting, erroring, permanentlyFailed }
+enum SyncStatusType { ok, waiting, erroring, permanentlyFailed }

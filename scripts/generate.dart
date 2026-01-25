@@ -12,8 +12,6 @@ void main(List<String> args) async {
   print("Cloning Gomuks repository...");
   final cloneResult = await Process.run("git", [
     "clone",
-    "--branch",
-    "tulir/ffi",
     "--depth",
     "1",
     "https://mau.dev/gomuks/gomuks",
@@ -32,7 +30,7 @@ void main(List<String> args) async {
       dartFile: Platform.script.resolve("../lib/src/third_party/gomuks.g.dart"),
     ),
     headers: Headers(
-      entryPoints: [File(join(repoDir.path, "pkg", "ffi", "ffi.h")).uri],
+      entryPoints: [File(join(repoDir.path, "pkg", "ffi", "gomuksffi.h")).uri],
       compilerOptions: ["--no-warnings"],
     ),
     functions: Functions.includeAll,

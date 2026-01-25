@@ -1,61 +1,71 @@
 import "dart:ffi";
+import "dart:isolate";
 import "package:ffi/ffi.dart";
 import "package:flutter/foundation.dart";
+import "package:nexus/controllers/sync_status_controller.dart";
 import "package:nexus/helpers/extensions/gomuks_buffer.dart";
 import "package:nexus/models/client_state.dart";
+import "package:nexus/models/login.dart";
 import "package:nexus/models/sync_status.dart";
 import "package:nexus/src/third_party/gomuks.g.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 
-void gomuksCallback(
-  Pointer<Char> command,
-  int requestId,
-  GomuksBorrowedBuffer data,
-) {
-  try {
-    final muksEventType = command.cast<Utf8>().toDartString();
-    final Map<String, dynamic> decodedMuksEvent = data.toJson();
-
-    switch (muksEventType) {
-      case "client_state":
-        final clientState = ClientState.fromJson(decodedMuksEvent);
-        debugPrint("Received event: $clientState");
-        break;
-      case "sync_status":
-        final syncStatus = SyncStatus.fromJson(decodedMuksEvent);
-        debugPrint("Received event: $syncStatus");
-        break;
-      default:
-        debugPrint("Unhandled event: $muksEventType: $decodedMuksEvent");
-    }
-  } catch (error, stackTrace) {
-    debugPrintStack(stackTrace: stackTrace, label: error.toString());
-  }
-}
-
-class ClientController extends Notifier<int> {
+class ClientController extends AsyncNotifier<int> {
   @override
-  int build() {
-    final handle = GomuksInit();
+  Future<int> build() async {
+    final handle = await Isolate.run(GomuksInit);
     ref.onDispose(() => GomuksDestroy(handle));
 
     GomuksStart(
       handle,
       NativeCallable<
             Void Function(Pointer<Char>, Int64, GomuksBorrowedBuffer)
-          >.listener(gomuksCallback)
+          >.listener((
+            Pointer<Char> command,
+            int requestId,
+            GomuksBorrowedBuffer data,
+          ) {
+            try {
+              final muksEventType = command.cast<Utf8>().toDartString();
+              final Map<String, dynamic> decodedMuksEvent = data.toJson();
+
+              switch (muksEventType) {
+                case "client_state":
+                  final clientState = ClientState.fromJson(decodedMuksEvent);
+                  debugPrint("Received event: $clientState");
+                  break;
+                case "sync_status":
+                  ref
+                      .watch(SyncStatusController.provider.notifier)
+                      .set(SyncStatus.fromJson(decodedMuksEvent));
+                  break;
+                default:
+                  debugPrint(
+                    "Unhandled event: $muksEventType: $decodedMuksEvent",
+                  );
+              }
+            } catch (error, stackTrace) {
+              debugPrintStack(stackTrace: stackTrace, label: error.toString());
+            }
+          })
           .nativeFunction,
     );
 
     return handle;
   }
 
-  Map<String, dynamic> sendCommand(String command, Map<String, dynamic> data) {
+  Future<Map<String, dynamic>> sendCommand(
+    String command,
+    Map<String, dynamic> data,
+  ) async {
     final bufferPointer = data.toGomuksBufferPtr();
-    final response = GomuksSubmitCommand(
-      state,
-      command.toNativeUtf8().cast<Char>(),
-      bufferPointer.ref,
+    final handle = await future;
+    final response = await Isolate.run(
+      () => GomuksSubmitCommand(
+        handle,
+        command.toNativeUtf8().cast<Char>(),
+        bufferPointer.ref,
+      ),
     );
 
     calloc.free(bufferPointer);
@@ -63,7 +73,27 @@ class ClientController extends Notifier<int> {
     return response.buf.toJson();
   }
 
-  static final provider = NotifierProvider<ClientController, int>(
+  Future<bool> login(Login login) async {
+    try {
+      await sendCommand("login", login.toJson());
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<String?> discoverHomeserver(Uri homeserver) async {
+    try {
+      final response = await sendCommand("discover_homeserver", {
+        "user_id": "@fakeuser:${homeserver.host}",
+      });
+      return (response["m.homeserver"] as Map<String, dynamic>)["base_url"];
+    } catch (_) {
+      return null;
+    }
+  }
+
+  static final provider = AsyncNotifierProvider<ClientController, int>(
     ClientController.new,
   );
 }

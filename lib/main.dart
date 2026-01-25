@@ -3,8 +3,11 @@ import "package:flutter/foundation.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client_controller.dart";
 import "package:nexus/controllers/shared_prefs_controller.dart";
+import "package:nexus/controllers/sync_status_controller.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
 import "package:nexus/helpers/extensions/scheme_to_theme.dart";
+import "package:nexus/models/sync_status.dart";
+import "package:nexus/pages/login_page.dart";
 import "package:nexus/widgets/error_dialog.dart";
 import "package:window_manager/window_manager.dart";
 import "package:flutter/material.dart";
@@ -96,50 +99,7 @@ class App extends ConsumerWidget {
       home: Builder(
         builder: (context) => ref
             .watch(SharedPrefsController.provider)
-            .betterWhen(
-              data: (_) => ElevatedButton(
-                onPressed: () async {
-                  final response = ref
-                      .watch(ClientController.provider.notifier)
-                      .sendCommand("login", {
-                        "homeserver_url": "https://matrix.federated.nexus",
-                        "username": "quadradical",
-                        "password": "Quadfnrad1!",
-                      });
-                  print(response);
-                },
-                child: Text("foo"),
-              ),
-              // .betterWhen(
-              //   data: (client) =>
-              //       client.accessToken == null ? LoginPage() : ChatPage(),
-              //   loading: () => Scaffold(
-              //     body: Center(
-              //       child: Column(
-              //         mainAxisSize: MainAxisSize.min,
-              //         spacing: 16,
-              //         children: [
-              //           Text(
-              //             "Syncing...",
-              //             style: Theme.of(context).textTheme.headlineMedium,
-              //           ),
-              //           Loading(),
-              //         ],
-              //       ),
-              //     ),
-              //     appBar: Appbar(
-              //       actions: [
-              //         IconButton(
-              //           onPressed: () => Navigator.of(context).push(
-              //             MaterialPageRoute(builder: (_) => SettingsPage()),
-              //           ),
-              //           icon: Icon(Icons.settings),
-              //         ),
-              //       ],
-              //     ),
-              //   ),
-              // ),
-            ),
+            .betterWhen(data: (_) => LoginPage()),
       ),
     ),
   );
