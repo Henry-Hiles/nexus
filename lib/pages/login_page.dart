@@ -5,6 +5,7 @@ import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/client_controller.dart";
 import "package:nexus/helpers/launch_helper.dart";
 import "package:nexus/models/homeserver.dart";
+import "package:nexus/models/login.dart";
 import "package:nexus/widgets/appbar.dart";
 import "package:nexus/widgets/divider_text.dart";
 import "package:nexus/widgets/loading.dart";
@@ -15,27 +16,25 @@ class LoginPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final client = ref.watch(ClientController.provider.notifier);
 
     final isLoading = useState(false);
-    final allowLogin = useState(false);
+    final homeserver = useState<String?>(null);
 
     final launch = ref.watch(LaunchHelper.provider).launchUrl;
 
-    Future<void> setHomeserver(Uri? homeserver) async {
+    Future<void> setHomeserver(Uri? newHomeserver) async {
       isLoading.value = true;
-      final succeeded = homeserver == null
-          ? false
-          : await ref
-                .watch(ClientController.provider.notifier)
-                .setHomeserver(
-                  homeserver.hasScheme
-                      ? homeserver
-                      : Uri.https(homeserver.path),
-                );
 
-      if (succeeded) {
-        allowLogin.value = true;
-      } else if (context.mounted) {
+      homeserver.value = newHomeserver == null
+          ? null
+          : await client.discoverHomeserver(
+              newHomeserver.hasScheme
+                  ? newHomeserver
+                  : Uri.https(newHomeserver.path),
+            );
+
+      if (homeserver.value == null && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -157,7 +156,7 @@ class LoginPage extends HookConsumerWidget {
               ),
               if (isLoading.value)
                 Padding(padding: EdgeInsets.only(top: 32), child: Loading())
-              else if (allowLogin.value) ...[
+              else if (homeserver.value != null) ...[
                 DividerText("Then, sign in:"),
                 SizedBox(height: 4),
                 TextField(
@@ -174,9 +173,13 @@ class LoginPage extends HookConsumerWidget {
                 ElevatedButton(
                   onPressed: () async {
                     isLoading.value = true;
-                    final succeeded = await ref
-                        .watch(ClientController.provider.notifier)
-                        .login(username.text, password.text);
+                    final succeeded = await client.login(
+                      Login(
+                        username: username.text,
+                        password: password.text,
+                        homeserverUrl: homeserver.value!,
+                      ),
+                    );
 
                     if (!succeeded && context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(

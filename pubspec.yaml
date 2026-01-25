@@ -54,14 +54,10 @@ dependencies:
     git:
       url: https://github.com/Henry-Hiles/flutter_chat_ui
       path: packages/flutter_link_previewer
-  matrix: ^4.1.0
-  sqflite_common_ffi: ^2.3.6
   color_hash: ^1.0.1
-  flutter_vodozemac: ^0.4.1
   flutter_widget_from_html_core: ^0.17.0
   flutter_svg: ^2.2.2
   json_annotation: ^4.9.0
-  vodozemac: ^0.4.0
   shared_preferences: ^2.5.3
   mention_tag_text_field: ^0.0.9
   fluttertagger: ^2.3.1
