@@ -82,7 +82,7 @@ class ClientController extends AsyncNotifier<int> {
     try {
       await sendCommand("verify", {"recovery_key": recoveryKey});
       return true;
-    } catch (_) {
+    } catch (error) {
       return false;
     }
   }
@@ -91,7 +91,7 @@ class ClientController extends AsyncNotifier<int> {
     try {
       await sendCommand("login", login.toJson());
       return true;
-    } catch (_) {
+    } catch (error) {
       return false;
     }
   }
@@ -102,7 +102,7 @@ class ClientController extends AsyncNotifier<int> {
         "user_id": "@fakeuser:${homeserver.host}",
       });
       return (response["m.homeserver"] as Map<String, dynamic>)["base_url"];
-    } catch (_) {
+    } catch (error) {
       return null;
     }
   }

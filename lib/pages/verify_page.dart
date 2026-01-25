@@ -10,6 +10,7 @@ class VerifyPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final passphraseController = useTextEditingController();
+    final isVerifying = useState(false);
     return AlertDialog(
       title: Text("Verify"),
       content: Column(
@@ -32,12 +33,47 @@ class VerifyPage extends HookConsumerWidget {
       ),
       actions: [
         TextButton(
-          onPressed: () async {
-            ref
-                .watch(ClientController.provider.notifier)
-                .verify(passphraseController.text);
-            Navigator.of(context).pop();
-          },
+          onPressed: isVerifying.value
+              ? null
+              : () async {
+                  final scaffoldMessenger = ScaffoldMessenger.of(context);
+                  final snackbar = scaffoldMessenger.showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        "Attempting to verify with recovery key...",
+                      ),
+                      duration: Duration(days: 999),
+                    ),
+                  );
+
+                  isVerifying.value = true;
+
+                  final success = await ref
+                      .watch(ClientController.provider.notifier)
+                      .verify(passphraseController.text);
+
+                  snackbar.close();
+                  if (!success) {
+                    isVerifying.value = false;
+                    if (context.mounted) {
+                      scaffoldMessenger.showSnackBar(
+                        SnackBar(
+                          backgroundColor: Theme.of(
+                            context,
+                          ).colorScheme.errorContainer,
+                          content: Text(
+                            "Verification failed. Is your passphrase correct?",
+                            style: TextStyle(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onErrorContainer,
+                            ),
+                          ),
+                        ),
+                      );
+                    }
+                  }
+                },
           child: Text("Verify"),
         ),
       ],
