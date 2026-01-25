@@ -20,11 +20,13 @@ class FormTextInput extends StatelessWidget {
   final Widget? trailing;
   final InputBorder? border;
   final List<TextInputFormatter>? formatters;
+  final bool autofocus;
 
   const FormTextInput({
     super.key,
     this.border,
     this.controller,
+    this.autofocus = false,
     this.title,
     this.obscure = false,
     this.readOnly = false,
@@ -45,6 +47,7 @@ class FormTextInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => TextFormField(
+    autofocus: autofocus,
     controller: controller,
     keyboardType: keyboardType,
     readOnly: readOnly,

@@ -1,14 +1,18 @@
 import "dart:io";
+import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/foundation.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client_controller.dart";
+import "package:nexus/controllers/client_state_controller.dart";
+import "package:nexus/controllers/multi_provider_controller.dart";
 import "package:nexus/controllers/shared_prefs_controller.dart";
-import "package:nexus/controllers/sync_status_controller.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
 import "package:nexus/helpers/extensions/scheme_to_theme.dart";
-import "package:nexus/models/sync_status.dart";
+import "package:nexus/pages/chat_page.dart";
 import "package:nexus/pages/login_page.dart";
+import "package:nexus/pages/verify_page.dart";
 import "package:nexus/widgets/error_dialog.dart";
+import "package:nexus/widgets/loading.dart";
 import "package:window_manager/window_manager.dart";
 import "package:flutter/material.dart";
 import "package:dynamic_system_colors/dynamic_system_colors.dart";
@@ -78,11 +82,11 @@ void main() async {
   );
 }
 
-class App extends ConsumerWidget {
+class App extends StatelessWidget {
   const App({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => DynamicColorBuilder(
+  Widget build(BuildContext context) => DynamicColorBuilder(
     builder: (lightDynamic, darkDynamic) => MaterialApp(
       navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
@@ -96,10 +100,38 @@ class App extends ConsumerWidget {
                     brightness: Brightness.dark,
                   ))
               .theme,
-      home: Builder(
-        builder: (context) => ref
-            .watch(SharedPrefsController.provider)
-            .betterWhen(data: (_) => LoginPage()),
+      home: Scaffold(
+        body: Consumer(
+          builder: (_, ref, _) => ref
+              .watch(
+                MultiProviderController.provider(
+                  IListConst([
+                    SharedPrefsController.provider,
+                    ClientController.provider,
+                  ]),
+                ),
+              )
+              .betterWhen(
+                data: (_) => Consumer(
+                  builder: (_, ref, _) {
+                    final clientState = ref.watch(
+                      ClientStateController.provider,
+                    );
+                    if (clientState == null || !clientState.isInitialized) {
+                      return Loading();
+                    }
+
+                    if (!clientState.isLoggedIn) {
+                      return LoginPage();
+                    } else if (!clientState.isVerified) {
+                      return VerifyPage();
+                    } else {
+                      return ChatPage();
+                    }
+                  },
+                ),
+              ),
+        ),
       ),
     ),
   );

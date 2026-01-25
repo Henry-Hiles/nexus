@@ -2,6 +2,7 @@ import "dart:ffi";
 import "dart:isolate";
 import "package:ffi/ffi.dart";
 import "package:flutter/foundation.dart";
+import "package:nexus/controllers/client_state_controller.dart";
 import "package:nexus/controllers/sync_status_controller.dart";
 import "package:nexus/helpers/extensions/gomuks_buffer.dart";
 import "package:nexus/models/client_state.dart";
@@ -31,18 +32,22 @@ class ClientController extends AsyncNotifier<int> {
 
               switch (muksEventType) {
                 case "client_state":
-                  final clientState = ClientState.fromJson(decodedMuksEvent);
-                  debugPrint("Received event: $clientState");
+                  ref
+                      .watch(ClientStateController.provider.notifier)
+                      .set(ClientState.fromJson(decodedMuksEvent));
                   break;
                 case "sync_status":
                   ref
                       .watch(SyncStatusController.provider.notifier)
                       .set(SyncStatus.fromJson(decodedMuksEvent));
                   break;
+                case "sync_complete":
+                  // ref
+                  //     .watch(SyncStatusController.provider.notifier)
+                  //     .set(SyncStatus.fromJson(decodedMuksEvent));
+                  break;
                 default:
-                  debugPrint(
-                    "Unhandled event: $muksEventType: $decodedMuksEvent",
-                  );
+                  debugPrint("Unhandled event: $muksEventType");
               }
             } catch (error, stackTrace) {
               debugPrintStack(stackTrace: stackTrace, label: error.toString());
@@ -71,6 +76,15 @@ class ClientController extends AsyncNotifier<int> {
     calloc.free(bufferPointer);
 
     return response.buf.toJson();
+  }
+
+  Future<bool> verify(String recoveryKey) async {
+    try {
+      await sendCommand("verify", {"recovery_key": recoveryKey});
+      return true;
+    } catch (_) {
+      return false;
+    }
   }
 
   Future<bool> login(Login login) async {
