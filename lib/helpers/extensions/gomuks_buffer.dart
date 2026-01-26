@@ -1,22 +1,8 @@
 import "dart:convert";
 import "dart:ffi";
 import "dart:typed_data";
-
 import "package:ffi/ffi.dart";
 import "package:nexus/src/third_party/gomuks.g.dart";
-
-extension GomuksBorrowedBufferToJson on GomuksBorrowedBuffer {
-  Uint8List toBytes() {
-    if (base == nullptr || length <= 0) return Uint8List(0);
-    return base.asTypedList(length);
-  }
-
-  Map<String, dynamic> toJson() {
-    final bytes = toBytes();
-    if (bytes.isEmpty) return {};
-    return jsonDecode(utf8.decode(bytes));
-  }
-}
 
 extension GomuksOwnedBufferToJson on GomuksOwnedBuffer {
   Uint8List toBytes() {

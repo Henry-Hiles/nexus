@@ -9,7 +9,7 @@ import "package:nexus/controllers/sync_status_controller.dart";
 import "package:nexus/helpers/extensions/gomuks_buffer.dart";
 import "package:nexus/models/client_state.dart";
 import "package:nexus/models/login.dart";
-import "package:nexus/models/sync_complete.dart";
+import "package:nexus/models/sync_data.dart";
 import "package:nexus/models/sync_status.dart";
 import "package:nexus/src/third_party/gomuks.g.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
@@ -20,17 +20,18 @@ class ClientController extends AsyncNotifier<int> {
     final handle = await Isolate.run(GomuksInit);
     ref.onDispose(() => GomuksDestroy(handle));
 
-    GomuksStart(
+    final errorCode = GomuksStart(
       handle,
       NativeCallable<
-            Void Function(Pointer<Char>, Int64, GomuksBorrowedBuffer)
+            Void Function(Pointer<Char>, Int64, GomuksOwnedBuffer)
           >.listener((
             Pointer<Char> command,
             int requestId,
-            GomuksBorrowedBuffer data,
+            GomuksOwnedBuffer data,
           ) {
             try {
               final muksEventType = command.cast<Utf8>().toDartString();
+              debugPrint("Handling $muksEventType...");
               final Map<String, dynamic> decodedMuksEvent = data.toJson();
 
               switch (muksEventType) {
@@ -45,9 +46,9 @@ class ClientController extends AsyncNotifier<int> {
                       .set(SyncStatus.fromJson(decodedMuksEvent));
                   break;
                 case "sync_complete":
-                  debugger(message: jsonEncode(decodedMuksEvent));
-                  final thing = SyncComplete.fromJson(decodedMuksEvent);
-                  debugger(message: jsonEncode(thing.toJson()));
+                  final syncData = SyncData.fromJson(decodedMuksEvent);
+                  debugPrint(jsonEncode(syncData.toJson()));
+
                   // ref
                   //     .watch(SyncStatusController.provider.notifier)
                   //     .set(SyncStatus.fromJson(decodedMuksEvent));
@@ -58,14 +59,17 @@ class ClientController extends AsyncNotifier<int> {
                 default:
                   debugPrint("Unhandled event: $muksEventType");
               }
+              debugPrint("Finished handling $muksEventType...");
             } catch (error, stackTrace) {
+              debugger();
               debugPrintStack(stackTrace: stackTrace, label: error.toString());
             }
           })
           .nativeFunction,
     );
 
-    return handle;
+    if (errorCode == 0) return handle;
+    throw Exception("GomuksStart returned error code $errorCode");
   }
 
   Future<Map<String, dynamic>> sendCommand(
