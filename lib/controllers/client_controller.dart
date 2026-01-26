@@ -1,3 +1,5 @@
+import "dart:convert";
+import "dart:developer";
 import "dart:ffi";
 import "dart:isolate";
 import "package:ffi/ffi.dart";
@@ -7,6 +9,7 @@ import "package:nexus/controllers/sync_status_controller.dart";
 import "package:nexus/helpers/extensions/gomuks_buffer.dart";
 import "package:nexus/models/client_state.dart";
 import "package:nexus/models/login.dart";
+import "package:nexus/models/sync_complete.dart";
 import "package:nexus/models/sync_status.dart";
 import "package:nexus/src/third_party/gomuks.g.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
@@ -42,9 +45,15 @@ class ClientController extends AsyncNotifier<int> {
                       .set(SyncStatus.fromJson(decodedMuksEvent));
                   break;
                 case "sync_complete":
+                  debugger(message: jsonEncode(decodedMuksEvent));
+                  final thing = SyncComplete.fromJson(decodedMuksEvent);
+                  debugger(message: jsonEncode(thing.toJson()));
                   // ref
                   //     .watch(SyncStatusController.provider.notifier)
                   //     .set(SyncStatus.fromJson(decodedMuksEvent));
+                  break;
+                case "typing":
+                  //TODO: IMPL
                   break;
                 default:
                   debugPrint("Unhandled event: $muksEventType");

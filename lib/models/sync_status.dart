@@ -6,8 +6,8 @@ part "sync_status.g.dart";
 abstract class SyncStatus with _$SyncStatus {
   const factory SyncStatus({
     required SyncStatusType type,
+    String? error,
     required int errorCount,
-    required int lastSync,
   }) = _SyncStatus;
 
   factory SyncStatus.fromJson(Map<String, Object?> json) =>
