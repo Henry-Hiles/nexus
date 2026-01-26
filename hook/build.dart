@@ -25,7 +25,7 @@ Future<void> main(List<String> args) => build(args, (input, output) async {
   final gomuksBuildDir = buildDir.resolve("gomuks/");
   final libFile = gomuksBuildDir.resolve(libFileName);
 
-  print("Building Gomuks shared library $libFileName...");
+  print("Building Gomuks shared library $libFileName from source...");
   final result = await Process.run("go", [
     "build",
     "-o",
@@ -48,6 +48,7 @@ Future<void> main(List<String> args) => build(args, (input, output) async {
         file: libFile,
       ),
     )
-    ..dependencies.add(libFile);
+    ..dependencies.add(libFile)
+    ..dependencies.add(gomuksBuildDir);
   print("Done!");
 });
