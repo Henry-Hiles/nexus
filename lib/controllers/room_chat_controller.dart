@@ -2,13 +2,9 @@ import "package:collection/collection.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart" as chat;
 import "package:flutter_riverpod/flutter_riverpod.dart";
-import "package:matrix/matrix.dart";
-import "package:nexus/controllers/avatar_controller.dart";
-import "package:nexus/controllers/events_controller.dart";
-import "package:nexus/helpers/extensions/event_to_message.dart";
-import "package:nexus/helpers/extensions/list_to_messages.dart";
 import "package:fluttertagger/fluttertagger.dart" as tagger;
 import "package:nexus/models/relation_type.dart";
+import "package:nexus/models/room.dart";
 
 class RoomChatController extends AsyncNotifier<ChatController> {
   final Room room;
@@ -16,52 +12,54 @@ class RoomChatController extends AsyncNotifier<ChatController> {
 
   @override
   Future<ChatController> build() async {
-    final timeline = await ref.watch(EventsController.provider(room).future);
+    // final timeline = await ref.watch(EventsController.provider(room).future);
 
-    ref.onDispose(
-      room.client.onTimelineEvent.stream.listen((event) async {
-        if (event.roomId != room.id) return;
+    return InMemoryChatController();
 
-        if (event.type == EventTypes.Redaction) {
-          final controller = await future;
-          final message = controller.messages.firstWhereOrNull(
-            (message) => message.id == event.redacts,
-          );
-          if (message == null) return;
+    // ref.onDispose(
+    //   room.client.onTimelineEvent.stream.listen((event) async {
+    //     if (event.roomId != room.metadata.id) return;
 
-          await controller.removeMessage(message);
-        } else {
-          final message = await event.toMessage(includeEdits: true, timeline);
-          if (event.relationshipType == RelationshipTypes.edit) {
-            final controller = await future;
-            final oldMessage = controller.messages.firstWhereOrNull(
-              (element) => element.id == event.relationshipEventId,
-            );
-            if (oldMessage == null || message == null) return;
-            return await updateMessage(
-              oldMessage,
-              message.copyWith(
-                id: oldMessage.id,
-                replyToMessageId: oldMessage.replyToMessageId,
-                metadata: {
-                  ...(oldMessage.metadata ?? {}),
-                  ...((message.metadata ?? {}).filterMap(
-                    (key, value) => value == null ? null : MapEntry(key, value),
-                  )),
-                },
-              ),
-            );
-          }
-          if (message != null) {
-            return await insertMessage(message);
-          }
-        }
-      }).cancel,
-    );
+    //     if (event.type == "m.room.redaction") {
+    //       final controller = await future;
+    //       final message = controller.messages.firstWhereOrNull(
+    //         (message) => message.id == event.redacts,
+    //       );
+    //       if (message == null) return;
 
-    return InMemoryChatController(
-      messages: await timeline.events.toMessages(room, timeline),
-    );
+    //       await controller.removeMessage(message);
+    //     } else {
+    //       final message = await event.toMessage(includeEdits: true, timeline);
+    //       if (event.relationshipType == RelationshipTypes.edit) {
+    //         final controller = await future;
+    //         final oldMessage = controller.messages.firstWhereOrNull(
+    //           (element) => element.id == event.relationshipEventId,
+    //         );
+    //         if (oldMessage == null || message == null) return;
+    //         return await updateMessage(
+    //           oldMessage,
+    //           message.copyWith(
+    //             id: oldMessage.id,
+    //             replyToMessageId: oldMessage.replyToMessageId,
+    //             metadata: {
+    //               ...(oldMessage.metadata ?? {}),
+    //               ...((message.metadata ?? {}).filterMap(
+    //                 (key, value) => value == null ? null : MapEntry(key, value),
+    //               )),
+    //             },
+    //           ),
+    //         );
+    //       }
+    //       if (message != null) {
+    //         return await insertMessage(message);
+    //       }
+    //     }
+    //   }).cancel,
+    // );
+
+    // return InMemoryChatController(
+    //   messages: await timeline.events.toMessages(room, timeline),
+    // );
   }
 
   Future<void> insertMessage(Message message) async {
@@ -79,37 +77,29 @@ class RoomChatController extends AsyncNotifier<ChatController> {
   }
 
   Future<void> deleteMessage(Message message, {String? reason}) async {
-    final controller = await future;
-    await controller.removeMessage(message);
-    await room.redactEvent(message.id, reason: reason);
+    // final controller = await future;
+    // await controller.removeMessage(message);
+    // await room.redactEvent(message.id, reason: reason);
   }
 
   Future<void> loadOlder() async {
-    final currentEvents = await future;
-    await ref.watch(EventsController.provider(room).notifier).prev();
-    final timeline = await ref.watch(EventsController.provider(room).future);
+    // final currentEvents = await future;
+    // await ref.watch(EventsController.provider(room).notifier).prev();
+    // final timeline = await ref.watch(EventsController.provider(room).future);
 
-    final controller = await future;
-    await controller.insertAllMessages(
-      await timeline.events
-          .where(
-            (event) => !currentEvents.messages.any(
-              (existingEvent) => existingEvent.id == event.eventId,
-            ),
-          )
-          .toList()
-          .toMessages(room, timeline),
-      index: 0,
-    );
-    ref.notifyListeners();
-  }
-
-  Future<void> markRead() async {
-    if (!room.hasNewMessages) return;
-    final controller = await future;
-    final id = controller.messages.last.id;
-
-    await room.setReadMarker(id, mRead: id);
+    // final controller = await future;
+    // await controller.insertAllMessages(
+    //   await timeline.events
+    //       .where(
+    //         (event) => !currentEvents.messages.any(
+    //           (existingEvent) => existingEvent.id == event.eventId,
+    //         ),
+    //       )
+    //       .toList()
+    //       .toMessages(room, timeline),
+    //   index: 0,
+    // );
+    // ref.notifyListeners();
   }
 
   Future<void> updateMessage(Message message, Message newMessage) async =>
@@ -121,37 +111,37 @@ class RoomChatController extends AsyncNotifier<ChatController> {
     required RelationType relationType,
     Message? relation,
   }) async {
-    var taggedMessage = message;
+    // var taggedMessage = message;
 
-    for (final tag in tags) {
-      final escaped = RegExp.escape(tag.id);
-      final pattern = RegExp(r"@+(" + escaped + r")(#[^#]*#)?");
+    // for (final tag in tags) {
+    //   final escaped = RegExp.escape(tag.id);
+    //   final pattern = RegExp(r"@+(" + escaped + r")(#[^#]*#)?");
 
-      taggedMessage = taggedMessage.replaceAllMapped(
-        pattern,
-        (match) => match.group(1)!,
-      );
-    }
+    //   taggedMessage = taggedMessage.replaceAllMapped(
+    //     pattern,
+    //     (match) => match.group(1)!,
+    //   );
+    // }
 
-    await room.sendTextEvent(
-      taggedMessage,
-      editEventId: relationType == RelationType.edit ? relation?.id : null,
-      inReplyTo: (relationType == RelationType.reply && relation != null)
-          ? await room.getEventById(relation.id)
-          : null,
-    );
+    // await room.sendTextEvent(
+    //   taggedMessage,
+    //   editEventId: relationType == RelationType.edit ? relation?.id : null,
+    //   inReplyTo: (relationType == RelationType.reply && relation != null)
+    //       ? await room.getEventById(relation.id)
+    //       : null,
+    // );
   }
 
   Future<chat.User> resolveUser(String id) async {
-    final user = await room.client.getUserProfile(id);
+    // final user = await room.client.getUserProfile(id);
     return chat.User(
       id: id,
-      name: user.displayname,
-      imageSource: user.avatarUrl == null
-          ? null
-          : (await ref.watch(
-              AvatarController.provider(user.avatarUrl!.toString()).future,
-            )).toString(),
+      // name: user.displayname,
+      // imageSource: user.avatarUrl == null
+      //     ? null
+      //     : (await ref.watch(
+      //         AvatarController.provider(user.avatarUrl!.toString()).future,
+      //       )).toString(),
     );
   }
 

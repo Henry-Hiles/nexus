@@ -15,35 +15,34 @@ class SpacesController extends Notifier<IList<Space>> {
     final topLevelSpaceIds = ref.watch(TopLevelSpacesController.provider);
     final spaceEdges = ref.watch(SpaceEdgesController.provider);
 
-    ISet<String> collectChildIds(String spaceId) {
-      ISet<String> result = ISet<String>();
-      void walk(String currentId) {
-        final children = spaceEdges[currentId] ?? IList<SpaceEdge>();
-        for (final edge in children) {
-          final childId = edge.childId;
-          if (!result.contains(childId)) {
-            result = result.add(childId);
-            walk(childId);
-          }
-        }
-      }
-
-      walk(spaceId);
-      return result;
-    }
-
-    final spaceIdToChildren = IMap.fromEntries(
+    final childRoomsBySpaceId = IMap.fromEntries(
       topLevelSpaceIds.map((spaceId) {
-        final children = collectChildIds(
+        ISet<String> walk(String currentId) {
+          final children = spaceEdges[currentId] ?? IList<SpaceEdge>();
+
+          return children.fold<ISet<String>>(const ISet.empty(), (acc, edge) {
+            final childId = edge.childId;
+            final isSpace = spaceEdges.containsKey(childId);
+
+            return acc
+                .addAll(!isSpace ? ISet([childId]) : const ISet.empty())
+                .addAll(isSpace ? walk(childId) : const ISet.empty());
+          });
+        }
+
+        return MapEntry(
           spaceId,
-        ).map((id) => rooms[id]).nonNulls.toIList();
-        return MapEntry(spaceId, children);
+          walk(spaceId).map((id) => rooms[id]).nonNulls.toIList(),
+        );
       }),
     );
 
-    final allNestedRoomIds = spaceIdToChildren.values
+    final allNestedRoomIds = childRoomsBySpaceId.values
         .expand((l) => l)
-        .map((r) => rooms.entries.firstWhere((e) => e.value == r).key)
+        .map(
+          (room) =>
+              rooms.entries.firstWhere((entry) => entry.value == room).key,
+        )
         .toISet();
 
     final dmRooms = rooms.values
@@ -55,7 +54,8 @@ class SpacesController extends Notifier<IList<Space>> {
           (e) =>
               e.value.metadata?.dmUserId == null &&
               !allNestedRoomIds.contains(e.key) &&
-              !topLevelSpaceIds.contains(e.key),
+              !topLevelSpaceIds.contains(e.key) &&
+              !spaceEdges.containsKey(e.key),
         )
         .map((e) => e.value)
         .toIList();
@@ -65,7 +65,7 @@ class SpacesController extends Notifier<IList<Space>> {
           final room = rooms[id];
           if (room == null) return null;
 
-          final children = spaceIdToChildren[id] ?? IList<Room>();
+          final children = childRoomsBySpaceId[id] ?? IList<Room>();
           return Space(
             id: id,
             title: room.metadata?.name ?? "Unnamed Room",

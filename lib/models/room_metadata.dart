@@ -20,7 +20,9 @@ abstract class RoomMetadata with _$RoomMetadata {
     required bool hasMemberList,
     @JsonKey(name: "preview_event_rowid") required int previewEventRowID,
     @EpochDateTimeConverter() required DateTime sortingTimestamp,
-    @Default(false) bool markedUnread,
+    required int unreadHighlights,
+    required int unreadNotifications,
+    required int unreadMessages,
   }) = _RoomMetadata;
 
   factory RoomMetadata.fromJson(Map<String, Object?> json) =>

@@ -6,12 +6,14 @@ class AvatarOrHash extends StatelessWidget {
   final String title;
   final Widget? fallback;
   final bool hasBadge;
+  final int badgeNumber;
   final double height;
   final Map<String, String> headers;
   const AvatarOrHash(
     this.avatar,
     this.title, {
     this.fallback,
+    this.badgeNumber = 0,
     this.hasBadge = false,
     this.height = 24,
     required this.headers,
@@ -30,6 +32,7 @@ class AvatarOrHash extends StatelessWidget {
       child: Center(
         child: Badge(
           isLabelVisible: hasBadge,
+          label: badgeNumber != 0 ? Text(badgeNumber.toString()) : null,
           smallSize: 12,
           backgroundColor: Theme.of(context).colorScheme.primary,
           child: ClipRRect(
