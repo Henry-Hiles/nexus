@@ -4,12 +4,10 @@ import "package:nexus/controllers/key_controller.dart";
 import "package:nexus/controllers/spaces_controller.dart";
 import "package:nexus/models/space.dart";
 
-class SelectedSpaceController extends AsyncNotifier<Space> {
+class SelectedSpaceController extends Notifier<Space> {
   @override
-  Future<Space> build() async {
-    final spaces = await ref.watch(
-      SpacesController.provider.selectAsync((data) => data),
-    );
+  Space build() {
+    final spaces = ref.watch(SpacesController.provider);
     final selectedSpaceId = ref.watch(
       KeyController.provider(KeyController.spaceKey),
     );
@@ -18,7 +16,7 @@ class SelectedSpaceController extends AsyncNotifier<Space> {
         spaces.first;
   }
 
-  static final provider = AsyncNotifierProvider<SelectedSpaceController, Space>(
+  static final provider = NotifierProvider<SelectedSpaceController, Space>(
     SelectedSpaceController.new,
   );
 }

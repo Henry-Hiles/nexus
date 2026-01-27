@@ -1,4 +1,5 @@
 import "dart:io";
+import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/material.dart";
 import "package:window_manager/window_manager.dart";
 
@@ -7,7 +8,7 @@ class Appbar extends StatelessWidget implements PreferredSizeWidget {
   final Widget? title;
   final Color? backgroundColor;
   final double? scrolledUnderElevation;
-  final List<Widget> actions;
+  final IList<Widget> actions;
 
   const Appbar({
     super.key,
@@ -15,7 +16,7 @@ class Appbar extends StatelessWidget implements PreferredSizeWidget {
     this.backgroundColor,
     this.scrolledUnderElevation,
     this.leading,
-    this.actions = const [],
+    this.actions = const IList.empty(),
   });
 
   @override
