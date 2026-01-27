@@ -4,6 +4,7 @@ import "package:flutter/foundation.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client_controller.dart";
 import "package:nexus/controllers/client_state_controller.dart";
+import "package:nexus/controllers/header_controller.dart";
 import "package:nexus/controllers/multi_provider_controller.dart";
 import "package:nexus/controllers/shared_prefs_controller.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
@@ -108,6 +109,7 @@ class App extends StatelessWidget {
                   IListConst([
                     SharedPrefsController.provider,
                     ClientController.provider,
+                    HeaderController.provider,
                   ]),
                 ),
               )

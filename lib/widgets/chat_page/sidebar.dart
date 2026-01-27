@@ -1,3 +1,4 @@
+import "package:collection/collection.dart";
 import "package:flutter/material.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
@@ -39,7 +40,7 @@ class Sidebar extends HookConsumerWidget {
     final indexOfSelectedRoom = selectedSpace.children.indexWhere(
       (room) => room.metadata?.id == selectedRoomId,
     );
-    final selectedRoomIndex = indexOfSelected == -1
+    final selectedRoomIndex = indexOfSelectedRoom == -1
         ? selectedSpace.children.isEmpty
               ? null
               : 0
@@ -65,11 +66,17 @@ class Sidebar extends HookConsumerWidget {
                       fallback: space.icon == null ? null : Icon(space.icon),
                       space.title,
                       headers: {}, // TODO
-                      hasBadge: false,
-                      // space.children.firstWhereOrNull( TODO
-                      //   (room) => room.roomData.hasNewMessages,
-                      // ) !=
-                      // null,
+                      hasBadge:
+                          space.children.firstWhereOrNull(
+                            (room) => room.metadata?.unreadMessages != 0,
+                          ) !=
+                          null,
+                      badgeNumber: space.children.fold(
+                        0,
+                        (previousValue, room) =>
+                            previousValue +
+                            (room.metadata?.unreadNotifications ?? 0),
+                      ),
                     ),
                     label: Text(space.title),
                     padding: EdgeInsets.only(top: 4),
@@ -184,13 +191,16 @@ class Sidebar extends HookConsumerWidget {
                   //  space.client.headers, TODO
                 ),
                 title: Text(
-                  selectedSpace.room?.metadata?.avatar.toString() ??
-                      selectedSpace.title,
+                  selectedSpace.title,
                   overflow: TextOverflow.ellipsis,
                 ),
                 backgroundColor: Colors.transparent,
                 actions: [
-                  if (selectedSpace.room != null) RoomMenu(selectedSpace.room!),
+                  if (selectedSpace.room != null)
+                    RoomMenu(
+                      selectedSpace.room!,
+                      children: selectedSpace.children,
+                    ),
                 ],
               ),
               body: NavigationRail(
@@ -203,8 +213,9 @@ class Sidebar extends HookConsumerWidget {
                       (room) => NavigationRailDestination(
                         label: Text(room.metadata?.name ?? "Unnamed Room"),
                         icon: AvatarOrHash(
-                          // hasBadge: room.roomData.hasNewMessages, TODO
                           null,
+                          hasBadge: room.metadata?.unreadMessages != 0,
+                          badgeNumber: room.metadata?.unreadNotifications ?? 0,
                           // room.avatar, TODO
                           room.metadata?.name ?? "Unnamed Room",
                           fallback: selectedSpaceId == "dms"

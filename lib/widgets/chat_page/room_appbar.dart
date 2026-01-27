@@ -1,13 +1,13 @@
+import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/material.dart";
-import "package:nexus/helpers/extensions/get_headers.dart";
-import "package:nexus/models/full_room.dart";
+import "package:nexus/models/room.dart";
 import "package:nexus/widgets/appbar.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/widgets/chat_page/room_menu.dart";
 
 class RoomAppbar extends StatelessWidget implements PreferredSizeWidget {
   final bool isDesktop;
-  final FullRoom room;
+  final Room room;
   final void Function(BuildContext context) onOpenMemberList;
   final void Function(BuildContext context) onOpenDrawer;
   const RoomAppbar(
@@ -24,22 +24,27 @@ class RoomAppbar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) => Appbar(
     leading: isDesktop
-        ? AvatarOrHash(
-            room.avatar,
-            room.title,
-            height: 24,
-            fallback: Icon(Icons.numbers),
-            headers: room.roomData.client.headers,
-          )
+        ? null
+        //  AvatarOrHash( TODO: Images
+        //     room.avatar,
+        //     room.title,
+        //     height: 24,
+        //     fallback: Icon(Icons.numbers),
+        //     headers: room.roomData.client.headers,
+        //   )
         : DrawerButton(onPressed: () => onOpenDrawer(context)),
     scrolledUnderElevation: 0,
     title: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(room.title, overflow: TextOverflow.ellipsis, maxLines: 1),
-        if (room.roomData.topic.isNotEmpty)
+        Text(
+          room.metadata?.name ?? "Unnamed Room",
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
+        ),
+        if (room.metadata?.topic?.isNotEmpty == true)
           Text(
-            room.roomData.topic,
+            room.metadata!.topic!,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.labelMedium?.copyWith(
@@ -54,7 +59,7 @@ class RoomAppbar extends StatelessWidget implements PreferredSizeWidget {
         onPressed: () => onOpenMemberList(context),
         icon: Icon(Icons.people),
       ),
-      RoomMenu(room.roomData),
-    ],
+      RoomMenu(room),
+    ].toIList(),
   );
 }

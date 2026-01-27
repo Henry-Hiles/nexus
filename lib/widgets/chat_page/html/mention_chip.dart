@@ -1,5 +1,5 @@
 import "package:flutter/material.dart";
-import "package:matrix/matrix.dart";
+import "package:nexus/helpers/extensions/link_to_mention.dart";
 
 class MentionChip extends StatelessWidget {
   final String label;
@@ -8,7 +8,7 @@ class MentionChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) => ActionChip(
     label: Text(
-      label.parseIdentifierIntoParts()?.primaryIdentifier ?? label,
+      label.mention ?? label,
       style: TextStyle(
         fontWeight: FontWeight.bold,
         color: Theme.of(context).colorScheme.onPrimary,

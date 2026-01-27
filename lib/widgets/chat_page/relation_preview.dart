@@ -1,22 +1,16 @@
 import "package:flutter/material.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
-import "package:matrix/matrix.dart";
-import "package:nexus/controllers/avatar_controller.dart";
-import "package:nexus/helpers/extensions/get_headers.dart";
 import "package:nexus/models/relation_type.dart";
-import "package:nexus/widgets/avatar_or_hash.dart";
 
 class RelationPreview extends ConsumerWidget {
   final Message? relatedMessage;
   final RelationType relationType;
   final VoidCallback onDismiss;
-  final Room room;
   const RelationPreview({
     required this.relatedMessage,
     required this.relationType,
     required this.onDismiss,
-    required this.room,
     super.key,
   });
 
@@ -37,18 +31,18 @@ class RelationPreview extends ConsumerWidget {
               "Editing message:",
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
-          AvatarOrHash(
-            ref
-                .watch(
-                  AvatarController.provider(
-                    relatedMessage!.metadata!["avatarUrl"],
-                  ),
-                )
-                .whenOrNull(data: (data) => data),
-            relatedMessage!.metadata!["displayName"].toString(),
-            headers: room.client.headers,
-            height: 16,
-          ),
+          // AvatarOrHash(
+          //   ref
+          //       .watch(
+          //         AvatarController.provider(
+          //           relatedMessage!.metadata!["avatarUrl"],
+          //         ),
+          //       )
+          //       .whenOrNull(data: (data) => data),
+          //   relatedMessage!.metadata!["displayName"].toString(),
+          //   headers: room.client.headers,
+          //   height: 16,
+          // ),
           Text(
             relatedMessage!.metadata?["displayName"] ??
                 relatedMessage!.authorId,

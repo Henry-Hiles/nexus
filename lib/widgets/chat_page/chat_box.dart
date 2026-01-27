@@ -5,10 +5,9 @@ import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:fluttertagger/fluttertagger.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
-import "package:matrix/matrix.dart";
 import "package:nexus/controllers/room_chat_controller.dart";
 import "package:nexus/models/relation_type.dart";
-import "package:nexus/widgets/chat_page/mention_overlay.dart";
+import "package:nexus/models/room.dart";
 import "package:nexus/widgets/chat_page/relation_preview.dart";
 
 class ChatBox extends HookConsumerWidget {
@@ -94,7 +93,6 @@ class ChatBox extends HookConsumerWidget {
                 relatedMessage: relatedMessage,
                 relationType: relationType,
                 onDismiss: onDismiss,
-                room: room,
               ),
               Container(
                 color: theme.colorScheme.surfaceContainerHighest,
@@ -105,20 +103,21 @@ class ChatBox extends HookConsumerWidget {
                     PopupMenuButton(
                       itemBuilder: (context) => [],
                       icon: Icon(Icons.add),
-                      enabled: room.canSendDefaultMessages,
+                      // enabled: room.canSendDefaultMessages, TODO: Permissions check
                     ),
                     Expanded(
                       child: FlutterTagger(
                         triggerStrategy: TriggerStrategy.eager,
-                        overlay: MentionOverlay(
-                          room,
-                          query: query.value,
-                          triggerCharacter: triggerCharacter.value,
-                          addTag: ({required id, required name}) {
-                            controller.value.addTag(id: id, name: name);
-                            node.requestFocus();
-                          },
-                        ),
+                        overlay: SizedBox.shrink(),
+                        //  MentionOverlay( TODO: Fix
+                        //   room,
+                        //   query: query.value,
+                        //   triggerCharacter: triggerCharacter.value,
+                        //   addTag: ({required id, required name}) {
+                        //     controller.value.addTag(id: id, name: name);
+                        //     node.requestFocus();
+                        //   },
+                        // ),
                         controller: controller.value,
                         onSearch: (newQuery, newTriggerCharacter) {
                           triggerCharacter.value = newTriggerCharacter;
@@ -126,13 +125,13 @@ class ChatBox extends HookConsumerWidget {
                         },
                         triggerCharacterAndStyles: {"@": style, "#": style},
                         builder: (context, key) => TextFormField(
-                          enabled: room.canSendDefaultMessages,
+                          // enabled: room.canSendDefaultMessages,
                           maxLines: 12,
                           minLines: 1,
                           decoration: InputDecoration(
-                            hintText: room.canSendDefaultMessages
-                                ? "Your message here..."
-                                : "You don't have permission to send messages in this room...",
+                            // hintText: room.canSendDefaultMessages
+                            //     ? "Your message here..."
+                            //     : "You don't have permission to send messages in this room...",
                             border: InputBorder.none,
                           ),
                           controller: controller.value,
@@ -143,7 +142,8 @@ class ChatBox extends HookConsumerWidget {
                       ),
                     ),
                     IconButton(
-                      onPressed: room.canSendDefaultMessages ? send : null,
+                      onPressed: send,
+                      // onPressed: room.canSendDefaultMessages ? send : null,
                       icon: Icon(Icons.send),
                     ),
                   ],

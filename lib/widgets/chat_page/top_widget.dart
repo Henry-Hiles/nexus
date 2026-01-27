@@ -8,11 +8,9 @@ import "package:nexus/widgets/chat_page/html/quoted.dart";
 class TopWidget extends ConsumerWidget {
   final Message message;
   final bool alwaysShow;
-  final Map<String, String> headers;
   final MessageGroupStatus? groupStatus;
   const TopWidget(
     this.message, {
-    required this.headers,
     required this.groupStatus,
     this.alwaysShow = false,
     super.key,
@@ -62,11 +60,11 @@ class TopWidget extends ConsumerWidget {
                   mainAxisSize: MainAxisSize.min,
                   spacing: 8,
                   children: [
-                    Avatar(
-                      userId: replyMessage.authorId,
-                      headers: headers,
-                      size: 16,
-                    ),
+                    // Avatar( TODO: images
+                    //   userId: replyMessage.authorId,
+                    //   headers: headers,
+                    //   size: 16,
+                    // ),
                     Flexible(
                       child: Text(
                         replyMessage.metadata?["displayName"] ??
@@ -104,7 +102,7 @@ class TopWidget extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             spacing: 8,
             children: [
-              Avatar(userId: message.authorId, headers: headers),
+              // Avatar(userId: message.authorId, headers: headers), TODO: images
               Flexible(
                 child: Text(
                   message.metadata?["displayName"] ?? message.authorId,

@@ -11,6 +11,8 @@ import "package:nexus/controllers/top_level_spaces_controller.dart";
 import "package:nexus/helpers/extensions/gomuks_buffer.dart";
 import "package:nexus/models/client_state.dart";
 import "package:nexus/models/login.dart";
+import "package:nexus/models/report.dart";
+import "package:nexus/models/room.dart";
 import "package:nexus/models/sync_data.dart";
 import "package:nexus/models/sync_status.dart";
 import "package:nexus/src/third_party/gomuks.g.dart";
@@ -116,6 +118,23 @@ class ClientController extends AsyncNotifier<int> {
     } catch (error) {
       return false;
     }
+  }
+
+  Future<void> leaveRoom(Room room) async {
+    if (room.metadata == null) return;
+    await sendCommand("leave_room", {"room_id": room.metadata!.id});
+  }
+
+  Future<void> reportEvent(Report report) =>
+      sendCommand("report_event", report.toJson());
+
+  Future<void> markRead(Room room) async {
+    if (room.events.isEmpty || room.metadata == null) return;
+    await sendCommand("mark_read", {
+      "room_id": room.metadata?.id,
+      "receipt_type": "m.read",
+      "event_id": room.events.last.eventId,
+    });
   }
 
   Future<bool> login(Login login) async {
