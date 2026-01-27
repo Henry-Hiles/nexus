@@ -1,3 +1,4 @@
+import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:freezed_annotation/freezed_annotation.dart";
 import "package:nexus/models/epoch_date_time_converter.dart";
 part "event.freezed.dart";
@@ -14,10 +15,10 @@ abstract class Event with _$Event {
     required String type,
     String? stateKey,
     @EpochDateTimeConverter() required DateTime timestamp,
-    required Map<String, dynamic> content,
-    Map<String, dynamic>? decrypted,
+    required IMap<String, dynamic> content,
+    IMap<String, dynamic>? decrypted,
     String? decryptedType,
-    @Default({}) Map<String, dynamic> unsigned,
+    @Default(IMap.empty()) IMap<String, dynamic> unsigned,
     LocalContent? localContent,
     String? transactionId,
     String? redactedBy,
@@ -25,7 +26,7 @@ abstract class Event with _$Event {
     String? relatesType,
     String? decryptionError,
     String? sendError,
-    @Default({}) Map<String, int> reactions,
+    @Default(IMap.empty()) IMap<String, int> reactions,
     int? lastEditRowId,
     @UnreadTypeConverter() UnreadType? unreadType,
   }) = _Event;
@@ -57,6 +58,7 @@ class UnreadTypeConverter implements JsonConverter<UnreadType?, int?> {
   int? toJson(UnreadType? object) => object?.value;
 }
 
+// I think this is correct but I'm not sure, its some type of bitmask.
 @immutable
 class UnreadType {
   final int value;

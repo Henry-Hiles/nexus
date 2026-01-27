@@ -2,72 +2,50 @@ import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/material.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client_controller.dart";
-import "package:nexus/helpers/extensions/get_full_room.dart";
-import "package:nexus/helpers/extensions/room_to_children.dart";
+import "package:nexus/controllers/rooms_controller.dart";
+import "package:nexus/controllers/top_level_spaces_controller.dart";
 import "package:nexus/models/space.dart";
 
 class SpacesController extends AsyncNotifier<IList<Space>> {
   @override
   Future<IList<Space>> build() async {
-    final client = await ref.watch(ClientController.provider.future);
+    final topLevelSpaceIds = ref.watch(TopLevelSpacesController.provider);
+    final rooms = ref.watch(RoomsController.provider);
 
-    ref.onDispose(
-      client.onSync.stream.listen((_) => ref.invalidateSelf()).cancel,
-    );
+    final topLevelSpaces = topLevelSpaceIds
+        .map((id) => rooms[id])
+        .nonNulls
+        .toIList();
 
-    final topLevel = IList(
-      await Future.wait(
-        client.rooms
-            .where((room) => !room.isDirectChat)
-            .where(
-              (room) => client.rooms
-                  .where((room) => room.isSpace)
-                  .every(
-                    (match) => match.spaceChildren.every(
-                      (child) => child.roomId != room.id,
-                    ),
-                  ),
-            )
-            .map((room) => room.fullRoom),
-      ),
-    );
+    final dmRooms = rooms.values
+        .where((room) => room.metadata?.dmUserId != null)
+        .toIList();
 
-    final topLevelSpaces = topLevel.where((r) => r.roomData.isSpace).toIList();
-    final topLevelRooms = topLevel.where((r) => !r.roomData.isSpace).toIList();
+    final topLevelRooms = rooms.values
+        .where((room) => room.metadata?.dmUserId == null)
+        .where(
+          (room) => spaceRooms.every(
+            (space) =>
+                space.spaceChildren.every((child) => child.roomId != room.id),
+          ),
+        )
+        .toIList();
 
+    // 4️⃣ Combine all into a single IList
     return IList([
       Space(
-        client: client,
-        title: "Home",
         id: "home",
+        title: "Home",
         children: topLevelRooms,
         icon: Icons.home,
       ),
       Space(
-        client: client,
-        title: "Direct Messages",
         id: "dms",
-        children: IList(
-          await Future.wait(
-            client.rooms
-                .where((room) => room.isDirectChat)
-                .map((room) => room.fullRoom),
-          ),
-        ),
+        title: "Direct Messages",
+        children: dmRooms,
         icon: Icons.person,
       ),
-      ...(await Future.wait(
-        topLevelSpaces.map(
-          (space) async => Space(
-            client: client,
-            title: space.title,
-            avatar: space.avatar,
-            id: space.roomData.id,
-            roomData: space.roomData,
-            children: IList(await space.roomData.getAllChildren()),
-          ),
-        ),
-      )),
+      ...topLevelSpaces,
     ]);
   }
 
