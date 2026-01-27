@@ -8,10 +8,12 @@ part "room_metadata.g.dart";
 abstract class RoomMetadata with _$RoomMetadata {
   const factory RoomMetadata({
     @JsonKey(name: "room_id") required String id,
+
     // required CreateEventContent creationContent,
     // required TombstoneEventContent tombstoneEventContent,
     String? name,
     Uri? avatar,
+    String? dmUserId,
     String? topic,
     String? canonicalAlias,
     LazyLoadSummary? lazyLoadSummary,

@@ -1,11 +1,12 @@
-import "dart:convert";
 import "dart:developer";
 import "dart:ffi";
 import "dart:isolate";
 import "package:ffi/ffi.dart";
 import "package:flutter/foundation.dart";
 import "package:nexus/controllers/client_state_controller.dart";
+import "package:nexus/controllers/rooms_controller.dart";
 import "package:nexus/controllers/sync_status_controller.dart";
+import "package:nexus/controllers/top_level_spaces_controller.dart";
 import "package:nexus/helpers/extensions/gomuks_buffer.dart";
 import "package:nexus/models/client_state.dart";
 import "package:nexus/models/login.dart";
@@ -18,55 +19,64 @@ class ClientController extends AsyncNotifier<int> {
   @override
   Future<int> build() async {
     final handle = await Isolate.run(GomuksInit);
-    ref.onDispose(() => GomuksDestroy(handle));
 
-    final errorCode = GomuksStart(
-      handle,
-      NativeCallable<
-            Void Function(Pointer<Char>, Int64, GomuksOwnedBuffer)
-          >.listener((
-            Pointer<Char> command,
-            int requestId,
-            GomuksOwnedBuffer data,
-          ) {
-            try {
-              final muksEventType = command.cast<Utf8>().toDartString();
-              debugPrint("Handling $muksEventType...");
-              final Map<String, dynamic> decodedMuksEvent = data.toJson();
+    final callable =
+        NativeCallable<
+          Void Function(Pointer<Char>, Int64, GomuksOwnedBuffer)
+        >.listener((
+          Pointer<Char> command,
+          int requestId,
+          GomuksOwnedBuffer data,
+        ) {
+          try {
+            final muksEventType = command.cast<Utf8>().toDartString();
+            debugPrint("Handling $muksEventType...");
+            final Map<String, dynamic> decodedMuksEvent = data.toJson();
 
-              switch (muksEventType) {
-                case "client_state":
-                  ref
-                      .watch(ClientStateController.provider.notifier)
-                      .set(ClientState.fromJson(decodedMuksEvent));
-                  break;
-                case "sync_status":
-                  ref
-                      .watch(SyncStatusController.provider.notifier)
-                      .set(SyncStatus.fromJson(decodedMuksEvent));
-                  break;
-                case "sync_complete":
-                  final syncData = SyncData.fromJson(decodedMuksEvent);
-                  debugPrint(jsonEncode(syncData.toJson()));
+            switch (muksEventType) {
+              case "client_state":
+                ref
+                    .watch(ClientStateController.provider.notifier)
+                    .set(ClientState.fromJson(decodedMuksEvent));
+                break;
+              case "sync_status":
+                ref
+                    .watch(SyncStatusController.provider.notifier)
+                    .set(SyncStatus.fromJson(decodedMuksEvent));
+                break;
+              case "sync_complete":
+                final syncData = SyncData.fromJson(decodedMuksEvent);
+                final roomProvider = RoomsController.provider;
 
-                  // ref
-                  //     .watch(SyncStatusController.provider.notifier)
-                  //     .set(SyncStatus.fromJson(decodedMuksEvent));
-                  break;
-                case "typing":
-                  //TODO: IMPL
-                  break;
-                default:
-                  debugPrint("Unhandled event: $muksEventType");
-              }
-              debugPrint("Finished handling $muksEventType...");
-            } catch (error, stackTrace) {
-              debugger();
-              debugPrintStack(stackTrace: stackTrace, label: error.toString());
+                if (syncData.clearState) ref.invalidate(roomProvider);
+                ref
+                    .watch(roomProvider.notifier)
+                    .update(syncData.rooms, syncData.leftRooms);
+                ref
+                    .watch(TopLevelSpacesController.provider.notifier)
+                    .set(syncData.topLevelSpaces);
+
+                // ref
+                //     .watch(SyncStatusController.provider.notifier)
+                //     .set(SyncStatus.fromJson(decodedMuksEvent));
+                break;
+              case "typing":
+                //TODO: IMPL
+                break;
+              default:
+                debugPrint("Unhandled event: $muksEventType");
             }
-          })
-          .nativeFunction,
-    );
+            debugPrint("Finished handling $muksEventType...");
+          } catch (error, stackTrace) {
+            debugger();
+            debugPrintStack(stackTrace: stackTrace, label: error.toString());
+          }
+        });
+
+    ref.onDispose(() => GomuksDestroy(handle));
+    ref.onDispose(callable.close);
+
+    final errorCode = GomuksStart(handle, callable.nativeFunction);
 
     if (errorCode == 0) return handle;
     throw Exception("GomuksStart returned error code $errorCode");

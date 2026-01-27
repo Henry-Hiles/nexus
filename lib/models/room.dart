@@ -1,3 +1,4 @@
+import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:freezed_annotation/freezed_annotation.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/models/read_receipt.dart";
@@ -9,14 +10,14 @@ part "room.g.dart";
 abstract class Room with _$Room {
   const factory Room({
     @JsonKey(name: "meta") RoomMetadata? metadata,
-    @Default([]) List<TimelineRowTuple> timeline,
+    @Default(IList.empty()) IList<TimelineRowTuple> timeline,
     required bool reset,
-    required Map<String, Map> state,
-    // required Map<String, AccountData> accountData,
-    required List<Event> events,
-    @Default({}) Map<String, List<ReadReceipt>> receipts,
+    required IMap<String, IMap> state,
+    // required IMap<String, AccountData> accountData,
+    required IList<Event> events,
+    @Default(IMap.empty()) IMap<String, IList<ReadReceipt>> receipts,
     required bool dismissNotifications,
-    // required List<Notification> notifications,
+    // required IList<Notification> notifications,
   }) = _Room;
 
   factory Room.fromJson(Map<String, Object?> json) => _$RoomFromJson(json);
