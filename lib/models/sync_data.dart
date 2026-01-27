@@ -1,6 +1,7 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:freezed_annotation/freezed_annotation.dart";
 import "package:nexus/models/room.dart";
+import "package:nexus/models/space_edge.dart";
 part "sync_data.freezed.dart";
 part "sync_data.g.dart";
 
@@ -12,8 +13,8 @@ abstract class SyncData with _$SyncData {
     @Default(IMap.empty()) IMap<String, Room> rooms,
     @Default(ISet.empty()) ISet<String> leftRooms,
     // required IList<InvitedRoom> invitedRooms,
-    // required IList<SpaceEdge> spaceEdges,
-    @Default(IList.empty()) IList<String> topLevelSpaces,
+    IMap<String, IList<SpaceEdge>>? spaceEdges,
+    IList<String>? topLevelSpaces,
   }) = _SyncData;
 
   factory SyncData.fromJson(Map<String, Object?> json) =>

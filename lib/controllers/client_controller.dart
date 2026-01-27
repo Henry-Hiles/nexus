@@ -5,6 +5,7 @@ import "package:ffi/ffi.dart";
 import "package:flutter/foundation.dart";
 import "package:nexus/controllers/client_state_controller.dart";
 import "package:nexus/controllers/rooms_controller.dart";
+import "package:nexus/controllers/space_edges_controller.dart";
 import "package:nexus/controllers/sync_status_controller.dart";
 import "package:nexus/controllers/top_level_spaces_controller.dart";
 import "package:nexus/helpers/extensions/gomuks_buffer.dart";
@@ -52,9 +53,16 @@ class ClientController extends AsyncNotifier<int> {
                 ref
                     .watch(roomProvider.notifier)
                     .update(syncData.rooms, syncData.leftRooms);
-                ref
-                    .watch(TopLevelSpacesController.provider.notifier)
-                    .set(syncData.topLevelSpaces);
+                if (syncData.topLevelSpaces != null) {
+                  ref
+                      .watch(TopLevelSpacesController.provider.notifier)
+                      .set(syncData.topLevelSpaces!);
+                }
+                if (syncData.spaceEdges != null) {
+                  ref
+                      .watch(SpaceEdgesController.provider.notifier)
+                      .set(syncData.spaceEdges!);
+                }
 
                 // ref
                 //     .watch(SyncStatusController.provider.notifier)

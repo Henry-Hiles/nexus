@@ -1,55 +1,94 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/material.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
-import "package:nexus/controllers/client_controller.dart";
 import "package:nexus/controllers/rooms_controller.dart";
 import "package:nexus/controllers/top_level_spaces_controller.dart";
+import "package:nexus/controllers/space_edges_controller.dart";
 import "package:nexus/models/space.dart";
+import "package:nexus/models/room.dart";
+import "package:nexus/models/space_edge.dart";
 
-class SpacesController extends AsyncNotifier<IList<Space>> {
+class SpacesController extends Notifier<IList<Space>> {
   @override
-  Future<IList<Space>> build() async {
-    final topLevelSpaceIds = ref.watch(TopLevelSpacesController.provider);
+  IList<Space> build() {
     final rooms = ref.watch(RoomsController.provider);
+    final topLevelSpaceIds = ref.watch(TopLevelSpacesController.provider);
+    final spaceEdges = ref.watch(SpaceEdgesController.provider);
 
-    final topLevelSpaces = topLevelSpaceIds
-        .map((id) => rooms[id])
-        .nonNulls
-        .toIList();
+    ISet<String> collectChildIds(String spaceId) {
+      ISet<String> result = ISet<String>();
+      void walk(String currentId) {
+        final children = spaceEdges[currentId] ?? IList<SpaceEdge>();
+        for (final edge in children) {
+          final childId = edge.childId;
+          if (!result.contains(childId)) {
+            result = result.add(childId);
+            walk(childId);
+          }
+        }
+      }
+
+      walk(spaceId);
+      return result;
+    }
+
+    final spaceIdToChildren = IMap.fromEntries(
+      topLevelSpaceIds.map((spaceId) {
+        final children = collectChildIds(
+          spaceId,
+        ).map((id) => rooms[id]).nonNulls.toIList();
+        return MapEntry(spaceId, children);
+      }),
+    );
+
+    final allNestedRoomIds = spaceIdToChildren.values
+        .expand((l) => l)
+        .map((r) => rooms.entries.firstWhere((e) => e.value == r).key)
+        .toISet();
 
     final dmRooms = rooms.values
         .where((room) => room.metadata?.dmUserId != null)
         .toIList();
 
-    final topLevelRooms = rooms.values
-        .where((room) => room.metadata?.dmUserId == null)
+    final homeRooms = rooms.entries
         .where(
-          (room) => spaceRooms.every(
-            (space) =>
-                space.spaceChildren.every((child) => child.roomId != room.id),
-          ),
+          (e) =>
+              e.value.metadata?.dmUserId == null &&
+              !allNestedRoomIds.contains(e.key) &&
+              !topLevelSpaceIds.contains(e.key),
         )
+        .map((e) => e.value)
         .toIList();
 
-    // 4️⃣ Combine all into a single IList
-    return IList([
-      Space(
-        id: "home",
-        title: "Home",
-        children: topLevelRooms,
-        icon: Icons.home,
-      ),
+    final topLevelSpacesList = topLevelSpaceIds
+        .map((id) {
+          final room = rooms[id];
+          if (room == null) return null;
+
+          final children = spaceIdToChildren[id] ?? IList<Room>();
+          return Space(
+            id: id,
+            title: room.metadata?.name ?? "Unnamed Room",
+            room: room,
+            children: children,
+          );
+        })
+        .nonNulls
+        .toIList();
+
+    return <Space>[
+      Space(id: "home", title: "Home", icon: Icons.home, children: homeRooms),
       Space(
         id: "dms",
         title: "Direct Messages",
+        icon: Icons.people,
         children: dmRooms,
-        icon: Icons.person,
       ),
-      ...topLevelSpaces,
-    ]);
+      ...topLevelSpacesList,
+    ].toIList();
   }
 
-  static final provider = AsyncNotifierProvider<SpacesController, IList<Space>>(
+  static final provider = NotifierProvider<SpacesController, IList<Space>>(
     SpacesController.new,
   );
 }
