@@ -1,6 +1,7 @@
 import "dart:developer";
 import "dart:ffi";
 import "dart:isolate";
+import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:ffi/ffi.dart";
 import "package:flutter/foundation.dart";
 import "package:nexus/controllers/client_state_controller.dart";
@@ -10,8 +11,12 @@ import "package:nexus/controllers/sync_status_controller.dart";
 import "package:nexus/controllers/top_level_spaces_controller.dart";
 import "package:nexus/helpers/extensions/gomuks_buffer.dart";
 import "package:nexus/models/client_state.dart";
-import "package:nexus/models/login.dart";
-import "package:nexus/models/report.dart";
+import "package:nexus/models/event.dart";
+import "package:nexus/models/get_event_request.dart";
+import "package:nexus/models/get_related_events_request.dart";
+import "package:nexus/models/login_request.dart";
+import "package:nexus/models/profile.dart";
+import "package:nexus/models/report_request.dart";
 import "package:nexus/models/room.dart";
 import "package:nexus/models/sync_data.dart";
 import "package:nexus/models/sync_status.dart";
@@ -34,7 +39,7 @@ class ClientController extends AsyncNotifier<int> {
           try {
             final muksEventType = command.cast<Utf8>().toDartString();
             debugPrint("Handling $muksEventType...");
-            final Map<String, dynamic> decodedMuksEvent = data.toJson();
+            final decodedMuksEvent = data.toJson();
 
             switch (muksEventType) {
               case "client_state":
@@ -92,10 +97,7 @@ class ClientController extends AsyncNotifier<int> {
     throw Exception("GomuksStart returned error code $errorCode");
   }
 
-  Future<Map<String, dynamic>> sendCommand(
-    String command,
-    Map<String, dynamic> data,
-  ) async {
+  Future<dynamic> sendCommand(String command, Map<String, dynamic> data) async {
     final bufferPointer = data.toGomuksBufferPtr();
     final handle = await future;
     final response = await Isolate.run(
@@ -125,7 +127,27 @@ class ClientController extends AsyncNotifier<int> {
     await sendCommand("leave_room", {"room_id": room.metadata!.id});
   }
 
-  Future<void> reportEvent(Report report) =>
+  Future<IList<Event>?> getRelatedEvents(
+    GetRelatedEventsRequest request,
+  ) async {
+    final response =
+        (await sendCommand("get_related_events", request.toJson())) as List?;
+    return response?.map((event) => Event.fromJson(event)).toIList();
+  }
+
+  Future<Event?> getEvent(GetEventRequest request) async {
+    final json = await sendCommand("get_event", request.toJson());
+
+    return json == null ? null : Event.fromJson(json);
+  }
+
+  Future<Profile?> getProfile(String userId) async {
+    final json = await sendCommand("get_profile", {"user_id": userId});
+
+    return json == null ? null : Profile.fromJson(json);
+  }
+
+  Future<void> reportEvent(ReportRequest report) =>
       sendCommand("report_event", report.toJson());
 
   Future<void> markRead(Room room) async {
@@ -137,7 +159,7 @@ class ClientController extends AsyncNotifier<int> {
     });
   }
 
-  Future<bool> login(Login login) async {
+  Future<bool> login(LoginRequest login) async {
     try {
       await sendCommand("login", login.toJson());
       return true;
@@ -151,7 +173,7 @@ class ClientController extends AsyncNotifier<int> {
       final response = await sendCommand("discover_homeserver", {
         "user_id": "@fakeuser:${homeserver.host}",
       });
-      return (response["m.homeserver"] as Map<String, dynamic>)["base_url"];
+      return response["m.homeserver"]?["base_url"];
     } catch (error) {
       return null;
     }

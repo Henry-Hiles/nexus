@@ -23,7 +23,7 @@ abstract class Event with _$Event {
     String? transactionId,
     String? redactedBy,
     String? relatesTo,
-    @JsonKey(name: "relates_type") String? relationType,
+    String? relationType,
     String? decryptionError,
     String? sendError,
     @Default(IMap.empty()) IMap<String, int> reactions,

@@ -1,10 +1,12 @@
+import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
-import "package:matrix/matrix.dart";
+import "package:nexus/controllers/client_controller.dart";
 import "package:nexus/helpers/extensions/event_to_message.dart";
+import "package:nexus/models/event.dart";
 
-extension ListToMessages on List<MatrixEvent> {
-  Future<List<Message>> toMessages(Room room, Timeline timeline) async =>
+extension ListToMessages on IList<Event> {
+  Future<List<Message>> toMessages(ClientController client) async =>
       (await Future.wait(
-        map((event) => Event.fromMatrixEvent(event, room).toMessage(timeline)),
-      )).nonNulls.toList().reversed.toList();
+        map((event) => event.toMessage(client)),
+      )).nonNulls.toList();
 }

@@ -18,7 +18,7 @@ import "package:nexus/helpers/extensions/better_when.dart";
 import "package:nexus/helpers/extensions/get_headers.dart";
 import "package:nexus/helpers/extensions/show_context_menu.dart";
 import "package:nexus/models/relation_type.dart";
-import "package:nexus/models/report.dart";
+import "package:nexus/models/report_request.dart";
 import "package:nexus/widgets/chat_page/chat_box.dart";
 import "package:nexus/widgets/chat_page/html/html.dart";
 import "package:nexus/widgets/chat_page/room_appbar.dart";
@@ -43,12 +43,13 @@ class RoomChat extends HookConsumerWidget {
     final replyToMessage = useState<Message?>(null);
     final memberListOpened = useState<bool>(showMembersByDefault);
     final relationType = useState(RelationType.reply);
-    final theme = Theme.of(context);
-    final danger = theme.colorScheme.error;
     final room = ref.watch(SelectedRoomController.provider);
     final userId = ref.watch(ClientStateController.provider)?.userId;
 
-    if (room == null || userId == null) {
+    final theme = Theme.of(context);
+    final danger = theme.colorScheme.error;
+
+    if (room == null || userId == null || room.metadata?.id == null) {
       return Center(
         child: Text(
           "Nothing to see here...",
@@ -56,7 +57,8 @@ class RoomChat extends HookConsumerWidget {
         ),
       );
     }
-    final controllerProvider = RoomChatController.provider(room);
+
+    final controllerProvider = RoomChatController.provider(room.metadata!.id);
     final notifier = ref.watch(controllerProvider.notifier);
 
     List<PopupMenuEntry> getMessageOptions(Message message) {
@@ -158,7 +160,7 @@ class RoomChat extends HookConsumerWidget {
                       onPressed: () {
                         if (room.metadata == null) return;
                         client.reportEvent(
-                          Report(
+                          ReportRequest(
                             roomId: room.metadata!.id,
                             eventId: message.id,
                             reason: reasonController.text.isEmpty

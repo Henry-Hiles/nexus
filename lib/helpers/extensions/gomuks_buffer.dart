@@ -4,7 +4,7 @@ import "dart:typed_data";
 import "package:ffi/ffi.dart";
 import "package:nexus/src/third_party/gomuks.g.dart";
 
-extension GomuksOwnedBufferToJson on GomuksOwnedBuffer {
+extension GomuksOwnedBufferToX on GomuksOwnedBuffer {
   Uint8List toBytes() {
     try {
       if (base == nullptr || length <= 0) return Uint8List(0);
@@ -14,14 +14,7 @@ extension GomuksOwnedBufferToJson on GomuksOwnedBuffer {
     }
   }
 
-  Map<String, dynamic> toJson() {
-    final bytes = toBytes();
-    if (bytes.isEmpty) return {};
-    final json = jsonDecode(utf8.decode(bytes));
-
-    if (json is Map<String, dynamic>?) return json ?? {};
-    throw json;
-  }
+  dynamic toJson() => jsonDecode(utf8.decode(toBytes()));
 }
 
 extension JsonToGomuksBuffer on Map<String, dynamic> {
