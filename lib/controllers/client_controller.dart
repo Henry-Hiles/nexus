@@ -16,6 +16,7 @@ import "package:nexus/models/get_event_request.dart";
 import "package:nexus/models/get_related_events_request.dart";
 import "package:nexus/models/login_request.dart";
 import "package:nexus/models/profile.dart";
+import "package:nexus/models/redact_event_request.dart";
 import "package:nexus/models/report_request.dart";
 import "package:nexus/models/room.dart";
 import "package:nexus/models/sync_data.dart";
@@ -112,6 +113,9 @@ class ClientController extends AsyncNotifier<int> {
 
     return response.buf.toJson();
   }
+
+  Future<void> redactEvent(RedactEventRequest report) =>
+      sendCommand("redact_event", report.toJson());
 
   Future<bool> verify(String recoveryKey) async {
     try {
