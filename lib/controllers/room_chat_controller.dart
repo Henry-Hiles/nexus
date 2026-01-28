@@ -9,6 +9,7 @@ import "package:nexus/controllers/new_events_controller.dart";
 import "package:nexus/controllers/selected_room_controller.dart";
 import "package:nexus/helpers/extensions/event_to_message.dart";
 import "package:nexus/helpers/extensions/list_to_messages.dart";
+import "package:nexus/models/redact_event_request.dart";
 import "package:nexus/models/relation_type.dart";
 
 class RoomChatController extends AsyncNotifier<ChatController> {
@@ -84,9 +85,17 @@ class RoomChatController extends AsyncNotifier<ChatController> {
   }
 
   Future<void> deleteMessage(Message message, {String? reason}) async {
-    // final controller = await future;
-    // await controller.removeMessage(message);
-    // await room.redactEvent(message.id, reason: reason);
+    final controller = await future;
+    await controller.removeMessage(message);
+    await ref
+        .watch(ClientController.provider.notifier)
+        .redactEvent(
+          RedactEventRequest(
+            eventId: message.id,
+            roomId: roomId,
+            reason: reason,
+          ),
+        );
   }
 
   Future<void> loadOlder() async {
@@ -140,10 +149,12 @@ class RoomChatController extends AsyncNotifier<ChatController> {
   }
 
   Future<chat.User> resolveUser(String id) async {
-    // final user = await room.client.getUserProfile(id);
+    final user = await ref
+        .watch(ClientController.provider.notifier)
+        .getProfile(id);
     return chat.User(
       id: id,
-      // name: user.displayname,
+      name: user?.displayName,
       // imageSource: user.avatarUrl == null
       //     ? null
       //     : (await ref.watch(
@@ -152,8 +163,8 @@ class RoomChatController extends AsyncNotifier<ChatController> {
     );
   }
 
-  static final provider =
-      AsyncNotifierProvider.family<RoomChatController, ChatController, String>(
+  static final provider = AsyncNotifierProvider.family
+      .autoDispose<RoomChatController, ChatController, String>(
         RoomChatController.new,
       );
 }
