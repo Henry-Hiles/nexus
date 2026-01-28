@@ -1,5 +1,3 @@
-import "dart:developer";
-
 import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:nexus/controllers/client_controller.dart";
 import "package:nexus/models/event.dart";
@@ -31,17 +29,19 @@ extension EventToMessage on Event {
           );
 
     final author = await client.getProfile(event.authorId);
-    final newContent = event.content["m.new_content"] as Map?;
+    final content = (decrypted ?? this.content);
+    final type = (decryptedType ?? this.type);
+    final newContent = content["m.new_content"] as Map?;
     final metadata = {
       "formatted":
           newContent?["formatted_body"] ??
           newContent?["body"] ??
-          event.content["formatted_body"] ??
-          event.content["body"] ??
+          content["formatted_body"] ??
+          content["body"] ??
           "",
       "reply": await replyEvent?.toMessage(client, mustBeText: true),
-      "body": newContent?["body"] ?? event.content["body"],
-      "eventType": event.type,
+      "body": newContent?["body"] ?? content["body"],
+      "eventType": type,
       "avatarUrl": author?.avatarUrl,
       "displayName": author?.displayName ?? authorId,
       "txnId": transactionId,
@@ -66,15 +66,13 @@ extension EventToMessage on Event {
               id: eventId,
               authorId: authorId,
               text: redactedBy == null
-                  ? event.content["body"] ?? ""
+                  ? content["body"] ?? ""
                   : "This message has been deleted...",
               replyToMessageId: replyId,
               deliveredAt: timestamp,
               editedAt: editedAt,
             )
             as TextMessage;
-
-    final content = (decrypted ?? this.content);
 
     if (mustBeText) return asText;
     return switch (type) {
@@ -101,13 +99,13 @@ extension EventToMessage on Event {
           source: "(await getAttachmentUri()).toString()", // TODO
           replyToMessageId: replyId,
           deliveredAt: timestamp,
-          blurhash: (event.content["info"] as Map?)?["xyz.amorgan.blurhash"],
+          blurhash: (content["info"] as Map?)?["xyz.amorgan.blurhash"],
         ),
         "m.audio" => Message.audio(
           metadata: metadata,
           id: eventId,
           authorId: authorId,
-          text: event.content["body"],
+          text: content["body"],
           replyToMessageId: replyId,
           source: "(await event.getAttachmentUri()).toString()", // TODO
           deliveredAt: timestamp,
@@ -115,7 +113,7 @@ extension EventToMessage on Event {
           duration: Duration(hours: 1),
         ),
         "m.file" => Message.file(
-          name: event.content["filename"].toString(),
+          name: content["filename"].toString(),
           metadata: metadata,
           id: eventId,
           authorId: authorId,
@@ -131,7 +129,7 @@ extension EventToMessage on Event {
         authorId: authorId,
         deliveredAt: timestamp,
         text:
-            "${content["displayname"] ?? event.stateKey} ${switch (event.content["membership"]) {
+            "${content["displayname"] ?? event.stateKey} ${switch (content["membership"]) {
               "invite" => "was invited to",
               "join" => "joined",
               "leave" => "left",
