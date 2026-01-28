@@ -1,65 +1,72 @@
 import "package:collection/collection.dart";
+import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart" as chat;
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:fluttertagger/fluttertagger.dart" as tagger;
+import "package:nexus/controllers/client_controller.dart";
+import "package:nexus/controllers/new_events_controller.dart";
+import "package:nexus/controllers/selected_room_controller.dart";
+import "package:nexus/helpers/extensions/event_to_message.dart";
+import "package:nexus/helpers/extensions/list_to_messages.dart";
 import "package:nexus/models/relation_type.dart";
-import "package:nexus/models/room.dart";
 
 class RoomChatController extends AsyncNotifier<ChatController> {
-  final Room room;
-  RoomChatController(this.room);
+  final String roomId;
+  RoomChatController(this.roomId);
 
   @override
   Future<ChatController> build() async {
-    // final timeline = await ref.watch(EventsController.provider(room).future);
+    final client = ref.watch(ClientController.provider.notifier);
+    final events =
+        ref.read(SelectedRoomController.provider)?.events ??
+        const IList.empty();
 
-    return InMemoryChatController();
+    ref.onDispose(
+      ref.listen(NewEventsController.provider(roomId), (_, next) async {
+        for (final event in next) {
+          if (event.type == "m.room.redaction") {
+            final controller = await future;
+            final message = controller.messages.firstWhereOrNull(
+              (message) => message.id == event.content["redacts"],
+            );
+            if (message == null) return;
 
-    // ref.onDispose(
-    //   room.client.onTimelineEvent.stream.listen((event) async {
-    //     if (event.roomId != room.metadata.id) return;
+            await controller.removeMessage(message);
+          } else {
+            final message = await event.toMessage(client, includeEdits: true);
+            if (event.relationType == "m.replace") {
+              final controller = await future;
+              final oldMessage = controller.messages.firstWhereOrNull(
+                (element) => element.id == event.relatesTo,
+              );
+              if (oldMessage == null || message == null) return;
 
-    //     if (event.type == "m.room.redaction") {
-    //       final controller = await future;
-    //       final message = controller.messages.firstWhereOrNull(
-    //         (message) => message.id == event.redacts,
-    //       );
-    //       if (message == null) return;
+              return await updateMessage(
+                oldMessage,
+                message.copyWith(
+                  id: oldMessage.id,
+                  replyToMessageId: oldMessage.replyToMessageId,
+                  metadata: {
+                    ...(oldMessage.metadata ?? {}),
+                    ...(message.metadata ?? {})
+                        .toIMap()
+                        .where((key, value) => value != null)
+                        .unlock,
+                  },
+                ),
+              );
+            }
+            if (message != null) {
+              return await insertMessage(message);
+            }
+          }
+        }
+      }).close,
+    );
 
-    //       await controller.removeMessage(message);
-    //     } else {
-    //       final message = await event.toMessage(includeEdits: true, timeline);
-    //       if (event.relationshipType == RelationshipTypes.edit) {
-    //         final controller = await future;
-    //         final oldMessage = controller.messages.firstWhereOrNull(
-    //           (element) => element.id == event.relationshipEventId,
-    //         );
-    //         if (oldMessage == null || message == null) return;
-    //         return await updateMessage(
-    //           oldMessage,
-    //           message.copyWith(
-    //             id: oldMessage.id,
-    //             replyToMessageId: oldMessage.replyToMessageId,
-    //             metadata: {
-    //               ...(oldMessage.metadata ?? {}),
-    //               ...((message.metadata ?? {}).filterMap(
-    //                 (key, value) => value == null ? null : MapEntry(key, value),
-    //               )),
-    //             },
-    //           ),
-    //         );
-    //       }
-    //       if (message != null) {
-    //         return await insertMessage(message);
-    //       }
-    //     }
-    //   }).cancel,
-    // );
-
-    // return InMemoryChatController(
-    //   messages: await timeline.events.toMessages(room, timeline),
-    // );
+    final messages = await events.toMessages(client);
+    return InMemoryChatController(messages: messages);
   }
 
   Future<void> insertMessage(Message message) async {
@@ -145,8 +152,8 @@ class RoomChatController extends AsyncNotifier<ChatController> {
     );
   }
 
-  static final provider = AsyncNotifierProvider.family
-      .autoDispose<RoomChatController, ChatController, Room>(
+  static final provider =
+      AsyncNotifierProvider.family<RoomChatController, ChatController, String>(
         RoomChatController.new,
       );
 }

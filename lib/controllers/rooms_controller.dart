@@ -1,5 +1,6 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
+import "package:nexus/controllers/new_events_controller.dart";
 import "package:nexus/models/read_receipt.dart";
 import "package:nexus/models/room.dart";
 
@@ -13,11 +14,18 @@ class RoomsController extends Notifier<IMap<String, Room>> {
       final incoming = entry.value;
       final existing = acc[roomId];
 
+      ref
+          .watch(NewEventsController.provider(roomId).notifier)
+          .add(incoming.events);
+
       return acc.add(
         roomId,
         existing?.copyWith(
               metadata: incoming.metadata ?? existing.metadata,
-              events: existing.events.addAll(incoming.events),
+              events: existing.events.updateById(
+                incoming.events,
+                (item) => item.eventId,
+              ),
               state: incoming.state.entries.fold(
                 existing.state,
                 (stateAcc, event) => stateAcc.add(
