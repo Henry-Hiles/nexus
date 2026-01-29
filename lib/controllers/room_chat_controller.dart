@@ -9,8 +9,11 @@ import "package:nexus/controllers/new_events_controller.dart";
 import "package:nexus/controllers/selected_room_controller.dart";
 import "package:nexus/helpers/extensions/event_to_message.dart";
 import "package:nexus/helpers/extensions/list_to_messages.dart";
-import "package:nexus/models/redact_event_request.dart";
+import "package:nexus/models/requests/redact_event_request.dart";
 import "package:nexus/models/relation_type.dart";
+import "package:nexus/models/requests/send_message_request.dart";
+import "package:nexus/models/room.dart";
+import "package:nexus/models/sync_data.dart";
 
 class RoomChatController extends AsyncNotifier<ChatController> {
   final String roomId;
@@ -67,7 +70,11 @@ class RoomChatController extends AsyncNotifier<ChatController> {
     );
 
     final messages = await events.toMessages(client);
-    return InMemoryChatController(messages: messages);
+    final controller = InMemoryChatController(messages: messages);
+
+    if (messages.length < 20) await loadOlder(controller);
+
+    return controller;
   }
 
   Future<void> insertMessage(Message message) async {
@@ -98,9 +105,12 @@ class RoomChatController extends AsyncNotifier<ChatController> {
         );
   }
 
-  Future<void> loadOlder() async {
-    // final currentEvents = await future;
-    // await ref.watch(EventsController.provider(room).notifier).prev();
+  Future<void> loadOlder([InMemoryChatController? chatController]) async {
+    final controller = chatController ?? await future;
+    final client = ref.watch(ClientController.provider.notifier);
+
+    client.
+    // await ref.watchInMemoryChatController? chatController(EventsController.provider(room).notifier).prev();
     // final timeline = await ref.watch(EventsController.provider(room).future);
 
     // final controller = await future;
@@ -127,25 +137,28 @@ class RoomChatController extends AsyncNotifier<ChatController> {
     required RelationType relationType,
     Message? relation,
   }) async {
-    // var taggedMessage = message;
+    var taggedMessage = message;
 
-    // for (final tag in tags) {
-    //   final escaped = RegExp.escape(tag.id);
-    //   final pattern = RegExp(r"@+(" + escaped + r")(#[^#]*#)?");
+    for (final tag in tags) {
+      final escaped = RegExp.escape(tag.id); // TODO: Fix
+      final pattern = RegExp(r"@+(" + escaped + r")(#[^#]*#)?");
 
-    //   taggedMessage = taggedMessage.replaceAllMapped(
-    //     pattern,
-    //     (match) => match.group(1)!,
-    //   );
-    // }
+      taggedMessage = taggedMessage.replaceAllMapped(
+        pattern,
+        (match) => match.group(1)!,
+      );
+    }
 
-    // await room.sendTextEvent(
-    //   taggedMessage,
-    //   editEventId: relationType == RelationType.edit ? relation?.id : null,
-    //   inReplyTo: (relationType == RelationType.reply && relation != null)
-    //       ? await room.getEventById(relation.id)
-    //       : null,
-    // );
+    final client = ref.watch(ClientController.provider.notifier);
+    client.sendMessage(
+      SendMessageRequest(
+        roomId: roomId,
+        text: taggedMessage,
+        relation: relation == null
+            ? null
+            : Relation(eventId: relation.id, relationType: relationType),
+      ),
+    );
   }
 
   Future<chat.User> resolveUser(String id) async {

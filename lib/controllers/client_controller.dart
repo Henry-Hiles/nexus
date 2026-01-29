@@ -12,12 +12,15 @@ import "package:nexus/controllers/top_level_spaces_controller.dart";
 import "package:nexus/helpers/extensions/gomuks_buffer.dart";
 import "package:nexus/models/client_state.dart";
 import "package:nexus/models/event.dart";
-import "package:nexus/models/get_event_request.dart";
-import "package:nexus/models/get_related_events_request.dart";
-import "package:nexus/models/login_request.dart";
+import "package:nexus/models/paginate.dart";
+import "package:nexus/models/requests/get_event_request.dart";
+import "package:nexus/models/requests/get_related_events_request.dart";
+import "package:nexus/models/requests/login_request.dart";
 import "package:nexus/models/profile.dart";
-import "package:nexus/models/redact_event_request.dart";
-import "package:nexus/models/report_request.dart";
+import "package:nexus/models/requests/paginate_request.dart";
+import "package:nexus/models/requests/redact_event_request.dart";
+import "package:nexus/models/requests/report_request.dart";
+import "package:nexus/models/requests/send_message_request.dart";
 import "package:nexus/models/room.dart";
 import "package:nexus/models/sync_data.dart";
 import "package:nexus/models/sync_status.dart";
@@ -98,7 +101,10 @@ class ClientController extends AsyncNotifier<int> {
     throw Exception("GomuksStart returned error code $errorCode");
   }
 
-  Future<dynamic> sendCommand(String command, Map<String, dynamic> data) async {
+  Future<dynamic> _sendCommand(
+    String command,
+    Map<String, dynamic> data,
+  ) async {
     final bufferPointer = data.toGomuksBufferPtr();
     final handle = await future;
     final response = await Isolate.run(
@@ -115,11 +121,14 @@ class ClientController extends AsyncNotifier<int> {
   }
 
   Future<void> redactEvent(RedactEventRequest report) =>
-      sendCommand("redact_event", report.toJson());
+      _sendCommand("redact_event", report.toJson());
+
+  Future<void> sendMessage(SendMessageRequest request) =>
+      _sendCommand("send_message", request.toJson());
 
   Future<bool> verify(String recoveryKey) async {
     try {
-      await sendCommand("verify", {"recovery_key": recoveryKey});
+      await _sendCommand("verify", {"recovery_key": recoveryKey});
       return true;
     } catch (error) {
       return false;
@@ -128,35 +137,38 @@ class ClientController extends AsyncNotifier<int> {
 
   Future<void> leaveRoom(Room room) async {
     if (room.metadata == null) return;
-    await sendCommand("leave_room", {"room_id": room.metadata!.id});
+    await _sendCommand("leave_room", {"room_id": room.metadata!.id});
   }
 
   Future<IList<Event>?> getRelatedEvents(
     GetRelatedEventsRequest request,
   ) async {
     final response =
-        (await sendCommand("get_related_events", request.toJson())) as List?;
+        (await _sendCommand("get_related_events", request.toJson())) as List?;
     return response?.map((event) => Event.fromJson(event)).toIList();
   }
 
   Future<Event?> getEvent(GetEventRequest request) async {
-    final json = await sendCommand("get_event", request.toJson());
+    final json = await _sendCommand("get_event", request.toJson());
 
     return json == null ? null : Event.fromJson(json);
   }
 
+  Future<Paginate> paginate(PaginateRequest request) async =>
+      Paginate.fromJson(await _sendCommand("paginate", request.toJson()));
+
   Future<Profile?> getProfile(String userId) async {
-    final json = await sendCommand("get_profile", {"user_id": userId});
+    final json = await _sendCommand("get_profile", {"user_id": userId});
 
     return json == null ? null : Profile.fromJson(json);
   }
 
   Future<void> reportEvent(ReportRequest report) =>
-      sendCommand("report_event", report.toJson());
+      _sendCommand("report_event", report.toJson());
 
   Future<void> markRead(Room room) async {
     if (room.events.isEmpty || room.metadata == null) return;
-    await sendCommand("mark_read", {
+    await _sendCommand("mark_read", {
       "room_id": room.metadata?.id,
       "receipt_type": "m.read",
       "event_id": room.events.last.eventId,
@@ -165,7 +177,7 @@ class ClientController extends AsyncNotifier<int> {
 
   Future<bool> login(LoginRequest login) async {
     try {
-      await sendCommand("login", login.toJson());
+      await _sendCommand("login", login.toJson());
       return true;
     } catch (error) {
       return false;
@@ -174,7 +186,7 @@ class ClientController extends AsyncNotifier<int> {
 
   Future<String?> discoverHomeserver(Uri homeserver) async {
     try {
-      final response = await sendCommand("discover_homeserver", {
+      final response = await _sendCommand("discover_homeserver", {
         "user_id": "@fakeuser:${homeserver.host}",
       });
       return response["m.homeserver"]?["base_url"];

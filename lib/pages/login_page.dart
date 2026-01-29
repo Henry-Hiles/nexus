@@ -5,7 +5,7 @@ import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/client_controller.dart";
 import "package:nexus/helpers/launch_helper.dart";
 import "package:nexus/models/homeserver.dart";
-import "package:nexus/models/login_request.dart";
+import "package:nexus/models/requests/login_request.dart";
 import "package:nexus/widgets/appbar.dart";
 import "package:nexus/widgets/divider_text.dart";
 import "package:nexus/widgets/loading.dart";

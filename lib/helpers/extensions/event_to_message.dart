@@ -1,8 +1,8 @@
 import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:nexus/controllers/client_controller.dart";
 import "package:nexus/models/event.dart";
-import "package:nexus/models/get_event_request.dart";
-import "package:nexus/models/get_related_events_request.dart";
+import "package:nexus/models/requests/get_event_request.dart";
+import "package:nexus/models/requests/get_related_events_request.dart";
 
 extension EventToMessage on Event {
   Future<Message?> toMessage(
@@ -92,8 +92,8 @@ extension EventToMessage on Event {
       // ),
       ("m.sticker" || "m.room.message") => switch (content["msgtype"]) {
         ("m.sticker" || "m.image") => Message.image(
-          metadata: metadata,
           id: eventId,
+          metadata: metadata,
           authorId: authorId,
           text: event.localContent?.sanitizedHtml,
           source: "(await getAttachmentUri()).toString()", // TODO
@@ -102,8 +102,8 @@ extension EventToMessage on Event {
           blurhash: (content["info"] as Map?)?["xyz.amorgan.blurhash"],
         ),
         "m.audio" => Message.audio(
-          metadata: metadata,
           id: eventId,
+          metadata: metadata,
           authorId: authorId,
           text: content["body"],
           replyToMessageId: replyId,
