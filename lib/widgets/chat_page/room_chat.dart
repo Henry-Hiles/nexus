@@ -18,7 +18,7 @@ import "package:nexus/helpers/extensions/better_when.dart";
 import "package:nexus/helpers/extensions/get_headers.dart";
 import "package:nexus/helpers/extensions/show_context_menu.dart";
 import "package:nexus/models/relation_type.dart";
-import "package:nexus/models/report_request.dart";
+import "package:nexus/models/requests/report_request.dart";
 import "package:nexus/widgets/chat_page/chat_box.dart";
 import "package:nexus/widgets/chat_page/html/html.dart";
 import "package:nexus/widgets/chat_page/room_appbar.dart";

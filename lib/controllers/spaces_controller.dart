@@ -45,19 +45,21 @@ class SpacesController extends Notifier<IList<Space>> {
         )
         .toISet();
 
-    final dmRooms = rooms.values
-        .where((room) => room.metadata?.dmUserId != null)
-        .toIList();
-
-    final homeRooms = rooms.entries
+    final otherRooms = rooms.entries
         .where(
           (e) =>
-              e.value.metadata?.dmUserId == null &&
               !allNestedRoomIds.contains(e.key) &&
               !topLevelSpaceIds.contains(e.key) &&
               !spaceEdges.containsKey(e.key),
         )
-        .map((e) => e.value)
+        .map((e) => e.value);
+
+    final homeRooms = otherRooms
+        .where((room) => room.metadata?.dmUserId == null)
+        .toIList();
+
+    final dmRooms = otherRooms
+        .where((room) => room.metadata?.dmUserId != null)
         .toIList();
 
     final topLevelSpacesList = topLevelSpaceIds
