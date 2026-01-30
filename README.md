@@ -32,8 +32,11 @@ A simple and user-friendly Matrix client made with Flutter and the Matrix Dart S
         -   [x] Mark as read button on rooms and spaces
     -   [ ] Searching
     -   [ ] Creating (Rooms, Spaces, and DMs)
-    -   [ ] Joining
-        -   [ ] Using alias/id/link
+    -   [x] Joining
+        -   [x] Using a text/uri/link
+            -   [x] Plain text
+            -   [x] `matrix:` Uri
+            -   [ ] Matrix.to link: I just need to fix my regex
         -   [ ] From space
         -   [ ] Exploring
     -   [x] Leaving

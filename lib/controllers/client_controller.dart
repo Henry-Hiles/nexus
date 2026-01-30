@@ -16,6 +16,7 @@ import "package:nexus/models/paginate.dart";
 import "package:nexus/models/requests/get_event_request.dart";
 import "package:nexus/models/requests/get_related_events_request.dart";
 import "package:nexus/models/requests/get_room_state_request.dart";
+import "package:nexus/models/requests/join_room_request.dart";
 import "package:nexus/models/requests/login_request.dart";
 import "package:nexus/models/profile.dart";
 import "package:nexus/models/requests/paginate_request.dart";
@@ -136,6 +137,11 @@ class ClientController extends AsyncNotifier<int> {
     } catch (error) {
       return false;
     }
+  }
+
+  Future<String> joinRoom(JoinRoomRequest request) async {
+    final response = await _sendCommand("join_room", request.toJson());
+    return response["room_id"];
   }
 
   Future<void> leaveRoom(Room room) async {
