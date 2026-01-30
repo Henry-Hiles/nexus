@@ -32,15 +32,15 @@ A simple and user-friendly Matrix client made with Flutter and the Matrix Dart S
         -   [x] Mark as read button on rooms and spaces
     -   [ ] Searching
     -   [ ] Creating (Rooms, Spaces, and DMs)
-    -   [x] Joining
-        -   [x] Using alias/id/link
+    -   [ ] Joining
+        -   [ ] Using alias/id/link
         -   [ ] From space
         -   [ ] Exploring
     -   [x] Leaving
     -   [x] Subspaces
 -   [x] Messages
     -   [x] Encryption
-        -   [ ] Restoring crypto identity from passphrase/key or verification
+        -   [x] Restoring crypto identity from passphrase/key or verification
     -   [x] Sending
         -   [x] Plain text
         -   [x] HTML/Markdown
