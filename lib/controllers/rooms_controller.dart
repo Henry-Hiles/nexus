@@ -15,18 +15,29 @@ class RoomsController extends Notifier<IMap<String, Room>> {
       final incoming = entry.value;
       final existing = acc[roomId];
 
+      final events = existing?.events.updateById(
+        incoming.events,
+        (item) => item.eventId,
+      );
+
       ref
           .watch(NewEventsController.provider(roomId).notifier)
-          .add(incoming.events);
+          .add(
+            incoming.timeline
+                .map(
+                  (timelineTuple) => events?.firstWhereOrNull(
+                    (event) => timelineTuple.eventRowId == event.rowId,
+                  ),
+                )
+                .nonNulls
+                .toIList(),
+          );
 
       return acc.add(
         roomId,
         existing?.copyWith(
               metadata: incoming.metadata ?? existing.metadata,
-              events: existing.events.updateById(
-                incoming.events,
-                (item) => item.eventId,
-              ),
+              events: events!,
               state: incoming.state.entries.fold(
                 existing.state,
                 (previousValue, event) => previousValue.add(
