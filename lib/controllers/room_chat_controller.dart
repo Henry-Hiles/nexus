@@ -83,13 +83,36 @@ class RoomChatController extends AsyncNotifier<ChatController> {
 
     if (messages.length < 20) await loadOlder(controller);
 
-    await client.getRoomState(
+    final state = await client.getRoomState(
       GetRoomStateRequest(
         roomId: roomId,
-        fetchMembers: true,
-        includeMembers: false,
+        fetchMembers: room.metadata?.hasMemberList == false,
+        includeMembers: true,
       ),
     );
+
+    ref
+        .watch(RoomsController.provider.notifier)
+        .update(
+          {
+            roomId: Room(
+              events: state,
+              state: state.fold(
+                const IMap.empty(),
+                (previousValue, stateEvent) => previousValue.add(
+                  stateEvent.type,
+                  (previousValue[stateEvent.type] ?? const IMap.empty()).addAll(
+                    IMap({
+                      if (stateEvent.stateKey != null)
+                        stateEvent.stateKey!: stateEvent.rowId,
+                    }),
+                  ),
+                ),
+              ),
+            ),
+          }.toIMap(),
+          const ISet.empty(),
+        );
 
     return controller;
   }
