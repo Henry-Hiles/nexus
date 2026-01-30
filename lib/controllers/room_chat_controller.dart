@@ -44,17 +44,18 @@ class RoomChatController extends AsyncNotifier<ChatController> {
 
     ref.onDispose(
       ref.listen(NewEventsController.provider(roomId), (_, next) async {
+        final controller = await future;
         for (final event in next) {
           if (event.type == "m.room.redaction") {
             final controller = await future;
             final message = controller.messages.firstWhereOrNull(
               (message) => message.id == event.content["redacts"],
             );
-            if (message == null) return;
+            if (message == null || !ref.mounted) return;
 
             await controller.removeMessage(message);
           } else {
-            final message = await ref.read(
+            final message = await ref.watch(
               MessageController.provider(
                 MessageConfig(event: event, includeEdits: true),
               ).future,
@@ -64,7 +65,7 @@ class RoomChatController extends AsyncNotifier<ChatController> {
               final oldMessage = controller.messages.firstWhereOrNull(
                 (element) => element.id == event.relatesTo,
               );
-              if (oldMessage == null || message == null) return;
+              if (oldMessage == null || message == null || !ref.mounted) return;
 
               return await updateMessage(
                 oldMessage,
@@ -84,8 +85,9 @@ class RoomChatController extends AsyncNotifier<ChatController> {
             if (message != null &&
                 !controller.messages.any(
                   (oldMessage) => oldMessage.id == message.id,
-                )) {
-              await insertMessage(message);
+                ) &&
+                ref.mounted) {
+              await controller.insertMessage(message);
             }
           }
         }

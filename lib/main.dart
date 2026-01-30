@@ -1,3 +1,4 @@
+import "dart:developer";
 import "dart:io";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/foundation.dart";
@@ -43,6 +44,7 @@ void showError(Object error, [StackTrace? stackTrace]) {
   if (error.toString().contains("Invalid image data")) return;
 
   debugPrintStack(stackTrace: stackTrace, label: error.toString());
+  debugger();
   if (navigatorKey.currentContext != null) {
     Future.delayed(
       Duration.zero,
