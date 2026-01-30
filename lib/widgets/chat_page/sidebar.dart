@@ -1,4 +1,3 @@
-import "package:collection/collection.dart";
 import "package:flutter/material.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
@@ -66,11 +65,9 @@ class Sidebar extends HookConsumerWidget {
                       fallback: space.icon == null ? null : Icon(space.icon),
                       space.title,
                       headers: {}, // TODO
-                      hasBadge:
-                          space.children.firstWhereOrNull(
-                            (room) => room.metadata?.unreadMessages != 0,
-                          ) !=
-                          null,
+                      hasBadge: space.children.any(
+                        (room) => room.metadata?.unreadMessages != 0,
+                      ),
                       badgeNumber: space.children.fold(
                         0,
                         (previousValue, room) =>

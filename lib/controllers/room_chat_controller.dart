@@ -10,7 +10,6 @@ import "package:nexus/controllers/rooms_controller.dart";
 import "package:nexus/controllers/selected_room_controller.dart";
 import "package:nexus/helpers/extensions/event_to_message.dart";
 import "package:nexus/helpers/extensions/list_to_messages.dart";
-import "package:nexus/models/event.dart";
 import "package:nexus/models/requests/get_room_state_request.dart";
 import "package:nexus/models/requests/paginate_request.dart";
 import "package:nexus/models/requests/redact_event_request.dart";
@@ -153,20 +152,17 @@ class RoomChatController extends AsyncNotifier<ChatController> {
           const ISet.empty(),
         );
 
-    final existingIds = controller.messages.map((m) => m.id).toSet();
-
-    final messages = await response.events
-        .where((event) => !existingIds.contains(event.eventId))
-        .fold(<String, Event>{}, (acc, event) {
-          acc[event.eventId] =
-              event; // overwrites duplicates in response.events
-          return acc;
-        })
-        .values
-        .toIList()
-        .reversed
-        .toMessages(ref);
-    await controller.insertAllMessages(messages, index: 0);
+    final messages = await response.events.reversed.toMessages(ref);
+    await controller.insertAllMessages(
+      messages
+          .where(
+            (newMessage) => !controller.messages.any(
+              (message) => message.id == newMessage.id,
+            ),
+          )
+          .toList(),
+      index: 0,
+    );
   }
 
   Future<void> updateMessage(Message message, Message newMessage) async =>
@@ -181,12 +177,14 @@ class RoomChatController extends AsyncNotifier<ChatController> {
     var taggedMessage = message;
 
     for (final tag in tags) {
-      final escaped = RegExp.escape(tag.id); // TODO: Fix
+      final escaped = RegExp.escape(tag.id);
       final pattern = RegExp(r"@+(" + escaped + r")(#[^#]*#)?");
 
       taggedMessage = taggedMessage.replaceAllMapped(
         pattern,
-        (match) => match.group(1)!,
+        (match) => match.group(
+          1,
+        )!, // TODO: Return an HTML or Markdown link from here, not plaintext
       );
     }
 
@@ -194,6 +192,7 @@ class RoomChatController extends AsyncNotifier<ChatController> {
     client.sendMessage(
       SendMessageRequest(
         roomId: roomId,
+        mentions: Mentions(), // TODO: Add parsed mentions
         text: taggedMessage,
         relation: relation == null
             ? null
