@@ -37,7 +37,11 @@ class MemberList extends ConsumerWidget {
                 ),
                 ...joined.map(
                   (member) => ListTile(
-                    onTap: () {},
+                    onTap: () => showDialog(
+                      context: context,
+                      builder: (context) =>
+                          Dialog(child: Text("TODO: Open member popover")),
+                    ),
                     // leading: AvatarOrHash( TODO
                     //   ref
                     //       .watch(
