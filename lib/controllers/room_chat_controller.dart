@@ -86,7 +86,8 @@ class RoomChatController extends AsyncNotifier<ChatController> {
     await client.getRoomState(
       GetRoomStateRequest(
         roomId: roomId,
-        fetchMembers: room.metadata?.hasMemberList == false,
+        fetchMembers: true,
+        includeMembers: false,
       ),
     );
 
@@ -182,9 +183,7 @@ class RoomChatController extends AsyncNotifier<ChatController> {
 
       taggedMessage = taggedMessage.replaceAllMapped(
         pattern,
-        (match) => match.group(
-          1,
-        )!, // TODO: Return an HTML or Markdown link from here, not plaintext
+        (match) => match.group(1)!,
       );
     }
 
@@ -192,7 +191,13 @@ class RoomChatController extends AsyncNotifier<ChatController> {
     client.sendMessage(
       SendMessageRequest(
         roomId: roomId,
-        mentions: Mentions(), // TODO: Add parsed mentions
+        mentions: Mentions(
+          userIds: [
+            if (relation != null && relationType == RelationType.reply)
+              relation.authorId,
+          ].toIList(),
+          room: taggedMessage.contains("@room"),
+        ),
         text: taggedMessage,
         relation: relation == null
             ? null

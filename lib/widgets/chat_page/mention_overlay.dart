@@ -71,7 +71,7 @@ class MentionOverlay extends ConsumerWidget {
                                         member.authorId,
                                   ),
                                   onTap: () => addTag(
-                                    id: member.authorId,
+                                    id: "[@${member.content["displayname"]}](https://matrix.to/#/${member.authorId})",
                                     name: member.authorId
                                         .substring(1)
                                         .split(":")
