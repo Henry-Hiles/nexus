@@ -21,12 +21,12 @@ import "package:nexus/models/relation_type.dart";
 import "package:nexus/models/requests/report_request.dart";
 import "package:nexus/widgets/chat_page/chat_box.dart";
 import "package:nexus/widgets/chat_page/html/html.dart";
+import "package:nexus/widgets/chat_page/member_list.dart";
 import "package:nexus/widgets/chat_page/room_appbar.dart";
 import "package:nexus/widgets/chat_page/top_widget.dart";
 import "package:nexus/widgets/form_text_input.dart";
 import "package:nexus/widgets/loading.dart";
 // import "package:dynamic_polls/dynamic_polls.dart";
-// import "package:matrix/matrix.dart";
 
 class RoomChat extends HookConsumerWidget {
   final bool isDesktop;
@@ -534,12 +534,12 @@ class RoomChat extends HookConsumerWidget {
             ),
           ),
 
-          // if (memberListOpened.value == true && showMembersByDefault) TODO: Member list
-          //   MemberList(room),
+          if (memberListOpened.value == true && showMembersByDefault)
+            MemberList(room),
         ],
       ),
 
-      // endDrawer: showMembersByDefault ? null : MemberList(room),
+      endDrawer: showMembersByDefault ? null : MemberList(room),
     );
   }
 }

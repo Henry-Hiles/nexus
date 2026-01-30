@@ -6,6 +6,7 @@ part "paginate_request.g.dart";
 abstract class PaginateRequest with _$PaginateRequest {
   const factory PaginateRequest({
     required String roomId,
+    required int? maxTimelineId,
     @Default(20) int limit,
   }) = _PaginateRequest;
 

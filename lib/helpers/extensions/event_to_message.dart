@@ -1,16 +1,19 @@
 import "package:flutter_chat_core/flutter_chat_core.dart";
+import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client_controller.dart";
+import "package:nexus/controllers/profile_controller.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/models/requests/get_event_request.dart";
 import "package:nexus/models/requests/get_related_events_request.dart";
 
 extension EventToMessage on Event {
   Future<Message?> toMessage(
-    ClientController client, {
+    Ref ref, {
     bool mustBeText = false,
     bool includeEdits = false,
   }) async {
     if (relationType == "m.replace" && !includeEdits) return null;
+    final client = ref.watch(ClientController.provider.notifier);
 
     final newEvents = await client.getRelatedEvents(
       GetRelatedEventsRequest(
@@ -28,22 +31,25 @@ extension EventToMessage on Event {
             GetEventRequest(roomId: roomId, eventId: replyId),
           );
 
-    final author = await client.getProfile(event.authorId);
+    final author = await ref.watch(
+      ProfileController.provider(event.authorId).future,
+    );
     final content = (decrypted ?? this.content);
     final type = (decryptedType ?? this.type);
     final newContent = content["m.new_content"] as Map?;
     final metadata = {
+      "timelineId": event.timelineRowId,
       "formatted":
           newContent?["formatted_body"] ??
           newContent?["body"] ??
           content["formatted_body"] ??
           content["body"] ??
           "",
-      "reply": await replyEvent?.toMessage(client, mustBeText: true),
+      "reply": await replyEvent?.toMessage(ref, mustBeText: true),
       "body": newContent?["body"] ?? content["body"],
       "eventType": type,
-      "avatarUrl": author?.avatarUrl,
-      "displayName": author?.displayName ?? authorId,
+      "avatarUrl": author.avatarUrl,
+      "displayName": author.displayName ?? authorId,
       "txnId": transactionId,
     };
 

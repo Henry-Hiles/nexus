@@ -186,7 +186,7 @@ class Sidebar extends HookConsumerWidget {
                       ? null
                       : Icon(selectedSpace.icon),
 
-                  selectedSpace.title, // TODO RM
+                  selectedSpace.title,
                   headers: {},
                   //  space.client.headers, TODO
                 ),
