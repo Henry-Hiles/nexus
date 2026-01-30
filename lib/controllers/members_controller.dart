@@ -17,6 +17,7 @@ class MembersController extends AsyncNotifier<IList<Event>> {
             ),
           )
           .nonNulls
+          .where((member) => member.content["membership"] == "join")
           .toIList();
 
   static final provider = AsyncNotifierProvider.family

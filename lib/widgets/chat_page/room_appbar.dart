@@ -24,14 +24,12 @@ class RoomAppbar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) => Appbar(
     leading: isDesktop
-        ? null
-        //  AvatarOrHash( TODO: Images
-        //     room.avatar,
-        //     room.title,
-        //     height: 24,
-        //     fallback: Icon(Icons.numbers),
-        //     headers: room.roomData.client.headers,
-        //   )
+        ? AvatarOrHash(
+            room.metadata?.avatar,
+            room.metadata?.name ?? "Unnamed Rooms",
+            height: 24,
+            fallback: Icon(Icons.numbers),
+          )
         : DrawerButton(onPressed: () => onOpenDrawer(context)),
     scrolledUnderElevation: 0,
     title: Column(

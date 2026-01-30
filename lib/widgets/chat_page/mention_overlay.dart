@@ -4,6 +4,7 @@ import "package:nexus/controllers/members_controller.dart";
 import "package:nexus/controllers/rooms_controller.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
 import "package:nexus/models/room.dart";
+import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/widgets/loading.dart";
 
 class MentionOverlay extends ConsumerWidget {
@@ -54,18 +55,12 @@ class MentionOverlay extends ConsumerWidget {
                                     ))
                               .map(
                                 (member) => ListTile(
-                                  // leading: AvatarOrHash( TODO: Images
-                                  //   ref
-                                  //       .watch(
-                                  //         AvatarController.provider(
-                                  //           member.content["avatar_url"]
-                                  //               .toString(),
-                                  //         ),
-                                  //       )
-                                  //       .whenOrNull(data: (data) => data),
-                                  //   member.content["displayname"].toString(),
-                                  //   headers: room.client.headers,
-                                  // ),
+                                  leading: AvatarOrHash(
+                                    Uri.tryParse(
+                                      member.content["avatar_url"] ?? "",
+                                    ),
+                                    member.content["displayname"] ?? "",
+                                  ),
                                   title: Text(
                                     member.content["displayname"] as String? ??
                                         member.authorId,
@@ -93,12 +88,11 @@ class MentionOverlay extends ConsumerWidget {
                             ))
                       .map(
                         (room) => ListTile(
-                          // leading: AvatarOrHash( TODO: Images
-                          //   room.avatar,
-                          //   room.title,
-                          //   fallback: Icon(Icons.numbers),
-                          //   headers: room.roomData.client.headers,
-                          // ),
+                          leading: AvatarOrHash(
+                            room.metadata?.avatar,
+                            room.metadata?.name ?? "Unnamed Room",
+                            fallback: Icon(Icons.numbers),
+                          ),
                           title: Text(room.metadata?.name ?? "Unnamed Room"),
                           subtitle: room.metadata?.topic == null
                               ? null
