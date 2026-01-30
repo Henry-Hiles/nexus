@@ -8,6 +8,7 @@ import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/room_chat_controller.dart";
 import "package:nexus/models/relation_type.dart";
 import "package:nexus/models/room.dart";
+import "package:nexus/widgets/chat_page/mention_overlay.dart";
 import "package:nexus/widgets/chat_page/relation_preview.dart";
 
 class ChatBox extends HookConsumerWidget {
@@ -108,16 +109,15 @@ class ChatBox extends HookConsumerWidget {
                     Expanded(
                       child: FlutterTagger(
                         triggerStrategy: TriggerStrategy.eager,
-                        overlay: SizedBox.shrink(),
-                        //  MentionOverlay( TODO: Fix
-                        //   room,
-                        //   query: query.value,
-                        //   triggerCharacter: triggerCharacter.value,
-                        //   addTag: ({required id, required name}) {
-                        //     controller.value.addTag(id: id, name: name);
-                        //     node.requestFocus();
-                        //   },
-                        // ),
+                        overlay: MentionOverlay(
+                          room,
+                          query: query.value,
+                          triggerCharacter: triggerCharacter.value,
+                          addTag: ({required id, required name}) {
+                            controller.value.addTag(id: id, name: name);
+                            node.requestFocus();
+                          },
+                        ),
                         controller: controller.value,
                         onSearch: (newQuery, newTriggerCharacter) {
                           triggerCharacter.value = newTriggerCharacter;
