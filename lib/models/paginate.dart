@@ -8,6 +8,7 @@ part "paginate.g.dart";
 abstract class Paginate with _$Paginate {
   const factory Paginate({
     required IList<Event> events,
+    required IList<Event> relatedEvents,
     required bool hasMore,
   }) = _Paginate;
 

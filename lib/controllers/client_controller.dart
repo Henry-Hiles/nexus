@@ -15,6 +15,7 @@ import "package:nexus/models/event.dart";
 import "package:nexus/models/paginate.dart";
 import "package:nexus/models/requests/get_event_request.dart";
 import "package:nexus/models/requests/get_related_events_request.dart";
+import "package:nexus/models/requests/get_room_state_request.dart";
 import "package:nexus/models/requests/login_request.dart";
 import "package:nexus/models/profile.dart";
 import "package:nexus/models/requests/paginate_request.dart";
@@ -117,7 +118,9 @@ class ClientController extends AsyncNotifier<int> {
 
     calloc.free(bufferPointer);
 
-    return response.buf.toJson();
+    final json = response.buf.toJson();
+    if (json is String) throw json;
+    return json;
   }
 
   Future<void> redactEvent(RedactEventRequest report) =>
@@ -140,6 +143,12 @@ class ClientController extends AsyncNotifier<int> {
     await _sendCommand("leave_room", {"room_id": room.metadata!.id});
   }
 
+  Future<IList<Event>> getRoomState(GetRoomStateRequest request) async {
+    final response =
+        (await _sendCommand("get_room_state", request.toJson())) as List;
+    return response.map((event) => Event.fromJson(event)).toIList();
+  }
+
   Future<IList<Event>?> getRelatedEvents(
     GetRelatedEventsRequest request,
   ) async {
@@ -157,11 +166,8 @@ class ClientController extends AsyncNotifier<int> {
   Future<Paginate> paginate(PaginateRequest request) async =>
       Paginate.fromJson(await _sendCommand("paginate", request.toJson()));
 
-  Future<Profile?> getProfile(String userId) async {
-    final json = await _sendCommand("get_profile", {"user_id": userId});
-
-    return json == null ? null : Profile.fromJson(json);
-  }
+  Future<Profile> getProfile(String userId) async =>
+      Profile.fromJson(await _sendCommand("get_profile", {"user_id": userId}));
 
   Future<void> reportEvent(ReportRequest report) =>
       _sendCommand("report_event", report.toJson());

@@ -1,3 +1,4 @@
+import "package:collection/collection.dart";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/new_events_controller.dart";
@@ -28,16 +29,22 @@ class RoomsController extends Notifier<IMap<String, Room>> {
               ),
               state: incoming.state.entries.fold(
                 existing.state,
-                (stateAcc, event) => stateAcc.add(
+                (previousValue, event) => previousValue.add(
                   event.key,
-                  (stateAcc[event.key] ?? IMap<dynamic, dynamic>()).addAll(
+                  (previousValue[event.key] ?? const IMap.empty()).addAll(
                     event.value,
                   ),
                 ),
               ),
-              timeline: incoming.reset
-                  ? incoming.timeline
-                  : existing.timeline.addAll(incoming.timeline),
+              timeline:
+                  (incoming.reset
+                          ? incoming.timeline
+                          : existing.timeline.updateById(
+                              incoming.timeline,
+                              (item) => item.timelineRowId,
+                            ))
+                      .sortedBy((element) => element.timelineRowId)
+                      .toIList(),
               receipts: incoming.receipts.entries.fold(
                 existing.receipts,
                 (receiptAcc, event) => receiptAcc.add(

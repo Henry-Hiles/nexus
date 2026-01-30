@@ -11,12 +11,13 @@ abstract class Room with _$Room {
   const factory Room({
     @JsonKey(name: "meta") RoomMetadata? metadata,
     @Default(IList.empty()) IList<TimelineRowTuple> timeline,
-    required bool reset,
-    required IMap<String, IMap> state,
+    @Default(false) bool reset,
+    @Default(IMap.empty()) IMap<String, IMap<String, int>> state,
     // required IMap<String, AccountData> accountData,
-    required IList<Event> events,
+    @Default(IList.empty()) IList<Event> events,
     @Default(IMap.empty()) IMap<String, IList<ReadReceipt>> receipts,
-    required bool dismissNotifications,
+    @Default(false) bool dismissNotifications,
+    @Default(true) bool hasMore,
     // required IList<Notification> notifications,
   }) = _Room;
 

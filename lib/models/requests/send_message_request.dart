@@ -9,8 +9,8 @@ abstract class SendMessageRequest with _$SendMessageRequest {
   const factory SendMessageRequest({
     required String roomId,
     required String text,
-    @Default(Mentions()) @JsonKey(name: "m.mentions") Mentions mentions,
-    @JsonKey(name: "m.relates_to") Relation? relation,
+    @Default(Mentions()) @JsonKey(name: "mentions") Mentions mentions,
+    @JsonKey(name: "relates_to") Relation? relation,
   }) = _SendMessageRequest;
 
   factory SendMessageRequest.fromJson(Map<String, Object?> json) =>
@@ -28,17 +28,16 @@ abstract class Mentions with _$Mentions {
       _$MentionsFromJson(json);
 }
 
-@freezed
+@Freezed(toJson: false)
 abstract class Relation with _$Relation {
-  const Relation._(); // required for custom methods
+  const Relation._();
 
   const factory Relation({
     required String eventId,
     required RelationType relationType,
   }) = _Relation;
 
-  @override
-  Map<String, Object?> toJson() {
+  Map<String, dynamic> toJson() {
     switch (relationType) {
       case RelationType.reply:
         return {
@@ -50,6 +49,6 @@ abstract class Relation with _$Relation {
     }
   }
 
-  factory Relation.fromJson(Map<String, Object?> json) =>
+  factory Relation.fromJson(Map<String, dynamic> json) =>
       _$RelationFromJson(json);
 }
