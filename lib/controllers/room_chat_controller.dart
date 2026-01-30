@@ -3,13 +3,14 @@ import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart" as chat;
 import "package:flutter_riverpod/flutter_riverpod.dart";
-import "package:fluttertagger/fluttertagger.dart" as tagger;
+import "package:fluttertagger/fluttertagger.dart";
 import "package:nexus/controllers/client_controller.dart";
+import "package:nexus/controllers/message_controller.dart";
+import "package:nexus/controllers/messages_controller.dart";
 import "package:nexus/controllers/new_events_controller.dart";
 import "package:nexus/controllers/rooms_controller.dart";
 import "package:nexus/controllers/selected_room_controller.dart";
-import "package:nexus/helpers/extensions/event_to_message.dart";
-import "package:nexus/helpers/extensions/list_to_messages.dart";
+import "package:nexus/models/message_config.dart";
 import "package:nexus/models/requests/get_room_state_request.dart";
 import "package:nexus/models/requests/paginate_request.dart";
 import "package:nexus/models/requests/redact_event_request.dart";
@@ -27,15 +28,19 @@ class RoomChatController extends AsyncNotifier<ChatController> {
     final room = ref.read(SelectedRoomController.provider);
     if (room == null) return InMemoryChatController();
 
-    final messages = await room.timeline
-        .map(
-          (timelineRowTuple) => room.events.firstWhereOrNull(
-            (event) => event.rowId == timelineRowTuple.eventRowId,
-          ),
-        )
-        .nonNulls
-        .toMessages(ref);
-    final controller = InMemoryChatController(messages: messages);
+    final messages = await ref.watch(
+      MessagesController.provider(
+        room.timeline
+            .map(
+              (timelineRowTuple) => room.events.firstWhereOrNull(
+                (event) => event.rowId == timelineRowTuple.eventRowId,
+              ),
+            )
+            .nonNulls
+            .toIList(),
+      ).future,
+    );
+    final controller = InMemoryChatController(messages: messages.toList());
 
     ref.onDispose(
       ref.listen(NewEventsController.provider(roomId), (_, next) async {
@@ -49,7 +54,11 @@ class RoomChatController extends AsyncNotifier<ChatController> {
 
             await controller.removeMessage(message);
           } else {
-            final message = await event.toMessage(ref, includeEdits: true);
+            final message = await ref.read(
+              MessageController.provider(
+                MessageConfig(event: event, includeEdits: true),
+              ).future,
+            );
             if (event.relationType == "m.replace") {
               final controller = await future;
               final oldMessage = controller.messages.firstWhereOrNull(
@@ -180,7 +189,9 @@ class RoomChatController extends AsyncNotifier<ChatController> {
           const ISet.empty(),
         );
 
-    final messages = await response.events.reversed.toMessages(ref);
+    final messages = await ref.watch(
+      MessagesController.provider(response.events.reversed).future,
+    );
     await controller.insertAllMessages(
       messages
           .where(
@@ -198,7 +209,7 @@ class RoomChatController extends AsyncNotifier<ChatController> {
 
   Future<void> send(
     String message, {
-    required Iterable<tagger.Tag> tags,
+    required Iterable<Tag> tags,
     required RelationType relationType,
     Message? relation,
   }) async {

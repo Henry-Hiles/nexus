@@ -9,6 +9,7 @@ abstract class ClientState with _$ClientState {
     required bool isLoggedIn,
     required bool isVerified,
     required String? userId,
+    required String? homeserverUrl,
   }) = _ClientState;
 
   factory ClientState.fromJson(Map<String, Object?> json) =>

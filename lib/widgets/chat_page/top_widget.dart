@@ -1,8 +1,8 @@
 import "dart:math";
 import "package:flutter/material.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
-import "package:flutter_chat_ui/flutter_chat_ui.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
+import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/widgets/chat_page/html/quoted.dart";
 
 class TopWidget extends ConsumerWidget {
@@ -60,11 +60,11 @@ class TopWidget extends ConsumerWidget {
                   mainAxisSize: MainAxisSize.min,
                   spacing: 8,
                   children: [
-                    // Avatar( TODO: images
-                    //   userId: replyMessage.authorId,
-                    //   headers: headers,
-                    //   size: 16,
-                    // ),
+                    AvatarOrHash(
+                      Uri.tryParse(replyMessage.metadata?["avatarUrl"] ?? ""),
+                      replyMessage.metadata?["displayName"] ?? "",
+                      height: 16,
+                    ),
                     Flexible(
                       child: Text(
                         replyMessage.metadata?["displayName"] ??
@@ -102,7 +102,10 @@ class TopWidget extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             spacing: 8,
             children: [
-              // Avatar(userId: message.authorId, headers: headers), TODO: images
+              AvatarOrHash(
+                Uri.parse(message.metadata?["avatarUrl"] ?? ""),
+                message.metadata?["displayName"] ?? "",
+              ),
               Flexible(
                 child: Text(
                   message.metadata?["displayName"] ?? message.authorId,

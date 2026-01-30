@@ -2,7 +2,10 @@ import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/material.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart";
+import "package:nexus/controllers/client_state_controller.dart";
+import "package:nexus/helpers/extensions/get_headers.dart";
 import "package:nexus/helpers/extensions/link_to_mention.dart";
+import "package:nexus/helpers/extensions/mxc_to_https.dart";
 import "package:nexus/helpers/launch_helper.dart";
 import "package:nexus/widgets/chat_page/html/mention_chip.dart";
 import "package:nexus/widgets/chat_page/html/spoiler_text.dart";
@@ -40,53 +43,36 @@ class Html extends ConsumerWidget {
               ? null
               : InlineCustomWidget(child: MentionChip(element.text)),
 
-        // "img" => TODO: Img support
-        //   element.attributes["src"] == null
-        //       ? null
-        //       : Consumer(
-        //           builder: (_, ref, _) => ref
-        //               .watch(
-        //                 ThumbnailController.provider(
-        //                   ImageData(
-        //                     uri: element.attributes["src"]!,
-        //                     height: height,
-        //                     width: width,
-        //                   ),
-        //                 ),
-        //               )
-        //               .when(
-        //                 data: (uri) {
-        //                   if (uri == null) return SizedBox.shrink();
-
-        //                   return InlineCustomWidget(
-        //                     child: Image.network(
-        //                       uri,
-        //                       headers: client.headers,
-        //                       errorBuilder: (_, error, _) => Text(
-        //                         "Image Failed to Load",
-        //                         style: TextStyle(
-        //                           color: Theme.of(context).colorScheme.error,
-        //                         ),
-        //                       ),
-        //                       height: height.toDouble(),
-        //                       width: width?.toDouble(),
-        //                       loadingBuilder: (_, child, loadingProgress) =>
-        //                           loadingProgress == null
-        //                           ? child
-        //                           : CircularProgressIndicator(),
-        //                     ),
-        //                   );
-        //                 },
-        //                 error: ErrorDialog.new,
-        //                 loading: () => InlineCustomWidget(
-        //                   child: SizedBox(
-        //                     width: width?.toDouble(),
-        //                     height: height.toDouble(),
-        //                     child: CircularProgressIndicator(),
-        //                   ),
-        //                 ),
-        //               ),
-        //         ),
+        "img" =>
+          element.attributes["src"] == null
+              ? null
+              : InlineCustomWidget(
+                  child: Image.network(
+                    Uri.parse(element.attributes["src"]!)
+                        .mxcToHttps(
+                          ref.watch(
+                                ClientStateController.provider.select(
+                                  (value) => value?.homeserverUrl,
+                                ),
+                              ) ??
+                              "",
+                        )
+                        .toString(),
+                    headers: ref.headers,
+                    errorBuilder: (_, error, _) => Text(
+                      "Image Failed to Load",
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                    ),
+                    height: height.toDouble(),
+                    width: width?.toDouble(),
+                    loadingBuilder: (_, child, loadingProgress) =>
+                        loadingProgress == null
+                        ? child
+                        : CircularProgressIndicator(),
+                  ),
+                ),
         ("del" ||
             "h1" ||
             "h2" ||

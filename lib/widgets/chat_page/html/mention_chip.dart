@@ -19,7 +19,7 @@ class MentionChip extends StatelessWidget {
       context: context,
       builder: (_) => Dialog(
         child: Text("TODO: Open room or join room dialog, or user popover"),
-      ), // TODO
+      ),
     ),
   );
 }

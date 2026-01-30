@@ -61,10 +61,9 @@ class Sidebar extends HookConsumerWidget {
                 .map(
                   (space) => NavigationRailDestination(
                     icon: AvatarOrHash(
-                      null, // TODO: Url
+                      space.room?.metadata?.avatar,
                       fallback: space.icon == null ? null : Icon(space.icon),
                       space.title,
-                      headers: {}, // TODO
                       hasBadge: space.children.any(
                         (room) => room.metadata?.unreadMessages != 0,
                       ),
@@ -177,15 +176,12 @@ class Sidebar extends HookConsumerWidget {
               backgroundColor: Colors.transparent,
               appBar: AppBar(
                 leading: AvatarOrHash(
-                  null,
-                  // space.avatar, TODO
+                  selectedSpace.room?.metadata?.avatar,
                   fallback: selectedSpace.icon == null
                       ? null
                       : Icon(selectedSpace.icon),
 
                   selectedSpace.title,
-                  headers: {},
-                  //  space.client.headers, TODO
                 ),
                 title: Text(
                   selectedSpace.title,
@@ -210,15 +206,13 @@ class Sidebar extends HookConsumerWidget {
                       (room) => NavigationRailDestination(
                         label: Text(room.metadata?.name ?? "Unnamed Room"),
                         icon: AvatarOrHash(
-                          null,
+                          room.metadata?.avatar,
                           hasBadge: room.metadata?.unreadMessages != 0,
                           badgeNumber: room.metadata?.unreadNotifications ?? 0,
-                          // room.avatar, TODO
                           room.metadata?.name ?? "Unnamed Room",
                           fallback: selectedSpaceId == "dms"
                               ? null
                               : Icon(Icons.numbers),
-                          headers: {},
                           //  space.client.headers,
                         ),
                       ),

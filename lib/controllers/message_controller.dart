@@ -1,41 +1,51 @@
 import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client_controller.dart";
+import "package:nexus/controllers/client_state_controller.dart";
 import "package:nexus/controllers/profile_controller.dart";
-import "package:nexus/models/event.dart";
+import "package:nexus/helpers/extensions/mxc_to_https.dart";
+import "package:nexus/models/message_config.dart";
 import "package:nexus/models/requests/get_event_request.dart";
 import "package:nexus/models/requests/get_related_events_request.dart";
 
-extension EventToMessage on Event {
-  Future<Message?> toMessage(
-    Ref ref, {
-    bool mustBeText = false,
-    bool includeEdits = false,
-  }) async {
-    if (relationType == "m.replace" && !includeEdits) return null;
+class MessageController extends AsyncNotifier<Message?> {
+  final MessageConfig config;
+  MessageController(this.config);
+
+  @override
+  Future<Message?> build() async {
+    if (config.event.relationType == "m.replace" && !config.includeEdits) {
+      return null;
+    }
     final client = ref.watch(ClientController.provider.notifier);
 
     final newEvents = await client.getRelatedEvents(
       GetRelatedEventsRequest(
-        roomId: roomId,
-        eventId: eventId,
+        roomId: config.event.roomId,
+        eventId: config.event.eventId,
         relationType: "m.replace",
       ),
     );
-    final event = newEvents?.lastOrNull ?? this;
+    if (!ref.mounted) return null;
+    final event = newEvents?.lastOrNull ?? config.event;
 
-    final replyId = this.content["m.relates_to"]?["m.in_reply_to"]?["event_id"];
+    final replyId =
+        config.event.content["m.relates_to"]?["m.in_reply_to"]?["event_id"];
     final replyEvent = replyId == null
         ? null
         : await client.getEvent(
-            GetEventRequest(roomId: roomId, eventId: replyId),
+            GetEventRequest(roomId: config.event.roomId, eventId: replyId),
           );
 
-    final author = await ref.watch(
+    if (!ref.mounted) return null;
+
+    final author = await ref.read(
       ProfileController.provider(event.authorId).future,
     );
-    final content = (decrypted ?? this.content);
-    final type = (decryptedType ?? this.type);
+    if (!ref.mounted) return null;
+
+    final content = (event.decrypted ?? event.content);
+    final type = (config.event.decryptedType ?? config.event.type);
     final newContent = content["m.new_content"] as Map?;
     final metadata = {
       "timelineId": event.timelineRowId,
@@ -45,18 +55,25 @@ extension EventToMessage on Event {
           content["formatted_body"] ??
           content["body"] ??
           "",
-      "reply": await replyEvent?.toMessage(ref, mustBeText: true),
+      if (replyEvent != null)
+        "reply": await ref.read(
+          MessageController.provider(
+            MessageConfig(event: replyEvent, mustBeText: true),
+          ).future,
+        ),
       "body": newContent?["body"] ?? content["body"],
       "eventType": type,
       "avatarUrl": author.avatarUrl,
-      "displayName": author.displayName ?? authorId,
-      "txnId": transactionId,
+      "displayName": author.displayName ?? event.authorId,
+      "txnId": config.event.transactionId,
     };
+
+    if (!ref.mounted) return null;
 
     final editedAt = event.relationType == "m.replace" ? event.timestamp : null;
 
-    if ((event.redactedBy != null && !mustBeText) ||
-        (!includeEdits && (relationType == "m.replace"))) {
+    if ((event.redactedBy != null && !config.mustBeText) ||
+        (!config.includeEdits && (config.event.relationType == "m.replace"))) {
       return null;
     }
 
@@ -69,18 +86,24 @@ extension EventToMessage on Event {
     final asText =
         Message.text(
               metadata: metadata,
-              id: eventId,
-              authorId: authorId,
-              text: redactedBy == null
+              id: config.event.eventId,
+              authorId: event.authorId,
+              text: config.event.redactedBy == null
                   ? content["body"] ?? ""
                   : "This message has been deleted...",
               replyToMessageId: replyId,
-              deliveredAt: timestamp,
+              deliveredAt: config.event.timestamp,
               editedAt: editedAt,
             )
             as TextMessage;
 
-    if (mustBeText) return asText;
+    if (config.mustBeText) return asText;
+
+    final homeserver = ref.read(ClientStateController.provider)?.homeserverUrl;
+    final source = homeserver == null || content["url"] == null
+        ? "null"
+        : Uri.parse(content["url"]).mxcToHttps(homeserver).toString();
+
     return switch (type) {
       "m.room.encrypted" => asText.copyWith(
         text: "Unable to decrypt message.",
@@ -98,42 +121,42 @@ extension EventToMessage on Event {
       // ),
       ("m.sticker" || "m.room.message") => switch (content["msgtype"]) {
         ("m.sticker" || "m.image") => Message.image(
-          id: eventId,
+          id: config.event.eventId,
           metadata: metadata,
-          authorId: authorId,
+          authorId: event.authorId,
           text: event.localContent?.sanitizedHtml,
-          source: "(await getAttachmentUri()).toString()", // TODO
+          source: source,
           replyToMessageId: replyId,
-          deliveredAt: timestamp,
+          deliveredAt: config.event.timestamp,
           blurhash: (content["info"] as Map?)?["xyz.amorgan.blurhash"],
         ),
         "m.audio" => Message.audio(
-          id: eventId,
+          id: config.event.eventId,
           metadata: metadata,
-          authorId: authorId,
+          authorId: event.authorId,
           text: content["body"],
           replyToMessageId: replyId,
-          source: "(await event.getAttachmentUri()).toString()", // TODO
-          deliveredAt: timestamp,
+          source: source,
+          deliveredAt: config.event.timestamp,
           // TODO: See if we can figure out duration
           duration: Duration(hours: 1),
         ),
         "m.file" => Message.file(
           name: content["filename"].toString(),
           metadata: metadata,
-          id: eventId,
-          authorId: authorId,
-          source: "(await event.getAttachmentUri()).toString()", // TODO
+          id: config.event.eventId,
+          authorId: event.authorId,
+          source: source,
           replyToMessageId: replyId,
-          deliveredAt: timestamp,
+          deliveredAt: config.event.timestamp,
         ),
         _ => asText,
       },
       "m.room.member" => Message.system(
         metadata: metadata,
-        id: eventId,
-        authorId: authorId,
-        deliveredAt: timestamp,
+        id: config.event.eventId,
+        authorId: event.authorId,
+        deliveredAt: config.event.timestamp,
         text:
             "${content["displayname"] ?? event.stateKey} ${switch (content["membership"]) {
               "invite" => "was invited to",
@@ -151,11 +174,16 @@ extension EventToMessage on Event {
             // ignore: dead_code
             ? Message.unsupported(
                 metadata: metadata,
-                id: eventId,
-                authorId: authorId,
+                id: config.event.eventId,
+                authorId: event.authorId,
                 replyToMessageId: replyId,
               )
             : null,
     };
   }
+
+  static final provider = AsyncNotifierProvider.family
+      .autoDispose<MessageController, Message?, MessageConfig>(
+        MessageController.new,
+      );
 }

@@ -488,9 +488,7 @@ class RoomChat extends HookConsumerWidget {
                                   onTap: () => showDialog(
                                     context: context,
                                     builder: (_) => Dialog(
-                                      child: Text(
-                                        "TODO: Download Attachments", // TODO
-                                      ),
+                                      child: Text("TODO: Download Attachments"),
                                     ),
                                   ),
                                   child: FlyerChatFileMessage(
