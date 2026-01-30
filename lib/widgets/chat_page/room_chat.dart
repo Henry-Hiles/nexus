@@ -267,7 +267,9 @@ class RoomChat extends HookConsumerWidget {
                             chatAnimatedListBuilder: (_, itemBuilder) =>
                                 ChatAnimatedList(
                                   itemBuilder: itemBuilder,
-                                  onEndReached: notifier.loadOlder,
+                                  onEndReached: room.hasMore
+                                      ? notifier.loadOlder
+                                      : null,
                                   onStartReached: () => client.markRead(room),
                                   bottomPadding: 72,
                                 ),

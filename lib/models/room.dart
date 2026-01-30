@@ -28,7 +28,7 @@ abstract class Room with _$Room {
 abstract class TimelineRowTuple with _$TimelineRowTuple {
   const factory TimelineRowTuple({
     @JsonKey(name: "timeline_rowid") required int timelineRowId,
-    @JsonKey(name: "timeline_eventid") int? eventRowId,
+    @JsonKey(name: "event_rowid") int? eventRowId,
   }) = _TimelineRowTuple;
 
   factory TimelineRowTuple.fromJson(Map<String, Object?> json) =>

@@ -27,6 +27,16 @@ class RoomChatController extends AsyncNotifier<ChatController> {
     final room = ref.read(SelectedRoomController.provider);
     if (room == null) return InMemoryChatController();
 
+    final messages = await room.timeline
+        .map(
+          (timelineRowTuple) => room.events.firstWhereOrNull(
+            (event) => event.rowId == timelineRowTuple.eventRowId,
+          ),
+        )
+        .nonNulls
+        .toMessages(ref);
+    final controller = InMemoryChatController(messages: messages);
+
     ref.onDispose(
       ref.listen(NewEventsController.provider(roomId), (_, next) async {
         for (final event in next) {
@@ -62,23 +72,17 @@ class RoomChatController extends AsyncNotifier<ChatController> {
                 ),
               );
             }
-            if (message != null) {
-              return await insertMessage(message);
+            if (message != null &&
+                !controller.messages.any(
+                  (oldMessage) => oldMessage.id == message.id,
+                )) {
+              await insertMessage(message);
             }
           }
         }
-      }).close,
+      }, weak: true).close,
     );
 
-    final messages = await room.timeline
-        .map(
-          (timelineRowTuple) => room.events.firstWhereOrNull(
-            (event) => event.rowId == timelineRowTuple.eventRowId,
-          ),
-        )
-        .nonNulls
-        .toMessages(ref);
-    final controller = InMemoryChatController(messages: messages);
     ref.onDispose(controller.dispose);
 
     if (messages.length < 20) await loadOlder(controller);
