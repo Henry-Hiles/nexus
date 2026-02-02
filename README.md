@@ -36,7 +36,7 @@ A simple and user-friendly Matrix client made with Flutter and the Matrix Dart S
         -   [x] Using a text/uri/link
             -   [x] Plain text
             -   [x] `matrix:` Uri
-            -   [ ] Matrix.to link: I just need to fix my regex
+            -   [ ] Matrix.to link: I just need to fix my regex, I should do this next.
         -   [ ] From space
         -   [ ] Exploring
     -   [x] Leaving
@@ -108,7 +108,7 @@ A simple and user-friendly Matrix client made with Flutter and the Matrix Dart S
     -   [ ] About
     -   [x] Log Out
 
-## Development
+## Build Instructions
 
 First, clone and open the repo:
 
@@ -122,18 +122,30 @@ cd nexus
 #### Linux
 
 -   With Nix: Either use direnv, or `nix flake develop`
--   Without Nix: Install Flutter, Rust, the libsecret dev package for your distro (must be in `PKG_CONFIG_PATH`), and sqlite (must be in `LD_LIBRARY_PATH`).
+-   Without Nix: Install Flutter, Go, Olm, Git, Clang, and GLibc.
 
 #### Windows / MacOS
 
-I don't really know. You will need Flutter and Rust, and otherwise I guess just keep installing stuff until there aren't any errors.
+I don't really know. You will need Flutter, Git, Olm, Go, and Visual Studio tools, and otherwise I guess just keep installing stuff until there aren't any errors. I will look into this sometimeTM.
 
-###
+### Set up Flutter
 
 Get dependencies:
 
 ```sh
 flutter pub get
+```
+
+Get dependencies:
+
+```sh
+flutter pub get
+```
+
+Clone Gomuks and generate bindings:
+
+```sh
+scripts/generate.sh
 ```
 
 Build generated files, and watch for new changes:

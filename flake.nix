@@ -45,17 +45,11 @@
               olm
               git
               clang
-              (flutter.override { extraPkgConfigPackages = [ pkgs.libsecret ]; })
-
-              (pkgs.writeShellScriptBin "rustup" (builtins.readFile ./nix/fake-rustup.sh))
+              flutter
             ];
 
             env = {
-              LD_LIBRARY_PATH = "${
-                pkgs.lib.makeLibraryPath ([
-                  pkgs.sqlite
-                ])
-              }:./build/native_assets/linux";
+              LD_LIBRARY_PATH = "./build/native_assets/linux";
               CPATH = lib.makeSearchPath "include" [ pkgs.glibc.dev ];
             };
           };
