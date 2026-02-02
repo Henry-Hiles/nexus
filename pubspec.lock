@@ -880,14 +880,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.11.1"
-  mention_tag_text_field:
-    dependency: "direct main"
-    description:
-      name: mention_tag_text_field
-      sha256: ba7b9d8003e0f340a65c6dcdb7770f4340f653ae1612a9e31e11d12f7f1dd80f
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.0.9"
   meta:
     dependency: transitive
     description:
