@@ -36,14 +36,14 @@ A simple and user-friendly Matrix client made with Flutter and the Matrix Dart S
         -   [x] Using a text/uri/link
             -   [x] Plain text
             -   [x] `matrix:` Uri
-            -   [ ] Matrix.to link: I just need to fix my regex, I should do this next.
+            -   [ ] Matrix.to link: I just need to fix my regex, I should do this soon.
         -   [ ] From space
         -   [ ] Exploring
     -   [x] Leaving
     -   [x] Subspaces
 -   [x] Messages
     -   [x] Encryption
-        -   [x] Restoring crypto identity from passphrase/key or verification
+        -   [x] Restoring crypto identity from a recovery passphrase/key
     -   [x] Sending
         -   [x] Plain text
         -   [x] HTML/Markdown
@@ -62,6 +62,8 @@ A simple and user-friendly Matrix client made with Flutter and the Matrix Dart S
             -   [ ] Jump to original message
         -   [x] Edits
         -   [x] Attachments
+            -   [x] Unencrypted
+            -   [ ] Encrypted
             -   [x] Blurhashing
             -   [ ] Downloading attachments
             -   [x] Opening attachments in their own view
@@ -84,8 +86,10 @@ A simple and user-friendly Matrix client made with Flutter and the Matrix Dart S
     -   [ ] Creating
 -   [ ] Threads
 -   [ ] Profile popouts
--   [x] Copy link to [room, space]
--   [x] Reporting
+-   [ ] Copy link to [room, space]
+-   [ ] Reporting
+    -   [x] Events
+    -   [ ] Rooms
 -   [ ] Notifications using UnifiedPush
 -   [ ] Group calls using [MSC4195](https://github.com/matrix-org/matrix-spec-proposals/pull/4195)
 -   [ ] Invites
