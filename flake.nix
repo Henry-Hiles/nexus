@@ -50,6 +50,8 @@
             ];
 
             env = {
+              LIBCLANG_PATH = "${pkgs.llvmPackages.libclang}/lib";
+              LD_LIBRARY_PATH = "./build/native_assets/linux";
               CPATH = lib.makeSearchPath "include" [ pkgs.glibc.dev ];
             };
           };
