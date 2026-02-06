@@ -44,6 +44,7 @@
               go
               olm
               git
+              llvm
               clang
               flutter
             ];
