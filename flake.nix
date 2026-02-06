@@ -44,14 +44,11 @@
               go
               olm
               git
-              llvm
-              clang
               flutter
             ];
 
             env = {
-              LIBCLANG_PATH = "${pkgs.llvmPackages.libclang}/lib";
-              LD_LIBRARY_PATH = "./build/native_assets/linux";
+              LD_LIBRARY_PATH = "${pkgs.llvmPackages.libclang.lib}/lib:./build/native_assets/linux";
               CPATH = lib.makeSearchPath "include" [ pkgs.glibc.dev ];
             };
           };
