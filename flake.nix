@@ -50,7 +50,6 @@
             ];
 
             env = {
-              LD_LIBRARY_PATH = "./build/native_assets/linux";
               CPATH = lib.makeSearchPath "include" [ pkgs.glibc.dev ];
             };
           };
