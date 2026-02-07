@@ -15,6 +15,7 @@ A simple and user-friendly Matrix client made with Flutter and the Matrix Dart S
 
 ## Progress
 
+-   [ ] New logo
 -   [x] Move from the Dart SDK to the Gomuks SDK with Dart bindings: https://git.federated.nexus/Henry-Hiles/nexus/pulls/2
 -   [ ] Platform Support
     -   [x] Linux
@@ -26,6 +27,7 @@ A simple and user-friendly Matrix client made with Flutter and the Matrix Dart S
 -   [x] Login
     -   [x] Username / password auth
     -   [ ] OAuth / OIDC
+    -   [ ] Improve initial sync experience
 -   [x] Rooms / Spaces
     -   [x] Displaying and choosing
     -   [x] Reading, showing unread
