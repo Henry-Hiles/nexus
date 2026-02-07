@@ -25,6 +25,8 @@ void main(List<String> args) async {
   }
 
   print("Generating FFI Bindings...");
+
+  final libclangPath = Platform.environment["LIBCLANG_PATH"];
   FfiGenerator(
     output: Output(
       dartFile: Platform.script.resolve("../lib/src/third_party/gomuks.g.dart"),
@@ -34,6 +36,10 @@ void main(List<String> args) async {
       compilerOptions: ["--no-warnings"],
     ),
     functions: Functions.includeAll,
-  ).generate();
+  ).generate(
+    libclangDylib: libclangPath == null
+        ? null
+        : Uri.file(join(libclangPath, "libclang.so")),
+  );
   print("Done!");
 }
