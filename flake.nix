@@ -51,10 +51,7 @@
 
             env = {
               LIBCLANG_PATH = lib.makeLibraryPath [ pkgs.libclang ];
-              LD_LIBRARY_PATH = lib.makeLibraryPath [
-                pkgs.zlib
-                "./build/native_assets/linux"
-              ];
+              LD_LIBRARY_PATH = "./build/native_assets/linux:${lib.makeLibraryPath [ pkgs.zlib ]}";
               CPATH = lib.makeSearchPath "include" [ pkgs.glibc.dev ];
             };
           };
