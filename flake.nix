@@ -39,22 +39,30 @@
             };
           };
 
-          devShells.default = pkgs.mkShell {
-            packages = with pkgs; [
-              go
-              olm
-              git
-              llvm
-              clang
-              flutter
-            ];
+          devShells =
+            let
+              packages = with pkgs; [
+                go
+                olm
+                git
+              ];
 
-            env = {
-              LIBCLANG_PATH = lib.makeLibraryPath [ pkgs.libclang ];
-              LD_LIBRARY_PATH = "./build/native_assets/linux:${lib.makeLibraryPath [ pkgs.zlib ]}";
-              CPATH = lib.makeSearchPath "include" [ pkgs.glibc.dev ];
+              env = {
+                LIBCLANG_PATH = lib.makeLibraryPath [ pkgs.libclang ];
+                LD_LIBRARY_PATH = "./build/native_assets/linux:${lib.makeLibraryPath [ pkgs.zlib ]}";
+                CPATH = lib.makeSearchPath "include" [ pkgs.glibc.dev ];
+              };
+            in
+            {
+              default = pkgs.mkShell {
+                inherit env;
+                packages = packages ++ [
+                  pkgs.flutter
+                ];
+              };
+
+              nix = pkgs.mkShell { inherit packages env; };
             };
-          };
         };
     };
 }
