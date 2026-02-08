@@ -6,6 +6,7 @@ import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client_controller.dart";
 import "package:nexus/controllers/client_state_controller.dart";
 import "package:nexus/controllers/header_controller.dart";
+import "package:nexus/controllers/init_complete_controller.dart";
 import "package:nexus/controllers/multi_provider_controller.dart";
 import "package:nexus/controllers/shared_prefs_controller.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
@@ -122,6 +123,7 @@ class App extends StatelessWidget {
                     final clientState = ref.watch(
                       ClientStateController.provider,
                     );
+
                     if (clientState == null || !clientState.isInitialized) {
                       return Loading();
                     }
@@ -131,7 +133,9 @@ class App extends StatelessWidget {
                     } else if (!clientState.isVerified) {
                       return VerifyPage();
                     } else {
-                      return ChatPage();
+                      return ref.watch(InitCompleteController.provider)
+                          ? ChatPage()
+                          : Loading();
                     }
                   },
                 ),
