@@ -147,7 +147,7 @@ class ClientController extends AsyncNotifier<int> {
 
   Future<String?> getAccessToken() async {
     final response = await _sendCommand("get_account_info", {});
-    return response["access_token"];
+    return response?["access_token"];
   }
 
   Future<void> leaveRoom(Room room) async {
