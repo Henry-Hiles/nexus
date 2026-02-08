@@ -5,7 +5,8 @@ class HeaderController extends AsyncNotifier<Map<String, String>> {
   @override
   Future<Map<String, String>> build() async {
     final client = ref.watch(ClientController.provider.notifier);
-    return {"authorization": "Bearer ${await client.getAccessToken()}"};
+    final accessToken = await client.getAccessToken();
+    return {"authorization": "Bearer $accessToken"};
   }
 
   static final provider =
