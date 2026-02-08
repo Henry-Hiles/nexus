@@ -85,9 +85,6 @@ class ClientController extends AsyncNotifier<int> {
                 //     .watch(SyncStatusController.provider.notifier)
                 //     .set(SyncStatus.fromJson(decodedMuksEvent));
                 break;
-              case "typing":
-                //TODO: IMPL
-                break;
               default:
                 debugPrint("Unhandled event: $muksEventType");
             }
