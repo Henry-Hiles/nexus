@@ -2,6 +2,7 @@ import "package:flutter/material.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/models/relation_type.dart";
+import "package:nexus/widgets/avatar_or_hash.dart";
 
 class RelationPreview extends ConsumerWidget {
   final Message? relatedMessage;
@@ -31,18 +32,11 @@ class RelationPreview extends ConsumerWidget {
               "Editing message:",
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
-          // AvatarOrHash(
-          //   ref
-          //       .watch(
-          //         AvatarController.provider(
-          //           relatedMessage!.metadata!["avatarUrl"],
-          //         ),
-          //       )
-          //       .whenOrNull(data: (data) => data),
-          //   relatedMessage!.metadata!["displayName"].toString(),
-          //   headers: room.client.headers,
-          //   height: 16,
-          // ),
+          AvatarOrHash(
+            Uri.tryParse(relatedMessage?.metadata?["avatarUrl"] ?? ""),
+            relatedMessage?.metadata?["displayName"]?.toString() ?? "",
+            height: 16,
+          ),
           Text(
             relatedMessage!.metadata?["displayName"] ??
                 relatedMessage!.authorId,

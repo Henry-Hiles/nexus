@@ -45,7 +45,6 @@ void showError(Object error, [StackTrace? stackTrace]) {
   if (error.toString().contains("Invalid image data")) return;
 
   debugPrintStack(stackTrace: stackTrace, label: error.toString());
-  debugger();
   if (navigatorKey.currentContext != null) {
     Future.delayed(
       Duration.zero,
