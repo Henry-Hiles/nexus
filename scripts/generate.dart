@@ -15,6 +15,8 @@ void main(List<String> args) async {
     "--depth",
     "1",
     "https://mau.dev/gomuks/gomuks",
+    "--branch",
+    "tulir/ffi-updates",
     repoDir.path,
   ]);
 

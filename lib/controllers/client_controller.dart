@@ -105,9 +105,9 @@ class ClientController extends AsyncNotifier<int> {
   }
 
   Future<dynamic> _sendCommand(
-    String command,
-    Map<String, dynamic> data,
-  ) async {
+    String command, [
+    Map<String, dynamic> data = const {},
+  ]) async {
     final bufferPointer = data.toGomuksBufferPtr();
     final handle = await future;
     final response = await Isolate.run(
@@ -143,6 +143,11 @@ class ClientController extends AsyncNotifier<int> {
   Future<String> joinRoom(JoinRoomRequest request) async {
     final response = await _sendCommand("join_room", request.toJson());
     return response["room_id"];
+  }
+
+  Future<String?> getAccessToken() async {
+    final response = await _sendCommand("get_account_info", {});
+    return response["access_token"];
   }
 
   Future<void> leaveRoom(Room room) async {
