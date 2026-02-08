@@ -13,7 +13,7 @@ extension LinkToMention on String {
     final trimmed = trim();
 
     final matrixTo = RegExp(
-      r"^https?://matrix\.to/#/([^/?#]+)",
+      r"^https?://matrix\.to/#/(.[^/?#]+)",
       caseSensitive: false,
     );
 

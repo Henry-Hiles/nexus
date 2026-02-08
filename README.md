@@ -36,10 +36,11 @@ A simple and user-friendly Matrix client made with Flutter and the Matrix Dart S
     -   [ ] Searching
     -   [ ] Creating (Rooms, Spaces, and DMs)
     -   [x] Joining
+        -   [ ] Parse vias
         -   [x] Using a text/uri/link
             -   [x] Plain text
             -   [x] `matrix:` Uri
-            -   [ ] Matrix.to link: I just need to fix my regex, I should do this soon.
+            -   [x] Matrix.to link: I just need to fix my regex, I should do this soon.
         -   [ ] From space
         -   [ ] Exploring
     -   [x] Leaving
