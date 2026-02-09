@@ -56,7 +56,7 @@ class MessageController extends AsyncNotifier<Message?> {
           content["body"] ??
           "",
       if (replyEvent != null)
-        "reply": await ref.read(
+        "reply": await ref.watch(
           MessageController.provider(
             MessageConfig(event: replyEvent, mustBeText: true),
           ).future,
