@@ -409,7 +409,10 @@ class RoomChat extends HookConsumerWidget {
                                                 return "<a href=\"$url\">$url</a>";
                                               },
                                             )
-                                            .replaceAll("\n", "<br/>"),
+                                            .replaceAll(
+                                              "\n",
+                                              "<br class=\"fake-break\"/>",
+                                            ),
                                       ),
                                       if (message.editedAt != null)
                                         Text(

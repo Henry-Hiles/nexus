@@ -30,10 +30,14 @@ class Html extends ConsumerWidget {
       return switch (element.localName) {
         "code" =>
           element.parent?.localName == "pre"
-              ? CodeBlock(
-                  element.text,
-                  lang: element.className.replaceAll("language-", ""),
-                )
+              ? element.outerHtml.contains("<br class=\"fake-break\">")
+                    ? Html(
+                        """<pre>${element.outerHtml.replaceAll("<br class=\"fake-break\">", "\n")}</pre>""",
+                      )
+                    : CodeBlock(
+                        element.text,
+                        lang: element.className.replaceAll("language-", ""),
+                      )
               : null,
 
         "blockquote" => Quoted(Html(element.innerHtml)),
