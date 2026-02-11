@@ -120,7 +120,7 @@ class MessageController extends AsyncNotifier<Message?> {
       //   authorId: senderId,
       // ),
       ("m.sticker" || "m.room.message") => switch (content["msgtype"]) {
-        ("m.sticker" || "m.image") => Message.image(
+        (null || "m.image") => Message.image(
           id: config.event.eventId,
           metadata: metadata,
           authorId: event.authorId,
