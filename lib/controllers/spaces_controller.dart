@@ -40,8 +40,11 @@ class SpacesController extends Notifier<IList<Space>> {
     final allNestedRoomIds = childRoomsBySpaceId.values
         .expand((l) => l)
         .map(
-          (room) =>
-              rooms.entries.firstWhere((entry) => entry.value == room).key,
+          (room) => rooms.entries
+              .firstWhere(
+                (entry) => entry.value.metadata?.id == room.metadata?.id,
+              )
+              .key,
         )
         .toISet();
 
