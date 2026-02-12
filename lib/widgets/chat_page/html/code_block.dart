@@ -41,6 +41,7 @@ class CodeBlock extends StatelessWidget {
                   padding: EdgeInsets.all(8),
                   child: SelectableText(
                     code,
+                    minLines: 1,
                     maxLines: 99,
                     style: TextStyle(fontFamily: "monospace"),
                   ),
