@@ -31,7 +31,10 @@ class TopWidget extends ConsumerWidget {
                   min(
                     max(
                       max(
-                        (message as TextMessage).text.length - 20,
+                        (message as TextMessage).text.length -
+                            (replyMessage.metadata?["displayName"] as String)
+                                .length -
+                            5,
                         message.metadata?["displayName"].length,
                       ),
                       5,
