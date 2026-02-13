@@ -1,11 +1,12 @@
 import "package:freezed_annotation/freezed_annotation.dart";
+import "package:nexus/models/room.dart";
 part "get_event_request.freezed.dart";
 part "get_event_request.g.dart";
 
 @freezed
 abstract class GetEventRequest with _$GetEventRequest {
   const factory GetEventRequest({
-    required String roomId,
+    required Room room,
     required String eventId,
     @Default(false) bool unredact,
   }) = _GetEventRequest;

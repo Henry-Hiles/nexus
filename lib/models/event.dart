@@ -27,7 +27,7 @@ abstract class Event with _$Event {
     String? decryptionError,
     String? sendError,
     @Default(IMap.empty()) IMap<String, int> reactions,
-    int? lastEditRowId,
+    @JsonKey(name: "last_edit_rowid") int? lastEditRowId,
     @UnreadTypeConverter() UnreadType? unreadType,
   }) = _Event;
 

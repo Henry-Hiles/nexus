@@ -1,3 +1,4 @@
+import "package:collection/collection.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client_controller.dart";
@@ -6,7 +7,6 @@ import "package:nexus/controllers/profile_controller.dart";
 import "package:nexus/helpers/extensions/mxc_to_https.dart";
 import "package:nexus/models/message_config.dart";
 import "package:nexus/models/requests/get_event_request.dart";
-import "package:nexus/models/requests/get_related_events_request.dart";
 
 class MessageController extends AsyncNotifier<Message?> {
   final MessageConfig config;
@@ -19,22 +19,20 @@ class MessageController extends AsyncNotifier<Message?> {
     }
     final client = ref.watch(ClientController.provider.notifier);
 
-    final newEvents = await client.getRelatedEvents(
-      GetRelatedEventsRequest(
-        roomId: config.event.roomId,
-        eventId: config.event.eventId,
-        relationType: "m.replace",
-      ),
-    );
     if (!ref.mounted) return null;
-    final event = newEvents?.lastOrNull ?? config.event;
+    final event = config.event.lastEditRowId == null
+        ? config.event
+        : config.room.events.firstWhereOrNull(
+                (e) => e.rowId == config.event.lastEditRowId,
+              ) ??
+              config.event;
 
     final replyId =
         config.event.content["m.relates_to"]?["m.in_reply_to"]?["event_id"];
     final replyEvent = replyId == null
         ? null
         : await client.getEvent(
-            GetEventRequest(roomId: config.event.roomId, eventId: replyId),
+            GetEventRequest(room: config.room, eventId: replyId),
           );
 
     if (!ref.mounted) return null;
@@ -58,7 +56,11 @@ class MessageController extends AsyncNotifier<Message?> {
       if (replyEvent != null)
         "reply": await ref.watch(
           MessageController.provider(
-            MessageConfig(event: replyEvent, mustBeText: true),
+            MessageConfig(
+              event: replyEvent,
+              room: config.room,
+              mustBeText: true,
+            ),
           ).future,
         ),
       "body": newContent?["body"] ?? content["body"],
@@ -152,21 +154,24 @@ class MessageController extends AsyncNotifier<Message?> {
         ),
         _ => asText,
       },
-      "m.room.member" => Message.system(
-        metadata: metadata,
-        id: config.event.eventId,
-        authorId: event.authorId,
-        deliveredAt: config.event.timestamp,
-        text:
-            "${content["displayname"] ?? event.stateKey} ${switch (content["membership"]) {
-              "invite" => "was invited to",
-              "join" => "joined",
-              "leave" => "left",
-              "knock" => "asked to join",
-              "ban" => "was banned from",
-              _ => "did something relating to",
-            }} the room.",
-      ),
+      "m.room.member" =>
+        content["membership"] == event.unsigned["prev_content"]?["membership"]
+            ? null
+            : Message.system(
+                metadata: metadata,
+                id: config.event.eventId,
+                authorId: event.authorId,
+                deliveredAt: config.event.timestamp,
+                text:
+                    "${content["displayname"] ?? event.stateKey} ${switch (content["membership"]) {
+                      "invite" => "was invited to",
+                      "join" => "joined",
+                      "leave" => "left",
+                      "knock" => "asked to join",
+                      "ban" => "was banned from",
+                      _ => "did something relating to",
+                    }} the room.",
+              ),
       "m.room.redaction" => null,
       _ =>
         // Turn this on for debugging purposes

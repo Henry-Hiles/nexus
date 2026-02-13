@@ -11,6 +11,7 @@ import "package:nexus/controllers/new_events_controller.dart";
 import "package:nexus/controllers/rooms_controller.dart";
 import "package:nexus/controllers/selected_room_controller.dart";
 import "package:nexus/models/message_config.dart";
+import "package:nexus/models/messages_config.dart";
 import "package:nexus/models/requests/get_room_state_request.dart";
 import "package:nexus/models/requests/paginate_request.dart";
 import "package:nexus/models/requests/redact_event_request.dart";
@@ -30,14 +31,17 @@ class RoomChatController extends AsyncNotifier<ChatController> {
 
     final messages = await ref.watch(
       MessagesController.provider(
-        room.timeline
-            .map(
-              (timelineRowTuple) => room.events.firstWhereOrNull(
-                (event) => event.rowId == timelineRowTuple.eventRowId,
-              ),
-            )
-            .nonNulls
-            .toIList(),
+        MessagesConfig(
+          room: room,
+          events: room.timeline
+              .map(
+                (timelineRowTuple) => room.events.firstWhereOrNull(
+                  (event) => event.rowId == timelineRowTuple.eventRowId,
+                ),
+              )
+              .nonNulls
+              .toIList(),
+        ),
       ).future,
     );
     final controller = InMemoryChatController(messages: messages.toList());
@@ -57,7 +61,7 @@ class RoomChatController extends AsyncNotifier<ChatController> {
           } else {
             final message = await ref.watch(
               MessageController.provider(
-                MessageConfig(event: event, includeEdits: true),
+                MessageConfig(event: event, room: room, includeEdits: true),
               ).future,
             );
             if (event.relationType == "m.replace") {
@@ -191,8 +195,13 @@ class RoomChatController extends AsyncNotifier<ChatController> {
           const ISet.empty(),
         );
 
+    final room = ref.watch(RoomsController.provider)[roomId];
+    if (room == null) return;
+
     final messages = await ref.watch(
-      MessagesController.provider(response.events.reversed).future,
+      MessagesController.provider(
+        MessagesConfig(room: room, events: response.events.reversed),
+      ).future,
     );
     await controller.insertAllMessages(
       messages

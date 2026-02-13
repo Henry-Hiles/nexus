@@ -1,6 +1,7 @@
 import "dart:developer";
 import "dart:ffi";
 import "dart:isolate";
+import "package:collection/collection.dart";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:ffi/ffi.dart";
 import "package:flutter/foundation.dart";
@@ -170,8 +171,12 @@ class ClientController extends AsyncNotifier<int> {
   }
 
   Future<Event?> getEvent(GetEventRequest request) async {
-    final json = await _sendCommand("get_event", request.toJson());
+    final event = request.room.events.firstWhereOrNull(
+      (event) => event.eventId == request.eventId,
+    );
+    if (event != null) return event;
 
+    final json = await _sendCommand("get_event", request.toJson());
     return json == null ? null : Event.fromJson(json);
   }
 
