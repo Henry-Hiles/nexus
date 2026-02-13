@@ -70,7 +70,7 @@ class MessageController extends AsyncNotifier<Message?> {
       "body": newContent?["body"] ?? content["body"],
       "eventType": type,
       "avatarUrl": author?.content["avatar_url"],
-      "displayName": author?.content["displayname"] ?? event.stateKey,
+      "displayName": author?.content["displayname"] ?? event.authorId,
       "txnId": config.event.transactionId,
     };
 
