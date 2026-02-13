@@ -46,7 +46,7 @@ class MemberList extends ConsumerWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   subtitle: Text(
-                    member.authorId,
+                    member.stateKey ?? "Unknown User",
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),

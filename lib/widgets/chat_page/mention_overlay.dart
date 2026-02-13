@@ -42,9 +42,12 @@ class MentionOverlay extends ConsumerWidget {
                                   ? members
                                   : members.where(
                                       (member) =>
-                                          member.authorId
-                                              .toLowerCase()
-                                              .contains(query.toLowerCase()) ||
+                                          member.stateKey
+                                                  ?.toLowerCase()
+                                                  .contains(
+                                                    query.toLowerCase(),
+                                                  ) ==
+                                              true ||
                                           (member.content["displayname"]
                                                       as String?)
                                                   ?.toLowerCase()
@@ -63,14 +66,20 @@ class MentionOverlay extends ConsumerWidget {
                                   ),
                                   title: Text(
                                     member.content["displayname"] as String? ??
-                                        member.authorId,
+                                        member.stateKey ??
+                                        "Unknown User",
                                   ),
+                                  subtitle: member.stateKey != null
+                                      ? Text(member.stateKey!)
+                                      : null,
                                   onTap: () => addTag(
-                                    id: "[@${member.content["displayname"]}](https://matrix.to/#/${member.authorId})",
-                                    name: member.authorId
-                                        .substring(1)
-                                        .split(":")
-                                        .first,
+                                    id: "[@${member.content["displayname"]}](https://matrix.to/#/${member.stateKey})",
+                                    name:
+                                        member.stateKey
+                                            ?.substring(1)
+                                            .split(":")
+                                            .first ??
+                                        "Unknown User",
                                   ),
                                 ),
                               )
