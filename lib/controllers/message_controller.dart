@@ -3,7 +3,7 @@ import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client_controller.dart";
 import "package:nexus/controllers/client_state_controller.dart";
-import "package:nexus/controllers/profile_controller.dart";
+import "package:nexus/controllers/members_controller.dart";
 import "package:nexus/helpers/extensions/mxc_to_https.dart";
 import "package:nexus/models/message_config.dart";
 import "package:nexus/models/requests/get_event_request.dart";
@@ -37,8 +37,11 @@ class MessageController extends AsyncNotifier<Message?> {
 
     if (!ref.mounted) return null;
 
-    final author = await ref.read(
-      ProfileController.provider(event.authorId).future,
+    final members = await ref.watch(
+      MembersController.provider(config.room).future,
+    );
+    final author = members.firstWhereOrNull(
+      (member) => member.stateKey == event.authorId,
     );
     if (!ref.mounted) return null;
 
@@ -63,10 +66,11 @@ class MessageController extends AsyncNotifier<Message?> {
             ),
           ).future,
         ),
+      "big": event.localContent?.bigEmoji == true,
       "body": newContent?["body"] ?? content["body"],
       "eventType": type,
-      "avatarUrl": author.avatarUrl,
-      "displayName": author.displayName ?? event.authorId,
+      "avatarUrl": author?.content["avatar_url"],
+      "displayName": author?.content["displayname"] ?? event.stateKey,
       "txnId": config.event.transactionId,
     };
 
