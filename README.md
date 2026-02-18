@@ -52,6 +52,7 @@ A simple and user-friendly Matrix client made with Flutter and the Matrix Dart S
         -   [x] Plain text
         -   [x] HTML/Markdown
         -   [x] Replies
+            -   [ ] Choose ping on/off
         -   [ ] Attachments
         -   [ ] Commands with [MSC4391](https://github.com/matrix-org/matrix-spec-proposals/pull/4391)
             -   [x] Mentions
