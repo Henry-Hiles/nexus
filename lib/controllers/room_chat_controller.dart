@@ -133,8 +133,9 @@ class RoomChatController extends AsyncNotifier<ChatController> {
 
     ref.onDispose(controller.dispose);
 
-    for (final _ in List.filled(2, null)) {
-      if (messages.length < 20) await loadOlder(controller);
+    // While there are under 20 messages, try up to two times to load more messages.
+    for (var i = 0; i < 2 && messages.length < 20; i++) {
+      await loadOlder(controller);
     }
 
     return controller;
