@@ -5,6 +5,7 @@ import "package:collection/collection.dart";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:ffi/ffi.dart";
 import "package:flutter/foundation.dart";
+import "package:nexus/controllers/account_data_controller.dart";
 import "package:nexus/controllers/client_state_controller.dart";
 import "package:nexus/controllers/init_complete_controller.dart";
 import "package:nexus/controllers/rooms_controller.dart";
@@ -66,16 +67,26 @@ class ClientController extends AsyncNotifier<int> {
               case "sync_complete":
                 final syncData = SyncData.fromJson(decodedMuksEvent);
                 final roomProvider = RoomsController.provider;
+                final accountDataProvider = AccountDataController.provider;
 
-                if (syncData.clearState) ref.invalidate(roomProvider);
+                if (syncData.clearState) {
+                  ref.invalidate(roomProvider);
+                  ref.invalidate(accountDataProvider);
+                }
+
                 ref
                     .watch(roomProvider.notifier)
                     .update(syncData.rooms, syncData.leftRooms);
+                ref
+                    .watch(accountDataProvider.notifier)
+                    .update(syncData.accountData);
+
                 if (syncData.topLevelSpaces != null) {
                   ref
                       .watch(TopLevelSpacesController.provider.notifier)
                       .set(syncData.topLevelSpaces!);
                 }
+
                 if (syncData.spaceEdges != null) {
                   ref
                       .watch(SpaceEdgesController.provider.notifier)
