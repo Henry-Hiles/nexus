@@ -99,7 +99,9 @@ class RoomChatController extends AsyncNotifier<ChatController> {
 
     ref.onDispose(controller.dispose);
 
-    if (messages.length < 20) await loadOlder(controller);
+    for (final _ in List.filled(2, null)) {
+      if (messages.length < 20) await loadOlder(controller);
+    }
 
     final state = await client.getRoomState(
       GetRoomStateRequest(
@@ -170,7 +172,7 @@ class RoomChatController extends AsyncNotifier<ChatController> {
           PaginateRequest(
             roomId: roomId,
             maxTimelineId: ref
-                .watch(RoomsController.provider)[roomId]
+                .read(RoomsController.provider)[roomId]
                 ?.timeline
                 .firstOrNull
                 ?.timelineRowId,
@@ -197,7 +199,7 @@ class RoomChatController extends AsyncNotifier<ChatController> {
           const ISet.empty(),
         );
 
-    final room = ref.watch(RoomsController.provider)[roomId];
+    final room = ref.read(RoomsController.provider)[roomId];
     if (room == null) return;
 
     final messages = await ref.watch(
