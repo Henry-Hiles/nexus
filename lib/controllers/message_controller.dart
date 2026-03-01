@@ -140,18 +140,7 @@ class MessageController extends AsyncNotifier<Message?> {
           deliveredAt: config.event.timestamp,
           blurhash: (content["info"] as Map?)?["xyz.amorgan.blurhash"],
         ),
-        "m.audio" => Message.audio(
-          id: config.event.eventId,
-          metadata: metadata,
-          authorId: event.authorId,
-          text: content["body"],
-          replyToMessageId: replyId,
-          source: source,
-          deliveredAt: config.event.timestamp,
-          // TODO: See if we can figure out duration
-          duration: Duration(hours: 1),
-        ),
-        "m.file" => Message.file(
+        "m.audio" || "m.file" => Message.file(
           name: content["filename"].toString(),
           size: content["info"]["size"],
           metadata: metadata,
