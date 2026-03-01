@@ -55,11 +55,11 @@ A simple and user-friendly Matrix client made with Flutter and the Matrix Dart S
             -   [ ] Choose ping on/off
         -   [ ] Attachments
         -   [ ] Commands with [MSC4391](https://github.com/matrix-org/matrix-spec-proposals/pull/4391)
-            -   [x] Mentions
-                -   [x] Users
-                -   [x] Rooms
-            -   [ ] Custom emojis/stickers
-            -   [ ] GIFs using Giphy
+        -   [x] Mentions
+            -   [x] Users
+            -   [x] Rooms
+        -   [ ] Custom emojis/stickers
+        -   [ ] GIFs using Gomuks' GIF proxies
     -   [x] Recieving
         -   [x] Plain text
         -   [x] HTML
