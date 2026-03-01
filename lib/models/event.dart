@@ -38,6 +38,7 @@ abstract class Event with _$Event {
 abstract class LocalContent with _$LocalContent {
   const factory LocalContent({
     String? sanitizedHtml,
+    String? editSource,
     bool? wasPlaintext,
     bool? bigEmoji,
     bool? hasMath,

@@ -70,6 +70,7 @@ class MessageController extends AsyncNotifier<Message?> {
       "body": newContent?["body"] ?? content["body"],
       "eventType": type,
       "avatarUrl": author?.content["avatar_url"],
+      "editSource": event.localContent?.editSource,
       "displayName": author?.content["displayname"]?.isNotEmpty == true
           ? author?.content["displayname"]
           : event.authorId.substring(1).split(":")[0],
