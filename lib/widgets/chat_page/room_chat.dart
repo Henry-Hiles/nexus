@@ -455,30 +455,54 @@ class RoomChat extends HookConsumerWidget {
                                   index, {
                                   required bool isSentByMe,
                                   MessageGroupStatus? groupStatus,
-                                }) => FlyerChatImageMessage(
-                                  topWidget: TopWidget(
-                                    message,
-                                    groupStatus: groupStatus,
-                                    alwaysShow: true,
-                                  ),
-                                  customImageProvider: CachedNetworkImage(
-                                    message.source,
-                                    ref.watch(CrossCacheController.provider),
-                                    headers: ref.headers,
-                                  ),
-                                  errorBuilder: (context, error, stackTrace) =>
-                                      Center(
-                                        child: Text(
-                                          "Image Failed to Load",
-                                          style: TextStyle(
-                                            color: Theme.of(
-                                              context,
-                                            ).colorScheme.error,
-                                          ),
-                                        ),
+                                }) => Column(
+                                  spacing: 4,
+                                  crossAxisAlignment: isSentByMe
+                                      ? CrossAxisAlignment.end
+                                      : CrossAxisAlignment.start,
+                                  children: [
+                                    SizedBox(height: 12),
+                                    FlyerChatTextMessage(
+                                      message: TextMessage(
+                                        id: "${message.id}-text",
+                                        authorId: message.authorId,
+                                        text: message.metadata?["body"],
                                       ),
-                                  message: message,
-                                  index: index,
+                                      index: index,
+                                    ),
+                                    FlyerChatImageMessage(
+                                      topWidget: TopWidget(
+                                        message,
+                                        groupStatus: MessageGroupStatus(
+                                          isFirst: false,
+                                          isLast: true,
+                                          isMiddle: false,
+                                        ),
+                                        alwaysShow: true,
+                                      ),
+                                      customImageProvider: CachedNetworkImage(
+                                        message.source,
+                                        ref.watch(
+                                          CrossCacheController.provider,
+                                        ),
+                                        headers: ref.headers,
+                                      ),
+                                      errorBuilder:
+                                          (context, error, stackTrace) =>
+                                              Center(
+                                                child: Text(
+                                                  "Image Failed to Load",
+                                                  style: TextStyle(
+                                                    color: Theme.of(
+                                                      context,
+                                                    ).colorScheme.error,
+                                                  ),
+                                                ),
+                                              ),
+                                      message: message,
+                                      index: index,
+                                    ),
+                                  ],
                                 ),
                             fileMessageBuilder:
                                 (

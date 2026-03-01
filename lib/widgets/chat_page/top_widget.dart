@@ -121,7 +121,6 @@ class TopWidget extends ConsumerWidget {
             ],
           ),
         ),
-      SizedBox(height: 4),
     ],
   );
 }
