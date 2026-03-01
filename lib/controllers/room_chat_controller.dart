@@ -25,7 +25,7 @@ class RoomChatController extends AsyncNotifier<ChatController> {
   @override
   Future<ChatController> build() async {
     final client = ref.watch(ClientController.provider.notifier);
-    final room = ref.read(RoomsController.provider)[roomId];
+    var room = ref.read(RoomsController.provider)[roomId];
     if (room == null) return InMemoryChatController();
 
     final state = await client.getRoomState(
@@ -59,13 +59,16 @@ class RoomChatController extends AsyncNotifier<ChatController> {
           const ISet.empty(),
         );
 
+    room = ref.read(RoomsController.provider)[roomId];
+    if (room == null) return InMemoryChatController();
+
     final messages = await ref.watch(
       MessagesController.provider(
         MessagesConfig(
           room: room,
           events: room.timeline
               .map(
-                (timelineRowTuple) => room.events.firstWhereOrNull(
+                (timelineRowTuple) => room!.events.firstWhereOrNull(
                   (event) => event.rowId == timelineRowTuple.eventRowId,
                 ),
               )
@@ -91,7 +94,7 @@ class RoomChatController extends AsyncNotifier<ChatController> {
           } else {
             final message = await ref.watch(
               MessageController.provider(
-                MessageConfig(event: event, room: room, includeEdits: true),
+                MessageConfig(event: event, room: room!, includeEdits: true),
               ).future,
             );
             if (event.relationType == "m.replace") {

@@ -52,9 +52,14 @@ class RoomAppbar extends StatelessWidget implements PreferredSizeWidget {
       ],
     ),
     actions: [
-      IconButton(onPressed: () {}, icon: Icon(Icons.push_pin)),
+      IconButton(
+        onPressed: null,
+        icon: Icon(Icons.push_pin),
+        tooltip: "Open pinned messages",
+      ),
       IconButton(
         onPressed: () => onOpenMemberList(context),
+        tooltip: "Open member list",
         icon: Icon(Icons.people),
       ),
       RoomMenu(room),

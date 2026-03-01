@@ -37,9 +37,7 @@ class MessageController extends AsyncNotifier<Message?> {
 
     if (!ref.mounted) return null;
 
-    final members = await ref.watch(
-      MembersController.provider(config.room).future,
-    );
+    final members = ref.watch(MembersController.provider(config.room));
     final author = members.firstWhereOrNull(
       (member) => member.stateKey == event.authorId,
     );

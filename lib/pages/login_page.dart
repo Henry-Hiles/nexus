@@ -97,6 +97,7 @@ class LoginPage extends HookConsumerWidget {
                     ),
                   ),
                   IconButton.filled(
+                    tooltip: "Confirm homeserver choice",
                     onPressed: isLoading.value
                         ? null
                         : () => setHomeserver(Uri.tryParse(homeserverUrl.text)),
@@ -143,6 +144,7 @@ class LoginPage extends HookConsumerWidget {
                         ? null
                         : () => setHomeserver(homeserver.url),
                     trailing: IconButton(
+                      tooltip: "Launch homeserver info page",
                       onPressed: () => launch(homeserver.url),
                       icon: Icon(Icons.info_outline),
                     ),

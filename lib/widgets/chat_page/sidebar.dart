@@ -155,6 +155,7 @@ class Sidebar extends HookConsumerWidget {
                     icon: Icon(Icons.add),
                   ),
                   IconButton(
+                    tooltip: "Explore other rooms",
                     onPressed: () => showDialog(
                       context: context,
                       builder: (context) => AlertDialog(title: Text("To-do")),
@@ -162,6 +163,7 @@ class Sidebar extends HookConsumerWidget {
                     icon: Icon(Icons.explore),
                   ),
                   IconButton(
+                    tooltip: "Open settings",
                     onPressed: () => Navigator.of(
                       context,
                     ).push(MaterialPageRoute(builder: (_) => SettingsPage())),

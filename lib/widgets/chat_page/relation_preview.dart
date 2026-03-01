@@ -56,6 +56,8 @@ class RelationPreview extends ConsumerWidget {
             ),
           ),
           IconButton(
+            tooltip:
+                "Cancel ${relationType == RelationType.edit ? "edit" : "reply"}",
             onPressed: onDismiss,
             icon: Icon(Icons.close),
             iconSize: 20,

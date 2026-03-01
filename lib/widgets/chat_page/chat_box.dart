@@ -95,7 +95,27 @@ class ChatBox extends HookConsumerWidget {
                   spacing: 8,
                   children: [
                     PopupMenuButton(
-                      itemBuilder: (context) => [],
+                      tooltip: "Add media",
+                      itemBuilder: (context) => [
+                        PopupMenuItem(
+                          child: ListTile(
+                            title: Text("Camera"),
+                            leading: Icon(Icons.add_a_photo),
+                          ),
+                        ),
+                        PopupMenuItem(
+                          child: ListTile(
+                            title: Text("Gallery"),
+                            leading: Icon(Icons.add_photo_alternate),
+                          ),
+                        ),
+                        PopupMenuItem(
+                          child: ListTile(
+                            title: Text("Files"),
+                            leading: Icon(Icons.add_photo_alternate),
+                          ),
+                        ),
+                      ],
                       icon: Icon(Icons.add),
                       // enabled: room.canSendDefaultMessages, TODO: Permissions check
                     ),
@@ -138,6 +158,7 @@ class ChatBox extends HookConsumerWidget {
                       onPressed: send,
                       // onPressed: room.canSendDefaultMessages ? send : null,
                       icon: Icon(Icons.send),
+                      tooltip: "Send message",
                     ),
                   ],
                 ),

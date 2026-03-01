@@ -49,10 +49,15 @@ class Appbar extends StatelessWidget implements PreferredSizeWidget {
           if (!(Platform.isAndroid || Platform.isIOS)) ...[
             if (!Platform.isLinux)
               IconButton(
+                tooltip: "Maximize window",
                 onPressed: maximize,
                 icon: const Icon(Icons.fullscreen),
               ),
-            IconButton(onPressed: () => exit(0), icon: const Icon(Icons.close)),
+            IconButton(
+              tooltip: "Close window",
+              onPressed: () => exit(0),
+              icon: const Icon(Icons.close),
+            ),
           ],
         ],
       ),
