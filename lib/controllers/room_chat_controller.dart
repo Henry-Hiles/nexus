@@ -9,7 +9,6 @@ import "package:nexus/controllers/message_controller.dart";
 import "package:nexus/controllers/messages_controller.dart";
 import "package:nexus/controllers/new_events_controller.dart";
 import "package:nexus/controllers/rooms_controller.dart";
-import "package:nexus/controllers/selected_room_controller.dart";
 import "package:nexus/models/message_config.dart";
 import "package:nexus/models/messages_config.dart";
 import "package:nexus/models/requests/get_room_state_request.dart";
@@ -26,7 +25,7 @@ class RoomChatController extends AsyncNotifier<ChatController> {
   @override
   Future<ChatController> build() async {
     final client = ref.watch(ClientController.provider.notifier);
-    final room = ref.read(SelectedRoomController.provider);
+    final room = ref.read(RoomsController.provider)[roomId];
     if (room == null) return InMemoryChatController();
 
     final messages = await ref.watch(
@@ -111,7 +110,7 @@ class RoomChatController extends AsyncNotifier<ChatController> {
     );
 
     ref
-        .watch(RoomsController.provider.notifier)
+        .read(RoomsController.provider.notifier)
         .update(
           {
             roomId: Room(
@@ -165,15 +164,18 @@ class RoomChatController extends AsyncNotifier<ChatController> {
   }
 
   Future<void> loadOlder([InMemoryChatController? chatController]) async {
-    final controller = chatController ?? await future;
-    final client = ref.watch(ClientController.provider.notifier);
-
-    final response = await client.paginate(
-      PaginateRequest(
-        roomId: roomId,
-        maxTimelineId: controller.messages.firstOrNull?.metadata?["timelineId"],
-      ),
-    );
+    final response = await ref
+        .watch(ClientController.provider.notifier)
+        .paginate(
+          PaginateRequest(
+            roomId: roomId,
+            maxTimelineId: ref
+                .watch(RoomsController.provider)[roomId]
+                ?.timeline
+                .firstOrNull
+                ?.timelineRowId,
+          ),
+        );
 
     ref
         .watch(RoomsController.provider.notifier)
@@ -203,6 +205,8 @@ class RoomChatController extends AsyncNotifier<ChatController> {
         MessagesConfig(room: room, events: response.events.reversed),
       ).future,
     );
+
+    final controller = chatController ?? await future;
     await controller.insertAllMessages(
       messages
           .where(
