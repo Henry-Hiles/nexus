@@ -153,6 +153,7 @@ class MessageController extends AsyncNotifier<Message?> {
         ),
         "m.file" => Message.file(
           name: content["filename"].toString(),
+          size: content["info"]["size"],
           metadata: metadata,
           id: config.event.eventId,
           authorId: event.authorId,
