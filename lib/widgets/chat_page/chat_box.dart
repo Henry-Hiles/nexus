@@ -34,7 +34,7 @@ class ChatBox extends HookConsumerWidget {
     if (relationType == RelationType.edit &&
         relatedMessage is TextMessage &&
         controller.value.text.isEmpty) {
-      controller.value.text = relatedMessage?.metadata?["editSource"];
+      controller.value.text = relatedMessage?.metadata?["editSource"] ?? "";
     }
 
     void send() {
