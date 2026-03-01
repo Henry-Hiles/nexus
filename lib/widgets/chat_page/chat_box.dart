@@ -112,7 +112,7 @@ class ChatBox extends HookConsumerWidget {
                         PopupMenuItem(
                           child: ListTile(
                             title: Text("Files"),
-                            leading: Icon(Icons.add_photo_alternate),
+                            leading: Icon(Icons.attachment),
                           ),
                         ),
                       ],
@@ -142,9 +142,10 @@ class ChatBox extends HookConsumerWidget {
                           maxLines: 12,
                           minLines: 1,
                           decoration: InputDecoration(
-                            // hintText: room.canSendDefaultMessages
-                            //     ? "Your message here..."
-                            //     : "You don't have permission to send messages in this room...",
+                            hintText:
+                                true // TODO: room.canSendDefaultMessages
+                                ? "Your message here..."
+                                : "You don't have permission to send messages in this room...",
                             border: InputBorder.none,
                           ),
                           controller: controller.value,
