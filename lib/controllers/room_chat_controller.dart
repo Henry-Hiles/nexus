@@ -28,6 +28,37 @@ class RoomChatController extends AsyncNotifier<ChatController> {
     final room = ref.read(RoomsController.provider)[roomId];
     if (room == null) return InMemoryChatController();
 
+    final state = await client.getRoomState(
+      GetRoomStateRequest(
+        roomId: roomId,
+        fetchMembers: room.metadata?.hasMemberList == false,
+        includeMembers: true,
+      ),
+    );
+
+    ref
+        .read(RoomsController.provider.notifier)
+        .update(
+          {
+            roomId: Room(
+              events: state,
+              state: state.fold(
+                const IMap.empty(),
+                (previousValue, stateEvent) => previousValue.add(
+                  stateEvent.type,
+                  (previousValue[stateEvent.type] ?? const IMap.empty()).addAll(
+                    IMap({
+                      if (stateEvent.stateKey != null)
+                        stateEvent.stateKey!: stateEvent.rowId,
+                    }),
+                  ),
+                ),
+              ),
+            ),
+          }.toIMap(),
+          const ISet.empty(),
+        );
+
     final messages = await ref.watch(
       MessagesController.provider(
         MessagesConfig(
@@ -102,37 +133,6 @@ class RoomChatController extends AsyncNotifier<ChatController> {
     for (final _ in List.filled(2, null)) {
       if (messages.length < 20) await loadOlder(controller);
     }
-
-    final state = await client.getRoomState(
-      GetRoomStateRequest(
-        roomId: roomId,
-        fetchMembers: room.metadata?.hasMemberList == false,
-        includeMembers: true,
-      ),
-    );
-
-    ref
-        .read(RoomsController.provider.notifier)
-        .update(
-          {
-            roomId: Room(
-              events: state,
-              state: state.fold(
-                const IMap.empty(),
-                (previousValue, stateEvent) => previousValue.add(
-                  stateEvent.type,
-                  (previousValue[stateEvent.type] ?? const IMap.empty()).addAll(
-                    IMap({
-                      if (stateEvent.stateKey != null)
-                        stateEvent.stateKey!: stateEvent.rowId,
-                    }),
-                  ),
-                ),
-              ),
-            ),
-          }.toIMap(),
-          const ISet.empty(),
-        );
 
     return controller;
   }
