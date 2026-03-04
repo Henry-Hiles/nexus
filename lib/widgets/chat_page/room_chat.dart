@@ -391,6 +391,10 @@ class RoomChat extends HookConsumerWidget {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Html(
+                                        textStyle:
+                                            message.metadata?["big"] == true
+                                            ? TextStyle(fontSize: 32)
+                                            : null,
                                         (message.metadata?["formatted"]
                                                 as String)
                                             .replaceAllMapped(

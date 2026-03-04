@@ -14,11 +14,13 @@ import "package:nexus/widgets/chat_page/html/quoted.dart";
 
 class Html extends ConsumerWidget {
   final String html;
-  const Html(this.html, {super.key});
+  final TextStyle? textStyle;
+  const Html(this.html, {this.textStyle, super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => HtmlWidget(
     html,
+    textStyle: textStyle,
     customWidgetBuilder: (element) {
       if (element.attributes.keys.contains("data-mx-spoiler")) {
         return InlineCustomWidget(child: SpoilerText(text: element.text));
