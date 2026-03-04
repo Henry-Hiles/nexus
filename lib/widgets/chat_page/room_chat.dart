@@ -466,7 +466,7 @@ class RoomChat extends HookConsumerWidget {
                                       message: TextMessage(
                                         id: "${message.id}-text",
                                         authorId: message.authorId,
-                                        text: message.metadata?["body"],
+                                        text: message.metadata?["formatted"],
                                       ),
                                       index: index,
                                     ),
