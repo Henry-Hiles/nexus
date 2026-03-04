@@ -103,6 +103,7 @@ A simple and user-friendly Matrix client made with Flutter and the Matrix Dart S
     -   [ ] Spam filtering
 -   [ ] Settings
     -   [ ] Light/Dark mode
+    -   [ ] SSD or CSD
     -   [ ] Show media by default
     -   [ ] Dynamic Theming
     -   [ ] Devices
