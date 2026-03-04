@@ -467,6 +467,11 @@ class RoomChat extends HookConsumerWidget {
                                   children: [
                                     SizedBox(height: 12),
                                     FlyerChatTextMessage(
+                                      topWidget: TopWidget(
+                                        message,
+                                        groupStatus: groupStatus,
+                                        alwaysShow: true,
+                                      ),
                                       message: TextMessage(
                                         id: "${message.id}-text",
                                         authorId: message.authorId,
@@ -475,15 +480,6 @@ class RoomChat extends HookConsumerWidget {
                                       index: index,
                                     ),
                                     FlyerChatImageMessage(
-                                      topWidget: TopWidget(
-                                        message,
-                                        groupStatus: MessageGroupStatus(
-                                          isFirst: false,
-                                          isLast: true,
-                                          isMiddle: false,
-                                        ),
-                                        alwaysShow: true,
-                                      ),
                                       customImageProvider: CachedNetworkImage(
                                         message.source,
                                         ref.watch(
