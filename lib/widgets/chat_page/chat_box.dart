@@ -29,6 +29,7 @@ class ChatBox extends HookConsumerWidget {
     final theme = Theme.of(context);
     final controller = useRef(FlutterTaggerController());
     final triggerCharacter = useState("");
+    final shouldMention = useState(true);
     final query = useState("");
 
     if (relationType == RelationType.edit &&
@@ -43,6 +44,7 @@ class ChatBox extends HookConsumerWidget {
           .watch(RoomChatController.provider(room.metadata!.id).notifier)
           .send(
             controller.value.formattedText,
+            shouldMention: shouldMention.value,
             relation: relatedMessage,
             relationType: relationType,
             tags: controller.value.tags,
@@ -84,6 +86,9 @@ class ChatBox extends HookConsumerWidget {
           child: Column(
             children: [
               RelationPreview(
+                shouldMention: shouldMention.value,
+                toggleShouldMention: () =>
+                    shouldMention.value = !shouldMention.value,
                 relatedMessage: relatedMessage,
                 relationType: relationType,
                 onDismiss: onDismiss,

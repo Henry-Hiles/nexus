@@ -230,6 +230,7 @@ class RoomChatController extends AsyncNotifier<ChatController> {
 
   Future<void> send(
     String message, {
+    bool shouldMention = true,
     required Iterable<Tag> tags,
     required RelationType relationType,
     Message? relation,
@@ -252,7 +253,9 @@ class RoomChatController extends AsyncNotifier<ChatController> {
         roomId: roomId,
         mentions: Mentions(
           userIds: [
-            if (relation != null && relationType == RelationType.reply)
+            if (shouldMention == true &&
+                relation != null &&
+                relationType == RelationType.reply)
               relation.authorId,
           ].toIList(),
           room: taggedMessage.contains("@room"),

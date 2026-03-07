@@ -8,10 +8,14 @@ class RelationPreview extends ConsumerWidget {
   final Message? relatedMessage;
   final RelationType relationType;
   final VoidCallback onDismiss;
+  final bool shouldMention;
+  final VoidCallback toggleShouldMention;
   const RelationPreview({
     required this.relatedMessage,
     required this.relationType,
     required this.onDismiss,
+    required this.shouldMention,
+    required this.toggleShouldMention,
     super.key,
   });
 
@@ -55,6 +59,18 @@ class RelationPreview extends ConsumerWidget {
               maxLines: 1,
             ),
           ),
+
+          if (relationType == RelationType.reply)
+            TextButton(
+              onPressed: toggleShouldMention,
+              child: Text(
+                shouldMention ? "@On" : "@Off",
+                style: TextStyle(
+                  fontWeight: FontWeight.w900,
+                  color: shouldMention ? null : Theme.of(context).disabledColor,
+                ),
+              ),
+            ),
           IconButton(
             tooltip:
                 "Cancel ${relationType == RelationType.edit ? "edit" : "reply"}",
