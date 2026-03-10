@@ -7,7 +7,7 @@ part "message_config.g.dart";
 @freezed
 abstract class MessageConfig with _$MessageConfig {
   const factory MessageConfig({
-    @Default(false) bool mustBeText,
+    @Default(false) bool alwaysReturn,
     @Default(false) bool includeEdits,
     required Room room,
     required Event event,

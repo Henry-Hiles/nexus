@@ -22,11 +22,13 @@ class TopWidget extends ConsumerWidget {
     children: [
       Builder(
         builder: (_) {
-          final replyMessage = message.metadata?["reply"] as TextMessage?;
+          final replyMessage = message.metadata?["reply"] as Message?;
 
           if (replyMessage == null) return SizedBox.shrink();
-          final smallerText = message is TextMessage
-              ? replyMessage.text.substring(
+
+          final smallerText =
+              message is TextMessage && replyMessage.metadata!["body"] != null
+              ? replyMessage.metadata!["body"].substring(
                   0,
                   min(
                     max(
@@ -39,14 +41,14 @@ class TopWidget extends ConsumerWidget {
                       ),
                       5,
                     ),
-                    replyMessage.text.length,
+                    replyMessage.metadata!["body"].length,
                   ),
                 )
               : null;
           final replyText =
               (smallerText == null ||
-                  smallerText.length == replyMessage.text.length)
-              ? replyMessage.text
+                  smallerText.length == replyMessage.metadata!["body"].length)
+              ? replyMessage.metadata!["body"]
               : "$smallerText...";
 
           return Padding(

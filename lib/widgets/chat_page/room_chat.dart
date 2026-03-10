@@ -395,8 +395,7 @@ class RoomChat extends HookConsumerWidget {
                                             message.metadata?["big"] == true
                                             ? TextStyle(fontSize: 32)
                                             : null,
-                                        (message.metadata?["formatted"]
-                                                as String)
+                                        message.text
                                             .replaceAllMapped(
                                               RegExp(
                                                 "(<a\\b[^>]*>.*?<\\/a>)|(\\bhttps?:\\/\\/[^\\s<]+)",
@@ -466,20 +465,29 @@ class RoomChat extends HookConsumerWidget {
                                       : CrossAxisAlignment.start,
                                   children: [
                                     SizedBox(height: 12),
-                                    FlyerChatTextMessage(
-                                      topWidget: TopWidget(
-                                        message,
-                                        groupStatus: groupStatus,
-                                        alwaysShow: true,
+                                    if (message.text?.isNotEmpty == true)
+                                      FlyerChatTextMessage(
+                                        topWidget: TopWidget(
+                                          message,
+                                          groupStatus: groupStatus,
+                                          alwaysShow: true,
+                                        ),
+                                        message: TextMessage(
+                                          id: "${message.id}-text",
+                                          authorId: message.authorId,
+                                          text: message.text!,
+                                        ),
+                                        index: index,
                                       ),
-                                      message: TextMessage(
-                                        id: "${message.id}-text",
-                                        authorId: message.authorId,
-                                        text: message.metadata?["formatted"],
-                                      ),
-                                      index: index,
-                                    ),
                                     FlyerChatImageMessage(
+                                      topWidget:
+                                          message.text?.isNotEmpty == true
+                                          ? null
+                                          : TopWidget(
+                                              message,
+                                              groupStatus: groupStatus,
+                                              alwaysShow: true,
+                                            ),
                                       customImageProvider: CachedNetworkImage(
                                         message.source,
                                         ref.watch(

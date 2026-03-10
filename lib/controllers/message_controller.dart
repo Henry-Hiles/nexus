@@ -47,25 +47,21 @@ class MessageController extends AsyncNotifier<Message?> {
     final type = (config.event.decryptedType ?? config.event.type);
     final newContent = content["m.new_content"] as Map?;
     final metadata = {
-      "timelineId": event.timelineRowId,
-      "formatted":
-          newContent?["formatted_body"] ??
-          newContent?["body"] ??
-          content["formatted_body"] ??
-          content["body"] ??
-          "",
+      "body": config.event.redactedBy == null
+          ? (newContent?["body"] ?? content["body"] ?? "")
+          : "Deleted Message",
       if (replyEvent != null)
         "reply": await ref.watch(
           MessageController.provider(
             MessageConfig(
               event: replyEvent,
               room: config.room,
-              mustBeText: true,
+              alwaysReturn: true,
             ),
           ).future,
         ),
+      "timelineId": event.timelineRowId,
       "big": event.localContent?.bigEmoji == true,
-      "body": newContent?["body"] ?? content["body"],
       "eventType": type,
       "avatarUrl": author?.content["avatar_url"],
       "editSource":
@@ -82,7 +78,7 @@ class MessageController extends AsyncNotifier<Message?> {
 
     final editedAt = event.relationType == "m.replace" ? event.timestamp : null;
 
-    if ((event.redactedBy != null && !config.mustBeText) ||
+    if ((event.redactedBy != null && !config.alwaysReturn) ||
         (!config.includeEdits && (config.event.relationType == "m.replace"))) {
       return null;
     }
@@ -98,16 +94,17 @@ class MessageController extends AsyncNotifier<Message?> {
               metadata: metadata,
               id: config.event.eventId,
               authorId: event.authorId,
-              text: config.event.redactedBy == null
-                  ? content["body"] ?? ""
-                  : "This message has been deleted...",
+              text:
+                  newContent?["formatted_body"] ??
+                  newContent?["body"] ??
+                  content["formatted_body"] ??
+                  content["body"] ??
+                  "",
               replyToMessageId: replyId,
               deliveredAt: config.event.timestamp,
               editedAt: editedAt,
             )
             as TextMessage;
-
-    if (config.mustBeText) return asText;
 
     final homeserver = ref.read(ClientStateController.provider)?.homeserverUrl;
     final source = homeserver == null || content["url"] == null
@@ -117,7 +114,7 @@ class MessageController extends AsyncNotifier<Message?> {
     return switch (type) {
       "m.room.encrypted" => asText.copyWith(
         text: "Unable to decrypt message.",
-        metadata: {...metadata, "formatted": "Unable to decrypt message."},
+        metadata: {...metadata, "body": "Unable to decrypt message."},
       ),
       // "org.matrix.msc3381.poll.start" => Message.custom(
       //   metadata: {
@@ -134,7 +131,11 @@ class MessageController extends AsyncNotifier<Message?> {
           id: config.event.eventId,
           metadata: metadata,
           authorId: event.authorId,
-          text: event.localContent?.sanitizedHtml,
+          text:
+              newContent?["formatted_body"] ??
+              newContent?["body"] ??
+              content["formatted_body"] ??
+              content["body"],
           source: source,
           replyToMessageId: replyId,
           deliveredAt: config.event.timestamp,
@@ -156,7 +157,18 @@ class MessageController extends AsyncNotifier<Message?> {
         content["membership"] == event.unsigned["prev_content"]?["membership"]
             ? null
             : Message.system(
-                metadata: metadata,
+                metadata: {
+                  ...metadata,
+                  "body":
+                      "${content["displayname"] ?? event.stateKey} ${switch (content["membership"]) {
+                        "invite" => "was invited to",
+                        "join" => "joined",
+                        "leave" => "left",
+                        "knock" => "asked to join",
+                        "ban" => "was banned from",
+                        _ => "did something relating to",
+                      }} the room.",
+                },
                 id: config.event.eventId,
                 authorId: event.authorId,
                 deliveredAt: config.event.timestamp,
@@ -170,18 +182,30 @@ class MessageController extends AsyncNotifier<Message?> {
                       _ => "did something relating to",
                     }} the room.",
               ),
-      "m.room.redaction" => null,
-      _ =>
-        // Turn this on for debugging purposes
-        false
-            // ignore: dead_code
-            ? Message.unsupported(
-                metadata: metadata,
-                id: config.event.eventId,
-                authorId: event.authorId,
-                replyToMessageId: replyId,
+
+      "m.room.redaction" =>
+        config.alwaysReturn
+            ? asText.copyWith(
+                metadata: {
+                  ...(asText.metadata ?? {}),
+                  "body": "Deleted Message",
+                },
               )
             : null,
+      _ =>
+        config.alwaysReturn
+            ? asText
+            : (
+              // Turn this on for debugging purposes
+              false
+                  // ignore: dead_code
+                  ? Message.unsupported(
+                      metadata: metadata,
+                      id: config.event.eventId,
+                      authorId: event.authorId,
+                      replyToMessageId: replyId,
+                    )
+                  : null),
     };
   }
 
