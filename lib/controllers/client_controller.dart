@@ -201,11 +201,15 @@ class ClientController extends AsyncNotifier<int> {
       _sendCommand("report_event", report.toJson());
 
   Future<void> markRead(Room room) async {
-    if (room.events.isEmpty || room.metadata == null) return;
+    final event = room.events.firstWhereOrNull(
+      (event) => event.rowId == room.timeline.last.eventRowId,
+    );
+    if (event == null || room.metadata == null) return;
+
     await _sendCommand("mark_read", {
-      "room_id": room.metadata?.id,
+      "room_id": room.metadata!.id,
       "receipt_type": "m.read",
-      "event_id": room.events.last.eventId,
+      "event_id": event.eventId,
     });
   }
 
