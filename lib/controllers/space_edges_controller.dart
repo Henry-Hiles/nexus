@@ -6,7 +6,8 @@ class SpaceEdgesController extends Notifier<IMap<String, IList<SpaceEdge>>> {
   @override
   IMap<String, IList<SpaceEdge>> build() => const IMap.empty();
 
-  void set(IMap<String, IList<SpaceEdge>> newEdges) => state = newEdges;
+  void set(IMap<String, IList<SpaceEdge>> newEdges) =>
+      state = state.addAll(newEdges);
 
   static final provider =
       NotifierProvider<SpaceEdgesController, IMap<String, IList<SpaceEdge>>>(
