@@ -50,10 +50,8 @@ class RelationPreview extends ConsumerWidget {
           ),
           Expanded(
             child: Text(
-              (relatedMessage is TextMessage)
-                  ? (relatedMessage as TextMessage).text
-                  : relatedMessage?.metadata?["body"] ??
-                        relatedMessage?.metadata?["eventType"],
+              relatedMessage?.metadata?["body"] ??
+                  relatedMessage?.metadata?["eventType"],
               overflow: TextOverflow.ellipsis,
               style: theme.textTheme.labelMedium,
               maxLines: 1,
