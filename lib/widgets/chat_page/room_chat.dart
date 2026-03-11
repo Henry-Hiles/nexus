@@ -1,3 +1,5 @@
+import "dart:math";
+
 import "package:cross_cache/cross_cache.dart";
 import "package:flutter/material.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
@@ -244,17 +246,30 @@ class RoomChat extends HookConsumerWidget {
                                 if (message is ImageMessage) {
                                   showDialog(
                                     context: context,
-                                    builder: (_) => Dialog(
-                                      backgroundColor: Colors.transparent,
-                                      insetPadding: EdgeInsets.all(64),
-                                      child: InteractiveViewer(
-                                        child: Image(
-                                          image: CachedNetworkImage(
-                                            message.source,
-                                            ref.watch(
-                                              CrossCacheController.provider,
+                                    builder: (_) => LayoutBuilder(
+                                      builder: (context, constraints) => Dialog(
+                                        backgroundColor: Colors.transparent,
+                                        insetPadding: EdgeInsets.all(
+                                          constraints.maxWidth / 100,
+                                        ),
+                                        child: ConstrainedBox(
+                                          constraints: BoxConstraints(
+                                            minWidth: min(
+                                              constraints.maxWidth,
+                                              1000,
                                             ),
-                                            headers: ref.headers,
+                                          ),
+                                          child: InteractiveViewer(
+                                            child: Image(
+                                              fit: BoxFit.contain,
+                                              image: CachedNetworkImage(
+                                                message.source,
+                                                ref.watch(
+                                                  CrossCacheController.provider,
+                                                ),
+                                                headers: ref.headers,
+                                              ),
+                                            ),
                                           ),
                                         ),
                                       ),
