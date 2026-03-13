@@ -19,6 +19,7 @@ import "package:nexus/helpers/extensions/show_context_menu.dart";
 import "package:nexus/models/relation_type.dart";
 import "package:nexus/models/requests/report_request.dart";
 import "package:nexus/widgets/chat_page/chat_box.dart";
+import "package:nexus/widgets/chat_page/image_message.dart";
 import "package:nexus/widgets/chat_page/member_list.dart";
 import "package:nexus/widgets/chat_page/message_wrapper.dart";
 import "package:nexus/widgets/chat_page/room_appbar.dart";
@@ -238,6 +239,7 @@ class RoomChat extends HookConsumerWidget {
                               ),
                           builders: Builders(
                             loadMoreBuilder: (_) => Loading(),
+
                             chatAnimatedListBuilder: (_, itemBuilder) =>
                                 ChatAnimatedList(
                                   itemBuilder: itemBuilder,
@@ -247,6 +249,7 @@ class RoomChat extends HookConsumerWidget {
                                   onStartReached: () => client.markRead(room),
                                   bottomPadding: 72,
                                 ),
+
                             composerBuilder: (_) => ChatBox(
                               relationType: relationType.value,
                               relatedMessage: replyToMessage.value,
@@ -254,104 +257,6 @@ class RoomChat extends HookConsumerWidget {
                               room: room,
                             ),
 
-                            // TODO: Polls
-                            // customMessageBuilder:
-                            //     (
-                            //       context,
-                            //       message,
-                            //       index, {
-                            //       required bool isSentByMe,
-                            //       MessageGroupStatus? groupStatus,
-                            //     }) {
-                            //       final poll =
-                            //           message.metadata?["poll"]
-                            //               as PollStartContent;
-                            //       final responses =
-                            //           (message.metadata?["responses"]
-                            //                   as Map<
-                            //                     String,
-                            //                     Set<String>
-                            //                   >)
-                            //               .values
-                            //               .expand((set) => set)
-                            //               .fold(<String, int>{}, (
-                            //                 acc,
-                            //                 value,
-                            //               ) {
-                            //                 acc[value] =
-                            //                     (acc[value] ?? 0) + 1;
-                            //                 return acc;
-                            //               });
-
-                            //       return Column(
-                            //         crossAxisAlignment:
-                            //             CrossAxisAlignment.start,
-                            //         spacing: 4,
-                            //         children: [
-                            //           TopWidget(
-                            //             message,
-                            //             headers: room
-                            //                 .roomData
-                            //                 .client
-                            //                 .headers,
-                            //             groupStatus: groupStatus,
-                            //           ),
-
-                            //           DynamicPolls(
-                            //             startDate: DateTime.now(),
-                            //             endDate: DateTime.now(),
-                            //             private:
-                            //                 poll.kind ==
-                            //                 PollKind.undisclosed,
-                            //             allowReselection: true,
-                            //             backgroundDecoration:
-                            //                 BoxDecoration(
-                            //                   borderRadius:
-                            //                       BorderRadius.all(
-                            //                         Radius.circular(16),
-                            //                       ),
-                            //                   border: Border.all(
-                            //                     color: theme
-                            //                         .colorScheme
-                            //                         .primaryContainer,
-                            //                     width: 4,
-                            //                   ),
-                            //                 ),
-                            //             allStyle: Styles(
-                            //               titleStyle: TitleStyle(
-                            //                 style: theme
-                            //                     .textTheme
-                            //                     .headlineSmall,
-                            //               ),
-                            //               optionStyle: OptionStyle(
-                            //                 fillColor: theme
-                            //                     .colorScheme
-                            //                     .primaryContainer,
-                            //                 selectedBorderColor: theme
-                            //                     .colorScheme
-                            //                     .primary,
-                            //                 borderColor: theme
-                            //                     .colorScheme
-                            //                     .primary,
-                            //                 unselectedBorderColor:
-                            //                     Colors.transparent,
-                            //                 textSelectColor: theme
-                            //                     .colorScheme
-                            //                     .primary,
-                            //               ),
-                            //             ),
-                            //             onOptionSelected:
-                            //                 (int index) {},
-                            //             title: poll.question.mText,
-                            //             options: poll.answers
-                            //                 .map(
-                            //                   (option) => option.mText,
-                            //                 )
-                            //                 .toList(),
-                            //           ),
-                            //         ],
-                            //       );
-                            //     },
                             textMessageBuilder:
                                 (
                                   context,
@@ -372,6 +277,7 @@ class RoomChat extends HookConsumerWidget {
 
                                   groupStatus,
                                 ),
+
                             imageMessageBuilder:
                                 (
                                   context,
@@ -379,103 +285,30 @@ class RoomChat extends HookConsumerWidget {
                                   index, {
                                   required bool isSentByMe,
                                   MessageGroupStatus? groupStatus,
-                                }) {
-                                  final text =
-                                      message.metadata?["text"] as TextMessage?;
-                                  return MessageWrapper(
-                                    text ?? message,
-                                    Column(
-                                      spacing: 4,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        TextMessageWrapper(
+                                }) => MessageWrapper(
+                                  message,
+                                  Column(
+                                    spacing: 4,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      TextMessageWrapper(
+                                        message,
+                                        content: message.text,
+                                        groupStatus: groupStatus,
+                                        onTapReply: notifier.scrollToMessage,
+                                        updateMessage: controller.updateMessage,
+                                        isSentByMe: isSentByMe,
+                                        extra: ExpandableImageMessage(
                                           message,
-                                          content: message.text,
-                                          groupStatus: groupStatus,
-                                          onTapReply: notifier.scrollToMessage,
-                                          updateMessage:
-                                              controller.updateMessage,
-                                          isSentByMe: isSentByMe,
-                                          extra: InkWell(
-                                            onTap: () => showDialog(
-                                              context: context,
-                                              builder: (_) => LayoutBuilder(
-                                                builder:
-                                                    (
-                                                      context,
-                                                      constraints,
-                                                    ) => Dialog(
-                                                      backgroundColor:
-                                                          Colors.transparent,
-                                                      insetPadding:
-                                                          EdgeInsets.all(
-                                                            constraints
-                                                                    .maxWidth /
-                                                                100,
-                                                          ),
-                                                      child: ConstrainedBox(
-                                                        constraints:
-                                                            BoxConstraints(
-                                                              minWidth: min(
-                                                                constraints
-                                                                    .maxWidth,
-                                                                1000,
-                                                              ),
-                                                            ),
-                                                        child: InteractiveViewer(
-                                                          child: Image(
-                                                            fit: BoxFit.contain,
-                                                            image: CachedNetworkImage(
-                                                              message.source,
-                                                              ref.watch(
-                                                                CrossCacheController
-                                                                    .provider,
-                                                              ),
-                                                              headers:
-                                                                  ref.headers,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                              ),
-                                            ),
-                                            child: FlyerChatImageMessage(
-                                              customImageProvider:
-                                                  CachedNetworkImage(
-                                                    message.source,
-                                                    ref.watch(
-                                                      CrossCacheController
-                                                          .provider,
-                                                    ),
-                                                    headers: ref.headers,
-                                                  ),
-                                              errorBuilder:
-                                                  (
-                                                    context,
-                                                    error,
-                                                    stackTrace,
-                                                  ) => Center(
-                                                    child: Text(
-                                                      "Image Failed to Load",
-                                                      style: TextStyle(
-                                                        color: Theme.of(
-                                                          context,
-                                                        ).colorScheme.error,
-                                                      ),
-                                                    ),
-                                                  ),
-                                              message: message,
-                                              index: index,
-                                            ),
-                                          ),
+                                          index: index,
                                         ),
-                                      ],
-                                    ),
-                                    groupStatus,
-                                  );
-                                },
+                                      ),
+                                    ],
+                                  ),
+                                  groupStatus,
+                                ),
+
                             fileMessageBuilder:
                                 (
                                   _,
@@ -506,6 +339,7 @@ class RoomChat extends HookConsumerWidget {
                                   ),
                                   groupStatus,
                                 ),
+
                             systemMessageBuilder:
                                 (
                                   _,
@@ -517,6 +351,7 @@ class RoomChat extends HookConsumerWidget {
                                   message: message,
                                   index: index,
                                 ),
+
                             unsupportedMessageBuilder:
                                 (
                                   _,
