@@ -464,6 +464,7 @@ class RoomChat extends HookConsumerWidget {
                                                 ),
                                           ),
                                         FlyerChatTextMessage(
+                                          showStatus: false,
                                           customWidget: getTextWidget(message),
                                           message: message,
                                           showTime: true,
