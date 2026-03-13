@@ -20,19 +20,21 @@ class MessageWrapper extends StatelessWidget {
               message.metadata?["displayName"] ?? "",
             )
           : SizedBox(width: 40),
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (groupStatus?.isFirst != false)
-            Text(
-              message.metadata?["displayName"] ?? message.authorId,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(
-                context,
-              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-            ),
-          child,
-        ],
+      Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (groupStatus?.isFirst != false)
+              Text(
+                message.metadata?["displayName"] ?? message.authorId,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+              ),
+            child,
+          ],
+        ),
       ),
     ],
   );
