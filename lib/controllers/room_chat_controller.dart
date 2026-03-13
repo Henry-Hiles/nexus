@@ -18,12 +18,12 @@ import "package:nexus/models/relation_type.dart";
 import "package:nexus/models/requests/send_message_request.dart";
 import "package:nexus/models/room.dart";
 
-class RoomChatController extends AsyncNotifier<ChatController> {
+class RoomChatController extends AsyncNotifier<InMemoryChatController> {
   final String roomId;
   RoomChatController(this.roomId);
 
   @override
-  Future<ChatController> build() async {
+  Future<InMemoryChatController> build() async {
     final client = ref.watch(ClientController.provider.notifier);
     var room = ref.read(RoomsController.provider)[roomId];
     if (room == null) return InMemoryChatController();
@@ -283,8 +283,13 @@ class RoomChatController extends AsyncNotifier<ChatController> {
     );
   }
 
+  Future<void> scrollToMessage(Message message) async {
+    final controller = await future;
+    return await controller.scrollToMessage(message.id);
+  }
+
   static final provider = AsyncNotifierProvider.family
-      .autoDispose<RoomChatController, ChatController, String>(
+      .autoDispose<RoomChatController, InMemoryChatController, String>(
         RoomChatController.new,
       );
 }

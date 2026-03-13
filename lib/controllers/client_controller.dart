@@ -167,6 +167,11 @@ class ClientController extends AsyncNotifier<int> {
     await _sendCommand("leave_room", {"room_id": room.metadata!.id});
   }
 
+  // (await _sendCommand("get_event_context", {
+  //   "room_id": request.roomId,
+  //   "event_id": r"$OqZT4NuTj0J1-771IOEEWRI4XdumRNu6ighlvO3K3gc",
+  // }));
+
   Future<IList<Event>> getRoomState(GetRoomStateRequest request) async {
     final response =
         (await _sendCommand("get_room_state", request.toJson())) as List;

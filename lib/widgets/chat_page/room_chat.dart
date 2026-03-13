@@ -435,6 +435,7 @@ class RoomChat extends HookConsumerWidget {
                                   customWidget: getTextWidget(message),
                                   topWidget: TopWidget(
                                     message,
+                                    onTapReply: notifier.scrollToMessage,
                                     groupStatus: groupStatus,
                                   ),
                                   message: message,
@@ -491,6 +492,8 @@ class RoomChat extends HookConsumerWidget {
                                           topWidget: TopWidget(
                                             message,
                                             groupStatus: groupStatus,
+                                            onTapReply:
+                                                notifier.scrollToMessage,
                                             alwaysShow: true,
                                           ),
                                           message: textMessage,
@@ -503,6 +506,8 @@ class RoomChat extends HookConsumerWidget {
                                             : TopWidget(
                                                 message,
                                                 groupStatus: groupStatus,
+                                                onTapReply:
+                                                    notifier.scrollToMessage,
                                                 alwaysShow: true,
                                               ),
                                         customImageProvider: CachedNetworkImage(
@@ -547,6 +552,7 @@ class RoomChat extends HookConsumerWidget {
                                   child: FlyerChatFileMessage(
                                     topWidget: TopWidget(
                                       message,
+                                      onTapReply: notifier.scrollToMessage,
                                       groupStatus: groupStatus,
                                     ),
                                     message: message,

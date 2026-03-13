@@ -9,9 +9,11 @@ class TopWidget extends ConsumerWidget {
   final Message message;
   final bool alwaysShow;
   final MessageGroupStatus? groupStatus;
+  final void Function(Message message)? onTapReply;
   const TopWidget(
     this.message, {
     required this.groupStatus,
+    this.onTapReply,
     this.alwaysShow = false,
     super.key,
   });
@@ -54,12 +56,7 @@ class TopWidget extends ConsumerWidget {
           return Padding(
             padding: EdgeInsets.only(bottom: 12),
             child: InkWell(
-              onTap: () => showDialog(
-                context: context,
-                builder: (_) => Dialog(
-                  child: Text("TODO: Scroll to original message"),
-                ), // TODO
-              ),
+              onTap: () => onTapReply?.call(replyMessage),
               child: Quoted(
                 Row(
                   mainAxisSize: MainAxisSize.min,
