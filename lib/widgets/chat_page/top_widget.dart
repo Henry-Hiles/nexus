@@ -19,107 +19,71 @@ class TopWidget extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Builder(
-        builder: (_) {
-          final replyMessage = message.metadata?["reply"] as Message?;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final replyMessage = message.metadata?["reply"] as Message?;
 
-          if (replyMessage == null) return SizedBox.shrink();
+    if (replyMessage == null) return SizedBox.shrink();
 
-          final smallerText =
-              message is TextMessage && replyMessage.metadata!["body"] != null
-              ? replyMessage.metadata!["body"].substring(
-                  0,
-                  min(
-                    max(
-                      max(
-                        (message as TextMessage).text.length -
-                            (replyMessage.metadata?["displayName"] as String)
-                                .length -
-                            5,
-                        message.metadata?["displayName"].length,
-                      ),
+    final smallerText =
+        message is TextMessage && replyMessage.metadata!["body"] != null
+        ? replyMessage.metadata!["body"].substring(
+            0,
+            min(
+              max(
+                max(
+                  (message as TextMessage).text.length -
+                      (replyMessage.metadata?["displayName"] as String).length -
                       5,
-                    ),
-                    replyMessage.metadata!["body"].length,
-                  ),
-                )
-              : null;
-          final replyText =
-              (smallerText == null ||
-                  smallerText.length == replyMessage.metadata!["body"].length)
-              ? replyMessage.metadata!["body"]
-              : "$smallerText...";
-
-          return Padding(
-            padding: EdgeInsets.only(bottom: 12),
-            child: InkWell(
-              onTap: () => onTapReply?.call(replyMessage),
-              child: Quoted(
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  spacing: 8,
-                  children: [
-                    AvatarOrHash(
-                      Uri.tryParse(replyMessage.metadata?["avatarUrl"] ?? ""),
-                      replyMessage.metadata?["displayName"] ?? "",
-                      height: 16,
-                    ),
-                    Flexible(
-                      child: Text(
-                        replyMessage.metadata?["displayName"] ??
-                            replyMessage.authorId,
-                        style: Theme.of(context).textTheme.labelMedium
-                            ?.copyWith(fontWeight: FontWeight.bold),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    Flexible(
-                      child: Text(
-                        replyText,
-                        overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.labelMedium,
-                        maxLines: 1,
-                      ),
-                    ),
-                  ],
+                  message.metadata?["displayName"].length,
                 ),
+                5,
               ),
+              replyMessage.metadata!["body"].length,
             ),
-          );
-        },
-      ),
-      if (alwaysShow ||
-          groupStatus?.isFirst != false ||
-          message.metadata?["reply"] != null)
-        InkWell(
-          onTap: () => showDialog(
-            context: context,
-            builder: (_) =>
-                Dialog(child: Text("TODO: Show user profile")), // TODO
-          ),
-          child: Row(
+          )
+        : null;
+    final replyText =
+        (smallerText == null ||
+            smallerText.length == replyMessage.metadata!["body"].length)
+        ? replyMessage.metadata!["body"]
+        : "$smallerText...";
+
+    return Padding(
+      padding: EdgeInsets.only(bottom: 12),
+      child: InkWell(
+        onTap: () => onTapReply?.call(replyMessage),
+        child: Quoted(
+          Row(
             mainAxisSize: MainAxisSize.min,
             spacing: 8,
             children: [
               AvatarOrHash(
-                Uri.parse(message.metadata?["avatarUrl"] ?? ""),
-                message.metadata?["displayName"] ?? "",
+                Uri.tryParse(replyMessage.metadata?["avatarUrl"] ?? ""),
+                replyMessage.metadata?["displayName"] ?? "",
+                height: 16,
               ),
               Flexible(
                 child: Text(
-                  message.metadata?["displayName"] ?? message.authorId,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  replyMessage.metadata?["displayName"] ??
+                      replyMessage.authorId,
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Flexible(
+                child: Text(
+                  replyText,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.labelMedium,
+                  maxLines: 1,
                 ),
               ),
             ],
           ),
         ),
-    ],
-  );
+      ),
+    );
+  }
 }

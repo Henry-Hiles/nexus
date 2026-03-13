@@ -46,6 +46,12 @@ class MessageController extends AsyncNotifier<Message?> {
     final content = (event.decrypted ?? event.content);
     final type = (config.event.decryptedType ?? config.event.type);
     final newContent = content["m.new_content"] as Map?;
+
+    final homeserver = ref.read(ClientStateController.provider)?.homeserverUrl;
+    final source = homeserver == null || content["url"] == null
+        ? "null"
+        : Uri.parse(content["url"]).mxcToHttps(homeserver).toString();
+
     final metadata = {
       "body": config.event.redactedBy == null
           ? (newContent?["body"] ?? content["body"] ?? "")
@@ -72,6 +78,16 @@ class MessageController extends AsyncNotifier<Message?> {
           ? author?.content["displayname"]
           : event.authorId.substring(1).split(":")[0],
       "txnId": config.event.transactionId,
+      "image": content["msgtype"] == "m.image"
+          ? Message.image(
+              id: "${config.event.eventId}-image",
+              authorId: event.authorId,
+              source: source,
+              replyToMessageId: replyId,
+              deliveredAt: config.event.timestamp,
+              blurhash: (content["info"] as Map?)?["xyz.amorgan.blurhash"],
+            )
+          : null,
     };
 
     if (!ref.mounted) return null;
@@ -106,11 +122,6 @@ class MessageController extends AsyncNotifier<Message?> {
             )
             as TextMessage;
 
-    final homeserver = ref.read(ClientStateController.provider)?.homeserverUrl;
-    final source = homeserver == null || content["url"] == null
-        ? "null"
-        : Uri.parse(content["url"]).mxcToHttps(homeserver).toString();
-
     return switch (type) {
       "m.room.encrypted" => asText.copyWith(
         text: "Unable to decrypt message.",
@@ -127,20 +138,6 @@ class MessageController extends AsyncNotifier<Message?> {
       //   authorId: senderId,
       // ),
       ("m.sticker" || "m.room.message") => switch (content["msgtype"]) {
-        (null || "m.image") => Message.image(
-          id: config.event.eventId,
-          metadata: metadata,
-          authorId: event.authorId,
-          text:
-              newContent?["formatted_body"] ??
-              newContent?["body"] ??
-              content["formatted_body"] ??
-              content["body"],
-          source: source,
-          replyToMessageId: replyId,
-          deliveredAt: config.event.timestamp,
-          blurhash: (content["info"] as Map?)?["xyz.amorgan.blurhash"],
-        ),
         "m.audio" || "m.file" => Message.file(
           name: content["filename"].toString(),
           size: content["info"]["size"],

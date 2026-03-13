@@ -1,5 +1,4 @@
 import "dart:math";
-
 import "package:cross_cache/cross_cache.dart";
 import "package:flutter/material.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
@@ -21,10 +20,10 @@ import "package:nexus/helpers/extensions/get_headers.dart";
 import "package:nexus/helpers/extensions/show_context_menu.dart";
 import "package:nexus/models/relation_type.dart";
 import "package:nexus/models/requests/report_request.dart";
-import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/widgets/chat_page/chat_box.dart";
 import "package:nexus/widgets/chat_page/html/html.dart";
 import "package:nexus/widgets/chat_page/member_list.dart";
+import "package:nexus/widgets/chat_page/message_wrapper.dart";
 import "package:nexus/widgets/chat_page/room_appbar.dart";
 import "package:nexus/widgets/chat_page/top_widget.dart";
 import "package:nexus/widgets/form_text_input.dart";
@@ -51,37 +50,6 @@ class RoomChat extends HookConsumerWidget {
 
     final theme = Theme.of(context);
     final danger = theme.colorScheme.error;
-
-    Widget getTextWidget(TextMessage message) => Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Html(
-          textStyle: message.metadata?["big"] == true
-              ? TextStyle(fontSize: 32)
-              : null,
-          message.text
-              .replaceAllMapped(
-                RegExp(
-                  "(<a\\b[^>]*>.*?<\\/a>)|(\\bhttps?:\\/\\/[^\\s<]+)",
-                  caseSensitive: false,
-                ),
-                (m) {
-                  // If it's already an <a> tag, leave it unchanged
-                  if (m.group(1) != null) {
-                    return m.group(1)!;
-                  }
-
-                  // Otherwise, wrap the bare URL
-                  final url = m.group(2)!;
-                  return "<a href=\"$url\">$url</a>";
-                },
-              )
-              .replaceAll("\n", "<br class=\"fake-break\"/>"),
-        ),
-        if (message.editedAt != null)
-          Text("(edited)", style: theme.textTheme.labelSmall),
-      ],
-    );
 
     if (room == null || userId == null || room.metadata?.id == null) {
       return Center(
@@ -268,47 +236,6 @@ class RoomChat extends HookConsumerWidget {
                                 globalPosition: details.globalPosition,
                                 children: getMessageOptions(message),
                               ),
-                          onMessageTap:
-                              (
-                                context,
-                                message, {
-                                required details,
-                                required index,
-                              }) {
-                                if (message is ImageMessage) {
-                                  showDialog(
-                                    context: context,
-                                    builder: (_) => LayoutBuilder(
-                                      builder: (context, constraints) => Dialog(
-                                        backgroundColor: Colors.transparent,
-                                        insetPadding: EdgeInsets.all(
-                                          constraints.maxWidth / 100,
-                                        ),
-                                        child: ConstrainedBox(
-                                          constraints: BoxConstraints(
-                                            minWidth: min(
-                                              constraints.maxWidth,
-                                              1000,
-                                            ),
-                                          ),
-                                          child: InteractiveViewer(
-                                            child: Image(
-                                              fit: BoxFit.contain,
-                                              image: CachedNetworkImage(
-                                                message.source,
-                                                ref.watch(
-                                                  CrossCacheController.provider,
-                                                ),
-                                                headers: ref.headers,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                }
-                              },
                           builders: Builders(
                             loadMoreBuilder: (_) => Loading(),
                             chatAnimatedListBuilder: (_, itemBuilder) =>
@@ -432,48 +359,161 @@ class RoomChat extends HookConsumerWidget {
                                   index, {
                                   required bool isSentByMe,
                                   MessageGroupStatus? groupStatus,
-                                }) => Row(
-                                  spacing: 8,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    groupStatus?.isFirst != false
-                                        ? AvatarOrHash(
-                                            Uri.parse(
-                                              message.metadata?["avatarUrl"] ??
-                                                  "",
-                                            ),
-                                            height: 40,
-                                            message.metadata?["displayName"] ??
-                                                "",
-                                          )
-                                        : SizedBox(width: 40),
+                                }) {
+                                  final image =
+                                      message.metadata?["image"]
+                                          as ImageMessage?;
+                                  return MessageWrapper(
+                                    message,
                                     Column(
+                                      spacing: 4,
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        if (groupStatus?.isFirst != false)
-                                          Text(
-                                            message.metadata?["displayName"] ??
-                                                message.authorId,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .titleMedium
-                                                ?.copyWith(
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                          ),
                                         FlyerChatTextMessage(
-                                          showStatus: false,
-                                          customWidget: getTextWidget(message),
-                                          message: message,
                                           showTime: true,
+                                          showStatus: false,
+                                          customWidget: Column(
+                                            spacing: 4,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Html(
+                                                    textStyle:
+                                                        message.metadata?["big"] ==
+                                                            true
+                                                        ? TextStyle(
+                                                            fontSize: 32,
+                                                          )
+                                                        : null,
+                                                    message.text
+                                                        .replaceAllMapped(
+                                                          RegExp(
+                                                            "(<a\\b[^>]*>.*?<\\/a>)|(\\bhttps?:\\/\\/[^\\s<]+)",
+                                                            caseSensitive:
+                                                                false,
+                                                          ),
+                                                          (m) {
+                                                            // If it's already an <a> tag, leave it unchanged
+                                                            if (m.group(1) !=
+                                                                null) {
+                                                              return m.group(
+                                                                1,
+                                                              )!;
+                                                            }
+
+                                                            // Otherwise, wrap the bare URL
+                                                            final url = m.group(
+                                                              2,
+                                                            )!;
+                                                            return "<a href=\"$url\">$url</a>";
+                                                          },
+                                                        )
+                                                        .replaceAll(
+                                                          "\n",
+                                                          "<br class=\"fake-break\"/>",
+                                                        ),
+                                                  ),
+                                                  if (message.editedAt != null)
+                                                    Text(
+                                                      "(edited)",
+                                                      style: theme
+                                                          .textTheme
+                                                          .labelSmall,
+                                                    ),
+                                                ],
+                                              ),
+                                              if (image != null)
+                                                InkWell(
+                                                  onTap: () => showDialog(
+                                                    context: context,
+                                                    builder: (_) => LayoutBuilder(
+                                                      builder: (context, constraints) => Dialog(
+                                                        backgroundColor:
+                                                            Colors.transparent,
+                                                        insetPadding:
+                                                            EdgeInsets.all(
+                                                              constraints
+                                                                      .maxWidth /
+                                                                  100,
+                                                            ),
+                                                        child: ConstrainedBox(
+                                                          constraints:
+                                                              BoxConstraints(
+                                                                minWidth: min(
+                                                                  constraints
+                                                                      .maxWidth,
+                                                                  1000,
+                                                                ),
+                                                              ),
+                                                          child: InteractiveViewer(
+                                                            child: Image(
+                                                              fit: BoxFit
+                                                                  .contain,
+                                                              image: CachedNetworkImage(
+                                                                image.source,
+                                                                ref.watch(
+                                                                  CrossCacheController
+                                                                      .provider,
+                                                                ),
+                                                                headers:
+                                                                    ref.headers,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  child: FlyerChatImageMessage(
+                                                    customImageProvider:
+                                                        CachedNetworkImage(
+                                                          image.source,
+                                                          ref.watch(
+                                                            CrossCacheController
+                                                                .provider,
+                                                          ),
+                                                          headers: ref.headers,
+                                                        ),
+                                                    errorBuilder:
+                                                        (
+                                                          context,
+                                                          error,
+                                                          stackTrace,
+                                                        ) => Center(
+                                                          child: Text(
+                                                            "Image Failed to Load",
+                                                            style: TextStyle(
+                                                              color: Theme.of(
+                                                                context,
+                                                              ).colorScheme.error,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                    message: image,
+                                                    index: index,
+                                                  ),
+                                                ),
+                                            ],
+                                          ),
+                                          topWidget: TopWidget(
+                                            message,
+                                            groupStatus: groupStatus,
+                                            onTapReply:
+                                                notifier.scrollToMessage,
+                                          ),
+                                          message: message,
                                           index: index,
                                         ),
                                       ],
                                     ),
-                                  ],
-                                ),
+                                    groupStatus,
+                                  );
+                                },
                             linkPreviewBuilder: (_, message, isSentByMe) =>
                                 LinkPreview(
                                   text: message.text,
@@ -493,80 +533,6 @@ class RoomChat extends HookConsumerWidget {
                                         ),
                                       ),
                                 ),
-                            imageMessageBuilder:
-                                (
-                                  _,
-                                  message,
-                                  index, {
-                                  required bool isSentByMe,
-                                  MessageGroupStatus? groupStatus,
-                                }) {
-                                  final textMessage =
-                                      message.text?.isNotEmpty == true
-                                      ? TextMessage(
-                                          id: "${message.id}-text",
-                                          authorId: message.authorId,
-                                          text: message.text!,
-                                        )
-                                      : null;
-                                  return Column(
-                                    spacing: 4,
-                                    crossAxisAlignment: isSentByMe
-                                        ? CrossAxisAlignment.end
-                                        : CrossAxisAlignment.start,
-                                    children: [
-                                      SizedBox(height: 12),
-                                      if (textMessage != null)
-                                        FlyerChatTextMessage(
-                                          customWidget: getTextWidget(
-                                            textMessage,
-                                          ),
-                                          topWidget: TopWidget(
-                                            message,
-                                            groupStatus: groupStatus,
-                                            onTapReply:
-                                                notifier.scrollToMessage,
-                                            alwaysShow: true,
-                                          ),
-                                          message: textMessage,
-                                          index: index,
-                                        ),
-                                      FlyerChatImageMessage(
-                                        topWidget:
-                                            message.text?.isNotEmpty == true
-                                            ? null
-                                            : TopWidget(
-                                                message,
-                                                groupStatus: groupStatus,
-                                                onTapReply:
-                                                    notifier.scrollToMessage,
-                                                alwaysShow: true,
-                                              ),
-                                        customImageProvider: CachedNetworkImage(
-                                          message.source,
-                                          ref.watch(
-                                            CrossCacheController.provider,
-                                          ),
-                                          headers: ref.headers,
-                                        ),
-                                        errorBuilder:
-                                            (context, error, stackTrace) =>
-                                                Center(
-                                                  child: Text(
-                                                    "Image Failed to Load",
-                                                    style: TextStyle(
-                                                      color: Theme.of(
-                                                        context,
-                                                      ).colorScheme.error,
-                                                    ),
-                                                  ),
-                                                ),
-                                        message: message,
-                                        index: index,
-                                      ),
-                                    ],
-                                  );
-                                },
                             fileMessageBuilder:
                                 (
                                   _,
@@ -574,22 +540,28 @@ class RoomChat extends HookConsumerWidget {
                                   index, {
                                   required bool isSentByMe,
                                   MessageGroupStatus? groupStatus,
-                                }) => InkWell(
-                                  onTap: () => showDialog(
-                                    context: context,
-                                    builder: (_) => Dialog(
-                                      child: Text("TODO: Download Attachments"),
+                                }) => MessageWrapper(
+                                  message,
+                                  InkWell(
+                                    onTap: () => showDialog(
+                                      context: context,
+                                      builder: (_) => Dialog(
+                                        child: Text(
+                                          "TODO: Download Attachments",
+                                        ),
+                                      ),
+                                    ),
+                                    child: FlyerChatFileMessage(
+                                      topWidget: TopWidget(
+                                        message,
+                                        onTapReply: notifier.scrollToMessage,
+                                        groupStatus: groupStatus,
+                                      ),
+                                      message: message,
+                                      index: index,
                                     ),
                                   ),
-                                  child: FlyerChatFileMessage(
-                                    topWidget: TopWidget(
-                                      message,
-                                      onTapReply: notifier.scrollToMessage,
-                                      groupStatus: groupStatus,
-                                    ),
-                                    message: message,
-                                    index: index,
-                                  ),
+                                  groupStatus,
                                 ),
                             systemMessageBuilder:
                                 (
