@@ -78,16 +78,6 @@ class MessageController extends AsyncNotifier<Message?> {
           ? author?.content["displayname"]
           : event.authorId.substring(1).split(":")[0],
       "txnId": config.event.transactionId,
-      "image": content["msgtype"] == "m.image"
-          ? Message.image(
-              id: "${config.event.eventId}-image",
-              authorId: event.authorId,
-              source: source,
-              replyToMessageId: replyId,
-              deliveredAt: config.event.timestamp,
-              blurhash: (content["info"] as Map?)?["xyz.amorgan.blurhash"],
-            )
-          : null,
     };
 
     if (!ref.mounted) return null;
@@ -138,6 +128,15 @@ class MessageController extends AsyncNotifier<Message?> {
       //   authorId: senderId,
       // ),
       ("m.sticker" || "m.room.message") => switch (content["msgtype"]) {
+        null || "m.image" => Message.image(
+          id: "${config.event.eventId}-image",
+          authorId: event.authorId,
+          source: source,
+          replyToMessageId: replyId,
+          text: asText.text,
+          deliveredAt: config.event.timestamp,
+          blurhash: (content["info"] as Map?)?["xyz.amorgan.blurhash"],
+        ),
         "m.audio" || "m.file" => Message.file(
           name: content["filename"].toString(),
           size: content["info"]["size"],
