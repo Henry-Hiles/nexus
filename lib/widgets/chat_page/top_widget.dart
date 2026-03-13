@@ -27,7 +27,7 @@ class TopWidget extends ConsumerWidget {
     if (replyMessage == null) return SizedBox.shrink();
 
     final smallerText =
-        message is TextMessage && replyMessage.metadata!["body"] != null
+        message is TextMessage && replyMessage.metadata?["body"] != null
         ? replyMessage.metadata!["body"].substring(
             0,
             min(

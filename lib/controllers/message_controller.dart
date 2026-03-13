@@ -133,6 +133,7 @@ class MessageController extends AsyncNotifier<Message?> {
           authorId: event.authorId,
           source: source,
           replyToMessageId: replyId,
+          metadata: metadata,
           text: asText.text,
           deliveredAt: config.event.timestamp,
           blurhash: (content["info"] as Map?)?["xyz.amorgan.blurhash"],
