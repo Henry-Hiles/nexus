@@ -21,6 +21,7 @@ import "package:nexus/helpers/extensions/get_headers.dart";
 import "package:nexus/helpers/extensions/show_context_menu.dart";
 import "package:nexus/models/relation_type.dart";
 import "package:nexus/models/requests/report_request.dart";
+import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/widgets/chat_page/chat_box.dart";
 import "package:nexus/widgets/chat_page/html/html.dart";
 import "package:nexus/widgets/chat_page/member_list.dart";
@@ -431,16 +432,46 @@ class RoomChat extends HookConsumerWidget {
                                   index, {
                                   required bool isSentByMe,
                                   MessageGroupStatus? groupStatus,
-                                }) => FlyerChatTextMessage(
-                                  customWidget: getTextWidget(message),
-                                  topWidget: TopWidget(
-                                    message,
-                                    onTapReply: notifier.scrollToMessage,
-                                    groupStatus: groupStatus,
-                                  ),
-                                  message: message,
-                                  showTime: true,
-                                  index: index,
+                                }) => Row(
+                                  spacing: 8,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    groupStatus?.isFirst != false
+                                        ? AvatarOrHash(
+                                            Uri.parse(
+                                              message.metadata?["avatarUrl"] ??
+                                                  "",
+                                            ),
+                                            height: 40,
+                                            message.metadata?["displayName"] ??
+                                                "",
+                                          )
+                                        : SizedBox(width: 40),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        if (groupStatus?.isFirst != false)
+                                          Text(
+                                            message.metadata?["displayName"] ??
+                                                message.authorId,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleMedium
+                                                ?.copyWith(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                          ),
+                                        FlyerChatTextMessage(
+                                          customWidget: getTextWidget(message),
+                                          message: message,
+                                          showTime: true,
+                                          index: index,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
                             linkPreviewBuilder: (_, message, isSentByMe) =>
                                 LinkPreview(
