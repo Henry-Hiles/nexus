@@ -42,10 +42,6 @@ dependencies:
   flyer_chat_image_message: ^2.2.2
   flyer_chat_system_message: ^2.1.13
   flyer_chat_file_message: ^2.3.1
-  flyer_chat_text_message:
-    git:
-      url: https://github.com/Henry-Hiles/flutter_chat_ui
-      path: packages/flyer_chat_text_message
   flutter_chat_ui:
     git:
       url: https://github.com/Henry-Hiles/flutter_chat_ui

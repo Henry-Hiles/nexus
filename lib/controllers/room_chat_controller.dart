@@ -104,7 +104,7 @@ class RoomChatController extends AsyncNotifier<InMemoryChatController> {
               );
               if (oldMessage == null || message == null || !ref.mounted) return;
 
-              return await updateMessage(
+              return await controller.updateMessage(
                 oldMessage,
                 message.copyWith(
                   id: oldMessage.id,
@@ -224,9 +224,6 @@ class RoomChatController extends AsyncNotifier<InMemoryChatController> {
       index: 0,
     );
   }
-
-  Future<void> updateMessage(Message message, Message newMessage) async =>
-      (await future).updateMessage(message, newMessage);
 
   Future<void> send(
     String message, {

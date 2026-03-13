@@ -4,11 +4,9 @@ import "package:flutter/material.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:flutter_chat_ui/flutter_chat_ui.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
-import "package:flutter_link_previewer/flutter_link_previewer.dart";
 import "package:flyer_chat_file_message/flyer_chat_file_message.dart";
 import "package:flyer_chat_image_message/flyer_chat_image_message.dart";
 import "package:flyer_chat_system_message/flyer_chat_system_message.dart";
-import "package:flyer_chat_text_message/flyer_chat_text_message.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/client_controller.dart";
 import "package:nexus/controllers/client_state_controller.dart";
@@ -21,10 +19,10 @@ import "package:nexus/helpers/extensions/show_context_menu.dart";
 import "package:nexus/models/relation_type.dart";
 import "package:nexus/models/requests/report_request.dart";
 import "package:nexus/widgets/chat_page/chat_box.dart";
-import "package:nexus/widgets/chat_page/html/html.dart";
 import "package:nexus/widgets/chat_page/member_list.dart";
 import "package:nexus/widgets/chat_page/message_wrapper.dart";
 import "package:nexus/widgets/chat_page/room_appbar.dart";
+import "package:nexus/widgets/chat_page/text_message_wrapper.dart";
 import "package:nexus/widgets/chat_page/top_widget.dart";
 import "package:nexus/widgets/form_text_input.dart";
 import "package:nexus/widgets/loading.dart";
@@ -187,6 +185,13 @@ class RoomChat extends HookConsumerWidget {
       ];
     }
 
+    final chatTheme = ChatTheme.fromThemeData(theme).copyWith(
+      colors: ChatColors.fromThemeData(theme).copyWith(
+        primary: theme.colorScheme.primaryContainer,
+        onPrimary: theme.colorScheme.onPrimaryContainer,
+      ),
+    );
+
     return Scaffold(
       appBar: RoomAppbar(
         room,
@@ -208,12 +213,7 @@ class RoomChat extends HookConsumerWidget {
                       .betterWhen(
                         data: (controller) => Chat(
                           currentUserId: userId,
-                          theme: ChatTheme.fromThemeData(theme).copyWith(
-                            colors: ChatColors.fromThemeData(theme).copyWith(
-                              primary: theme.colorScheme.primaryContainer,
-                              onPrimary: theme.colorScheme.onPrimaryContainer,
-                            ),
-                          ),
+                          theme: chatTheme,
                           onMessageSecondaryTap:
                               (
                                 context,
@@ -359,180 +359,123 @@ class RoomChat extends HookConsumerWidget {
                                   index, {
                                   required bool isSentByMe,
                                   MessageGroupStatus? groupStatus,
-                                }) {
-                                  final image =
-                                      message.metadata?["image"]
-                                          as ImageMessage?;
-                                  return MessageWrapper(
+                                }) => MessageWrapper(
+                                  message,
+                                  TextMessageWrapper(
                                     message,
+                                    content: message.text,
+                                    groupStatus: groupStatus,
+                                    onTapReply: notifier.scrollToMessage,
+                                    updateMessage: controller.updateMessage,
+                                    isSentByMe: isSentByMe,
+                                  ),
+
+                                  groupStatus,
+                                ),
+                            imageMessageBuilder:
+                                (
+                                  context,
+                                  message,
+                                  index, {
+                                  required bool isSentByMe,
+                                  MessageGroupStatus? groupStatus,
+                                }) {
+                                  final text =
+                                      message.metadata?["text"] as TextMessage?;
+                                  return MessageWrapper(
+                                    text ?? message,
                                     Column(
                                       spacing: 4,
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        FlyerChatTextMessage(
-                                          showTime: true,
-                                          showStatus: false,
-                                          customWidget: Column(
-                                            spacing: 4,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Html(
-                                                    textStyle:
-                                                        message.metadata?["big"] ==
-                                                            true
-                                                        ? TextStyle(
-                                                            fontSize: 32,
-                                                          )
-                                                        : null,
-                                                    message.text
-                                                        .replaceAllMapped(
-                                                          RegExp(
-                                                            "(<a\\b[^>]*>.*?<\\/a>)|(\\bhttps?:\\/\\/[^\\s<]+)",
-                                                            caseSensitive:
-                                                                false,
+                                        TextMessageWrapper(
+                                          message,
+                                          content: message.text,
+                                          groupStatus: groupStatus,
+                                          onTapReply: notifier.scrollToMessage,
+                                          updateMessage:
+                                              controller.updateMessage,
+                                          isSentByMe: isSentByMe,
+                                          extra: InkWell(
+                                            onTap: () => showDialog(
+                                              context: context,
+                                              builder: (_) => LayoutBuilder(
+                                                builder:
+                                                    (
+                                                      context,
+                                                      constraints,
+                                                    ) => Dialog(
+                                                      backgroundColor:
+                                                          Colors.transparent,
+                                                      insetPadding:
+                                                          EdgeInsets.all(
+                                                            constraints
+                                                                    .maxWidth /
+                                                                100,
                                                           ),
-                                                          (m) {
-                                                            // If it's already an <a> tag, leave it unchanged
-                                                            if (m.group(1) !=
-                                                                null) {
-                                                              return m.group(
-                                                                1,
-                                                              )!;
-                                                            }
-
-                                                            // Otherwise, wrap the bare URL
-                                                            final url = m.group(
-                                                              2,
-                                                            )!;
-                                                            return "<a href=\"$url\">$url</a>";
-                                                          },
-                                                        )
-                                                        .replaceAll(
-                                                          "\n",
-                                                          "<br class=\"fake-break\"/>",
-                                                        ),
-                                                  ),
-                                                  if (message.editedAt != null)
-                                                    Text(
-                                                      "(edited)",
-                                                      style: theme
-                                                          .textTheme
-                                                          .labelSmall,
-                                                    ),
-                                                ],
-                                              ),
-                                              if (image != null)
-                                                InkWell(
-                                                  onTap: () => showDialog(
-                                                    context: context,
-                                                    builder: (_) => LayoutBuilder(
-                                                      builder: (context, constraints) => Dialog(
-                                                        backgroundColor:
-                                                            Colors.transparent,
-                                                        insetPadding:
-                                                            EdgeInsets.all(
-                                                              constraints
-                                                                      .maxWidth /
-                                                                  100,
+                                                      child: ConstrainedBox(
+                                                        constraints:
+                                                            BoxConstraints(
+                                                              minWidth: min(
+                                                                constraints
+                                                                    .maxWidth,
+                                                                1000,
+                                                              ),
                                                             ),
-                                                        child: ConstrainedBox(
-                                                          constraints:
-                                                              BoxConstraints(
-                                                                minWidth: min(
-                                                                  constraints
-                                                                      .maxWidth,
-                                                                  1000,
-                                                                ),
+                                                        child: InteractiveViewer(
+                                                          child: Image(
+                                                            fit: BoxFit.contain,
+                                                            image: CachedNetworkImage(
+                                                              message.source,
+                                                              ref.watch(
+                                                                CrossCacheController
+                                                                    .provider,
                                                               ),
-                                                          child: InteractiveViewer(
-                                                            child: Image(
-                                                              fit: BoxFit
-                                                                  .contain,
-                                                              image: CachedNetworkImage(
-                                                                image.source,
-                                                                ref.watch(
-                                                                  CrossCacheController
-                                                                      .provider,
-                                                                ),
-                                                                headers:
-                                                                    ref.headers,
-                                                              ),
+                                                              headers:
+                                                                  ref.headers,
                                                             ),
                                                           ),
                                                         ),
                                                       ),
                                                     ),
+                                              ),
+                                            ),
+                                            child: FlyerChatImageMessage(
+                                              customImageProvider:
+                                                  CachedNetworkImage(
+                                                    message.source,
+                                                    ref.watch(
+                                                      CrossCacheController
+                                                          .provider,
+                                                    ),
+                                                    headers: ref.headers,
                                                   ),
-                                                  child: FlyerChatImageMessage(
-                                                    customImageProvider:
-                                                        CachedNetworkImage(
-                                                          image.source,
-                                                          ref.watch(
-                                                            CrossCacheController
-                                                                .provider,
-                                                          ),
-                                                          headers: ref.headers,
-                                                        ),
-                                                    errorBuilder:
-                                                        (
+                                              errorBuilder:
+                                                  (
+                                                    context,
+                                                    error,
+                                                    stackTrace,
+                                                  ) => Center(
+                                                    child: Text(
+                                                      "Image Failed to Load",
+                                                      style: TextStyle(
+                                                        color: Theme.of(
                                                           context,
-                                                          error,
-                                                          stackTrace,
-                                                        ) => Center(
-                                                          child: Text(
-                                                            "Image Failed to Load",
-                                                            style: TextStyle(
-                                                              color: Theme.of(
-                                                                context,
-                                                              ).colorScheme.error,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                    message: image,
-                                                    index: index,
+                                                        ).colorScheme.error,
+                                                      ),
+                                                    ),
                                                   ),
-                                                ),
-                                            ],
+                                              message: message,
+                                              index: index,
+                                            ),
                                           ),
-                                          topWidget: TopWidget(
-                                            message,
-                                            groupStatus: groupStatus,
-                                            onTapReply:
-                                                notifier.scrollToMessage,
-                                          ),
-                                          message: message,
-                                          index: index,
                                         ),
                                       ],
                                     ),
                                     groupStatus,
                                   );
                                 },
-                            linkPreviewBuilder: (_, message, isSentByMe) =>
-                                LinkPreview(
-                                  text: message.text,
-                                  backgroundColor: isSentByMe
-                                      ? theme.colorScheme.inversePrimary
-                                      : theme.colorScheme.surfaceContainerLow,
-                                  insidePadding: EdgeInsets.symmetric(
-                                    vertical: 8,
-                                    horizontal: 16,
-                                  ),
-                                  linkPreviewData: message.linkPreviewData,
-                                  onLinkPreviewDataFetched: (linkPreviewData) =>
-                                      notifier.updateMessage(
-                                        message,
-                                        message.copyWith(
-                                          linkPreviewData: linkPreviewData,
-                                        ),
-                                      ),
-                                ),
                             fileMessageBuilder:
                                 (
                                   _,

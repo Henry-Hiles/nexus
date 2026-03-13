@@ -5,11 +5,13 @@ import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/widgets/chat_page/html/quoted.dart";
 
+typedef OnTapReply = void Function(Message message)?;
+
 class TopWidget extends ConsumerWidget {
   final Message message;
   final bool alwaysShow;
   final MessageGroupStatus? groupStatus;
-  final void Function(Message message)? onTapReply;
+  final OnTapReply onTapReply;
   const TopWidget(
     this.message, {
     required this.groupStatus,
