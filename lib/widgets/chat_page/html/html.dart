@@ -51,8 +51,9 @@ class Html extends ConsumerWidget {
 
         "img" =>
           element.attributes["src"] == null
-              ? null
+              ? SizedBox.shrink()
               : InlineCustomWidget(
+                  alignment: PlaceholderAlignment.middle,
                   child: Image.network(
                     Uri.parse(element.attributes["src"]!)
                         .mxcToHttps(
@@ -125,9 +126,7 @@ class Html extends ConsumerWidget {
             .mapTo<MapEntry<String, String>?>(
               (key, value) => switch (key) {
                 "data-mx-color" => MapEntry("color", value),
-
                 "data-mx-bg-color" => MapEntry("background-color", value),
-
                 _ => null,
               },
             )
