@@ -23,6 +23,7 @@ class MessageWrapper extends StatelessWidget {
       Expanded(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: 4,
           children: [
             if (groupStatus?.isFirst != false)
               Text(
