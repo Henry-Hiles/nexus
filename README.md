@@ -29,7 +29,7 @@ A simple and user-friendly Matrix client made with Flutter and the Matrix Dart S
 - [x] Login
     - [x] Username / password auth
     - [ ] OAuth / OIDC
-    - [ ] Improve initial sync experience
+    - [x] Improve initial sync experience
 - [x] Rooms / Spaces
     - [x] Displaying and choosing
     - [x] Reading, showing unread
