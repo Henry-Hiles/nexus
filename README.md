@@ -18,6 +18,7 @@ A simple and user-friendly Matrix client made with Flutter and the Matrix Dart S
 - [ ] New logo
 - [ ] Make context menus appear as bottom sheets on mobile
 - [x] Move from the Dart SDK to the Gomuks SDK with Dart bindings: https://git.federated.nexus/Henry-Hiles/nexus/pulls/2
+    - [ ] Allow using remote gomuks over websocket
 - [ ] Platform Support
     - [x] Linux
     - [x] Windows
