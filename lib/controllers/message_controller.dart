@@ -66,6 +66,7 @@ class MessageController extends AsyncNotifier<Message?> {
             ),
           ).future,
         ),
+      "flashing": false,
       "timelineId": event.timelineRowId,
       "big": event.localContent?.bigEmoji == true,
       "eventType": type,

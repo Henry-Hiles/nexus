@@ -259,18 +259,13 @@ class RoomChat extends HookConsumerWidget {
                                   index, {
                                   required bool isSentByMe,
                                   MessageGroupStatus? groupStatus,
-                                }) => MessageWrapper(
+                                }) => TextMessageWrapper(
                                   message,
-                                  TextMessageWrapper(
-                                    message,
-                                    content: message.text,
-                                    groupStatus: groupStatus,
-                                    onTapReply: notifier.scrollToMessage,
-                                    updateMessage: controller.updateMessage,
-                                    isSentByMe: isSentByMe,
-                                  ),
-
-                                  groupStatus,
+                                  content: message.text,
+                                  groupStatus: groupStatus,
+                                  onTapReply: notifier.scrollToMessage,
+                                  updateMessage: controller.updateMessage,
+                                  isSentByMe: isSentByMe,
                                 ),
 
                             imageMessageBuilder:

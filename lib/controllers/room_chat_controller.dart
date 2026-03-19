@@ -1,3 +1,5 @@
+import "dart:async";
+
 import "package:collection/collection.dart";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
@@ -282,6 +284,16 @@ class RoomChatController extends AsyncNotifier<InMemoryChatController> {
 
   Future<void> scrollToMessage(Message message) async {
     final controller = await future;
+    Future<void> setFlashing(bool flashing) => controller.updateMessage(
+      message,
+      message.copyWith(
+        metadata: {...(message.metadata ?? {}), "flashing": flashing},
+      ),
+    );
+
+    await setFlashing(true);
+    Timer(Duration(seconds: 1), () => setFlashing(false));
+
     return await controller.scrollToMessage(message.id);
   }
 
