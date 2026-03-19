@@ -1,13 +1,15 @@
 import "package:flutter/material.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:flutter_link_previewer/flutter_link_previewer.dart";
+import "package:nexus/models/room.dart";
 import "package:nexus/widgets/chat_page/html/html.dart";
 import "package:nexus/widgets/chat_page/message_wrapper.dart";
-import "package:nexus/widgets/chat_page/top_widget.dart";
+import "package:nexus/widgets/chat_page/reply_widget.dart";
 
 class TextMessageWrapper extends StatelessWidget {
   final Message message;
   final String? content;
+  final Room room;
   final MessageGroupStatus? groupStatus;
   final Future<void> Function(Message oldMessage, Message newMessage)
   updateMessage;
@@ -19,6 +21,7 @@ class TextMessageWrapper extends StatelessWidget {
     this.message, {
     this.content,
     this.onTapReply,
+    required this.room,
     required this.updateMessage,
     required this.groupStatus,
     required this.isSentByMe,
@@ -46,8 +49,9 @@ class TextMessageWrapper extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              TopWidget(
+              ReplyWidget(
                 message,
+                room: room,
                 groupStatus: groupStatus,
                 onTapReply: onTapReply,
               ),

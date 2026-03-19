@@ -19,7 +19,7 @@ import "package:nexus/widgets/chat_page/member_list.dart";
 import "package:nexus/widgets/chat_page/message_wrapper.dart";
 import "package:nexus/widgets/chat_page/room_appbar.dart";
 import "package:nexus/widgets/chat_page/text_message_wrapper.dart";
-import "package:nexus/widgets/chat_page/top_widget.dart";
+import "package:nexus/widgets/chat_page/reply_widget.dart";
 import "package:nexus/widgets/form_text_input.dart";
 import "package:nexus/widgets/loading.dart";
 // import "package:dynamic_polls/dynamic_polls.dart";
@@ -260,6 +260,7 @@ class RoomChat extends HookConsumerWidget {
                                   required bool isSentByMe,
                                   MessageGroupStatus? groupStatus,
                                 }) => TextMessageWrapper(
+                                  room: room,
                                   message,
                                   content: message.text,
                                   groupStatus: groupStatus,
@@ -277,6 +278,7 @@ class RoomChat extends HookConsumerWidget {
                                   MessageGroupStatus? groupStatus,
                                 }) => TextMessageWrapper(
                                   message,
+                                  room: room,
                                   content: message.text,
                                   groupStatus: groupStatus,
                                   onTapReply: notifier.scrollToMessage,
@@ -307,7 +309,8 @@ class RoomChat extends HookConsumerWidget {
                                       ),
                                     ),
                                     child: FlyerChatFileMessage(
-                                      topWidget: TopWidget(
+                                      topWidget: ReplyWidget(
+                                        room: room,
                                         message,
                                         onTapReply: notifier.scrollToMessage,
                                         groupStatus: groupStatus,

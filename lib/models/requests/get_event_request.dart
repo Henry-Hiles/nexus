@@ -18,6 +18,15 @@ abstract class GetEventRequest with _$GetEventRequest {
     "unredact": unredact,
   };
 
+  @override
+  bool operator ==(Object other) =>
+      other.runtimeType == runtimeType &&
+      other is GetEventRequest &&
+      other.eventId == eventId;
+
+  @override
+  int get hashCode => Object.hash(runtimeType, eventId);
+
   factory GetEventRequest.fromJson(Map<String, Object?> json) =>
       _$GetEventRequestFromJson(json);
 }

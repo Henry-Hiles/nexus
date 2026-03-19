@@ -1,12 +1,10 @@
 import "package:collection/collection.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
-import "package:nexus/controllers/client_controller.dart";
 import "package:nexus/controllers/client_state_controller.dart";
 import "package:nexus/controllers/members_controller.dart";
 import "package:nexus/helpers/extensions/mxc_to_https.dart";
 import "package:nexus/models/message_config.dart";
-import "package:nexus/models/requests/get_event_request.dart";
 
 class MessageController extends AsyncNotifier<Message?> {
   final MessageConfig config;
@@ -18,7 +16,6 @@ class MessageController extends AsyncNotifier<Message?> {
       if (config.event.relationType == "m.replace" && !config.includeEdits) {
         return null;
       }
-      final client = ref.watch(ClientController.provider.notifier);
 
       if (!ref.mounted) return null;
       final event = config.event.lastEditRowId == null
@@ -28,17 +25,9 @@ class MessageController extends AsyncNotifier<Message?> {
                 ) ??
                 config.event;
 
-      final replyId =
-          config.event.content["m.relates_to"]?["m.in_reply_to"]?["event_id"];
-      final replyEvent = replyId == null
-          ? null
-          : await client
-                .getEvent(GetEventRequest(room: config.room, eventId: replyId))
-                .onError((_, _) => null);
-
       if (!ref.mounted) return null;
 
-      final members = ref.watch(MembersController.provider(config.room));
+      final members = ref.read(MembersController.provider(config.room));
       final author = members.firstWhereOrNull(
         (member) => member.stateKey == event.authorId,
       );
@@ -59,16 +48,6 @@ class MessageController extends AsyncNotifier<Message?> {
         "body": config.event.redactedBy == null
             ? (newContent?["body"] ?? content["body"] ?? "")
             : "Deleted Message",
-        if (replyEvent != null)
-          "reply": await ref.watch(
-            MessageController.provider(
-              MessageConfig(
-                event: replyEvent,
-                room: config.room,
-                alwaysReturn: true,
-              ),
-            ).future,
-          ),
         "flashing": false,
         "timelineId": event.timelineRowId,
         "big": event.localContent?.bigEmoji == true,
@@ -101,6 +80,9 @@ class MessageController extends AsyncNotifier<Message?> {
       // final match = Uri.tryParse(
       //   RegExp(regexLink, caseSensitive: false).firstMatch(body)?.group(0) ?? "",
       // );
+
+      final replyId =
+          config.event.content["m.relates_to"]?["m.in_reply_to"]?["event_id"];
 
       final asText =
           Message.text(

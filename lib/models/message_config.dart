@@ -6,12 +6,22 @@ part "message_config.g.dart";
 
 @freezed
 abstract class MessageConfig with _$MessageConfig {
+  const MessageConfig._();
   const factory MessageConfig({
     @Default(false) bool alwaysReturn,
     @Default(false) bool includeEdits,
     required Room room,
     required Event event,
   }) = _MessageConfig;
+
+  @override
+  bool operator ==(Object other) =>
+      other.runtimeType == runtimeType &&
+      other is MessageConfig &&
+      other.event.eventId == event.eventId;
+
+  @override
+  int get hashCode => Object.hash(runtimeType, event.eventId);
 
   factory MessageConfig.fromJson(Map<String, Object?> json) =>
       _$MessageConfigFromJson(json);
