@@ -275,28 +275,17 @@ class RoomChat extends HookConsumerWidget {
                                   index, {
                                   required bool isSentByMe,
                                   MessageGroupStatus? groupStatus,
-                                }) => MessageWrapper(
+                                }) => TextMessageWrapper(
                                   message,
-                                  Column(
-                                    spacing: 4,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      TextMessageWrapper(
-                                        message,
-                                        content: message.text,
-                                        groupStatus: groupStatus,
-                                        onTapReply: notifier.scrollToMessage,
-                                        updateMessage: controller.updateMessage,
-                                        isSentByMe: isSentByMe,
-                                        extra: ExpandableImageMessage(
-                                          message,
-                                          index: index,
-                                        ),
-                                      ),
-                                    ],
+                                  content: message.text,
+                                  groupStatus: groupStatus,
+                                  onTapReply: notifier.scrollToMessage,
+                                  updateMessage: controller.updateMessage,
+                                  isSentByMe: isSentByMe,
+                                  extra: ExpandableImageMessage(
+                                    message,
+                                    index: index,
                                   ),
-                                  groupStatus,
                                 ),
 
                             fileMessageBuilder:
