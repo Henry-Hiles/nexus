@@ -68,6 +68,8 @@ A simple and user-friendly Matrix client made with Flutter and the Matrix Dart S
         - [x] Replies
             - [x] Viewing
             - [ ] Jump to original message
+                - [x] In loaded timeline
+                - [ ] Out of loaded timeline
         - [x] Edits
         - [x] Attachments
             - [x] Unencrypted
@@ -101,8 +103,6 @@ A simple and user-friendly Matrix client made with Flutter and the Matrix Dart S
 - [ ] Notifications using UnifiedPush
 - [ ] Group calls using [MSC4195](https://github.com/matrix-org/matrix-spec-proposals/pull/4195)
 - [ ] Invites
-    - [ ] Viewing / accepting
-    - [ ] Spam filtering
 - [ ] Settings
     - [ ] Light/Dark mode
     - [ ] SSD or CSD
