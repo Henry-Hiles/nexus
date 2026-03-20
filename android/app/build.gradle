@@ -39,6 +39,11 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
+    kotlinOptions {
+        // do we want to update.. eventually?
+        jvmTarget = "17"
+    }
+
     defaultConfig {
         applicationId = "nexus.federated.Nexus"
         minSdk = 29
@@ -50,7 +55,8 @@ android {
 	signingConfigs {
 		release {
 			keyAlias "key"
-			storeFile keystoreProperties['path'] ? file(keystoreProperties['path']) : file(System.getenv("KEYSTORE_PATH"))
+			def storePath = keystoreProperties['path'] ?: System.getenv("KEYSTORE_PATH")
+			storeFile storePath ? file(storePath) : null
 			keyPassword keystoreProperties['password'] ?: System.getenv("KEYSTORE_PASSWORD")
 			storePassword keystoreProperties['password'] ?: System.getenv("KEYSTORE_PASSWORD")
 		}

@@ -33,7 +33,6 @@
           _module.args.pkgs = import nixpkgs {
             inherit system;
             config = {
-              permittedInsecurePackages = [ "olm-3.2.16" ];
               android_sdk.accept_license = true;
               allowUnfree = true;
             };
@@ -43,7 +42,6 @@
             let
               packages = with pkgs; [
                 go
-                olm
                 git
               ];
 

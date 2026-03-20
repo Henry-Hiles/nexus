@@ -59,15 +59,17 @@ void showError(Object error, [StackTrace? stackTrace]) {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await windowManager.ensureInitialized();
-  await windowManager.waitUntilReadyToShow(
-    WindowOptions(titleBarStyle: TitleBarStyle.hidden),
-  );
+  if (Platform.isLinux || Platform.isMacOS || Platform.isWindows) {
+    await windowManager.ensureInitialized();
+    await windowManager.waitUntilReadyToShow(
+      WindowOptions(titleBarStyle: TitleBarStyle.hidden),
+    );
 
-  if (Platform.isLinux) {
-    setWindowMinSize(const Size.square(500));
-  } else {
-    await windowManager.setMinimumSize(Size.square(500));
+    if (Platform.isLinux) {
+      setWindowMinSize(const Size.square(500));
+    } else {
+      await windowManager.setMinimumSize(Size.square(500));
+    }
   }
 
   FlutterError.onError = (FlutterErrorDetails details) =>
