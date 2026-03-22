@@ -40,39 +40,29 @@ class MentionOverlay extends ConsumerWidget {
                               ? members
                               : members.where(
                                   (member) =>
-                                      member.stateKey?.toLowerCase().contains(
+                                      member.userId.toLowerCase().contains(
                                             query.toLowerCase(),
                                           ) ==
                                           true ||
-                                      (member.content["displayname"] as String?)
-                                              ?.toLowerCase()
-                                              .contains(query.toLowerCase()) ==
+                                      member.displayName.toLowerCase().contains(
+                                            query.toLowerCase(),
+                                          ) ==
                                           true,
                                 ))
                           .map(
                             (member) => ListTile(
                               leading: AvatarOrHash(
-                                Uri.tryParse(
-                                  member.content["avatar_url"] ?? "",
-                                ),
-                                member.content["displayname"] ?? "",
+                                member.avatarUrl,
+                                member.displayName,
                               ),
-                              title: Text(
-                                member.content["displayname"] as String? ??
-                                    member.stateKey ??
-                                    "Unknown User",
-                              ),
-                              subtitle: member.stateKey != null
-                                  ? Text(member.stateKey!)
-                                  : null,
+                              title: Text(member.displayName),
+                              subtitle: Text(member.userId),
                               onTap: () => addTag(
-                                id: "[@${member.content["displayname"]}](https://matrix.to/#/${member.stateKey})",
-                                name:
-                                    member.stateKey
-                                        ?.substring(1)
-                                        .split(":")
-                                        .first ??
-                                    "Unknown User",
+                                id: "[@${member.displayName}](https://matrix.to/#/${member.userId})",
+                                name: member.userId
+                                    .substring(1)
+                                    .split(":")
+                                    .first,
                               ),
                             ),
                           )

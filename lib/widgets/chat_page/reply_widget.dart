@@ -1,15 +1,15 @@
-import "dart:math";
 import "package:flutter/material.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/event_controller.dart";
 import "package:nexus/controllers/message_controller.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
-import "package:nexus/models/message_config.dart";
+import "package:nexus/models/configs/message_config.dart";
 import "package:nexus/models/requests/get_event_request.dart";
 import "package:nexus/models/room.dart";
-import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/widgets/chat_page/html/quoted.dart";
+import "package:nexus/widgets/chat_page/lazy_loading/message_avatar.dart";
+import "package:nexus/widgets/chat_page/lazy_loading/message_displayname.dart";
 
 typedef OnTapReply = void Function(Message message)?;
 
@@ -61,73 +61,28 @@ class ReplyWidget extends ConsumerWidget {
                                   return SizedBox.shrink();
                                 }
 
-                                final smallerText =
-                                    message is TextMessage &&
-                                        replyMessage.metadata?["body"] != null
-                                    ? replyMessage.metadata!["body"].substring(
-                                        0,
-                                        min(
-                                          max(
-                                            max(
-                                              (message as TextMessage)
-                                                      .text
-                                                      .length -
-                                                  (replyMessage
-                                                              .metadata?["displayName"]
-                                                          as String)
-                                                      .length -
-                                                  5,
-                                              message
-                                                  .metadata?["displayName"]
-                                                  .length,
-                                            ),
-                                            5,
-                                          ),
-                                          replyMessage.metadata!["body"].length,
-                                        ),
-                                      )
-                                    : null;
-                                final replyText =
-                                    (smallerText == null ||
-                                        smallerText.length ==
-                                            replyMessage
-                                                .metadata!["body"]
-                                                .length)
-                                    ? replyMessage.metadata!["body"]
-                                    : "$smallerText...";
-
                                 return InkWell(
                                   onTap: () => onTapReply?.call(replyMessage),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     spacing: 8,
                                     children: [
-                                      AvatarOrHash(
-                                        Uri.tryParse(
-                                          replyMessage.metadata?["avatarUrl"] ??
-                                              "",
-                                        ),
-                                        replyMessage.metadata?["displayName"] ??
-                                            "",
-                                        height: 16,
-                                      ),
+                                      MessageAvatar(message, room),
                                       Flexible(
-                                        child: Text(
-                                          replyMessage
-                                                  .metadata?["displayName"] ??
-                                              replyMessage.authorId,
+                                        child: MessageDisplayname(
+                                          replyMessage,
+                                          room,
                                           style: Theme.of(context)
                                               .textTheme
                                               .labelMedium
                                               ?.copyWith(
                                                 fontWeight: FontWeight.bold,
                                               ),
-                                          overflow: TextOverflow.ellipsis,
                                         ),
                                       ),
                                       Flexible(
                                         child: Text(
-                                          replyText,
+                                          replyMessage.metadata!["body"],
                                           overflow: TextOverflow.ellipsis,
                                           style: Theme.of(
                                             context,

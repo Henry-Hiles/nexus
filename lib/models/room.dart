@@ -18,6 +18,7 @@ abstract class Room with _$Room {
     @Default(IMap.empty()) IMap<String, IList<ReadReceipt>> receipts,
     @Default(false) bool dismissNotifications,
     @Default(true) bool hasMore,
+    @Default(false) bool hasFetchedMembers,
     // required IList<Notification> notifications,
   }) = _Room;
 

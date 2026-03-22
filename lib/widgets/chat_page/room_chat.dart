@@ -320,6 +320,7 @@ class RoomChat extends HookConsumerWidget {
                                     ),
                                   ),
                                   groupStatus,
+                                  room,
                                 ),
 
                             systemMessageBuilder:

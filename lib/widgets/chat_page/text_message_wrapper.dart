@@ -109,6 +109,7 @@ class TextMessageWrapper extends StatelessWidget {
         ),
       ),
       groupStatus,
+      room,
     );
   }
 }

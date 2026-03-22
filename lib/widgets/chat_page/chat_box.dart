@@ -86,10 +86,11 @@ class ChatBox extends HookConsumerWidget {
           child: Column(
             children: [
               RelationPreview(
+                relatedMessage,
+                room: room,
                 shouldMention: shouldMention.value,
                 toggleShouldMention: () =>
                     shouldMention.value = !shouldMention.value,
-                relatedMessage: relatedMessage,
                 relationType: relationType,
                 onDismiss: onDismiss,
               ),

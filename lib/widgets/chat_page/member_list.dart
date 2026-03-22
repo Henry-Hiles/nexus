@@ -36,18 +36,9 @@ class MemberList extends ConsumerWidget {
                 builder: (context) =>
                     Dialog(child: Text("TODO: Open member popover")),
               ),
-              leading: AvatarOrHash(
-                Uri.tryParse(member.content["avatar_url"] ?? ""),
-                member.content["displayname"].toString(),
-              ),
-              title: Text(
-                member.content["displayname"].toString(),
-                overflow: TextOverflow.ellipsis,
-              ),
-              subtitle: Text(
-                member.stateKey ?? "Unknown User",
-                overflow: TextOverflow.ellipsis,
-              ),
+              leading: AvatarOrHash(member.avatarUrl, member.displayName),
+              title: Text(member.displayName, overflow: TextOverflow.ellipsis),
+              subtitle: Text(member.userId, overflow: TextOverflow.ellipsis),
             ),
           ),
         ],
