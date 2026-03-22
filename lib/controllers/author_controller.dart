@@ -12,8 +12,8 @@ class AuthorController extends AsyncNotifier<Membership> {
 
   @override
   Future<Membership> build() async {
-    var member = ref.watch(
-      MembersController.provider(config.room).select(
+    var member = await ref.watch(
+      MembersController.provider(config.room).selectAsync(
         (value) => value.firstWhereOrNull(
           (membership) => membership.userId == config.message.authorId,
         ),

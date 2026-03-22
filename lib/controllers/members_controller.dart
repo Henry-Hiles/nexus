@@ -7,47 +7,35 @@ import "package:nexus/models/membership.dart";
 import "package:nexus/models/requests/get_room_state_request.dart";
 import "package:nexus/models/room.dart";
 
-class MembersController extends Notifier<IList<Membership>> {
+class MembersController extends AsyncNotifier<IList<Membership>> {
   final Room room;
   MembersController(this.room);
 
   @override
-  IList<Membership> build() {
-    IList<Membership> membersFromState(IList<Event> members) => members.nonNulls
+  Future<IList<Membership>> build() async {
+    if (room.metadata == null) return const IList.empty();
+
+    final state = await ref
+        .watch(ClientController.provider.notifier)
+        .getRoomState(
+          GetRoomStateRequest(
+            roomId: room.metadata!.id,
+            fetchMembers: room.metadata!.hasMemberList == false,
+            includeMembers: true,
+          ),
+        );
+
+    return state.nonNulls
         .where((member) => member.content["membership"] == "join")
         .map(
           (membership) =>
               Membership.fromContent(membership.content, membership.stateKey!),
         )
         .toIList();
-
-    if (room.metadata != null) {
-      ref
-          .watch(ClientController.provider.notifier)
-          .getRoomState(
-            GetRoomStateRequest(
-              roomId: room.metadata!.id,
-              fetchMembers: room.metadata!.hasMemberList == false,
-              includeMembers: true,
-            ),
-          )
-          .then((value) => state = membersFromState(value));
-    }
-
-    return membersFromState(
-      (room.state["m.room.members"]?.values ?? [])
-          .map(
-            (eventRowId) => room.events.firstWhereOrNull(
-              (event) => event.rowId == eventRowId,
-            ),
-          )
-          .nonNulls
-          .toIList(),
-    );
   }
 
   static final provider =
-      NotifierProvider.family<MembersController, IList<Membership>, Room>(
+      AsyncNotifierProvider.family<MembersController, IList<Membership>, Room>(
         MembersController.new,
       );
 }
