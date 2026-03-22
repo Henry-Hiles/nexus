@@ -3,7 +3,7 @@ import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:flutter_link_previewer/flutter_link_previewer.dart";
 import "package:nexus/models/room.dart";
 import "package:nexus/widgets/chat_page/html/html.dart";
-import "package:nexus/widgets/chat_page/message_wrapper.dart";
+import "package:nexus/widgets/chat_page/wrappers/message_wrapper.dart";
 import "package:nexus/widgets/chat_page/reply_widget.dart";
 
 class TextMessageWrapper extends StatelessWidget {

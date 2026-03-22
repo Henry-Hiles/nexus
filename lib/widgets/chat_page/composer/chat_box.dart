@@ -8,8 +8,8 @@ import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/room_chat_controller.dart";
 import "package:nexus/models/relation_type.dart";
 import "package:nexus/models/room.dart";
-import "package:nexus/widgets/chat_page/mention_overlay.dart";
-import "package:nexus/widgets/chat_page/relation_preview.dart";
+import "package:nexus/widgets/chat_page/composer/mention_overlay.dart";
+import "package:nexus/widgets/chat_page/composer/relation_preview.dart";
 
 class ChatBox extends HookConsumerWidget {
   final Message? relatedMessage;
