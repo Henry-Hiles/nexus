@@ -36,6 +36,7 @@ class RoomsController extends Notifier<IMap<String, Room>> {
       return acc.add(
         roomId,
         existing?.copyWith(
+              hasMore: incoming.hasMore,
               metadata: incoming.metadata ?? existing.metadata,
               events: events!,
               state: incoming.state.entries.fold(

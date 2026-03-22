@@ -67,7 +67,7 @@ class ReplyWidget extends ConsumerWidget {
                                     mainAxisSize: MainAxisSize.min,
                                     spacing: 8,
                                     children: [
-                                      MessageAvatar(message, room),
+                                      MessageAvatar(replyMessage, room),
                                       Flexible(
                                         child: MessageDisplayname(
                                           replyMessage,

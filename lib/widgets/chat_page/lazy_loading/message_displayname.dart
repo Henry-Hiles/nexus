@@ -1,9 +1,9 @@
 import "package:flutter/widgets.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
-import "package:nexus/controllers/member_controller.dart";
+import "package:nexus/controllers/author_controller.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
-import "package:nexus/models/configs/member_config.dart";
+import "package:nexus/models/configs/author_config.dart";
 import "package:nexus/models/room.dart";
 
 class MessageDisplayname extends ConsumerWidget {
@@ -15,13 +15,11 @@ class MessageDisplayname extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => ref
       .watch(
-        MemberController.provider(
-          MemberConfig(room: room, userId: message.authorId),
-        ),
+        AuthorController.provider(AuthorConfig(room: room, message: message)),
       )
       .betterWhen(
         data: (membership) => Text(
-          membership.displayName,
+          "${membership.displayName} ${message.metadata?["pmp"] == null ? "" : "(via ${message.authorId})"}",
           style: style,
           overflow: TextOverflow.ellipsis,
         ),
