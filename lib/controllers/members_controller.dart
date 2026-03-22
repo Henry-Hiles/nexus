@@ -1,8 +1,6 @@
-import "package:collection/collection.dart";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client_controller.dart";
-import "package:nexus/models/event.dart";
 import "package:nexus/models/membership.dart";
 import "package:nexus/models/requests/get_room_state_request.dart";
 import "package:nexus/models/room.dart";
