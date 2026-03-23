@@ -21,7 +21,6 @@ import "package:nexus/widgets/chat_page/room_appbar.dart";
 import "package:nexus/widgets/chat_page/wrappers/text_message_wrapper.dart";
 import "package:nexus/widgets/chat_page/reply_widget.dart";
 import "package:nexus/widgets/form_text_input.dart";
-import "package:nexus/widgets/loading.dart";
 // import "package:dynamic_polls/dynamic_polls.dart";
 
 class RoomChat extends HookConsumerWidget {
@@ -233,7 +232,7 @@ class RoomChat extends HookConsumerWidget {
                                 children: getMessageOptions(message),
                               ),
                           builders: Builders(
-                            loadMoreBuilder: (_) => Loading(),
+                            loadMoreBuilder: (_) => SizedBox.shrink(),
 
                             chatAnimatedListBuilder: (_, itemBuilder) =>
                                 ChatAnimatedList(
