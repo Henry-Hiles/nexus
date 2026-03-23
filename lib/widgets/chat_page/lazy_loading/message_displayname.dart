@@ -23,6 +23,6 @@ class MessageDisplayname extends ConsumerWidget {
           style: style,
           overflow: TextOverflow.ellipsis,
         ),
-        loading: SizedBox.shrink,
+        loading: () => Text(""),
       );
 }
