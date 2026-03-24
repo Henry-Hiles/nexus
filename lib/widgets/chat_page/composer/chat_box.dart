@@ -68,7 +68,7 @@ class ChatBox extends HookConsumerWidget {
 
         return KeyEventResult.ignored;
       },
-    )..requestFocus();
+    );
 
     final style = TextStyle(
       color: theme.colorScheme.primary,
@@ -156,7 +156,6 @@ class ChatBox extends HookConsumerWidget {
                           ),
                           controller: controller.value,
                           key: key,
-                          autofocus: true,
                           focusNode: node,
                         ),
                       ),
