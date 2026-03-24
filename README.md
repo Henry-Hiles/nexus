@@ -138,12 +138,12 @@ cd nexus
 
 #### Linux
 
-- With Nix: Either use direnv, or `nix flake develop`
+- With Nix: Either use direnv and `direnv allow`, or `nix flake develop`
 - Without Nix: Install Flutter, Go, Olm, Git, Clang, and GLibc.
 
 #### Windows / MacOS
 
-I don't really know. You will need Flutter, Git, Olm, Go, and Visual Studio tools, and otherwise I guess just keep installing stuff until there aren't any errors. I will look into this sometimeTM.
+I don't really know. You will need Flutter, Git, Go, and Visual Studio tools, and otherwise I guess just keep installing stuff until there aren't any errors. I will look into this sometimeTM.
 
 ### Set up Flutter
 
