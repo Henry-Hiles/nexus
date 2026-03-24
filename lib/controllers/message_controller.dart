@@ -2,9 +2,8 @@ import "package:collection/collection.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client_state_controller.dart";
-import "package:nexus/controllers/members_controller.dart";
 import "package:nexus/helpers/extensions/mxc_to_https.dart";
-import "package:nexus/models/message_config.dart";
+import "package:nexus/models/configs/message_config.dart";
 
 class MessageController extends AsyncNotifier<Message?> {
   final MessageConfig config;
@@ -27,12 +26,6 @@ class MessageController extends AsyncNotifier<Message?> {
 
       if (!ref.mounted) return null;
 
-      final members = ref.read(MembersController.provider(config.room));
-      final author = members.firstWhereOrNull(
-        (member) => member.stateKey == event.authorId,
-      );
-      if (!ref.mounted) return null;
-
       final content = (event.decrypted ?? event.content);
       final type = (config.event.decryptedType ?? config.event.type);
       final newContent = content["m.new_content"] as Map?;
@@ -52,14 +45,11 @@ class MessageController extends AsyncNotifier<Message?> {
         "timelineId": event.timelineRowId,
         "big": event.localContent?.bigEmoji == true,
         "eventType": type,
-        "avatarUrl": author?.content["avatar_url"],
+        "pmp": event.content["com.beeper.per_message_profile"],
         "editSource":
             event.localContent?.editSource ??
             newContent?["body"] ??
             content["body"],
-        "displayName": author?.content["displayname"]?.isNotEmpty == true
-            ? author?.content["displayname"]
-            : event.authorId.substring(1).split(":")[0],
         "txnId": config.event.transactionId,
       };
 

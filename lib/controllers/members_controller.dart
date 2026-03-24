@@ -1,25 +1,39 @@
-import "package:collection/collection.dart";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
-import "package:nexus/models/event.dart";
+import "package:nexus/controllers/client_controller.dart";
+import "package:nexus/models/membership.dart";
+import "package:nexus/models/requests/get_room_state_request.dart";
 import "package:nexus/models/room.dart";
 
-class MembersController extends Notifier<IList<Event>> {
+class MembersController extends AsyncNotifier<IList<Membership>> {
   final Room room;
   MembersController(this.room);
 
   @override
-  IList<Event> build() => (room.state["m.room.member"]?.values ?? [])
-      .map(
-        (eventRowId) =>
-            room.events.firstWhereOrNull((event) => event.rowId == eventRowId),
-      )
-      .nonNulls
-      .where((member) => member.content["membership"] == "join")
-      .toIList();
+  Future<IList<Membership>> build() async {
+    if (room.metadata == null) return const IList.empty();
 
-  static final provider = NotifierProvider.family
-      .autoDispose<MembersController, IList<Event>, Room>(
+    final state = await ref
+        .watch(ClientController.provider.notifier)
+        .getRoomState(
+          GetRoomStateRequest(
+            roomId: room.metadata!.id,
+            fetchMembers: room.metadata!.hasMemberList == false,
+            includeMembers: true,
+          ),
+        );
+
+    return state.nonNulls
+        .where((member) => member.content["membership"] == "join")
+        .map(
+          (membership) =>
+              Membership.fromContent(membership.content, membership.stateKey!),
+        )
+        .toIList();
+  }
+
+  static final provider =
+      AsyncNotifierProvider.family<MembersController, IList<Membership>, Room>(
         MembersController.new,
       );
 }

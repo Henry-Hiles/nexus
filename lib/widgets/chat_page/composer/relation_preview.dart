@@ -2,7 +2,9 @@ import "package:flutter/material.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/models/relation_type.dart";
-import "package:nexus/widgets/avatar_or_hash.dart";
+import "package:nexus/models/room.dart";
+import "package:nexus/widgets/chat_page/lazy_loading/message_avatar.dart";
+import "package:nexus/widgets/chat_page/lazy_loading/message_displayname.dart";
 
 class RelationPreview extends ConsumerWidget {
   final Message? relatedMessage;
@@ -10,8 +12,11 @@ class RelationPreview extends ConsumerWidget {
   final VoidCallback onDismiss;
   final bool shouldMention;
   final VoidCallback toggleShouldMention;
-  const RelationPreview({
-    required this.relatedMessage,
+  final Room room;
+
+  const RelationPreview(
+    this.relatedMessage, {
+    required this.room,
     required this.relationType,
     required this.onDismiss,
     required this.shouldMention,
@@ -36,14 +41,10 @@ class RelationPreview extends ConsumerWidget {
               "Editing message:",
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
-          AvatarOrHash(
-            Uri.tryParse(relatedMessage?.metadata?["avatarUrl"] ?? ""),
-            relatedMessage?.metadata?["displayName"]?.toString() ?? "",
-            height: 16,
-          ),
-          Text(
-            relatedMessage!.metadata?["displayName"] ??
-                relatedMessage!.authorId,
+          MessageAvatar(relatedMessage!, room),
+          MessageDisplayname(
+            relatedMessage!,
+            room,
             style: theme.textTheme.labelMedium?.copyWith(
               fontWeight: FontWeight.bold,
             ),

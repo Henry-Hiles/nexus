@@ -13,15 +13,14 @@ import "package:nexus/helpers/extensions/better_when.dart";
 import "package:nexus/helpers/extensions/show_context_menu.dart";
 import "package:nexus/models/relation_type.dart";
 import "package:nexus/models/requests/report_request.dart";
-import "package:nexus/widgets/chat_page/chat_box.dart";
+import "package:nexus/widgets/chat_page/composer/chat_box.dart";
 import "package:nexus/widgets/chat_page/image_message.dart";
 import "package:nexus/widgets/chat_page/member_list.dart";
-import "package:nexus/widgets/chat_page/message_wrapper.dart";
+import "package:nexus/widgets/chat_page/wrappers/message_wrapper.dart";
 import "package:nexus/widgets/chat_page/room_appbar.dart";
-import "package:nexus/widgets/chat_page/text_message_wrapper.dart";
+import "package:nexus/widgets/chat_page/wrappers/text_message_wrapper.dart";
 import "package:nexus/widgets/chat_page/reply_widget.dart";
 import "package:nexus/widgets/form_text_input.dart";
-import "package:nexus/widgets/loading.dart";
 // import "package:dynamic_polls/dynamic_polls.dart";
 
 class RoomChat extends HookConsumerWidget {
@@ -233,7 +232,7 @@ class RoomChat extends HookConsumerWidget {
                                 children: getMessageOptions(message),
                               ),
                           builders: Builders(
-                            loadMoreBuilder: (_) => Loading(),
+                            loadMoreBuilder: (_) => SizedBox.shrink(),
 
                             chatAnimatedListBuilder: (_, itemBuilder) =>
                                 ChatAnimatedList(
@@ -320,6 +319,7 @@ class RoomChat extends HookConsumerWidget {
                                     ),
                                   ),
                                   groupStatus,
+                                  room,
                                 ),
 
                             systemMessageBuilder:

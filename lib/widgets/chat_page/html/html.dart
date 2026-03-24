@@ -22,6 +22,10 @@ class Html extends ConsumerWidget {
     html,
     textStyle: textStyle,
     customWidgetBuilder: (element) {
+      if (element.attributes.keys.contains("data-mx-profile-fallback")) {
+        return SizedBox.shrink();
+      }
+
       if (element.attributes.keys.contains("data-mx-spoiler")) {
         return InlineCustomWidget(child: SpoilerText(text: element.text));
       }

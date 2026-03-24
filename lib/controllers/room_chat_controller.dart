@@ -1,5 +1,4 @@
 import "dart:async";
-
 import "package:collection/collection.dart";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
@@ -11,8 +10,8 @@ import "package:nexus/controllers/message_controller.dart";
 import "package:nexus/controllers/messages_controller.dart";
 import "package:nexus/controllers/new_events_controller.dart";
 import "package:nexus/controllers/rooms_controller.dart";
-import "package:nexus/models/message_config.dart";
-import "package:nexus/models/messages_config.dart";
+import "package:nexus/models/configs/messages_config.dart";
+import "package:nexus/models/configs/message_config.dart";
 import "package:nexus/models/requests/get_room_state_request.dart";
 import "package:nexus/models/requests/paginate_request.dart";
 import "package:nexus/models/requests/redact_event_request.dart";
@@ -31,11 +30,7 @@ class RoomChatController extends AsyncNotifier<InMemoryChatController> {
     if (room == null) return InMemoryChatController();
 
     final state = await client.getRoomState(
-      GetRoomStateRequest(
-        roomId: roomId,
-        fetchMembers: room.metadata?.hasMemberList == false,
-        includeMembers: true,
-      ),
+      GetRoomStateRequest(roomId: roomId),
     );
 
     ref
