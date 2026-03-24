@@ -35,15 +35,14 @@ class Appbar extends StatelessWidget implements PreferredSizeWidget {
     }
 
     return GestureDetector(
-      behavior: HitTestBehavior.translucent,
-      onDoubleTap: maximize,
       onPanStart: (_) => windowManager.startDragging(),
       child: AppBar(
         leading: leading,
         backgroundColor: backgroundColor,
         scrolledUnderElevation: scrolledUnderElevation,
         actionsPadding: const EdgeInsets.symmetric(horizontal: 8),
-        title: title,
+        title: IgnorePointer(child: title),
+        flexibleSpace: GestureDetector(onDoubleTap: maximize),
         actions: [
           ...actions,
           if (!(Platform.isAndroid || Platform.isIOS)) ...[
