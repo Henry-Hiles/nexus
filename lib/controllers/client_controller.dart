@@ -1,5 +1,6 @@
 import "dart:developer";
 import "dart:ffi";
+import "dart:io";
 import "dart:isolate";
 import "package:collection/collection.dart";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
@@ -31,11 +32,20 @@ import "package:nexus/models/sync_data.dart";
 import "package:nexus/models/sync_status.dart";
 import "package:nexus/src/third_party/gomuks.g.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
+import "package:path_provider/path_provider.dart";
 
 class ClientController extends AsyncNotifier<int> {
   @override
   Future<int> build() async {
-    final handle = await Isolate.run(GomuksInit);
+    final Pointer<Char> root;
+    if (Platform.isAndroid) {
+      final dir = await getApplicationSupportDirectory();
+      root = "${dir.path}/gomuks".toNativeUtf8().cast();
+    } else {
+      root = nullptr.cast();
+    }
+
+    final handle = GomuksInit(root);
 
     final callable =
         NativeCallable<
