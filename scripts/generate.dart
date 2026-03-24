@@ -12,15 +12,28 @@ void main(List<String> args) async {
   print("Cloning Gomuks repository...");
   final cloneResult = await Process.run("git", [
     "clone",
-    "--depth",
-    "1",
-    "https://mau.dev/gomuks/gomuks",
+    "https://github.com/zachatrocity/gomuks",
     repoDir.path,
   ]);
 
   if (cloneResult.exitCode != 0) {
     throw Exception(
       "Failed to clone Gomuks repository: \n${cloneResult.stderr}",
+    );
+  }
+
+  final commit = await File.fromUri(
+    Platform.script.resolve("../gomuks.lock"),
+  ).readAsString();
+
+  final checkoutResult = await Process.run("git", [
+    "checkout",
+    commit,
+  ], workingDirectory: repoDir.path);
+
+  if (checkoutResult.exitCode != 0) {
+    throw Exception(
+      "Failed to check out locked commit: \n${checkoutResult.stderr}",
     );
   }
 
