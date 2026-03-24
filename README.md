@@ -130,7 +130,7 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
 First, clone and open the repo:
 
 ```sh
-git clone https://git.federated.nexus/Henry-Hiles/nexus
+git clone --recurse-submodules https://git.federated.nexus/Henry-Hiles/nexus
 cd nexus
 ```
 
@@ -153,13 +153,7 @@ Get dependencies:
 flutter pub get
 ```
 
-Get dependencies:
-
-```sh
-flutter pub get
-```
-
-Clone Gomuks and generate bindings:
+Generate Gomuks bindings:
 
 ```sh
 scripts/generate.sh

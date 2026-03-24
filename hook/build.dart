@@ -3,7 +3,7 @@ import "package:hooks/hooks.dart";
 import "package:code_assets/code_assets.dart";
 
 Future<void> main(List<String> args) => build(args, (input, output) async {
-  final buildDir = input.packageRoot.resolve("src/");
+  final buildDir = input.packageRoot.resolve("build/");
   if (await File(buildDir.resolve("lock").toFilePath()).exists()) return;
 
   final codeConfig = input.config.code;
@@ -27,10 +27,11 @@ Future<void> main(List<String> args) => build(args, (input, output) async {
 
       final targetNdkApi = codeConfig.android.targetNdkApi;
 
-      final ndkHome = Platform.environment["ANDROID_NDK_HOME"]
-          ?? Platform.environment["ANDROID_NDK_ROOT"]
-          ?? Platform.environment["NDK_HOME"]
-          ?? await _findNdkFromSdk();
+      final ndkHome =
+          Platform.environment["ANDROID_NDK_HOME"] ??
+          Platform.environment["ANDROID_NDK_ROOT"] ??
+          Platform.environment["NDK_HOME"] ??
+          await _findNdkFromSdk();
       if (ndkHome == null) {
         throw Exception(
           "Could not find Android NDK. Set ANDROID_NDK_HOME or install via sdkmanager.",
@@ -39,34 +40,30 @@ Future<void> main(List<String> args) => build(args, (input, output) async {
 
       final hostTag = _ndkHostTag();
       final (goArch, ccTriple) = _androidArch(targetArch);
-      final cc = "$ndkHome/toolchains/llvm/prebuilt/$hostTag/bin/$ccTriple$targetNdkApi-clang";
+      final cc =
+          "$ndkHome/toolchains/llvm/prebuilt/$hostTag/bin/$ccTriple$targetNdkApi-clang";
 
-      env = {
-        "CGO_ENABLED": "1",
-        "GOOS": "android",
-        "GOARCH": goArch,
-        "CC": cc,
-      };
+      env = {"CGO_ENABLED": "1", "GOOS": "android", "GOARCH": goArch, "CC": cc};
       break;
     default:
       throw UnsupportedError("Unsupported OS: $targetOS");
   }
 
-  final gomuksBuildDir = buildDir.resolve("gomuks/");
-  final libFile = gomuksBuildDir.resolve("${targetArch.name}/$libFileName");
+  final gomuksBuildDir = input.packageRoot.resolve("gomuks/");
+  final libFile = buildDir.resolve("${targetArch.name}/$libFileName");
 
   // goheif/dav1d supported on Android would need to fix upstream
   final tags = targetOS == OS.android ? "goolm,noheic" : "goolm";
 
-  print("Building Gomuks shared library $libFileName (${targetOS.name}/${targetArch.name}) from source...");
-  final result = await Process.run("go", [
-    "build",
-    "-tags", tags,
-    "-o",
-    libFile.path,
-    "-buildmode=c-shared",
-  ], workingDirectory: gomuksBuildDir.resolve("source/pkg/ffi/").toFilePath(),
-     environment: env.isNotEmpty ? env : null);
+  print(
+    "Building Gomuks shared library $libFileName (${targetOS.name}/${targetArch.name}) from source...",
+  );
+  final result = await Process.run(
+    "go",
+    ["build", "-tags", tags, "-o", libFile.path, "-buildmode=c-shared"],
+    workingDirectory: gomuksBuildDir.resolve("pkg/ffi/").toFilePath(),
+    environment: env.isNotEmpty ? env : null,
+  );
 
   if (result.exitCode != 0) {
     throw Exception("Failed to build Gomuks shared library\n${result.stderr}");
@@ -90,8 +87,9 @@ Future<void> main(List<String> args) => build(args, (input, output) async {
 
 Future<String?> _findNdkFromSdk() async {
   // pretty sure this wont be needed with nix, i'll get this removed
-  final androidHome = Platform.environment["ANDROID_HOME"]
-      ?? Platform.environment["ANDROID_SDK_ROOT"];
+  final androidHome =
+      Platform.environment["ANDROID_HOME"] ??
+      Platform.environment["ANDROID_SDK_ROOT"];
   if (androidHome == null) return null;
   final ndkDir = Directory("$androidHome/ndk");
   if (!await ndkDir.exists()) return null;
