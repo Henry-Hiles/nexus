@@ -12,7 +12,8 @@ import "package:nexus/widgets/chat_page/room_menu.dart";
 import "package:nexus/widgets/form_text_input.dart";
 
 class Sidebar extends HookConsumerWidget {
-  const Sidebar({super.key});
+  final bool isDesktop;
+  const Sidebar({required this.isDesktop, super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -220,9 +221,12 @@ class Sidebar extends HookConsumerWidget {
                       ),
                     )
                     .toList(),
-                onDestinationSelected: (value) => selectedRoomIdNotifier.set(
-                  selectedSpace.children[value].metadata?.id,
-                ),
+                onDestinationSelected: (value) {
+                  selectedRoomIdNotifier.set(
+                    selectedSpace.children[value].metadata?.id,
+                  );
+                  if (!isDesktop) Navigator.of(context).pop();
+                },
               ),
             ),
           ),

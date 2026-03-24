@@ -16,7 +16,7 @@ class ChatPage extends ConsumerWidget {
         body: Builder(
           builder: (context) => Row(
             children: [
-              if (isDesktop) Sidebar(),
+              if (isDesktop) Sidebar(isDesktop: isDesktop),
               Expanded(
                 child: RoomChat(
                   isDesktop: isDesktop,
@@ -26,7 +26,7 @@ class ChatPage extends ConsumerWidget {
             ],
           ),
         ),
-        drawer: isDesktop ? null : Sidebar(),
+        drawer: isDesktop ? null : Sidebar(isDesktop: isDesktop),
       );
     },
   );
