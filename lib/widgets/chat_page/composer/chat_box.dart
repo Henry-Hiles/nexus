@@ -1,4 +1,3 @@
-import "dart:io";
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
@@ -55,15 +54,10 @@ class ChatBox extends HookConsumerWidget {
 
     final node = useFocusNode(
       onKeyEvent: (_, event) {
-        if (event is KeyDownEvent && !Platform.isAndroid && !Platform.isIOS) {
-          if (event.logicalKey == LogicalKeyboardKey.enter &&
-              !HardwareKeyboard.instance.isShiftPressed) {
-            send();
-            return KeyEventResult.handled;
-          } else if (event.logicalKey == LogicalKeyboardKey.escape) {
-            onDismiss();
-            return KeyEventResult.handled;
-          }
+        if (event is KeyDownEvent &&
+            event.logicalKey == LogicalKeyboardKey.escape) {
+          onDismiss();
+          return KeyEventResult.handled;
         }
 
         return KeyEventResult.ignored;
@@ -156,6 +150,9 @@ class ChatBox extends HookConsumerWidget {
                           ),
                           controller: controller.value,
                           key: key,
+                          // TODO: Setting for send on enter on / off
+                          onFieldSubmitted: (_) => send(),
+                          textInputAction: TextInputAction.done,
                           focusNode: node,
                         ),
                       ),
