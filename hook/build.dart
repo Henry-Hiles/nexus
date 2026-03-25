@@ -3,9 +3,6 @@ import "package:hooks/hooks.dart";
 import "package:code_assets/code_assets.dart";
 
 Future<void> main(List<String> args) => build(args, (input, output) async {
-  final buildDir = input.packageRoot.resolve("build/");
-  if (await File(buildDir.resolve("lock").toFilePath()).exists()) return;
-
   final codeConfig = input.config.code;
   final targetOS = codeConfig.targetOS;
   final targetArch = codeConfig.targetArchitecture;
@@ -49,6 +46,7 @@ Future<void> main(List<String> args) => build(args, (input, output) async {
       throw UnsupportedError("Unsupported OS: $targetOS");
   }
 
+  final buildDir = input.packageRoot.resolve("build/");
   final gomuksBuildDir = input.packageRoot.resolve("gomuks/");
   final libFile = buildDir.resolve("${targetArch.name}/$libFileName");
 

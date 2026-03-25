@@ -2,6 +2,7 @@
   description = "Nexus Flutter Flake";
 
   inputs = {
+    self.submodules = true;
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     flake-parts.url = "github:hercules-ci/flake-parts";
   };
@@ -38,32 +39,11 @@
             };
           };
 
-          devShells.default =
-            let
-              android = pkgs.callPackage ./nix/android.nix { };
-            in
-            pkgs.mkShell {
-              packages = with pkgs; [
-                go
-                git
-                jdk17
-                flutter
-                android.platform-tools
-              ];
+          packages.default = pkgs.callPackage ./linux/nix/package.nix {
+            src = self;
+          };
 
-              env = rec {
-                LIBCLANG_PATH = lib.makeLibraryPath [ pkgs.libclang ];
-                LD_LIBRARY_PATH = "./build/native_assets/linux:${lib.makeLibraryPath [ pkgs.zlib ]}";
-                CPATH = lib.makeSearchPath "include" [ pkgs.glibc.dev ];
-
-                ANDROID_HOME = "${android.androidsdk}/libexec/android-sdk";
-                ANDROID_SDK_ROOT = ANDROID_HOME;
-                JAVA_HOME = pkgs.jdk17;
-
-                TOOLS = "${ANDROID_HOME}/build-tools/${"36.0.0"}";
-                GRADLE_OPTS = "-Dorg.gradle.project.android.aapt2FromMavenOverride=${TOOLS}/aapt2";
-              };
-            };
+          devShells.default = pkgs.callPackage ./linux/nix/devshell.nix { };
         };
     };
 }
