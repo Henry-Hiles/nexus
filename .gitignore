@@ -39,3 +39,6 @@ key.properties
 
 # Devel Password
 password.txt
+
+# Nix
+/result

@@ -1,9 +1,9 @@
 {
   lib,
+  callPackage,
   libclang,
   flutter,
   src,
-  go,
 }:
 
 flutter.buildFlutterApplication {
@@ -12,15 +12,12 @@ flutter.buildFlutterApplication {
   inherit src;
 
   preBuild = ''
+    cp ${callPackage ./gomuks.nix { inherit src; }}/lib/* .
     packageRunCustom nexus generate source/scripts test
     packageRun build_runner build
   '';
 
   env.LIBCLANG_PATH = lib.makeLibraryPath [ libclang ];
-
-  nativeBuildInputs = [
-    go
-  ];
 
   autoPubspecLock = src + "/pubspec.lock";
 

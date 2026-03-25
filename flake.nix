@@ -39,8 +39,13 @@
             };
           };
 
-          packages.default = pkgs.callPackage ./linux/nix/package.nix {
-            src = self;
+          packages = {
+            default = pkgs.callPackage ./linux/nix/pkg {
+              src = self;
+            };
+            gomuks = pkgs.callPackage ./linux/nix/pkg/gomuks.nix {
+              src = self;
+            };
           };
 
           devShells.default = pkgs.callPackage ./linux/nix/devshell.nix { };

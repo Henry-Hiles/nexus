@@ -46,25 +46,31 @@ Future<void> main(List<String> args) => build(args, (input, output) async {
       throw UnsupportedError("Unsupported OS: $targetOS");
   }
 
-  final buildDir = input.packageRoot.resolve("build/");
+  var libFile = input.packageRoot.resolve(libFileName);
   final gomuksBuildDir = input.packageRoot.resolve("gomuks/");
-  final libFile = buildDir.resolve("${targetArch.name}/$libFileName");
 
-  // goheif/dav1d supported on Android would need to fix upstream
-  final tags = targetOS == OS.android ? "goolm,noheic" : "goolm";
+  if (!(await File.fromUri(libFile).exists())) {
+    final buildDir = input.packageRoot.resolve("build/");
+    libFile = buildDir.resolve("${targetArch.name}/$libFileName");
 
-  print(
-    "Building Gomuks shared library $libFileName (${targetOS.name}/${targetArch.name}) from source...",
-  );
-  final result = await Process.run(
-    "go",
-    ["build", "-tags", tags, "-o", libFile.path, "-buildmode=c-shared"],
-    workingDirectory: gomuksBuildDir.resolve("pkg/ffi/").toFilePath(),
-    environment: env.isNotEmpty ? env : null,
-  );
+    // goheif/dav1d supported on Android would need to fix upstream
+    final tags = targetOS == OS.android ? "goolm,noheic" : "goolm";
 
-  if (result.exitCode != 0) {
-    throw Exception("Failed to build Gomuks shared library\n${result.stderr}");
+    print(
+      "Building Gomuks shared library $libFileName (${targetOS.name}/${targetArch.name}) from source...",
+    );
+    final result = await Process.run(
+      "go",
+      ["build", "-tags", tags, "-o", libFile.path, "-buildmode=c-shared"],
+      workingDirectory: gomuksBuildDir.resolve("pkg/ffi/").toFilePath(),
+      environment: env.isNotEmpty ? env : null,
+    );
+
+    if (result.exitCode != 0) {
+      throw Exception(
+        "Failed to build Gomuks shared library\n${result.stderr}",
+      );
+    }
   }
 
   final generatedFile = "src/third_party/gomuks.g.dart";
