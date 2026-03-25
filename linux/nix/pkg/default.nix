@@ -27,6 +27,11 @@ flutter.buildFlutterApplication {
     flutter_link_previewer = "sha256-4fuag7lRH5cMBFD3fUzj2K541JwXLoz8HF/4OMr3uhk=";
   };
 
+  postInstall = ''
+    install -D assets/icon.svg $out/share/icons/hicolor/scalable/apps/nexus.svg
+    install -D linux/nexus.desktop --target-directory $out/share/applications
+  '';
+
   meta = {
     description = "A simple and user-friendly Matrix client";
     mainProgram = "nexus";
