@@ -24,7 +24,7 @@ buildGoModule (finalAttrs: {
   installPhase = ''
     runHook preInstall
 
-    install -D --mode=0644 libgomuks.so --target-directory $out/lib
+    install -Dm0644 libgomuks.so -t $out/lib
 
     runHook postInstall
   '';
