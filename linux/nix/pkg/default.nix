@@ -30,6 +30,8 @@ flutter.buildFlutterApplication {
   postInstall = ''
     install -D assets/icon.svg $out/share/icons/hicolor/scalable/apps/nexus.svg
     install -D linux/nexus.desktop --target-directory $out/share/applications
+      wrapProgram $out/bin/nexus \
+      --suffix LD_LIBRARY_PATH : $out/app/nexus/lib
   '';
 
   meta = {
