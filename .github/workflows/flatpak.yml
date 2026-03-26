@@ -1,10 +1,13 @@
 name: "Build Flatpaks"
 
 on:
+  push:
+    branches: ["main"]
+    tags: ["*"]
   workflow_dispatch:
 
 jobs:
-  build-windows:
+  build-flatpak:
     runs-on: ubuntu-latest
 
     steps:
@@ -13,9 +16,8 @@ jobs:
 
       - name: Lix GHA Installer Action
         uses: samueldr/lix-gha-installer-action@v2026-02-22
-
-      - name: Enable flakes
-        run: echo "experimental-features = nix-command flakes" > /etc/nix/nix.conf
+        with:
+          extra_nix_config: experimental-features = nix-command flakes flake-self-attrs
 
       - name: Build app
         run: nix build .#flatpak
