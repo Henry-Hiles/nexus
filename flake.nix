@@ -50,6 +50,8 @@
               inherit default;
 
               flatpak = inputs.nix2flatpak.lib.${system}.mkFlatpak {
+                appName = "Nexus";
+                developer = "QuadRadical";
                 appId = "nexus.federated.Nexus";
                 package = default;
                 runtime = "org.gnome.Platform/49";
