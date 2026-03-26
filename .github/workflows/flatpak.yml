@@ -8,7 +8,15 @@ on:
 
 jobs:
   build-flatpak:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            runner: ubuntu-latest
+          - arch: aarch64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
 
     steps:
       - name: Checkout repository
@@ -25,5 +33,5 @@ jobs:
       - name: Upload installer artifact
         uses: actions/upload-artifact@v6
         with:
-          name: "nexus.federated.Nexus.flatpak"
-          path: "result/nexus.federated.Nexus.flatpak"
+          name: nexus.federated.Nexus-${{ matrix.arch }}.flatpak
+          path: result/nexus.federated.Nexus.flatpak
