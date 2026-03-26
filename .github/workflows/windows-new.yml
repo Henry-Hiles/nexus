@@ -17,14 +17,12 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
 
-      - name: Install Flutter dependencies
-        run: flutter pub get
-
       - name: Set up Go
         uses: actions/setup-go@v6
 
-      - name: Run build_runner & build Windows EXE
+      - name: Set up flutter, build
         run: |
+          flutter pub get
           dart scripts/generate.dart
           flutter pub run build_runner build
           flutter build windows --release
