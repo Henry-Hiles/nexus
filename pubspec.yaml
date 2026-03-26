@@ -34,10 +34,6 @@ dependencies:
   dynamic_system_colors: ^1.8.0
   collection: ^1.19.1
   window_manager: ^0.5.1
-  window_size:
-    git:
-      url: https://github.com/google/flutter-desktop-embedding
-      path: plugins/window_size
   flutter_chat_core: ^2.0.0
   flyer_chat_image_message: ^2.2.2
   flyer_chat_system_message: ^2.1.13

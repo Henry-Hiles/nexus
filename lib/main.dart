@@ -18,7 +18,6 @@ import "package:nexus/widgets/loading.dart";
 import "package:window_manager/window_manager.dart";
 import "package:flutter/material.dart";
 import "package:dynamic_system_colors/dynamic_system_colors.dart";
-import "package:window_size/window_size.dart";
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -64,12 +63,7 @@ void main() async {
     await windowManager.waitUntilReadyToShow(
       WindowOptions(titleBarStyle: TitleBarStyle.hidden),
     );
-
-    // if (Platform.isLinux) {
-    //   setWindowMinSize(const Size.square(500));
-    // } else {
-    //   await windowManager.setMinimumSize(Size.square(500));
-    // }
+    await windowManager.setMinimumSize(Size.square(500));
   }
 
   FlutterError.onError = (FlutterErrorDetails details) =>
