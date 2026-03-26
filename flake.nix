@@ -5,6 +5,7 @@
     self.submodules = true;
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     flake-parts.url = "github:hercules-ci/flake-parts";
+    nix2flatpak.url = "github:neobrain/nix2flatpak";
   };
 
   outputs =
@@ -39,14 +40,32 @@
             };
           };
 
-          packages = {
-            default = pkgs.callPackage ./linux/nix/pkg {
-              src = self;
+          packages =
+            let
+              default = pkgs.callPackage ./linux/nix/pkg {
+                src = self;
+              };
+            in
+            {
+              inherit default;
+
+              flatpak = inputs.nix2flatpak.lib.${system}.mkFlatpak {
+                appId = "nexus.federated.Nexus";
+                package = default;
+                runtime = "org.gnome.Platform/49";
+                permissions = {
+                  share = [ "network" ];
+                  sockets = [
+                    "fallback-x11"
+                    "wayland"
+                  ];
+                };
+              };
+
+              gomuks = pkgs.callPackage ./linux/nix/pkg/gomuks.nix {
+                src = self;
+              };
             };
-            gomuks = pkgs.callPackage ./linux/nix/pkg/gomuks.nix {
-              src = self;
-            };
-          };
 
           devShells.default = pkgs.callPackage ./linux/nix/devshell.nix { };
         };
