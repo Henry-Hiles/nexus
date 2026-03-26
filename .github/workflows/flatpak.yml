@@ -1,0 +1,27 @@
+name: "Build Flatpaks"
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Lix GHA Installer Action
+        uses: samueldr/lix-gha-installer-action@v2026-02-22
+
+      - name: Enable flakes
+        run: echo "experimental-features = nix-command flakes" > /etc/nix/nix.conf
+
+      - name: Build app
+        run: nix build .#flatpak
+
+      - name: Upload installer artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: "nexus.federated.Nexus.flatpak"
+          path: "result/nexus.federated.Nexus.flatpak"
