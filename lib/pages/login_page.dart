@@ -175,7 +175,7 @@ class LoginPage extends HookConsumerWidget {
                 ElevatedButton(
                   onPressed: () async {
                     isLoading.value = true;
-                    final succeeded = await client.login(
+                    final error = await client.login(
                       LoginRequest(
                         username: username.text,
                         password: password.text,
@@ -183,11 +183,11 @@ class LoginPage extends HookConsumerWidget {
                       ),
                     );
 
-                    if (!succeeded && context.mounted) {
+                    if (error != null && context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
-                            "Login failed. Is your password right?",
+                            "Login failed. Is your password right?\nError: $error",
                             style: TextStyle(
                               color: theme.colorScheme.onErrorContainer,
                             ),

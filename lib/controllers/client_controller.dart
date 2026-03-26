@@ -153,12 +153,12 @@ class ClientController extends AsyncNotifier<int> {
   Future<void> sendMessage(SendMessageRequest request) =>
       _sendCommand("send_message", request.toJson());
 
-  Future<bool> verify(String recoveryKey) async {
+  Future<String?> verify(String recoveryKey) async {
     try {
       await _sendCommand("verify", {"recovery_key": recoveryKey});
-      return true;
+      return null;
     } catch (error) {
-      return false;
+      return error.toString();
     }
   }
 
@@ -228,12 +228,12 @@ class ClientController extends AsyncNotifier<int> {
     });
   }
 
-  Future<bool> login(LoginRequest login) async {
+  Future<String?> login(LoginRequest login) async {
     try {
       await _sendCommand("login", login.toJson());
-      return true;
+      return null;
     } catch (error) {
-      return false;
+      return error.toString();
     }
   }
 

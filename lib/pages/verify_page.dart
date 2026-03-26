@@ -48,12 +48,12 @@ class VerifyPage extends HookConsumerWidget {
 
                   isVerifying.value = true;
 
-                  final success = await ref
+                  final error = await ref
                       .watch(ClientController.provider.notifier)
                       .verify(passphraseController.text);
 
                   snackbar.close();
-                  if (!success) {
+                  if (error != null) {
                     isVerifying.value = false;
                     if (context.mounted) {
                       scaffoldMessenger.showSnackBar(
@@ -62,7 +62,7 @@ class VerifyPage extends HookConsumerWidget {
                             context,
                           ).colorScheme.errorContainer,
                           content: Text(
-                            "Verification failed. Is your passphrase correct?",
+                            "Verification failed. Is your passphrase correct?\nError: $error",
                             style: TextStyle(
                               color: Theme.of(
                                 context,
