@@ -13,6 +13,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+        with:
+          submodules: recursive
 
       - name: Lix GHA Installer Action
         uses: samueldr/lix-gha-installer-action@v2026-02-22
