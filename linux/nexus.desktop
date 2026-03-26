@@ -1,5 +1,6 @@
 [Desktop Entry]
 Name=Nexus
+GenericName=Matrix Client
 Comment=A simple and user-friendly Matrix client
 Exec=nexus
 Icon=nexus
