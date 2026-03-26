@@ -16,11 +16,13 @@ jobs:
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.41.5
 
       - name: Set up Go
         uses: actions/setup-go@v6
 
-      - name: Set up flutter, build
+      - name: Build with Flutter
         run: |
           flutter pub get
           dart scripts/generate.dart
