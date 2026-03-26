@@ -23,6 +23,7 @@ flutter.buildFlutterApplication {
 
   gitHashes = {
     window_size = "sha256-XelNtp7tpZ91QCEcvewVphNUtgQX7xrp5QP0oFo6DgM=";
+    dynamic_system_colors = "sha256-es6rjMK1drkqZBKYUP77yw/q5+0uLwWOEDOXRawy3Dc=";
     flutter_chat_ui = "sha256-4fuag7lRH5cMBFD3fUzj2K541JwXLoz8HF/4OMr3uhk=";
     flutter_link_previewer = "sha256-4fuag7lRH5cMBFD3fUzj2K541JwXLoz8HF/4OMr3uhk=";
   };
