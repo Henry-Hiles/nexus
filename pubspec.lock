@@ -348,10 +348,11 @@ packages:
   dynamic_system_colors:
     dependency: "direct main"
     description:
-      name: dynamic_system_colors
-      sha256: "43794e658fa88cbdec9f397dd1afd2eb69b6c9717e99b93b16ba37c3aa3b3a8c"
-      url: "https://pub.dev"
-    source: hosted
+      path: "."
+      ref: HEAD
+      resolved-ref: "3b61760d5e0ac1229eefde5b61247947eede4110"
+      url: "https://github.com/hasali19/flutter_dynamic_system_colors"
+    source: git
     version: "1.8.0"
   encrypt:
     dependency: transitive
