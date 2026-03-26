@@ -59,6 +59,7 @@
                     "fallback-x11"
                     "wayland"
                   ];
+                  devices = [ "dri" ];
                 };
               };
 
