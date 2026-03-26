@@ -35,4 +35,5 @@ jobs:
       - name: Upload installer artifact
         uses: actions/upload-artifact@v6
         with:
+          name: APK
           path: build/app/outputs/flutter-apk/app-release.apk
