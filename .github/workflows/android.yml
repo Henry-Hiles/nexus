@@ -20,9 +20,17 @@ jobs:
         uses: samueldr/lix-gha-installer-action@v2026-02-22
         with:
           extra_nix_config: experimental-features = nix-command flakes flake-self-attrs
+      
+      - name: Decode keystore
+        run: echo "$KEYSTORE_CONTENT" | base64 --decode > keystore.jks
+        env:
+          KEYSTORE_CONTENT: ${{ secrets.KEYSTORE_CONTENT }}
 
       - name: Build app
         run: nix develop --command bash -c "flutter pub get && dart scripts/generate.dart && flutter pub run build_runner build && flutter build apk --release"
+        env:
+          KEYSTORE_PATH: ../../keystore.jks
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
 
       - name: Upload installer artifact
         uses: actions/upload-artifact@v6
