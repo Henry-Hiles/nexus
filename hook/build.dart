@@ -18,7 +18,7 @@ Future<void> main(List<String> args) => build(args, (input, output) async {
       break;
     case OS.windows:
       libFileName = "libgomuks.dll";
-      env = {"GOENV": "C:\\Users\\runneradmin\\AppData\\Roaming\\go\\env"};
+      env = {"GOCACHE": r"C:\Users\runneradmin\AppData\Local\go-build"};
       break;
     case OS.android:
       libFileName = "libgomuks.so";
