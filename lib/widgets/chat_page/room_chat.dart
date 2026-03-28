@@ -14,7 +14,7 @@ import "package:nexus/helpers/extensions/show_context_menu.dart";
 import "package:nexus/models/relation_type.dart";
 import "package:nexus/models/requests/report_request.dart";
 import "package:nexus/widgets/chat_page/composer/chat_box.dart";
-import "package:nexus/widgets/chat_page/image_message.dart";
+import "package:nexus/widgets/chat_page/expandable_image_message.dart";
 import "package:nexus/widgets/chat_page/member_list.dart";
 import "package:nexus/widgets/chat_page/wrappers/message_wrapper.dart";
 import "package:nexus/widgets/chat_page/room_appbar.dart";

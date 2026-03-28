@@ -1,7 +1,9 @@
 import "package:collection/collection.dart";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
+import "package:nexus/controllers/client_state_controller.dart";
 import "package:nexus/controllers/new_events_controller.dart";
+import "package:nexus/helpers/extensions/mxc_to_https.dart";
 import "package:nexus/models/read_receipt.dart";
 import "package:nexus/models/room.dart";
 
@@ -10,6 +12,13 @@ class RoomsController extends Notifier<IMap<String, Room>> {
   IMap<String, Room> build() => const IMap.empty();
 
   void update(IMap<String, Room> rooms, ISet<String> leftRooms) {
+    final homeserver =
+        ref.watch(
+          ClientStateController.provider.select(
+            (value) => value?.homeserverUrl,
+          ),
+        ) ??
+        "";
     final merged = rooms.entries.fold(state, (acc, entry) {
       final roomId = entry.key;
       final incoming = entry.value;
@@ -37,7 +46,13 @@ class RoomsController extends Notifier<IMap<String, Room>> {
         roomId,
         existing?.copyWith(
               hasMore: incoming.hasMore,
-              metadata: incoming.metadata ?? existing.metadata,
+              metadata:
+                  incoming.metadata?.copyWith(
+                    avatar:
+                        incoming.metadata?.avatar?.mxcToHttps(homeserver) ??
+                        existing.metadata?.avatar,
+                  ) ??
+                  existing.metadata,
               events: events!,
               state: incoming.state.entries.fold(
                 existing.state,
@@ -67,7 +82,11 @@ class RoomsController extends Notifier<IMap<String, Room>> {
                 ),
               ),
             ) ??
-            incoming,
+            incoming.copyWith(
+              metadata: incoming.metadata?.copyWith(
+                avatar: incoming.metadata?.avatar?.mxcToHttps(homeserver),
+              ),
+            ),
       );
     });
 

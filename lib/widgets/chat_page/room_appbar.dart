@@ -3,6 +3,7 @@ import "package:flutter/material.dart";
 import "package:nexus/models/room.dart";
 import "package:nexus/widgets/appbar.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
+import "package:nexus/widgets/chat_page/expandable_image.dart";
 import "package:nexus/widgets/chat_page/room_menu.dart";
 
 class RoomAppbar extends StatelessWidget implements PreferredSizeWidget {
@@ -24,11 +25,14 @@ class RoomAppbar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) => Appbar(
     leading: isDesktop
-        ? AvatarOrHash(
-            room.metadata?.avatar,
-            room.metadata?.name ?? "Unnamed Rooms",
-            height: 24,
-            fallback: Icon(Icons.numbers),
+        ? ExpandableImage(
+            room.metadata?.avatar?.toString(),
+            child: AvatarOrHash(
+              room.metadata?.avatar,
+              room.metadata?.name ?? "Unnamed Rooms",
+              height: 24,
+              fallback: Icon(Icons.numbers),
+            ),
           )
         : DrawerButton(onPressed: () => onOpenDrawer(context)),
     scrolledUnderElevation: 0,

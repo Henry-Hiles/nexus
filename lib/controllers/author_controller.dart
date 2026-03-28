@@ -2,6 +2,7 @@ import "dart:async";
 import "package:collection/collection.dart";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
+import "package:nexus/controllers/client_state_controller.dart";
 import "package:nexus/controllers/members_controller.dart";
 import "package:nexus/models/configs/author_config.dart";
 import "package:nexus/models/membership.dart";
@@ -12,7 +13,7 @@ class AuthorController extends AsyncNotifier<Membership> {
 
   @override
   Future<Membership> build() async {
-    var member = await ref.watch(
+    final member = await ref.watch(
       MembersController.provider(config.room).selectAsync(
         (value) => value.firstWhereOrNull(
           (membership) => membership.userId == config.message.authorId,
@@ -25,6 +26,12 @@ class AuthorController extends AsyncNotifier<Membership> {
         : Membership.fromContent(
             IMap(config.message.metadata?["pmp"]),
             config.message.authorId,
+            ref.watch(
+                  ClientStateController.provider.select(
+                    (value) => value?.homeserverUrl,
+                  ),
+                ) ??
+                "",
           );
 
     return Membership(
