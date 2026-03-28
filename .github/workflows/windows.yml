@@ -21,13 +21,13 @@ jobs:
         with:
           flutter-version: 3.41.5
 
+      - name: Set up Go
+        uses: actions/setup-go@v6
+
       - name: test
         run: |
           cd gomuks/pkg/ffi
           go build -tags goolm -o ../../../libgomuks.dll -buildmode=c-shared
-
-      - name: Set up Go
-        uses: actions/setup-go@v6
 
       - name: Build with Flutter
         run: |
