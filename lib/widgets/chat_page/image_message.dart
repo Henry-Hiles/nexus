@@ -6,6 +6,7 @@ import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:flyer_chat_image_message/flyer_chat_image_message.dart";
 import "package:nexus/controllers/cross_cache_controller.dart";
 import "package:nexus/helpers/extensions/get_headers.dart";
+import "package:nexus/widgets/error_dialog.dart";
 
 class ExpandableImageMessage extends ConsumerWidget {
   final ImageMessage message;
@@ -28,6 +29,8 @@ class ExpandableImageMessage extends ConsumerWidget {
             child: InteractiveViewer(
               child: Image(
                 fit: BoxFit.contain,
+                errorBuilder: (_, error, stackTrace) =>
+                    ErrorDialog(error, stackTrace),
                 image: CachedNetworkImage(
                   message.source,
                   ref.watch(CrossCacheController.provider),
