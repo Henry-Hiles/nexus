@@ -26,7 +26,7 @@ jobs:
         with:
           go-version-file: gomuks/go.mod
 
-      - name: test
+      - name: Do go build
         run: |
           cd gomuks/pkg/ffi
           go build -tags goolm -o ../../../libgomuks.dll -buildmode=c-shared
