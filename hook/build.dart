@@ -58,7 +58,7 @@ Future<void> main(List<String> args) => build(args, (input, output) async {
     final tags = targetOS == OS.android ? "goolm,noheic" : "goolm";
 
     print(
-      "Building Gomuks shared library $libFileName (${targetOS.name}/${targetArch.name}) from source...",
+      "Building Gomuks shared library $libFileName (${targetOS.name}/${targetArch.name}) to ${libFile.path}...",
     );
     final result = await Process.run(
       "go",
