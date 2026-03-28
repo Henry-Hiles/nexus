@@ -29,8 +29,10 @@ class ExpandableImageMessage extends ConsumerWidget {
             child: InteractiveViewer(
               child: Image(
                 fit: BoxFit.contain,
-                errorBuilder: (_, error, stackTrace) =>
-                    ErrorDialog(error, stackTrace),
+                errorBuilder: (_, error, stackTrace) => ErrorDialog(
+                  "Loading failed for ${message.source}\nError: $error",
+                  stackTrace,
+                ),
                 image: CachedNetworkImage(
                   message.source,
                   ref.watch(CrossCacheController.provider),
