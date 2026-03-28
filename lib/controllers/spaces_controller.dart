@@ -1,3 +1,4 @@
+import "package:collection/collection.dart";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/material.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
@@ -99,15 +100,37 @@ class SpacesController extends Notifier<IList<Space>> {
         .toIList();
 
     return <Space>[
-      Space(id: "home", title: "Home", icon: Icons.home, children: homeRooms),
-      Space(
-        id: "dms",
-        title: "Direct Messages",
-        icon: Icons.people,
-        children: dmRooms,
-      ),
-      ...topLevelSpacesList,
-    ].toIList();
+          Space(
+            id: "home",
+            title: "Home",
+            icon: Icons.home,
+            children: homeRooms,
+          ),
+          Space(
+            id: "dms",
+            title: "Direct Messages",
+            icon: Icons.people,
+            children: dmRooms,
+          ),
+          ...topLevelSpacesList,
+        ]
+        .map(
+          (space) => space.copyWith(
+            children: space.children
+                .sortedBy(
+                  (element) =>
+                      element
+                          .metadata
+                          ?.sortingTimestamp
+                          .millisecondsSinceEpoch ??
+                      0,
+                )
+                .sortedBy((room) => room.metadata?.unreadMessages ?? 0)
+                .reversed
+                .toIList(),
+          ),
+        )
+        .toIList();
   }
 
   static final provider = NotifierProvider<SpacesController, IList<Space>>(
