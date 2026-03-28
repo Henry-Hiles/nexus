@@ -56,7 +56,7 @@ Future<void> main(List<String> args) => build(args, (input, output) async {
 
     // goheif/dav1d supported on Android would need to fix upstream
     final tags = targetOS == OS.android ? "goolm,noheic" : "goolm";
-
+    throw "dir is: ${gomuksBuildDir.resolve("pkg/ffi/").toFilePath()}";
     print(
       "Building Gomuks shared library $libFileName (${targetOS.name}/${targetArch.name}) to ${libFile.path}...",
     );
