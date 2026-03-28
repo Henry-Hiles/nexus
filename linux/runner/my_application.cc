@@ -43,7 +43,7 @@ static void my_application_activate(GApplication* application) {
     }
   }
 #endif
-  gtk_widget_set_size_request(GTK_WIDGET(window), 500, 500);
+  gtk_widget_set_size_request(GTK_WIDGET(window), 250, -1);
   if (use_header_bar) {
     GtkHeaderBar* header_bar = GTK_HEADER_BAR(gtk_header_bar_new());
     gtk_widget_show(GTK_WIDGET(header_bar));
