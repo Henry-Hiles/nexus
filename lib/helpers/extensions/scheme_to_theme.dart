@@ -8,7 +8,7 @@ extension SchemeToTheme on ColorScheme {
       backgroundColor: surfaceContainerLow,
     ),
     textTheme: ThemeData(
-      fontFamilyFallback: ["sans"],
+      fontFamilyFallback: ["sans", "emoji"],
       brightness: brightness,
     ).textTheme,
     inputDecorationTheme: const InputDecorationTheme(

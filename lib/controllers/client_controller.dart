@@ -183,8 +183,8 @@ class ClientController extends AsyncNotifier<int> {
   // }));
 
   Future<IList<Event>> getRoomState(GetRoomStateRequest request) async {
-    Future<List?> getState(GetRoomStateRequest request) =>
-        _sendCommand("get_room_state", request.toJson()) as Future<List?>;
+    Future<List?> getState(GetRoomStateRequest request) async =>
+        (await _sendCommand("get_room_state", request.toJson())) as List?;
     final response = await getState(request);
 
     return (response ?? await getState(request.copyWith(refetch: true)) ?? [])
