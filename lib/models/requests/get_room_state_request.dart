@@ -6,6 +6,7 @@ part "get_room_state_request.g.dart";
 abstract class GetRoomStateRequest with _$GetRoomStateRequest {
   const factory GetRoomStateRequest({
     required String roomId,
+    @Default(false) bool refetch,
     @Default(false) bool fetchMembers,
     @Default(false) bool includeMembers,
   }) = _GetRoomStateRequest;
