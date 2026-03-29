@@ -21,9 +21,9 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
     - [ ] Allow using remote Gomuks over websocket
 - [ ] Platform Support
     - [x] Linux
-    - [x] Windows
+    - [ ] Windows (WIP)
     - [ ] MacOS
-    - [ ] Android
+    - [x] Android
     - [ ] iOS
     - [ ] Web (may not be possible)
 - [x] Login
