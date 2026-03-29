@@ -35,16 +35,18 @@ class RoomChat extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final client = ref.watch(ClientController.provider.notifier);
-    final replyToMessage = useState<Message?>(null);
+    final relatedMessage = useState<Message?>(null);
     final memberListOpened = useState<bool>(showMembersByDefault);
     final relationType = useState(RelationType.reply);
-    final room = ref.watch(SelectedRoomController.provider);
     final userId = ref.watch(ClientStateController.provider)?.userId;
+    final roomId = ref.watch(
+      SelectedRoomController.provider.select((value) => value?.metadata?.id),
+    );
 
     final theme = Theme.of(context);
     final danger = theme.colorScheme.error;
 
-    if (room == null || userId == null || room.metadata?.id == null) {
+    if (roomId == null || userId == null) {
       return Center(
         child: Text(
           "Nothing to see here...",
@@ -53,7 +55,7 @@ class RoomChat extends HookConsumerWidget {
       );
     }
 
-    final controllerProvider = RoomChatController.provider(room.metadata!.id);
+    final controllerProvider = RoomChatController.provider(roomId);
     final notifier = ref.watch(controllerProvider.notifier);
 
     List<PopupMenuEntry> getMessageOptions(Message message) {
@@ -61,7 +63,7 @@ class RoomChat extends HookConsumerWidget {
       return [
         PopupMenuItem(
           onTap: () {
-            replyToMessage.value = message;
+            relatedMessage.value = message;
             relationType.value = RelationType.reply;
           },
           child: ListTile(leading: Icon(Icons.reply), title: Text("Reply")),
@@ -69,7 +71,7 @@ class RoomChat extends HookConsumerWidget {
         if (message is TextMessage && isSentByMe)
           PopupMenuItem(
             onTap: () {
-              replyToMessage.value = message;
+              relatedMessage.value = message;
               relationType.value = RelationType.edit;
             },
             child: ListTile(leading: Icon(Icons.edit), title: Text("Edit")),
@@ -153,10 +155,9 @@ class RoomChat extends HookConsumerWidget {
                     ),
                     TextButton(
                       onPressed: () {
-                        if (room.metadata == null) return;
                         client.reportEvent(
                           ReportRequest(
-                            roomId: room.metadata!.id,
+                            roomId: roomId,
                             eventId: message.id,
                             reason: reasonController.text.isEmpty
                                 ? null
@@ -189,7 +190,6 @@ class RoomChat extends HookConsumerWidget {
 
     return Scaffold(
       appBar: RoomAppbar(
-        room,
         isDesktop: isDesktop,
         onOpenDrawer: (_) => Scaffold.of(context).openDrawer(),
         onOpenMemberList: (thisContext) {
@@ -237,18 +237,41 @@ class RoomChat extends HookConsumerWidget {
                             chatAnimatedListBuilder: (_, itemBuilder) =>
                                 ChatAnimatedList(
                                   itemBuilder: itemBuilder,
-                                  onEndReached: room.hasMore
+                                  onEndReached:
+                                      ref.watch(
+                                        SelectedRoomController.provider.select(
+                                          (room) => room?.hasMore == true,
+                                        ),
+                                      )
                                       ? notifier.loadOlder
                                       : null,
-                                  onStartReached: () => client.markRead(room),
+                                  onStartReached: () async {
+                                    final room = ref.watch(
+                                      SelectedRoomController.provider,
+                                    );
+                                    return room == null
+                                        ? null
+                                        : await client.markRead(room);
+                                  },
                                   bottomPadding: 72,
                                 ),
 
                             composerBuilder: (_) => ChatBox(
+                              onSend:
+                                  (
+                                    text, {
+                                    required shouldMention,
+                                    required tags,
+                                  }) => notifier.send(
+                                    text,
+                                    tags: tags,
+                                    relationType: relationType.value,
+                                    shouldMention: shouldMention,
+                                    relation: relatedMessage.value,
+                                  ),
                               relationType: relationType.value,
-                              relatedMessage: replyToMessage.value,
-                              onDismiss: () => replyToMessage.value = null,
-                              room: room,
+                              relatedMessage: relatedMessage.value,
+                              onDismiss: () => relatedMessage.value = null,
                             ),
 
                             textMessageBuilder:
@@ -259,7 +282,6 @@ class RoomChat extends HookConsumerWidget {
                                   required bool isSentByMe,
                                   MessageGroupStatus? groupStatus,
                                 }) => TextMessageWrapper(
-                                  room: room,
                                   message,
                                   content: message.text,
                                   groupStatus: groupStatus,
@@ -277,7 +299,6 @@ class RoomChat extends HookConsumerWidget {
                                   MessageGroupStatus? groupStatus,
                                 }) => TextMessageWrapper(
                                   message,
-                                  room: room,
                                   content: message.text,
                                   groupStatus: groupStatus,
                                   onTapReply: notifier.scrollToMessage,
@@ -309,7 +330,6 @@ class RoomChat extends HookConsumerWidget {
                                     ),
                                     child: FlyerChatFileMessage(
                                       topWidget: ReplyWidget(
-                                        room: room,
                                         message,
                                         onTapReply: notifier.scrollToMessage,
                                         groupStatus: groupStatus,
@@ -319,7 +339,6 @@ class RoomChat extends HookConsumerWidget {
                                     ),
                                   ),
                                   groupStatus,
-                                  room,
                                 ),
 
                             systemMessageBuilder:
@@ -358,11 +377,11 @@ class RoomChat extends HookConsumerWidget {
           ),
 
           if (memberListOpened.value == true && showMembersByDefault)
-            MemberList(room),
+            MemberList(),
         ],
       ),
 
-      endDrawer: showMembersByDefault ? null : MemberList(room),
+      endDrawer: showMembersByDefault ? null : MemberList(),
     );
   }
 }

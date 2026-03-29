@@ -1,12 +1,11 @@
+import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:fluttertagger/fluttertagger.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
-import "package:nexus/controllers/room_chat_controller.dart";
 import "package:nexus/models/relation_type.dart";
-import "package:nexus/models/room.dart";
 import "package:nexus/widgets/chat_page/composer/mention_overlay.dart";
 import "package:nexus/widgets/chat_page/composer/relation_preview.dart";
 
@@ -14,12 +13,17 @@ class ChatBox extends HookConsumerWidget {
   final Message? relatedMessage;
   final RelationType relationType;
   final VoidCallback onDismiss;
-  final Room room;
+  final Future<void> Function(
+    String text, {
+    required bool shouldMention,
+    required IList<Tag> tags,
+  })
+  onSend;
   const ChatBox({
     required this.relatedMessage,
     required this.relationType,
     required this.onDismiss,
-    required this.room,
+    required this.onSend,
     super.key,
   });
 
@@ -38,16 +42,12 @@ class ChatBox extends HookConsumerWidget {
     }
 
     void send() {
-      if (controller.value.text.trim().isEmpty || room.metadata == null) return;
-      ref
-          .watch(RoomChatController.provider(room.metadata!.id).notifier)
-          .send(
-            controller.value.formattedText,
-            shouldMention: shouldMention.value,
-            relation: relatedMessage,
-            relationType: relationType,
-            tags: controller.value.tags,
-          );
+      onSend(
+        controller.value.formattedText,
+        shouldMention: shouldMention.value,
+        tags: controller.value.tags.toIList(),
+      );
+
       onDismiss();
       controller.value.text = "";
     }
@@ -81,7 +81,6 @@ class ChatBox extends HookConsumerWidget {
             children: [
               RelationPreview(
                 relatedMessage,
-                room: room,
                 shouldMention: shouldMention.value,
                 toggleShouldMention: () =>
                     shouldMention.value = !shouldMention.value,
@@ -123,7 +122,6 @@ class ChatBox extends HookConsumerWidget {
                       child: FlutterTagger(
                         triggerStrategy: TriggerStrategy.eager,
                         overlay: MentionOverlay(
-                          room,
                           query: query.value,
                           triggerCharacter: triggerCharacter.value,
                           addTag: ({required id, required name}) {

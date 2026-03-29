@@ -3,17 +3,14 @@ import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/members_controller.dart";
 import "package:nexus/controllers/rooms_controller.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
-import "package:nexus/models/room.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/widgets/loading.dart";
 
 class MentionOverlay extends ConsumerWidget {
   final String? triggerCharacter;
   final String query;
-  final Room room;
   final void Function({required String id, required String name}) addTag;
-  const MentionOverlay(
-    this.room, {
+  const MentionOverlay({
     required this.query,
     required this.addTag,
     required this.triggerCharacter,
@@ -34,7 +31,7 @@ class MentionOverlay extends ConsumerWidget {
           child: switch (triggerCharacter) {
             "@" =>
               ref
-                  .watch(MembersController.provider(room))
+                  .watch(MembersController.provider)
                   .betterWhen(
                     data: (members) => ListView(
                       children:

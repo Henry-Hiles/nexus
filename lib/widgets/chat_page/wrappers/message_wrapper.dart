@@ -1,21 +1,13 @@
 import "package:flutter/material.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
-import "package:nexus/models/room.dart";
 import "package:nexus/widgets/chat_page/lazy_loading/message_avatar.dart";
 import "package:nexus/widgets/chat_page/lazy_loading/message_displayname.dart";
 
 class MessageWrapper extends StatelessWidget {
   final Message message;
   final Widget child;
-  final Room room;
   final MessageGroupStatus? groupStatus;
-  const MessageWrapper(
-    this.message,
-    this.child,
-    this.groupStatus,
-    this.room, {
-    super.key,
-  });
+  const MessageWrapper(this.message, this.child, this.groupStatus, {super.key});
 
   @override
   Widget build(BuildContext context) => ClipRRect(
@@ -33,7 +25,7 @@ class MessageWrapper extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           groupStatus?.isFirst != false
-              ? MessageAvatar(message, room, height: 40)
+              ? MessageAvatar(message, height: 40)
               : SizedBox(width: 40),
           Expanded(
             child: Column(
@@ -43,7 +35,6 @@ class MessageWrapper extends StatelessWidget {
                 if (groupStatus?.isFirst != false)
                   MessageDisplayname(
                     message,
-                    room,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),

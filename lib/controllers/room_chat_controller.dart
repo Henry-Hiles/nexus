@@ -223,13 +223,13 @@ class RoomChatController extends AsyncNotifier<InMemoryChatController> {
   }
 
   Future<void> send(
-    String message, {
+    String text, {
     bool shouldMention = true,
-    required Iterable<Tag> tags,
+    required IList<Tag> tags,
     required RelationType relationType,
     Message? relation,
   }) async {
-    var taggedMessage = message;
+    var taggedMessage = text;
 
     for (final tag in tags) {
       final escaped = RegExp.escape(tag.id);

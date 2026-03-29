@@ -2,16 +2,14 @@ import "package:flutter/material.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/members_controller.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
-import "package:nexus/models/room.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 
 class MemberList extends ConsumerWidget {
-  final Room room;
-  const MemberList(this.room, {super.key});
+  const MemberList({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final membersProvider = ref.watch(MembersController.provider(room));
+    final membersProvider = ref.watch(MembersController.provider);
     return Drawer(
       shape: Border(),
       child: Column(
