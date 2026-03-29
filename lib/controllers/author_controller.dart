@@ -44,8 +44,7 @@ class AuthorController extends AsyncNotifier<Membership> {
     );
   }
 
-  static final provider = AsyncNotifierProvider.family
-      .autoDispose<AuthorController, Membership, AuthorConfig>(
+  static final provider = AsyncNotifierProvider.family<AuthorController, Membership, AuthorConfig>(
         AuthorController.new,
       );
 }
