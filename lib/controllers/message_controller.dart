@@ -144,7 +144,7 @@ class MessageController extends AsyncNotifier<Message?> {
                   "${content["displayname"] ?? event.stateKey} ${switch (content["membership"]) {
                     "invite" => "was invited to",
                     "join" => "joined",
-                    "leave" => event.authorId == event.stateKey ? "was kicked" : "left",
+                    "leave" => event.authorId == event.stateKey ? "left" : "was kicked",
                     "ban" => "was banned from",
                     "knock" => "asked to join",
                     _ => "did something relating to",
