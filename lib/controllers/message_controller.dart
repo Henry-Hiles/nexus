@@ -91,6 +91,14 @@ class MessageController extends AsyncNotifier<Message?> {
               )
               as TextMessage;
 
+      Message toSystemMessage(String content) => Message.system(
+        metadata: {...metadata, "body": content},
+        id: config.event.eventId,
+        authorId: event.authorId,
+        deliveredAt: config.event.timestamp,
+        text: content,
+      );
+
       return switch (type) {
         "m.room.encrypted" => asText.copyWith(
           text: "Unable to decrypt message.",
@@ -132,32 +140,20 @@ class MessageController extends AsyncNotifier<Message?> {
         "m.room.member" =>
           content["membership"] == event.unsigned["prev_content"]?["membership"]
               ? null
-              : Message.system(
-                  metadata: {
-                    ...metadata,
-                    "body":
-                        "${content["displayname"] ?? event.stateKey} ${switch (content["membership"]) {
-                          "invite" => "was invited to",
-                          "join" => "joined",
-                          "leave" => "left",
-                          "knock" => "asked to join",
-                          "ban" => "was banned from",
-                          _ => "did something relating to",
-                        }} the room.",
-                  },
-                  id: config.event.eventId,
-                  authorId: event.authorId,
-                  deliveredAt: config.event.timestamp,
-                  text:
-                      "${content["displayname"] ?? event.stateKey} ${switch (content["membership"]) {
-                        "invite" => "was invited to",
-                        "join" => "joined",
-                        "leave" => "left",
-                        "knock" => "asked to join",
-                        "ban" => "was banned from",
-                        _ => "did something relating to",
-                      }} the room.",
+              : toSystemMessage(
+                  "${content["displayname"] ?? event.stateKey} ${switch (content["membership"]) {
+                    "invite" => "was invited to",
+                    "join" => "joined",
+                    "leave" => event.authorId == event.stateKey ? "was kicked" : "left",
+                    "ban" => "was banned from",
+                    "knock" => "asked to join",
+                    _ => "did something relating to",
+                  }} the room.",
                 ),
+
+        "m.room.server_acl" => toSystemMessage(
+          "${event.authorId} updated the server ban list.",
+        ),
 
         "m.room.redaction" =>
           config.alwaysReturn
