@@ -1,8 +1,10 @@
+import "package:cross_cache/cross_cache.dart";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/material.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart";
 import "package:nexus/controllers/client_state_controller.dart";
+import "package:nexus/controllers/cross_cache_controller.dart";
 import "package:nexus/helpers/extensions/get_headers.dart";
 import "package:nexus/helpers/extensions/link_to_mention.dart";
 import "package:nexus/helpers/extensions/mxc_to_https.dart";
@@ -58,18 +60,21 @@ class Html extends ConsumerWidget {
               ? SizedBox.shrink()
               : InlineCustomWidget(
                   alignment: PlaceholderAlignment.middle,
-                  child: Image.network(
-                    Uri.parse(element.attributes["src"]!)
-                        .mxcToHttps(
-                          ref.watch(
-                                ClientStateController.provider.select(
-                                  (value) => value?.homeserverUrl,
-                                ),
-                              ) ??
-                              "",
-                        )
-                        .toString(),
-                    headers: ref.headers,
+                  child: Image(
+                    image: CachedNetworkImage(
+                      Uri.parse(element.attributes["src"]!)
+                          .mxcToHttps(
+                            ref.watch(
+                                  ClientStateController.provider.select(
+                                    (value) => value?.homeserverUrl,
+                                  ),
+                                ) ??
+                                "",
+                          )
+                          .toString(),
+                      ref.watch(CrossCacheController.provider),
+                      headers: ref.headers,
+                    ),
                     errorBuilder: (_, error, _) => Text(
                       "Image Failed to Load",
                       style: TextStyle(
