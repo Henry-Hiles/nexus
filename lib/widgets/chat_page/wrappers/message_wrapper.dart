@@ -48,7 +48,7 @@ class MessageWrapper extends StatelessWidget {
                           ),
                         ),
                         if (message.deliveredAt != null &&
-                            groupStatus?.isFirst == true)
+                            groupStatus?.isFirst != false)
                           Tooltip(
                             message: message.deliveredAt!.toString(),
                             child: Text(
