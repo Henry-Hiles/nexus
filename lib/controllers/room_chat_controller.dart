@@ -28,7 +28,6 @@ class RoomChatController extends AsyncNotifier<InMemoryChatController> {
     final client = ref.watch(ClientController.provider.notifier);
     var room = ref.read(RoomsController.provider)[roomId];
     if (room == null) return InMemoryChatController();
-
     final state = await client.getRoomState(
       GetRoomStateRequest(roomId: roomId),
     );
@@ -78,7 +77,6 @@ class RoomChatController extends AsyncNotifier<InMemoryChatController> {
 
     ref.onDispose(
       ref.listen(NewEventsController.provider(roomId), (_, next) async {
-        final controller = await future;
         for (final event in next) {
           if (event.type == "m.room.redaction") {
             final controller = await future;
@@ -116,12 +114,8 @@ class RoomChatController extends AsyncNotifier<InMemoryChatController> {
                 ),
               );
             }
-            if (message != null &&
-                !controller.messages.any(
-                  (oldMessage) => oldMessage.id == message.id,
-                ) &&
-                ref.mounted) {
-              await controller.insertMessage(message);
+            if (message != null && ref.mounted) {
+              await insertMessage(message);
             }
           }
         }
@@ -152,19 +146,11 @@ class RoomChatController extends AsyncNotifier<InMemoryChatController> {
         : controller.updateMessage(oldMessage, message);
   }
 
-  Future<void> deleteMessage(Message message, {String? reason}) async {
-    final controller = await future;
-    await controller.removeMessage(message);
-    await ref
-        .watch(ClientController.provider.notifier)
-        .redactEvent(
-          RedactEventRequest(
-            eventId: message.id,
-            roomId: roomId,
-            reason: reason,
-          ),
-        );
-  }
+  Future<void> deleteMessage(Message message, {String? reason}) => ref
+      .watch(ClientController.provider.notifier)
+      .redactEvent(
+        RedactEventRequest(eventId: message.id, roomId: roomId, reason: reason),
+      );
 
   Future<void> loadOlder([InMemoryChatController? chatController]) async {
     final response = await ref
@@ -242,7 +228,8 @@ class RoomChatController extends AsyncNotifier<InMemoryChatController> {
     }
 
     final client = ref.watch(ClientController.provider.notifier);
-    client.sendMessage(
+    final room = ref.read(RoomsController.provider)[roomId];
+    final event = await client.sendMessage(
       SendMessageRequest(
         roomId: roomId,
         mentions: Mentions(
@@ -260,6 +247,15 @@ class RoomChatController extends AsyncNotifier<InMemoryChatController> {
             : Relation(eventId: relation.id, relationType: relationType),
       ),
     );
+    final message = room == null
+        ? null
+        : await ref.watch(
+            MessageController.provider(
+              MessageConfig(room: room, event: event),
+            ).future,
+          );
+
+    if (message != null) insertMessage(message);
   }
 
   Future<chat.User> resolveUser(String id) async {

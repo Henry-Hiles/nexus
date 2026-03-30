@@ -21,7 +21,7 @@ import "package:nexus/widgets/chat_page/room_appbar.dart";
 import "package:nexus/widgets/chat_page/wrappers/text_message_wrapper.dart";
 import "package:nexus/widgets/chat_page/reply_widget.dart";
 import "package:nexus/widgets/form_text_input.dart";
-// import "package:dynamic_polls/dynamic_polls.dart";
+import "package:nexus/main.dart";
 
 class RoomChat extends HookConsumerWidget {
   final bool isDesktop;
@@ -108,11 +108,13 @@ class RoomChat extends HookConsumerWidget {
                       ),
                       TextButton(
                         onPressed: () async {
-                          notifier.deleteMessage(
-                            message,
-                            reason: deleteReasonController.text,
-                          );
                           Navigator.of(context).pop();
+                          await notifier
+                              .deleteMessage(
+                                message,
+                                reason: deleteReasonController.text,
+                              )
+                              .onError(showError);
                         },
                         child: Text("Delete"),
                       ),

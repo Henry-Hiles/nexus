@@ -40,7 +40,9 @@ class TextMessageWrapper extends StatelessWidget {
           padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
           decoration: BoxDecoration(
             color: isSentByMe
-                ? colorScheme.primaryContainer
+                ? (message.id.startsWith("~")
+                      ? colorScheme.onPrimary
+                      : colorScheme.primaryContainer)
                 : colorScheme.surfaceContainer,
           ),
           child: Column(

@@ -9,6 +9,7 @@ import "package:flutter/foundation.dart";
 import "package:nexus/controllers/account_data_controller.dart";
 import "package:nexus/controllers/client_state_controller.dart";
 import "package:nexus/controllers/init_complete_controller.dart";
+import "package:nexus/controllers/new_events_controller.dart";
 import "package:nexus/controllers/rooms_controller.dart";
 import "package:nexus/controllers/space_edges_controller.dart";
 import "package:nexus/controllers/sync_status_controller.dart";
@@ -73,6 +74,13 @@ class ClientController extends AsyncNotifier<int> {
                 break;
               case "init_complete":
                 ref.watch(InitCompleteController.provider.notifier).complete();
+                break;
+              case "send_complete":
+                final event = Event.fromJson(decodedMuksEvent["event"]);
+
+                ref
+                    .watch(NewEventsController.provider(event.roomId).notifier)
+                    .add(IList([event]));
                 break;
               case "sync_complete":
                 final syncData = SyncData.fromJson(decodedMuksEvent);
@@ -150,8 +158,8 @@ class ClientController extends AsyncNotifier<int> {
   Future<void> redactEvent(RedactEventRequest report) =>
       _sendCommand("redact_event", report.toJson());
 
-  Future<void> sendMessage(SendMessageRequest request) =>
-      _sendCommand("send_message", request.toJson());
+  Future<Event> sendMessage(SendMessageRequest request) async =>
+      Event.fromJson(await _sendCommand("send_message", request.toJson()));
 
   Future<String?> verify(String recoveryKey) async {
     try {

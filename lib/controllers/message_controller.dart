@@ -46,6 +46,7 @@ class MessageController extends AsyncNotifier<Message?> {
         "big": event.localContent?.bigEmoji == true,
         "eventType": type,
         "pmp": event.content["com.beeper.per_message_profile"],
+        "error": event.sendError,
         "editSource":
             event.localContent?.editSource ??
             newContent?["body"] ??
