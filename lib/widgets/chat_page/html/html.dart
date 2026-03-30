@@ -9,6 +9,7 @@ import "package:nexus/helpers/extensions/get_headers.dart";
 import "package:nexus/helpers/extensions/link_to_mention.dart";
 import "package:nexus/helpers/extensions/mxc_to_https.dart";
 import "package:nexus/helpers/launch_helper.dart";
+import "package:nexus/widgets/chat_page/expandable_image.dart";
 import "package:nexus/widgets/chat_page/html/mention_chip.dart";
 import "package:nexus/widgets/chat_page/html/spoiler_text.dart";
 import "package:nexus/widgets/chat_page/html/code_block.dart";
@@ -34,6 +35,16 @@ class Html extends ConsumerWidget {
 
       final height = int.tryParse(element.attributes["height"] ?? "") ?? 300;
       final width = int.tryParse(element.attributes["width"] ?? "");
+      final src = Uri.tryParse(element.attributes["src"] ?? "")
+          ?.mxcToHttps(
+            ref.watch(
+                  ClientStateController.provider.select(
+                    (value) => value?.homeserverUrl,
+                  ),
+                ) ??
+                "",
+          )
+          .toString();
 
       return switch (element.localName) {
         "code" =>
@@ -56,37 +67,31 @@ class Html extends ConsumerWidget {
               : InlineCustomWidget(child: MentionChip(element.text)),
 
         "img" =>
-          element.attributes["src"] == null
+          src == null
               ? SizedBox.shrink()
               : InlineCustomWidget(
                   alignment: PlaceholderAlignment.middle,
-                  child: Image(
-                    image: CachedNetworkImage(
-                      Uri.parse(element.attributes["src"]!)
-                          .mxcToHttps(
-                            ref.watch(
-                                  ClientStateController.provider.select(
-                                    (value) => value?.homeserverUrl,
-                                  ),
-                                ) ??
-                                "",
-                          )
-                          .toString(),
-                      ref.watch(CrossCacheController.provider),
-                      headers: ref.headers,
-                    ),
-                    errorBuilder: (_, error, _) => Text(
-                      "Image Failed to Load",
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.error,
+                  child: ExpandableImage(
+                    src,
+                    child: Image(
+                      image: CachedNetworkImage(
+                        src,
+                        ref.watch(CrossCacheController.provider),
+                        headers: ref.headers,
                       ),
+                      errorBuilder: (_, error, _) => Text(
+                        "Image Failed to Load",
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                      ),
+                      height: height.toDouble(),
+                      width: width?.toDouble(),
+                      loadingBuilder: (_, child, loadingProgress) =>
+                          loadingProgress == null
+                          ? child
+                          : CircularProgressIndicator(),
                     ),
-                    height: height.toDouble(),
-                    width: width?.toDouble(),
-                    loadingBuilder: (_, child, loadingProgress) =>
-                        loadingProgress == null
-                        ? child
-                        : CircularProgressIndicator(),
                   ),
                 ),
         ("del" ||
