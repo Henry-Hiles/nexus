@@ -38,6 +38,7 @@ class MessageWrapper extends StatelessWidget {
                 children: [
                   if (groupStatus?.isFirst != false)
                     Row(
+                      spacing: 4,
                       children: [
                         Flexible(
                           child: MessageDisplayname(

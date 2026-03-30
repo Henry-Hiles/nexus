@@ -14,7 +14,7 @@ class MessageDisplayname extends ConsumerWidget {
       .watch(AuthorController.provider(message))
       .betterWhen(
         data: (membership) => Text(
-          "${membership.displayName} ${message.metadata?["pmp"] == null ? "" : "(via ${message.authorId})"}",
+          "${membership.displayName}${message.metadata?["pmp"] == null ? "" : " (via ${message.authorId})"}",
           style: style,
           overflow: TextOverflow.ellipsis,
         ),
