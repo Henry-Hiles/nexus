@@ -156,7 +156,7 @@ flutter pub get
 Generate Gomuks bindings:
 
 ```sh
-scripts/generate.sh
+dart scripts/generate.dart
 ```
 
 Build generated files, and watch for new changes:
