@@ -6,7 +6,6 @@ import "package:nexus/controllers/key_controller.dart";
 import "package:nexus/controllers/selected_space_controller.dart";
 import "package:nexus/controllers/spaces_controller.dart";
 import "package:nexus/helpers/extensions/join_room_with_snackbars.dart";
-import "package:nexus/pages/settings_page.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/widgets/chat_page/room_menu.dart";
 import "package:nexus/widgets/form_text_input.dart";
@@ -146,7 +145,7 @@ class Sidebar extends HookConsumerWidget {
                         ),
                       ),
                       PopupMenuItem(
-                        onTap: () {},
+                        onTap: null,
                         child: ListTile(
                           title: Text("Create a new room"),
                           leading: Icon(Icons.add),
@@ -157,17 +156,15 @@ class Sidebar extends HookConsumerWidget {
                   ),
                   IconButton(
                     tooltip: "Explore other rooms",
-                    onPressed: () => showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(title: Text("To-do")),
-                    ),
+                    onPressed: null,
                     icon: Icon(Icons.explore),
                   ),
                   IconButton(
                     tooltip: "Open settings",
-                    onPressed: () => Navigator.of(
-                      context,
-                    ).push(MaterialPageRoute(builder: (_) => SettingsPage())),
+                    onPressed: null,
+                    //  () => Navigator.of(
+                    //   context,
+                    // ).push(MaterialPageRoute(builder: (_) => SettingsPage())),
                     icon: Icon(Icons.settings),
                   ),
                 ],
