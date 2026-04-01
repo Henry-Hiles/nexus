@@ -132,7 +132,7 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
 #### Linux
 
 - With Nix: Either use direnv and `direnv allow`, or `nix flake develop`
-- Without Nix: Install Flutter, Go, Git, Libclang, and Glibc.
+- Without Nix: Install Flutter, Go, Git, Libclang, and Glibc. Do not use any Snap packages, they cause various compilation issues.
 
 #### Windows / MacOS
 
