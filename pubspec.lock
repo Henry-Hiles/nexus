@@ -466,11 +466,10 @@ packages:
   flutter_chat_ui:
     dependency: "direct main"
     description:
-      path: "packages/flutter_chat_ui"
-      ref: HEAD
-      resolved-ref: "03be67c8c81c8f637672ee03dd8f082d2c223627"
-      url: "https://github.com/Henry-Hiles/flutter_chat_ui"
-    source: git
+      name: flutter_chat_ui
+      sha256: cfbaac38f429beb33d9cc1ca920ae7ccbadbed282c99335d590d61306d3a3d0f
+      url: "https://pub.dev"
+    source: hosted
     version: "2.11.1"
   flutter_hooks:
     dependency: "direct main"

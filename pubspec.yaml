@@ -40,14 +40,8 @@ dependencies:
   flyer_chat_image_message: ^2.2.2
   flyer_chat_system_message: ^2.1.13
   flyer_chat_file_message: ^2.3.1
-  flutter_chat_ui:
-    git:
-      url: https://github.com/Henry-Hiles/flutter_chat_ui
-      path: packages/flutter_chat_ui
-  flutter_link_previewer:
-    git:
-      url: https://github.com/Henry-Hiles/flutter_chat_ui
-      path: packages/flutter_link_previewer
+  flutter_chat_ui: ^2.11.1
+  flutter_link_previewer: ^4.2.0
   color_hash: ^1.0.1
   flutter_widget_from_html_core: ^0.17.0
   flutter_svg: ^2.2.2
