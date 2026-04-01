@@ -50,7 +50,7 @@ class AvatarOrHash extends ConsumerWidget {
                         ref.watch(CrossCacheController.provider),
                         headers: ref.headers,
                       ),
-                      fit: BoxFit.contain,
+                      fit: BoxFit.cover,
                       errorBuilder: (_, _, _) => box,
                     ),
             ),

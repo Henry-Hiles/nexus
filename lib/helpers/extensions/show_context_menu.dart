@@ -9,6 +9,7 @@ extension ShowContextMenu on BuildContext {
 
     showMenu(
       context: this,
+      constraints: BoxConstraints.loose(Size.infinite),
       position: RelativeRect.fromLTRB(
         globalPosition.dx,
         globalPosition.dy,

@@ -2,6 +2,7 @@ import "package:flutter/material.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/members_controller.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
+import "package:nexus/helpers/extensions/show_user_popover.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 
 class MemberList extends ConsumerWidget {
@@ -35,23 +36,24 @@ class MemberList extends ConsumerWidget {
               child: ListView(
                 children: members
                     .map(
-                      (member) => ListTile(
-                        onTap: () => showDialog(
-                          context: context,
-                          builder: (context) =>
-                              Dialog(child: Text("TODO: Open member popover")),
+                      (member) => InkWell(
+                        onTapDown: (details) => context.showUserPopover(
+                          member,
+                          globalPosition: details.globalPosition,
                         ),
-                        leading: AvatarOrHash(
-                          member.avatarUrl,
-                          member.displayName,
-                        ),
-                        title: Text(
-                          member.displayName,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        subtitle: Text(
-                          member.userId,
-                          overflow: TextOverflow.ellipsis,
+                        child: ListTile(
+                          leading: AvatarOrHash(
+                            member.avatarUrl,
+                            member.displayName,
+                          ),
+                          title: Text(
+                            member.displayName,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          subtitle: Text(
+                            member.userId,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       ),
                     )

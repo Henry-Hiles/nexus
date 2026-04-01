@@ -7,6 +7,15 @@ extension SchemeToTheme on ColorScheme {
       titleSpacing: 0,
       backgroundColor: surfaceContainerLow,
     ),
+    menuTheme: MenuThemeData(
+      style: MenuStyle(
+        backgroundColor: WidgetStatePropertyAll(primaryContainer),
+      ),
+    ),
+    chipTheme: ChipThemeData(
+      labelStyle: TextStyle(color: onPrimary),
+      color: WidgetStatePropertyAll(primary),
+    ),
     textTheme: ThemeData(
       fontFamilyFallback: ["sans", "emoji"],
       brightness: brightness,
