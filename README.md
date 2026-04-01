@@ -127,23 +127,25 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
 
 ## Build Instructions
 
+### Prerequisites
+
+#### Linux
+
+- With Nix: Either use direnv and `direnv allow`, or `nix flake develop`
+- Without Nix: Install Flutter, Go, Git, Libclang, and Glibc.
+
+#### Windows / MacOS
+
+I don't really know. You will need Flutter, Git, Go, and Visual Studio tools, and otherwise I guess just keep installing stuff until there aren't any errors. I will look into this sometimeTM.
+
+### Clone repo
+
 First, clone and open the repo:
 
 ```sh
 git clone --recurse-submodules https://git.federated.nexus/Henry-Hiles/nexus
 cd nexus
 ```
-
-### Prerequisites
-
-#### Linux
-
-- With Nix: Either use direnv and `direnv allow`, or `nix flake develop`
-- Without Nix: Install Flutter, Go, Olm, Git, Clang, and GLibc.
-
-#### Windows / MacOS
-
-I don't really know. You will need Flutter, Git, Go, and Visual Studio tools, and otherwise I guess just keep installing stuff until there aren't any errors. I will look into this sometimeTM.
 
 ### Set up Flutter
 
