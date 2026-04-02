@@ -1,5 +1,6 @@
 import "package:flutter/material.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
+import "package:nexus/controllers/client_state_controller.dart";
 import "package:nexus/controllers/profile_controller.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
 import "package:nexus/models/membership.dart";
@@ -52,37 +53,38 @@ class UserPopover extends ConsumerWidget {
             ),
           ],
         ),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: [
-            FilledButton.icon(onPressed: null, label: Text("Message")),
-            FilledButton.icon(
-              onPressed: null,
-              label: Text("Kick"),
-              style: ButtonStyle(
-                backgroundColor: WidgetStatePropertyAll(
-                  theme.colorScheme.error,
-                ),
-                foregroundColor: WidgetStatePropertyAll(
-                  theme.colorScheme.onError,
-                ),
-              ),
-            ),
-            ElevatedButton.icon(
-              onPressed: null,
-              label: Text("Ban"),
-              style: ButtonStyle(
-                backgroundColor: WidgetStatePropertyAll(
-                  theme.colorScheme.errorContainer,
-                ),
-                foregroundColor: WidgetStatePropertyAll(
-                  theme.colorScheme.onErrorContainer,
+        if (member.userId != ref.watch(ClientStateController.provider)?.userId)
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              FilledButton.icon(onPressed: null, label: Text("Message")),
+              FilledButton.icon(
+                onPressed: null,
+                label: Text("Kick"),
+                style: ButtonStyle(
+                  backgroundColor: WidgetStatePropertyAll(
+                    theme.colorScheme.error,
+                  ),
+                  foregroundColor: WidgetStatePropertyAll(
+                    theme.colorScheme.onError,
+                  ),
                 ),
               ),
-            ),
-          ],
-        ),
+              ElevatedButton.icon(
+                onPressed: null,
+                label: Text("Ban"),
+                style: ButtonStyle(
+                  backgroundColor: WidgetStatePropertyAll(
+                    theme.colorScheme.errorContainer,
+                  ),
+                  foregroundColor: WidgetStatePropertyAll(
+                    theme.colorScheme.onErrorContainer,
+                  ),
+                ),
+              ),
+            ],
+          ),
       ],
     );
   }
