@@ -21,135 +21,133 @@ class Html extends ConsumerWidget {
   const Html(this.html, {this.textStyle, super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => SelectionArea(
-    child: HtmlWidget(
-      html,
-      textStyle: textStyle,
-      customWidgetBuilder: (element) {
-        if (element.attributes.keys.contains("data-mx-profile-fallback")) {
-          return SizedBox.shrink();
-        }
+  Widget build(BuildContext context, WidgetRef ref) => HtmlWidget(
+    html,
+    textStyle: textStyle,
+    customWidgetBuilder: (element) {
+      if (element.attributes.keys.contains("data-mx-profile-fallback")) {
+        return SizedBox.shrink();
+      }
 
-        if (element.attributes.keys.contains("data-mx-spoiler")) {
-          return InlineCustomWidget(child: SpoilerText(text: element.text));
-        }
+      if (element.attributes.keys.contains("data-mx-spoiler")) {
+        return InlineCustomWidget(child: SpoilerText(text: element.text));
+      }
 
-        final height = int.tryParse(element.attributes["height"] ?? "") ?? 300;
-        final width = int.tryParse(element.attributes["width"] ?? "");
-        final src = Uri.tryParse(element.attributes["src"] ?? "")
-            ?.mxcToHttps(
-              ref.watch(
-                    ClientStateController.provider.select(
-                      (value) => value?.homeserverUrl,
-                    ),
-                  ) ??
-                  "",
-            )
-            .toString();
+      final height = int.tryParse(element.attributes["height"] ?? "") ?? 300;
+      final width = int.tryParse(element.attributes["width"] ?? "");
+      final src = Uri.tryParse(element.attributes["src"] ?? "")
+          ?.mxcToHttps(
+            ref.watch(
+                  ClientStateController.provider.select(
+                    (value) => value?.homeserverUrl,
+                  ),
+                ) ??
+                "",
+          )
+          .toString();
 
-        return switch (element.localName) {
-          "code" =>
-            element.parent?.localName == "pre"
-                ? element.outerHtml.contains("<br class=\"fake-break\">")
-                      ? Html(
-                          """<pre>${element.outerHtml.replaceAll("<br class=\"fake-break\">", "\n")}</pre>""",
-                        )
-                      : CodeBlock(
-                          element.text,
-                          lang: element.className.replaceAll("language-", ""),
-                        )
-                : null,
+      return switch (element.localName) {
+        "code" =>
+          element.parent?.localName == "pre"
+              ? element.outerHtml.contains("<br class=\"fake-break\">")
+                    ? Html(
+                        """<pre>${element.outerHtml.replaceAll("<br class=\"fake-break\">", "\n")}</pre>""",
+                      )
+                    : CodeBlock(
+                        element.text,
+                        lang: element.className.replaceAll("language-", ""),
+                      )
+              : null,
 
-          "blockquote" => Quoted(Html(element.innerHtml)),
+        "blockquote" => Quoted(Html(element.innerHtml)),
 
-          "a" =>
-            element.attributes["href"]?.mention == null
-                ? null
-                : InlineCustomWidget(child: MentionChip(element.text)),
+        "a" =>
+          element.attributes["href"]?.mention == null
+              ? null
+              : InlineCustomWidget(child: MentionChip(element.text)),
 
-          "img" =>
-            src == null
-                ? SizedBox.shrink()
-                : InlineCustomWidget(
-                    alignment: PlaceholderAlignment.middle,
-                    child: ExpandableImage(
-                      src,
-                      child: Image(
-                        image: CachedNetworkImage(
-                          src,
-                          ref.watch(CrossCacheController.provider),
-                          headers: ref.headers,
-                        ),
-                        errorBuilder: (_, error, _) => Text(
-                          "Image Failed to Load",
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.error,
-                          ),
-                        ),
-                        height: height.toDouble(),
-                        width: width?.toDouble(),
-                        loadingBuilder: (_, child, loadingProgress) =>
-                            loadingProgress == null
-                            ? child
-                            : CircularProgressIndicator(),
+        "img" =>
+          src == null
+              ? SizedBox.shrink()
+              : InlineCustomWidget(
+                  alignment: PlaceholderAlignment.middle,
+                  child: ExpandableImage(
+                    src,
+                    child: Image(
+                      image: CachedNetworkImage(
+                        src,
+                        ref.watch(CrossCacheController.provider),
+                        headers: ref.headers,
                       ),
+                      errorBuilder: (_, error, _) => Text(
+                        "Image Failed to Load",
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                      ),
+                      height: height.toDouble(),
+                      width: width?.toDouble(),
+                      loadingBuilder: (_, child, loadingProgress) =>
+                          loadingProgress == null
+                          ? child
+                          : CircularProgressIndicator(),
                     ),
                   ),
-          ("del" ||
-              "h1" ||
-              "h2" ||
-              "h3" ||
-              "h4" ||
-              "h5" ||
-              "h6" ||
-              "p" ||
-              "ul" ||
-              "ol" ||
-              "sup" ||
-              "sub" ||
-              "li" ||
-              "b" ||
-              "i" ||
-              "u" ||
-              "strong" ||
-              "em" ||
-              "s" ||
-              "code" ||
-              "hr" ||
-              "br" ||
-              "div" ||
-              "table" ||
-              "thead" ||
-              "tbody" ||
-              "tr" ||
-              "th" ||
-              "td" ||
-              "caption" ||
-              "pre" ||
-              "span" ||
-              "details" ||
-              "summary") =>
-            null,
+                ),
+        ("del" ||
+            "h1" ||
+            "h2" ||
+            "h3" ||
+            "h4" ||
+            "h5" ||
+            "h6" ||
+            "p" ||
+            "ul" ||
+            "ol" ||
+            "sup" ||
+            "sub" ||
+            "li" ||
+            "b" ||
+            "i" ||
+            "u" ||
+            "strong" ||
+            "em" ||
+            "s" ||
+            "code" ||
+            "hr" ||
+            "br" ||
+            "div" ||
+            "table" ||
+            "thead" ||
+            "tbody" ||
+            "tr" ||
+            "th" ||
+            "td" ||
+            "caption" ||
+            "pre" ||
+            "span" ||
+            "details" ||
+            "summary") =>
+          null,
 
-          _ => SizedBox.shrink(),
-        };
-      },
-      customStylesBuilder: (element) => {
-        "width": "auto",
-        ...Map.fromEntries(
-          element.attributes
-              .mapTo<MapEntry<String, String>?>(
-                (key, value) => switch (key) {
-                  "data-mx-color" => MapEntry("color", value),
-                  "data-mx-bg-color" => MapEntry("background-color", value),
-                  _ => null,
-                },
-              )
-              .nonNulls,
-        ),
-      },
-      onTapUrl: (url) =>
-          ref.watch(LaunchHelper.provider).launchUrl(Uri.parse(url)),
-    ),
+        _ => SizedBox.shrink(),
+      };
+    },
+    customStylesBuilder: (element) => {
+      "width": "auto",
+      ...Map.fromEntries(
+        element.attributes
+            .mapTo<MapEntry<String, String>?>(
+              (key, value) => switch (key) {
+                "data-mx-color" => MapEntry("color", value),
+                "data-mx-bg-color" => MapEntry("background-color", value),
+                _ => null,
+              },
+            )
+            .nonNulls,
+      ),
+    },
+    onTapUrl: (url) =>
+        ref.watch(LaunchHelper.provider).launchUrl(Uri.parse(url)),
   );
 }
