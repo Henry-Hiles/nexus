@@ -6,6 +6,7 @@ import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client_state_controller.dart";
 import "package:nexus/controllers/members_controller.dart";
 import "package:nexus/models/membership.dart";
+import "package:nexus/models/membership_status.dart";
 
 class AuthorController extends AsyncNotifier<Membership> {
   final Message message;
@@ -35,6 +36,7 @@ class AuthorController extends AsyncNotifier<Membership> {
           );
 
     return Membership(
+      status: member?.status ?? MembershipStatus.leave,
       avatarUrl: pmp?.avatarUrl ?? member?.avatarUrl,
       displayName:
           pmp?.displayName ??

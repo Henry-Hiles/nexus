@@ -1,8 +1,9 @@
 import "package:flutter/material.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
-import "package:nexus/controllers/members_controller.dart";
+import "package:nexus/controllers/members_by_type_controller.dart";
 import "package:nexus/controllers/rooms_controller.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
+import "package:nexus/models/membership_status.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/widgets/loading.dart";
 
@@ -31,7 +32,9 @@ class MentionOverlay extends ConsumerWidget {
           child: switch (triggerCharacter) {
             "@" =>
               ref
-                  .watch(MembersController.provider)
+                  .watch(
+                    MembersByTypeController.provider(MembershipStatus.join),
+                  )
                   .betterWhen(
                     data: (members) => ListView(
                       children:

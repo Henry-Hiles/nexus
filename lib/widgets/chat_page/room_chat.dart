@@ -369,7 +369,7 @@ class RoomChat extends HookConsumerWidget {
                                   ),
                                 ),
                           ),
-                          resolveUser: notifier.resolveUser,
+                          resolveUser: (_) async => null,
                           chatController: controller,
                         ),
                       ),

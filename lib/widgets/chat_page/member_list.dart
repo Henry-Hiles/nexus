@@ -1,8 +1,9 @@
 import "package:flutter/material.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
-import "package:nexus/controllers/members_controller.dart";
+import "package:nexus/controllers/members_by_type_controller.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
 import "package:nexus/helpers/extensions/show_user_popover.dart";
+import "package:nexus/models/membership_status.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 
 class MemberList extends ConsumerWidget {
@@ -10,7 +11,9 @@ class MemberList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final membersProvider = ref.watch(MembersController.provider);
+    final membersProvider = ref.watch(
+      MembersByTypeController.provider(MembershipStatus.join),
+    );
     return Drawer(
       shape: Border(),
       child: Column(

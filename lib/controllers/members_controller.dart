@@ -29,7 +29,7 @@ class MembersController extends AsyncNotifier<IList<Membership>> {
         );
 
     return state.nonNulls
-        .where((member) => member.content["membership"] == "join")
+        .where((state) => state.type == "m.room.member")
         .map(
           (membership) => Membership.fromContent(
             membership.content,

@@ -2,7 +2,6 @@ import "dart:async";
 import "package:collection/collection.dart";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
-import "package:flutter_chat_core/flutter_chat_core.dart" as chat;
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:fluttertagger/fluttertagger.dart";
 import "package:nexus/controllers/client_controller.dart";
@@ -256,21 +255,6 @@ class RoomChatController extends AsyncNotifier<InMemoryChatController> {
           );
 
     if (message != null) insertMessage(message);
-  }
-
-  Future<chat.User> resolveUser(String id) async {
-    final user = await ref
-        .watch(ClientController.provider.notifier)
-        .getProfile(id);
-    return chat.User(
-      id: id,
-      name: user.displayName,
-      // imageSource: user.avatarUrl == null
-      //     ? null
-      //     : (await ref.watch(
-      //         AvatarController.provider(user.avatarUrl!.toString()).future,
-      //       )).toString(),
-    );
   }
 
   Future<void> scrollToMessage(Message message) async {

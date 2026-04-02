@@ -145,11 +145,11 @@ class MessageController extends AsyncNotifier<Message?> {
                   "${content["displayname"] ?? event.stateKey} ${switch (content["membership"]) {
                     "invite" => "was invited to",
                     "join" => "joined",
-                    "leave" => event.authorId == event.stateKey ? "left" : "was kicked",
+                    "leave" => event.authorId == event.stateKey ? "left" : (event.unsigned["prev_content"]?["membership"] == "ban" ? "was unbanned from" : "was kicked from"),
                     "ban" => "was banned from",
                     "knock" => "asked to join",
                     _ => "did something relating to",
-                  }} the room.",
+                  }} the room. ${content["reason"] ?? ""}",
                 ),
 
         "m.room.server_acl" => toSystemMessage(

@@ -28,6 +28,7 @@ import "package:nexus/models/requests/paginate_request.dart";
 import "package:nexus/models/requests/redact_event_request.dart";
 import "package:nexus/models/requests/report_request.dart";
 import "package:nexus/models/requests/send_message_request.dart";
+import "package:nexus/models/requests/set_membership_request.dart";
 import "package:nexus/models/room.dart";
 import "package:nexus/models/sync_data.dart";
 import "package:nexus/models/sync_status.dart";
@@ -224,8 +225,11 @@ class ClientController extends AsyncNotifier<int> {
   Future<Profile> getProfile(String userId) async =>
       Profile.fromJson(await _sendCommand("get_profile", {"user_id": userId}));
 
-  Future<void> reportEvent(ReportRequest report) =>
-      _sendCommand("report_event", report.toJson());
+  Future<void> reportEvent(ReportRequest request) =>
+      _sendCommand("report_event", request.toJson());
+
+  Future<void> setMembership(SetMembershipRequest request) =>
+      _sendCommand("set_membership", request.toJson());
 
   Future<void> markRead(Room room) async {
     final event = room.events.firstWhereOrNull(
