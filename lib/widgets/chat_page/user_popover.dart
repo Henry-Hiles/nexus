@@ -13,79 +13,77 @@ class UserPopover extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
-    return IntrinsicWidth(
-      child: Column(
-        spacing: 16,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            spacing: 16,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              AvatarOrHash(member.avatarUrl, member.displayName, height: 80),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SelectableText(
-                      member.displayName,
-                      style: textTheme.headlineSmall,
+    return Column(
+      spacing: 16,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Wrap(
+          alignment: WrapAlignment.center,
+          spacing: 16,
+          runSpacing: 8,
+          children: [
+            AvatarOrHash(member.avatarUrl, member.displayName, height: 80),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SelectableText(
+                  member.displayName,
+                  style: textTheme.headlineSmall,
+                ),
+                SelectableText(member.userId, style: textTheme.titleSmall),
+                SizedBox(height: 4),
+                ref
+                    .watch(ProfileController.provider(member.userId))
+                    .betterWhen(
+                      loading: SizedBox.shrink,
+                      data: (profile) => Wrap(
+                        spacing: 4,
+                        children: [
+                          for (final pronoun in profile.pronouns.where(
+                            (pronoun) => pronoun.language == "en",
+                          ))
+                            Chip(label: Text(pronoun.summary)),
+                          if (profile.timezone != null)
+                            Chip(label: Text(profile.timezone!)),
+                        ],
+                      ),
                     ),
-                    SelectableText(member.userId, style: textTheme.titleSmall),
-                    SizedBox(height: 4),
-                    ref
-                        .watch(ProfileController.provider(member.userId))
-                        .betterWhen(
-                          loading: SizedBox.shrink,
-                          data: (profile) => Row(
-                            spacing: 4,
-                            children: [
-                              for (final pronoun in profile.pronouns.where(
-                                (pronoun) => pronoun.language == "en",
-                              ))
-                                Chip(label: Text(pronoun.summary)),
-                              if (profile.timezone != null)
-                                Chip(label: Text(profile.timezone!)),
-                            ],
-                          ),
-                        ),
-                  ],
+              ],
+            ),
+          ],
+        ),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            FilledButton.icon(onPressed: null, label: Text("Message")),
+            FilledButton.icon(
+              onPressed: null,
+              label: Text("Kick"),
+              style: ButtonStyle(
+                backgroundColor: WidgetStatePropertyAll(
+                  theme.colorScheme.error,
+                ),
+                foregroundColor: WidgetStatePropertyAll(
+                  theme.colorScheme.onError,
                 ),
               ),
-            ],
-          ),
-          Row(
-            spacing: 8,
-            children: [
-              FilledButton.icon(onPressed: null, label: Text("Message")),
-              FilledButton.icon(
-                onPressed: null,
-                label: Text("Kick"),
-                style: ButtonStyle(
-                  backgroundColor: WidgetStatePropertyAll(
-                    theme.colorScheme.error,
-                  ),
-                  foregroundColor: WidgetStatePropertyAll(
-                    theme.colorScheme.onError,
-                  ),
+            ),
+            ElevatedButton.icon(
+              onPressed: null,
+              label: Text("Ban"),
+              style: ButtonStyle(
+                backgroundColor: WidgetStatePropertyAll(
+                  theme.colorScheme.errorContainer,
+                ),
+                foregroundColor: WidgetStatePropertyAll(
+                  theme.colorScheme.onErrorContainer,
                 ),
               ),
-              ElevatedButton.icon(
-                onPressed: null,
-                label: Text("Ban"),
-                style: ButtonStyle(
-                  backgroundColor: WidgetStatePropertyAll(
-                    theme.colorScheme.errorContainer,
-                  ),
-                  foregroundColor: WidgetStatePropertyAll(
-                    theme.colorScheme.onErrorContainer,
-                  ),
-                ),
-              ),
-            ].map((e) => Expanded(child: e)).toList(),
-          ),
-        ],
-      ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
