@@ -16,7 +16,7 @@ class MessageAvatar extends ConsumerWidget {
       .watch(AuthorController.provider(message))
       .betterWhen(
         data: (membership) => InkWell(
-          onTapDown: (details) => context.showUserPopover(
+          onTapUp: (details) => context.showUserPopover(
             membership,
             globalPosition: details.globalPosition,
           ),

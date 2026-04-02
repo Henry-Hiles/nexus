@@ -37,7 +37,7 @@ class MemberList extends ConsumerWidget {
                 children: members
                     .map(
                       (member) => InkWell(
-                        onTapDown: (details) => context.showUserPopover(
+                        onTapUp: (details) => context.showUserPopover(
                           member,
                           globalPosition: details.globalPosition,
                         ),
