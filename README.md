@@ -99,7 +99,8 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
     - [ ] Displaying
     - [ ] Creating
 - [ ] Threads
-- [ ] Profile popouts
+- [x] Profile popouts
+    - [ ] Working actions
 - [ ] Copy link to [room, space]
 - [ ] Reporting
     - [x] Events
