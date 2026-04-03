@@ -10,6 +10,7 @@ import "package:nexus/models/membership_status.dart";
 import "package:nexus/models/requests/set_membership_request.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/main.dart";
+import "package:nexus/widgets/chat_page/expandable_image.dart";
 
 class UserPopover extends ConsumerWidget {
   final Membership member;
@@ -33,7 +34,14 @@ class UserPopover extends ConsumerWidget {
           spacing: 16,
           runSpacing: 8,
           children: [
-            AvatarOrHash(member.avatarUrl, member.displayName, height: 80),
+            ExpandableImage(
+              member.avatarUrl?.toString(),
+              child: AvatarOrHash(
+                member.avatarUrl,
+                member.displayName,
+                height: 80,
+              ),
+            ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
