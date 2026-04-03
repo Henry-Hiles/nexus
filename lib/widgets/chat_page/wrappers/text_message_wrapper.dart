@@ -1,11 +1,17 @@
+import "package:cross_cache/cross_cache.dart";
 import "package:flutter/material.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:flutter_link_previewer/flutter_link_previewer.dart";
+import "package:flutter_riverpod/flutter_riverpod.dart";
+import "package:nexus/controllers/cross_cache_controller.dart";
+import "package:nexus/controllers/url_preview_controller.dart";
+import "package:nexus/helpers/extensions/better_when.dart";
+import "package:nexus/helpers/extensions/get_headers.dart";
 import "package:nexus/widgets/chat_page/html/html.dart";
 import "package:nexus/widgets/chat_page/wrappers/message_wrapper.dart";
 import "package:nexus/widgets/chat_page/reply_widget.dart";
 
-class TextMessageWrapper extends StatelessWidget {
+class TextMessageWrapper extends ConsumerWidget {
   final Message message;
   final String? content;
   final MessageGroupStatus? groupStatus;
@@ -27,7 +33,7 @@ class TextMessageWrapper extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textMessage = message is TextMessage ? message as TextMessage : null;
@@ -80,27 +86,35 @@ class TextMessageWrapper extends StatelessWidget {
               if (textMessage?.editedAt != null)
                 Text("(edited)", style: theme.textTheme.labelSmall),
               if (textMessage != null)
-                LinkPreview(
-                  text: textMessage.text,
-                  backgroundColor: isSentByMe
-                      ? colorScheme.inversePrimary
-                      : colorScheme.surfaceContainerLow,
-                  outsidePadding: EdgeInsets.only(top: 4),
-                  insidePadding: EdgeInsets.symmetric(
-                    vertical: 8,
-                    horizontal: 16,
-                  ),
-                  linkPreviewData: message.metadata?["linkPreviewData"],
-                  onLinkPreviewDataFetched: (linkPreviewData) => updateMessage(
-                    message,
-                    message.copyWith(
-                      metadata: {
-                        ...(message.metadata ?? {}),
-                        "linkPreviewData": linkPreviewData,
-                      },
+                ref
+                    .watch(UrlPreviewController.provider(textMessage))
+                    .betterWhen(
+                      loading: SizedBox.shrink,
+                      data: (preview) => preview == null
+                          ? SizedBox.shrink()
+                          : LinkPreview(
+                              imageBuilder: (url) => Image(
+                                image: CachedNetworkImage(
+                                  url,
+                                  ref.watch(CrossCacheController.provider),
+                                  headers: ref.headers,
+                                ),
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, _, _) => SizedBox.shrink(),
+                              ),
+                              text: textMessage.text,
+                              backgroundColor: isSentByMe
+                                  ? colorScheme.inversePrimary
+                                  : colorScheme.surfaceContainerLow,
+                              outsidePadding: EdgeInsets.only(top: 4),
+                              insidePadding: EdgeInsets.symmetric(
+                                vertical: 8,
+                                horizontal: 16,
+                              ),
+                              linkPreviewData: preview,
+                              onLinkPreviewDataFetched: (_) => null,
+                            ),
                     ),
-                  ),
-                ),
               if (extra != null) extra!,
             ],
           ),
