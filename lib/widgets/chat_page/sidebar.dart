@@ -1,14 +1,11 @@
 import "package:flutter/material.dart";
-import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
-import "package:nexus/controllers/client_controller.dart";
 import "package:nexus/controllers/key_controller.dart";
 import "package:nexus/controllers/selected_space_controller.dart";
 import "package:nexus/controllers/spaces_controller.dart";
-import "package:nexus/helpers/extensions/join_room_with_snackbars.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
+import "package:nexus/widgets/chat_page/join_dialog.dart";
 import "package:nexus/widgets/chat_page/room_menu.dart";
-import "package:nexus/widgets/form_text_input.dart";
 
 class Sidebar extends HookConsumerWidget {
   final bool isDesktop;
@@ -91,53 +88,7 @@ class Sidebar extends HookConsumerWidget {
                       PopupMenuItem(
                         onTap: () => showDialog(
                           context: context,
-                          builder: (alertContext) => HookBuilder(
-                            builder: (_) {
-                              final roomAlias = useTextEditingController();
-                              return AlertDialog(
-                                title: Text("Join a Room"),
-                                content: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "Enter the room alias, ID, or a Matrix.to link.",
-                                    ),
-                                    SizedBox(height: 12),
-                                    FormTextInput(
-                                      required: false,
-                                      capitalize: true,
-                                      controller: roomAlias,
-                                      title: "#room:server",
-                                    ),
-                                  ],
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: Navigator.of(context).pop,
-                                    child: Text("Cancel"),
-                                  ),
-                                  TextButton(
-                                    onPressed: () async {
-                                      Navigator.of(alertContext).pop();
-
-                                      final client = ref.watch(
-                                        ClientController.provider.notifier,
-                                      );
-                                      if (context.mounted) {
-                                        client.joinRoomWithSnackBars(
-                                          context,
-                                          roomAlias.text,
-                                          ref,
-                                        );
-                                      }
-                                    },
-                                    child: Text("Join"),
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
+                          builder: (_) => JoinDialog(),
                         ),
                         child: ListTile(
                           title: Text("Join an existing room (or space)"),

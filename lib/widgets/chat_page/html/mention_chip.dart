@@ -10,11 +10,9 @@ class MentionChip extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final mention = label.mention;
-    final membership =
-        mention?.startsWith("@") == true || label.startsWith("@") == true
+    final membership = label.mention.startsWith("@") == true
         ? ref
-              .watch(UserController.provider(mention ?? label))
+              .watch(UserController.provider(label.mention))
               .whenOrNull(data: (data) => data)
         : null;
 
@@ -31,8 +29,7 @@ class MentionChip extends ConsumerWidget {
         child: Chip(
           label: Text(
             (membership == null ? null : "@${membership.displayName}") ??
-                mention ??
-                label,
+                label.mention,
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: Theme.of(context).colorScheme.onPrimary,

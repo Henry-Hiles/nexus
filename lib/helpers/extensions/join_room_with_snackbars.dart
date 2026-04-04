@@ -1,10 +1,8 @@
-import "package:collection/collection.dart";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/material.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/client_controller.dart";
-import "package:nexus/controllers/key_controller.dart";
-import "package:nexus/controllers/spaces_controller.dart";
+import "package:nexus/helpers/extensions/focus_room.dart";
 import "package:nexus/helpers/extensions/link_to_mention.dart";
 import "package:nexus/models/requests/join_room_request.dart";
 
@@ -14,7 +12,7 @@ extension JoinRoomWithSnackbars on ClientController {
     String roomAlias,
     WidgetRef ref,
   ) async {
-    final roomIdOrAlias = roomAlias.mention ?? roomAlias;
+    final roomIdOrAlias = roomAlias.mention;
     // TODO: Parse vias properly
 
     final scaffoldMessenger = ScaffoldMessenger.of(context);
@@ -41,33 +39,7 @@ extension JoinRoomWithSnackbars on ClientController {
           content: Text("Room $roomIdOrAlias successfully joined."),
           action: SnackBarAction(
             label: "Open",
-            onPressed: () async {
-              final spaces = ref.watch(SpacesController.provider);
-              final space = spaces.firstWhereOrNull((space) => space.id == id);
-
-              await ref
-                  .watch(
-                    KeyController.provider(KeyController.spaceKey).notifier,
-                  )
-                  .set(
-                    space?.id ??
-                        spaces
-                            .firstWhere(
-                              (space) => space.children.any(
-                                (child) => child.metadata?.id == id,
-                              ),
-                            )
-                            .id,
-                  );
-
-              if (space == null) {
-                await ref
-                    .watch(
-                      KeyController.provider(KeyController.roomKey).notifier,
-                    )
-                    .set(id);
-              }
-            },
+            onPressed: () => ref.focusRoom(id),
           ),
         ),
       );
