@@ -60,7 +60,9 @@ class Html extends ConsumerWidget {
         "a" =>
           element.attributes["href"]?.mention == null
               ? null
-              : InlineCustomWidget(child: MentionChip(element.text)),
+              : InlineCustomWidget(
+                  child: MentionChip(element.attributes["href"]!),
+                ),
 
         "img" =>
           src == null
