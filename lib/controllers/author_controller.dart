@@ -1,10 +1,10 @@
 import "dart:async";
-import "package:collection/collection.dart";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client_state_controller.dart";
-import "package:nexus/controllers/members_controller.dart";
+import "package:nexus/controllers/user_controller.dart";
+import "package:nexus/helpers/extensions/get_localpart.dart";
 import "package:nexus/models/membership.dart";
 import "package:nexus/models/membership_status.dart";
 
@@ -15,11 +15,7 @@ class AuthorController extends AsyncNotifier<Membership> {
   @override
   Future<Membership> build() async {
     final member = await ref.watch(
-      MembersController.provider.selectAsync(
-        (value) => value.firstWhereOrNull(
-          (membership) => membership.userId == message.authorId,
-        ),
-      ),
+      UserController.provider(message.authorId).future,
     );
 
     final pmp = message.metadata?["pmp"] == null
@@ -39,9 +35,7 @@ class AuthorController extends AsyncNotifier<Membership> {
       status: member?.status ?? MembershipStatus.leave,
       avatarUrl: pmp?.avatarUrl ?? member?.avatarUrl,
       displayName:
-          pmp?.displayName ??
-          member?.displayName ??
-          message.authorId.substring(1).split(":").first,
+          pmp?.displayName ?? member?.displayName ?? message.authorId.localpart,
       userId: message.authorId,
     );
   }

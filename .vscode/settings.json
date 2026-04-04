@@ -3,6 +3,7 @@
         "Appbar",
         "Displayname",
         "Homeserver",
+        "localpart",
         "prefs",
         "vodozemac"
     ]
