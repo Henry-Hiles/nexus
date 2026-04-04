@@ -27,17 +27,19 @@ class MentionChip extends ConsumerWidget {
           );
         }
       },
-      child: Chip(
-        label: Text(
-          (membership == null ? null : "@${membership.displayName}") ??
-              mention ??
-              label,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Theme.of(context).colorScheme.onPrimary,
+      child: IgnorePointer(
+        child: Chip(
+          label: Text(
+            (membership == null ? null : "@${membership.displayName}") ??
+                mention ??
+                label,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.onPrimary,
+            ),
           ),
+          backgroundColor: Theme.of(context).colorScheme.primary,
         ),
-        backgroundColor: Theme.of(context).colorScheme.primary,
       ),
     );
   }
