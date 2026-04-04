@@ -5,6 +5,8 @@ import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:fluttertagger/fluttertagger.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
+import "package:nexus/controllers/power_level_controller.dart";
+import "package:nexus/models/configs/power_level_config.dart";
 import "package:nexus/models/relation_type.dart";
 import "package:nexus/widgets/chat_page/composer/mention_overlay.dart";
 import "package:nexus/widgets/chat_page/composer/relation_preview.dart";
@@ -42,6 +44,7 @@ class ChatBox extends HookConsumerWidget {
     }
 
     void send() {
+      if (controller.value.text.isEmpty) return;
       onSend(
         controller.value.formattedText,
         shouldMention: shouldMention.value,
@@ -67,6 +70,12 @@ class ChatBox extends HookConsumerWidget {
     final style = TextStyle(
       color: theme.colorScheme.primary,
       fontWeight: FontWeight.bold,
+    );
+
+    final canSendMessages = ref.watch(
+      PowerLevelController.provider(
+        PowerLevelConfig(eventType: "m.room.message"),
+      ),
     );
 
     return Positioned(
@@ -95,6 +104,7 @@ class ChatBox extends HookConsumerWidget {
                   children: [
                     PopupMenuButton(
                       tooltip: "Add media",
+                      enabled: canSendMessages,
                       itemBuilder: (context) => [
                         PopupMenuItem(
                           child: ListTile(
@@ -136,12 +146,11 @@ class ChatBox extends HookConsumerWidget {
                         },
                         triggerCharacterAndStyles: {"@": style, "#": style},
                         builder: (context, key) => TextFormField(
-                          // enabled: room.canSendDefaultMessages,
+                          enabled: canSendMessages,
                           maxLines: 12,
                           minLines: 1,
                           decoration: InputDecoration(
-                            hintText:
-                                true // TODO: room.canSendDefaultMessages
+                            hintText: canSendMessages
                                 ? "Your message here..."
                                 : "You don't have permission to send messages in this room...",
                             border: InputBorder.none,
@@ -156,7 +165,7 @@ class ChatBox extends HookConsumerWidget {
                       ),
                     ),
                     IconButton(
-                      onPressed: send,
+                      onPressed: !canSendMessages ? null : send,
                       // onPressed: room.canSendDefaultMessages ? send : null,
                       icon: Icon(Icons.send),
                       tooltip: "Send message",

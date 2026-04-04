@@ -1,4 +1,5 @@
 import "package:freezed_annotation/freezed_annotation.dart";
+import "package:nexus/models/requests/membership_action.dart";
 part "set_membership_request.freezed.dart";
 part "set_membership_request.g.dart";
 
@@ -16,6 +17,3 @@ abstract class SetMembershipRequest with _$SetMembershipRequest {
   factory SetMembershipRequest.fromJson(Map<String, Object?> json) =>
       _$SetMembershipRequestFromJson(json);
 }
-
-@JsonEnum()
-enum MembershipAction { ban, kick, unban, invite }

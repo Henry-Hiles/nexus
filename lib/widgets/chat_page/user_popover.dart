@@ -4,11 +4,14 @@ import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:intl/intl.dart";
 import "package:nexus/controllers/client_controller.dart";
 import "package:nexus/controllers/client_state_controller.dart";
+import "package:nexus/controllers/power_level_controller.dart";
 import "package:nexus/controllers/profile_controller.dart";
 import "package:nexus/controllers/selected_room_controller.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
+import "package:nexus/models/configs/power_level_config.dart";
 import "package:nexus/models/membership.dart";
 import "package:nexus/models/membership_status.dart";
+import "package:nexus/models/requests/membership_action.dart";
 import "package:nexus/models/requests/set_membership_request.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/main.dart";
@@ -150,7 +153,17 @@ class UserPopover extends ConsumerWidget {
             runSpacing: 8,
             children: [
               FilledButton.icon(onPressed: null, label: Text("Message")),
-              if (member.status == MembershipStatus.join ||
+
+              if (ref.watch(
+                        PowerLevelController.provider(
+                          PowerLevelConfig(
+                            eventType: "m.room.member",
+                            action: MembershipAction.kick,
+                            isStateEvent: true,
+                          ),
+                        ),
+                      ) &&
+                      member.status == MembershipStatus.join ||
                   member.status == MembershipStatus.invite)
                 FilledButton.icon(
                   onPressed: () => showMembershipDialog(MembershipAction.kick),
@@ -164,24 +177,33 @@ class UserPopover extends ConsumerWidget {
                     ),
                   ),
                 ),
-              ElevatedButton.icon(
-                onPressed: () => showMembershipDialog(
-                  member.status == MembershipStatus.ban
-                      ? MembershipAction.unban
-                      : MembershipAction.ban,
-                ),
-                label: Text(
-                  member.status == MembershipStatus.ban ? "Unban" : "Ban",
-                ),
-                style: ButtonStyle(
-                  backgroundColor: WidgetStatePropertyAll(
-                    theme.colorScheme.errorContainer,
-                  ),
-                  foregroundColor: WidgetStatePropertyAll(
-                    theme.colorScheme.onErrorContainer,
+              if (ref.watch(
+                PowerLevelController.provider(
+                  PowerLevelConfig(
+                    eventType: "m.room.member",
+                    action: MembershipAction.ban,
+                    isStateEvent: true,
                   ),
                 ),
-              ),
+              ))
+                ElevatedButton.icon(
+                  onPressed: () => showMembershipDialog(
+                    member.status == MembershipStatus.ban
+                        ? MembershipAction.unban
+                        : MembershipAction.ban,
+                  ),
+                  label: Text(
+                    member.status == MembershipStatus.ban ? "Unban" : "Ban",
+                  ),
+                  style: ButtonStyle(
+                    backgroundColor: WidgetStatePropertyAll(
+                      theme.colorScheme.errorContainer,
+                    ),
+                    foregroundColor: WidgetStatePropertyAll(
+                      theme.colorScheme.onErrorContainer,
+                    ),
+                  ),
+                ),
             ],
           ),
       ],
