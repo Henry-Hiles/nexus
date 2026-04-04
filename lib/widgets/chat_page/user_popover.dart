@@ -1,12 +1,12 @@
 import "package:flutter/material.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
+import "package:intl/intl.dart";
 import "package:nexus/controllers/client_controller.dart";
 import "package:nexus/controllers/client_state_controller.dart";
 import "package:nexus/controllers/profile_controller.dart";
 import "package:nexus/controllers/selected_room_controller.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
-import "package:nexus/helpers/extensions/capitalized.dart";
 import "package:nexus/models/membership.dart";
 import "package:nexus/models/membership_status.dart";
 import "package:nexus/models/requests/set_membership_request.dart";
@@ -34,7 +34,9 @@ class UserPopover extends ConsumerWidget {
         builder: (context) {
           final actionReasonController = useTextEditingController();
           return AlertDialog(
-            title: Text("${action.name.capitalized} ${member.userId}"),
+            title: Text(
+              "${toBeginningOfSentenceCase(action.name)} ${member.userId}",
+            ),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -70,7 +72,7 @@ class UserPopover extends ConsumerWidget {
                       )
                       .onError(showError);
                 },
-                child: Text(action.name.capitalized),
+                child: Text(toBeginningOfSentenceCase(action.name)),
               ),
             ],
           );
