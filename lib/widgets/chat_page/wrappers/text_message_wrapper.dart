@@ -2,6 +2,7 @@ import "package:cross_cache/cross_cache.dart";
 import "package:flutter/material.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:flutter_link_previewer/flutter_link_previewer.dart";
+import "package:flutter_linkify/flutter_linkify.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/cross_cache_controller.dart";
 import "package:nexus/controllers/url_preview_controller.dart";
@@ -60,29 +61,36 @@ class TextMessageWrapper extends ConsumerWidget {
                 onTapReply: onTapReply,
               ),
               if (content != null)
-                Html(
-                  textStyle: message.metadata?["big"] == true
-                      ? TextStyle(fontSize: 32)
-                      : null,
-                  content!
-                      .replaceAllMapped(
-                        RegExp(
-                          "(<a\\b[^>]*>.*?<\\/a>)|(\\bhttps?:\\/\\/[^\\s<]+)",
-                          caseSensitive: false,
-                        ),
-                        (m) {
-                          // If it's already an <a> tag, leave it unchanged
-                          if (m.group(1) != null) {
-                            return m.group(1)!;
-                          }
+                message.metadata?["format"] == "org.matrix.custom.html"
+                    ? Html(
+                        textStyle: message.metadata?["big"] == true
+                            ? TextStyle(fontSize: 32)
+                            : null,
+                        content!.replaceAllMapped(
+                          RegExp(
+                            "(<a\\b[^>]*>.*?<\\/a>)|(\\bhttps?:\\/\\/[^\\s<]+)",
+                            caseSensitive: false,
+                            dotAll: true,
+                          ),
+                          (m) {
+                            // If it's already an <a> tag, leave it unchanged
+                            if (m.group(1) != null) {
+                              return m.group(1)!;
+                            }
 
-                          // Otherwise, wrap the bare URL
-                          final url = m.group(2)!;
-                          return "<a href=\"$url\">$url</a>";
-                        },
+                            // Otherwise, wrap the bare URL
+                            final url = m.group(2)!;
+                            return "<a href=\"$url\">$url</a>";
+                          },
+                        ),
                       )
-                      .replaceAll("\n", "<br class=\"fake-break\"/>"),
-                ),
+                    : Linkify(
+                        text: content!,
+                        options: LinkifyOptions(humanize: false),
+                        linkStyle: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
               if (textMessage?.editedAt != null)
                 Text("(edited)", style: theme.textTheme.labelSmall),
               if (textMessage != null)

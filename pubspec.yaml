@@ -57,6 +57,7 @@ dependencies:
   ffigen: ^20.1.1
   timeago: ^3.7.1
   http: ^1.6.0
+  flutter_linkify: ^6.0.0
   
 dev_dependencies:
   build_runner: ^2.4.11

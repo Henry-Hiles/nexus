@@ -47,6 +47,7 @@ class MessageController extends AsyncNotifier<Message?> {
         "eventType": type,
         "pmp": event.content["com.beeper.per_message_profile"],
         "error": event.sendError,
+        "format": content["format"],
         "editSource":
             event.localContent?.editSource ??
             newContent?["body"] ??
