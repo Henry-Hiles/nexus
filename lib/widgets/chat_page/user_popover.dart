@@ -1,16 +1,19 @@
 import "package:flutter/material.dart";
+import "package:flutter_hooks/flutter_hooks.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client_controller.dart";
 import "package:nexus/controllers/client_state_controller.dart";
 import "package:nexus/controllers/profile_controller.dart";
 import "package:nexus/controllers/selected_room_controller.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
+import "package:nexus/helpers/extensions/capitalized.dart";
 import "package:nexus/models/membership.dart";
 import "package:nexus/models/membership_status.dart";
 import "package:nexus/models/requests/set_membership_request.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/main.dart";
 import "package:nexus/widgets/chat_page/expandable_image.dart";
+import "package:nexus/widgets/form_text_input.dart";
 
 class UserPopover extends ConsumerWidget {
   final Membership member;
@@ -23,6 +26,56 @@ class UserPopover extends ConsumerWidget {
     final client = ref.watch(ClientController.provider.notifier);
     final roomId = ref.watch(
       SelectedRoomController.provider.select((room) => room?.metadata?.id),
+    );
+
+    void showMembershipDialog(MembershipAction action) => showDialog(
+      context: context,
+      builder: (context) => HookBuilder(
+        builder: (context) {
+          final actionReasonController = useTextEditingController();
+          return AlertDialog(
+            title: Text("${action.name.capitalized} ${member.userId}"),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Are you sure you want to ${action.name} ${member.userId}?",
+                ),
+                SizedBox(height: 12),
+                FormTextInput(
+                  required: false,
+                  capitalize: true,
+                  controller: actionReasonController,
+                  title: "Reason for ${action.name} (optional)",
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: Navigator.of(context).pop,
+                child: Text("Cancel"),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  client
+                      .setMembership(
+                        SetMembershipRequest(
+                          userId: member.userId,
+                          roomId: roomId!,
+                          action: action,
+                          reason: actionReasonController.text,
+                        ),
+                      )
+                      .onError(showError);
+                },
+                child: Text(action.name.capitalized),
+              ),
+            ],
+          );
+        },
+      ),
     );
 
     return Column(
@@ -79,38 +132,26 @@ class UserPopover extends ConsumerWidget {
             runSpacing: 8,
             children: [
               FilledButton.icon(onPressed: null, label: Text("Message")),
-              FilledButton.icon(
-                onPressed: () => client
-                    .setMembership(
-                      SetMembershipRequest(
-                        userId: member.userId,
-                        roomId: roomId,
-                        action: MembershipAction.kick,
-                      ),
-                    )
-                    .onError(showError),
-                label: Text("Kick"),
-                style: ButtonStyle(
-                  backgroundColor: WidgetStatePropertyAll(
-                    theme.colorScheme.error,
-                  ),
-                  foregroundColor: WidgetStatePropertyAll(
-                    theme.colorScheme.onError,
+              if (member.status == MembershipStatus.join ||
+                  member.status == MembershipStatus.invite)
+                FilledButton.icon(
+                  onPressed: () => showMembershipDialog(MembershipAction.kick),
+                  label: Text("Kick"),
+                  style: ButtonStyle(
+                    backgroundColor: WidgetStatePropertyAll(
+                      theme.colorScheme.error,
+                    ),
+                    foregroundColor: WidgetStatePropertyAll(
+                      theme.colorScheme.onError,
+                    ),
                   ),
                 ),
-              ),
               ElevatedButton.icon(
-                onPressed: () => client
-                    .setMembership(
-                      SetMembershipRequest(
-                        userId: member.userId,
-                        roomId: roomId,
-                        action: member.status == MembershipStatus.ban
-                            ? MembershipAction.unban
-                            : MembershipAction.ban,
-                      ),
-                    )
-                    .onError(showError),
+                onPressed: () => showMembershipDialog(
+                  member.status == MembershipStatus.ban
+                      ? MembershipAction.unban
+                      : MembershipAction.ban,
+                ),
                 label: Text(
                   member.status == MembershipStatus.ban ? "Unban" : "Ban",
                 ),

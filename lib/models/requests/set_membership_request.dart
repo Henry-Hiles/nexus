@@ -8,6 +8,7 @@ abstract class SetMembershipRequest with _$SetMembershipRequest {
     required String userId,
     required String roomId,
 
+    String? reason,
     @JsonKey(name: "action") required MembershipAction action,
     @Default(false) @JsonKey(name: "msc4293_redact_events") bool redact,
   }) = _SetMembershipRequest;
