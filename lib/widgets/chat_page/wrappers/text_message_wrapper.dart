@@ -8,6 +8,7 @@ import "package:nexus/controllers/cross_cache_controller.dart";
 import "package:nexus/controllers/url_preview_controller.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
 import "package:nexus/helpers/extensions/get_headers.dart";
+import "package:nexus/helpers/launch_helper.dart";
 import "package:nexus/widgets/chat_page/html/html.dart";
 import "package:nexus/widgets/chat_page/wrappers/message_wrapper.dart";
 import "package:nexus/widgets/chat_page/reply_widget.dart";
@@ -87,6 +88,9 @@ class TextMessageWrapper extends ConsumerWidget {
                     : Linkify(
                         text: content!,
                         options: LinkifyOptions(humanize: false),
+                        onOpen: (link) => ref
+                            .watch(LaunchHelper.provider)
+                            .launchUrl(Uri.parse(link.url)),
                         linkStyle: TextStyle(
                           color: Theme.of(context).colorScheme.primary,
                         ),
