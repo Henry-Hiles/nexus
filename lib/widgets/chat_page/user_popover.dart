@@ -116,9 +116,25 @@ class UserPopover extends ConsumerWidget {
                           for (final pronoun in profile.pronouns.where(
                             (pronoun) => pronoun.language == "en",
                           ))
-                            Chip(label: Text(pronoun.summary)),
+                            Chip(
+                              label: Text(pronoun.summary),
+                              labelStyle: TextStyle(
+                                color: theme.colorScheme.onPrimary,
+                              ),
+                              color: WidgetStatePropertyAll(
+                                theme.colorScheme.primary,
+                              ),
+                            ),
                           if (profile.timezone != null)
-                            Chip(label: Text(profile.timezone!)),
+                            Chip(
+                              label: Text(profile.timezone!),
+                              labelStyle: TextStyle(
+                                color: theme.colorScheme.onPrimary,
+                              ),
+                              color: WidgetStatePropertyAll(
+                                theme.colorScheme.primary,
+                              ),
+                            ),
                         ],
                       ),
                     ),

@@ -12,10 +12,6 @@ extension SchemeToTheme on ColorScheme {
         backgroundColor: WidgetStatePropertyAll(primaryContainer),
       ),
     ),
-    chipTheme: ChipThemeData(
-      labelStyle: TextStyle(color: onPrimary),
-      color: WidgetStatePropertyAll(primary),
-    ),
     textTheme: ThemeData(
       fontFamilyFallback: ["sans", "emoji"],
       brightness: brightness,
