@@ -149,6 +149,7 @@ class ChatBox extends HookConsumerWidget {
                           enabled: canSendMessages,
                           maxLines: 12,
                           minLines: 1,
+                          autofocus: true,
                           decoration: InputDecoration(
                             hintText: canSendMessages
                                 ? "Your message here..."
@@ -159,6 +160,8 @@ class ChatBox extends HookConsumerWidget {
                           key: key,
                           // TODO: Setting for send on enter on / off
                           onFieldSubmitted: (_) => send(),
+                          // Don't defocus on submit
+                          onEditingComplete: () {},
                           textInputAction: TextInputAction.done,
                           focusNode: node,
                         ),
