@@ -105,6 +105,9 @@ class TextMessageWrapper extends ConsumerWidget {
                       data: (preview) => preview == null
                           ? SizedBox.shrink()
                           : LinkPreview(
+                              onTap: (url) => ref
+                                  .watch(LaunchHelper.provider)
+                                  .launchUrl(Uri.parse(url)),
                               imageBuilder: (url) => Image(
                                 image: CachedNetworkImage(
                                   url,
