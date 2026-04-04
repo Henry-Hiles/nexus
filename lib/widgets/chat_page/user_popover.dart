@@ -160,6 +160,7 @@ class UserPopover extends ConsumerWidget {
                             eventType: "m.room.member",
                             action: MembershipAction.kick,
                             isStateEvent: true,
+                            targetUser: member.userId,
                           ),
                         ),
                       ) &&
@@ -183,6 +184,7 @@ class UserPopover extends ConsumerWidget {
                     eventType: "m.room.member",
                     action: MembershipAction.ban,
                     isStateEvent: true,
+                    targetUser: member.userId,
                   ),
                 ),
               ))

@@ -9,6 +9,7 @@ abstract class PowerLevelConfig with _$PowerLevelConfig {
     @Default(false) bool isStateEvent,
     required String eventType,
     MembershipAction? action,
+    String? targetUser,
   }) = _PowerLevelConfig;
 
   factory PowerLevelConfig.fromJson(Map<String, Object?> json) =>

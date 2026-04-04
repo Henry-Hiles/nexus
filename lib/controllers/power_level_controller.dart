@@ -21,22 +21,40 @@ class PowerLevelController extends Notifier<bool> {
     final users = (event.content["users"] as Map<String, dynamic>? ?? {});
     final events = (event.content["events"] as Map<String, dynamic>? ?? {});
 
-    final userLevel = users.containsKey(user)
-        ? (users[user] as int)
+    int powerLevelOf(String userId) => users.containsKey(userId)
+        ? (users[userId] as int)
         : (event.content["users_default"] as int? ?? 0);
 
-    final requiredLevel = switch (config.action) {
-      MembershipAction.ban ||
-      MembershipAction.unban => (event.content["ban"] as int? ?? 50),
-      MembershipAction.kick => (event.content["kick"] as int? ?? 50),
-      MembershipAction.invite => (event.content["invite"] as int? ?? 0),
-      null =>
-        events.containsKey(config.eventType)
-            ? (events[config.eventType] as int)
-            : (config.isStateEvent
-                  ? (event.content["state_default"] as int? ?? 50)
-                  : (event.content["events_default"] as int? ?? 0)),
-    };
+    final userLevel = powerLevelOf(user);
+    final targetLevel = config.targetUser != null
+        ? powerLevelOf(config.targetUser!)
+        : null;
+
+    if (config.action != null) {
+      return switch (config.action!) {
+        MembershipAction.invite =>
+          userLevel >= (event.content["invite"] as int? ?? 0),
+
+        MembershipAction.kick =>
+          targetLevel != null &&
+              userLevel >= (event.content["kick"] as int? ?? 50) &&
+              userLevel > targetLevel,
+
+        MembershipAction.ban =>
+          targetLevel != null &&
+              userLevel >= (event.content["ban"] as int? ?? 50) &&
+              userLevel > targetLevel,
+
+        MembershipAction.unban =>
+          userLevel >= (event.content["ban"] as int? ?? 50),
+      };
+    }
+
+    final requiredLevel = events.containsKey(config.eventType)
+        ? (events[config.eventType] as int)
+        : (config.isStateEvent
+              ? (event.content["state_default"] as int? ?? 50)
+              : (event.content["events_default"] as int? ?? 0));
 
     return userLevel >= requiredLevel;
   }
