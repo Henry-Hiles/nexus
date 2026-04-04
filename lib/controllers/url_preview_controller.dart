@@ -17,7 +17,7 @@ class UrlPreviewController extends AsyncNotifier<LinkPreviewData?> {
       r'''https?://[^\s"'<>]+''',
     ).allMatches(message.text).firstOrNull?.group(0);
 
-    if (homeserver != null && link != null) {
+    if (homeserver != null && link != null && !link.contains("matrix.to")) {
       {
         final response = await get(
           Uri.parse(homeserver)
