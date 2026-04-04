@@ -90,6 +90,8 @@ class Html extends ConsumerWidget {
                     ),
                   ),
                 ),
+
+        // Allowed elements list
         ("del" ||
             "h1" ||
             "h2" ||
