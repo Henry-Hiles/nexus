@@ -126,7 +126,6 @@ class ChatBox extends HookConsumerWidget {
                         ),
                       ],
                       icon: Icon(Icons.add),
-                      // enabled: room.canSendDefaultMessages, TODO: Permissions check
                     ),
                     Expanded(
                       child: FlutterTagger(
@@ -169,7 +168,6 @@ class ChatBox extends HookConsumerWidget {
                     ),
                     IconButton(
                       onPressed: !canSendMessages ? null : send,
-                      // onPressed: room.canSendDefaultMessages ? send : null,
                       icon: Icon(Icons.send),
                       tooltip: "Send message",
                     ),
