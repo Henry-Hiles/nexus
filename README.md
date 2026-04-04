@@ -68,31 +68,31 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
         - [x] Per message profiles
         - [x] HTML
         - [x] URL Previews
-            - [x] Replies
-                - [x] Viewing
-                - [ ] Jump to original message
-                    - [x] In loaded timeline
-                    - [ ] Out of loaded timeline
-            - [x] Edits
-            - [x] Attachments
-                - [x] Unencrypted
-                - [ ] Encrypted
-                - [x] Blurhashing
-                - [ ] Downloading attachments
-                - [x] Opening attachments in their own view
-            - [ ] Polls: Waiting on https://github.com/SwanFlutter/dynamic_polls/issues/1
-            - [x] Mentions
-                - [x] Users
-                - [x] Rooms
-                    - [ ] Plain text (not sure if I want to add this or not, I probably won't unless there's interest)
-                    - [x] Matrix URIs
-                    - [x] Matrix.to links
-                - [ ] Do some fancy fetching to get nice names
-                - [ ] Make clickable
-            - [x] Custom emojis/stickers
-            - [x] History loading
-                - [x] Backwards
-                - [ ] Forwards
+        - [x] Replies
+            - [x] Viewing
+            - [ ] Jump to original message
+                - [x] In loaded timeline
+                - [ ] Out of loaded timeline
+        - [x] Edits
+        - [x] Attachments
+            - [x] Unencrypted
+            - [ ] Encrypted
+            - [x] Blurhashing
+            - [ ] Downloading attachments
+            - [x] Opening attachments in their own view
+        - [ ] Polls: Waiting on https://github.com/SwanFlutter/dynamic_polls/issues/1
+        - [x] Mentions
+            - [x] Users
+            - [x] Rooms
+                - [ ] Plain text (not sure if I want to add this or not, I probably won't unless there's interest)
+                - [x] Matrix URIs
+                - [x] Matrix.to links
+            - [ ] Do some fancy fetching to get nice names
+            - [ ] Make clickable
+        - [x] Custom emojis/stickers
+        - [x] History loading
+            - [x] Backwards
+            - [ ] Forwards
     - [x] Editing
     - [x] Deleting
 - [ ] Reactions: Waiting on https://github.com/flyerhq/flutter_chat_ui/pull/838 or me doing a custom impl
