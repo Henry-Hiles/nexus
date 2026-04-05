@@ -40,6 +40,12 @@ class TextMessageWrapper extends ConsumerWidget {
     final colorScheme = theme.colorScheme;
     final textMessage = message is TextMessage ? message as TextMessage : null;
 
+    final link = textMessage == null
+        ? null
+        : RegExp(
+            r'''https?://[^\s"'<>]+''',
+          ).allMatches(textMessage.text).firstOrNull?.group(0);
+
     return MessageWrapper(
       message,
       ClipRRect(
@@ -97,9 +103,9 @@ class TextMessageWrapper extends ConsumerWidget {
                       ),
               if (textMessage?.editedAt != null)
                 Text("(edited)", style: theme.textTheme.labelSmall),
-              if (textMessage != null)
+              if (link != null)
                 ref
-                    .watch(UrlPreviewController.provider(textMessage))
+                    .watch(UrlPreviewController.provider(link))
                     .betterWhen(
                       loading: SizedBox.shrink,
                       data: (preview) => preview == null
@@ -117,7 +123,7 @@ class TextMessageWrapper extends ConsumerWidget {
                                 fit: BoxFit.cover,
                                 errorBuilder: (_, _, _) => SizedBox.shrink(),
                               ),
-                              text: textMessage.text,
+                              text: link,
                               backgroundColor: isSentByMe
                                   ? colorScheme.inversePrimary
                                   : colorScheme.surfaceContainerLow,

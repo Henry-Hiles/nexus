@@ -7,17 +7,14 @@ import "package:nexus/controllers/header_controller.dart";
 import "package:nexus/helpers/extensions/mxc_to_https.dart";
 
 class UrlPreviewController extends AsyncNotifier<LinkPreviewData?> {
-  final TextMessage message;
-  UrlPreviewController(this.message);
+  final String link;
+  UrlPreviewController(this.link);
 
   @override
   Future<LinkPreviewData?> build() async {
     final homeserver = ref.watch(ClientStateController.provider)?.homeserverUrl;
-    final link = RegExp(
-      r'''https?://[^\s"'<>]+''',
-    ).allMatches(message.text).firstOrNull?.group(0);
 
-    if (homeserver != null && link != null && !link.contains("matrix.to")) {
+    if (homeserver != null && !link.contains("matrix.to")) {
       {
         final response = await get(
           Uri.parse(homeserver)
@@ -57,7 +54,7 @@ class UrlPreviewController extends AsyncNotifier<LinkPreviewData?> {
   }
 
   static final provider = AsyncNotifierProvider.autoDispose
-      .family<UrlPreviewController, LinkPreviewData?, TextMessage>(
+      .family<UrlPreviewController, LinkPreviewData?, String>(
         UrlPreviewController.new,
       );
 }
