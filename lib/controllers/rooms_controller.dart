@@ -11,7 +11,11 @@ class RoomsController extends Notifier<IMap<String, Room>> {
   @override
   IMap<String, Room> build() => const IMap.empty();
 
-  void update(IMap<String, Room> rooms, ISet<String> leftRooms) {
+  void update(
+    IMap<String, Room> rooms,
+    ISet<String> leftRooms, {
+    bool addToNewEvents = true,
+  }) {
     final homeserver =
         ref.watch(
           ClientStateController.provider.select(
@@ -29,18 +33,20 @@ class RoomsController extends Notifier<IMap<String, Room>> {
         (item) => item.eventId,
       );
 
-      ref
-          .watch(NewEventsController.provider(roomId).notifier)
-          .add(
-            incoming.timeline
-                .map(
-                  (timelineTuple) => events?.firstWhereOrNull(
-                    (event) => timelineTuple.eventRowId == event.rowId,
-                  ),
-                )
-                .nonNulls
-                .toIList(),
-          );
+      if (addToNewEvents) {
+        ref
+            .watch(NewEventsController.provider(roomId).notifier)
+            .add(
+              incoming.timeline
+                  .map(
+                    (timelineTuple) => events?.firstWhereOrNull(
+                      (event) => timelineTuple.eventRowId == event.rowId,
+                    ),
+                  )
+                  .nonNulls
+                  .toIList(),
+            );
+      }
 
       return acc.add(
         roomId,

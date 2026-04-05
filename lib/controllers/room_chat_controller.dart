@@ -123,9 +123,9 @@ class RoomChatController extends AsyncNotifier<InMemoryChatController> {
 
     ref.onDispose(controller.dispose);
 
-    // While there are under 20 messages, try up to two times to load more messages.
-    for (var i = 0; i < 2 && messages.length < 20; i++) {
-      await loadOlder(controller);
+    // While there are under 20 messages, try up to load more messages until theres no more or we have 20 messages.
+    for (var more = true; more == true && controller.messages.length < 20;) {
+      more = await loadOlder(controller);
     }
 
     return controller;
@@ -151,7 +151,7 @@ class RoomChatController extends AsyncNotifier<InMemoryChatController> {
         RedactEventRequest(eventId: message.id, roomId: roomId, reason: reason),
       );
 
-  Future<void> loadOlder([InMemoryChatController? chatController]) async {
+  Future<bool> loadOlder([InMemoryChatController? chatController]) async {
     final response = await ref
         .watch(ClientController.provider.notifier)
         .paginate(
@@ -183,28 +183,30 @@ class RoomChatController extends AsyncNotifier<InMemoryChatController> {
             ),
           }),
           const ISet.empty(),
+          addToNewEvents: false,
         );
 
     final room = ref.read(RoomsController.provider)[roomId];
-    if (room == null) return;
+    if (room != null) {
+      final messages = await ref.watch(
+        MessagesController.provider(
+          MessagesConfig(room: room, events: response.events.reversed),
+        ).future,
+      );
 
-    final messages = await ref.watch(
-      MessagesController.provider(
-        MessagesConfig(room: room, events: response.events.reversed),
-      ).future,
-    );
-
-    final controller = chatController ?? await future;
-    await controller.insertAllMessages(
-      messages
-          .where(
-            (newMessage) => !controller.messages.any(
-              (message) => message.id == newMessage.id,
-            ),
-          )
-          .toList(),
-      index: 0,
-    );
+      final controller = chatController ?? await future;
+      await controller.insertAllMessages(
+        messages
+            .where(
+              (newMessage) => !controller.messages.any(
+                (message) => message.id == newMessage.id,
+              ),
+            )
+            .toList(),
+        index: 0,
+      );
+    }
+    return response.hasMore;
   }
 
   Future<void> send(
