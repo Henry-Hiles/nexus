@@ -1,6 +1,5 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/material.dart";
-import "package:flutter/services.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:fluttertagger/fluttertagger.dart";
@@ -15,6 +14,7 @@ class ChatBox extends HookConsumerWidget {
   final Message? relatedMessage;
   final RelationType relationType;
   final VoidCallback onDismiss;
+  final FocusNode? node;
   final Future<void> Function(
     String text, {
     required bool shouldMention,
@@ -26,6 +26,7 @@ class ChatBox extends HookConsumerWidget {
     required this.relationType,
     required this.onDismiss,
     required this.onSend,
+    this.node,
     super.key,
   });
 
@@ -54,18 +55,6 @@ class ChatBox extends HookConsumerWidget {
       onDismiss();
       controller.value.text = "";
     }
-
-    final node = useFocusNode(
-      onKeyEvent: (_, event) {
-        if (event is KeyDownEvent &&
-            event.logicalKey == LogicalKeyboardKey.escape) {
-          onDismiss();
-          return KeyEventResult.handled;
-        }
-
-        return KeyEventResult.ignored;
-      },
-    );
 
     final style = TextStyle(
       color: theme.colorScheme.primary,
@@ -135,7 +124,7 @@ class ChatBox extends HookConsumerWidget {
                           triggerCharacter: triggerCharacter.value,
                           addTag: ({required id, required name}) {
                             controller.value.addTag(id: id, name: name);
-                            node.requestFocus();
+                            node?.requestFocus();
                           },
                         ),
                         controller: controller.value,

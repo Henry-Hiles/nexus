@@ -1,4 +1,5 @@
 import "package:flutter/material.dart";
+import "package:flutter/services.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:flutter_chat_ui/flutter_chat_ui.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
@@ -47,16 +48,35 @@ class RoomChat extends HookConsumerWidget {
     final danger = theme.colorScheme.error;
 
     if (roomId == null || userId == null) {
-      return Center(
-        child: Text(
-          "Nothing to see here...",
-          style: theme.textTheme.headlineMedium,
+      return Scaffold(
+        appBar: RoomAppbar(
+          isDesktop: isDesktop,
+          onOpenDrawer: (_) => Scaffold.of(context).openDrawer(),
+          onOpenMemberList: null,
+        ),
+        body: Center(
+          child: Text(
+            "Nothing to see here...",
+            style: theme.textTheme.headlineMedium,
+          ),
         ),
       );
     }
 
     final controllerProvider = RoomChatController.provider(roomId);
     final notifier = ref.watch(controllerProvider.notifier);
+
+    final composerNode = useFocusNode(
+      onKeyEvent: (_, event) {
+        if (event is KeyDownEvent &&
+            event.logicalKey == LogicalKeyboardKey.escape) {
+          relatedMessage.value = null;
+          return KeyEventResult.handled;
+        }
+
+        return KeyEventResult.ignored;
+      },
+    );
 
     List<PopupMenuEntry> getMessageOptions(Message message) {
       final isSentByMe = message.authorId == userId;
@@ -65,6 +85,7 @@ class RoomChat extends HookConsumerWidget {
           onTap: () {
             relatedMessage.value = message;
             relationType.value = RelationType.reply;
+            composerNode.requestFocus();
           },
           child: ListTile(leading: Icon(Icons.reply), title: Text("Reply")),
         ),
@@ -73,6 +94,7 @@ class RoomChat extends HookConsumerWidget {
             onTap: () {
               relatedMessage.value = message;
               relationType.value = RelationType.edit;
+              composerNode.requestFocus();
             },
             child: ListTile(leading: Icon(Icons.edit), title: Text("Edit")),
           ),
@@ -259,6 +281,7 @@ class RoomChat extends HookConsumerWidget {
                                 ),
 
                             composerBuilder: (_) => ChatBox(
+                              node: composerNode,
                               onSend:
                                   (
                                     text, {

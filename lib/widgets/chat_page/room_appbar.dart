@@ -9,12 +9,12 @@ import "package:nexus/widgets/chat_page/room_menu.dart";
 
 class RoomAppbar extends ConsumerWidget implements PreferredSizeWidget {
   final bool isDesktop;
-  final void Function(BuildContext context) onOpenMemberList;
+  final void Function(BuildContext context)? onOpenMemberList;
   final void Function(BuildContext context) onOpenDrawer;
   const RoomAppbar({
     required this.isDesktop,
-    required this.onOpenMemberList,
     required this.onOpenDrawer,
+    this.onOpenMemberList,
     super.key,
   });
 
@@ -23,39 +23,43 @@ class RoomAppbar extends ConsumerWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final room = ref.watch(SelectedRoomController.provider)!;
+    final room = ref.watch(SelectedRoomController.provider);
     return Appbar(
       leading: isDesktop
-          ? ExpandableImage(
-              room.metadata?.avatar?.toString(),
-              child: AvatarOrHash(
-                room.metadata?.avatar,
-                room.metadata?.name ?? "Unnamed Rooms",
-                height: 24,
-                fallback: Icon(Icons.numbers),
-              ),
-            )
+          ? room == null
+                ? null
+                : ExpandableImage(
+                    room.metadata?.avatar?.toString(),
+                    child: AvatarOrHash(
+                      room.metadata?.avatar,
+                      room.metadata?.name ?? "Unnamed Rooms",
+                      height: 24,
+                      fallback: Icon(Icons.numbers),
+                    ),
+                  )
           : DrawerButton(onPressed: () => onOpenDrawer(context)),
       scrolledUnderElevation: 0,
-      title: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            room.metadata?.name ?? "Unnamed Room",
-            overflow: TextOverflow.ellipsis,
-            maxLines: 1,
-          ),
-          if (room.metadata?.topic?.isNotEmpty == true)
-            Text(
-              room.metadata!.topic!,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
+      title: room == null
+          ? null
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  room.metadata?.name ?? "Unnamed Room",
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+                if (room.metadata?.topic?.isNotEmpty == true)
+                  Text(
+                    room.metadata!.topic!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+              ],
             ),
-        ],
-      ),
       actions: [
         IconButton(
           onPressed: null,
@@ -63,11 +67,11 @@ class RoomAppbar extends ConsumerWidget implements PreferredSizeWidget {
           tooltip: "Open pinned messages",
         ),
         IconButton(
-          onPressed: () => onOpenMemberList(context),
+          onPressed: () => onOpenMemberList?.call(context),
           tooltip: "Open member list",
           icon: Icon(Icons.people),
         ),
-        RoomMenu(room),
+        if (room != null) RoomMenu(room),
       ].toIList(),
     );
   }
