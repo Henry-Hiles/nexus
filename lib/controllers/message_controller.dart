@@ -1,4 +1,5 @@
 import "package:collection/collection.dart";
+import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client_state_controller.dart";
@@ -16,7 +17,6 @@ class MessageController extends AsyncNotifier<Message?> {
         return null;
       }
 
-      if (!ref.mounted) return null;
       final event = config.event.lastEditRowId == null
           ? config.event
           : config.room.events.firstWhereOrNull(
@@ -24,11 +24,11 @@ class MessageController extends AsyncNotifier<Message?> {
                 ) ??
                 config.event;
 
-      if (!ref.mounted) return null;
-
-      final content = (event.decrypted ?? event.content);
+      final decrypted = (event.decrypted ?? event.content);
       final type = (config.event.decryptedType ?? config.event.type);
-      final newContent = content["m.new_content"] as Map?;
+      final content = decrypted["m.new_content"] == null
+          ? decrypted
+          : IMap(decrypted["m.new_content"]);
 
       final homeserver = ref
           .read(ClientStateController.provider)
@@ -39,23 +39,18 @@ class MessageController extends AsyncNotifier<Message?> {
 
       final metadata = {
         "body": config.event.redactedBy == null
-            ? (newContent?["body"] ?? content["body"] ?? "")
+            ? (content["body"] ?? "")
             : "Deleted Message",
         "flashing": false,
         "timelineId": event.timelineRowId,
         "big": event.localContent?.bigEmoji == true,
         "eventType": type,
-        "pmp": event.content["com.beeper.per_message_profile"],
+        "pmp": content["com.beeper.per_message_profile"],
         "error": event.sendError,
-        "format": content["format"],
-        "editSource":
-            event.localContent?.editSource ??
-            newContent?["body"] ??
-            content["body"],
+        "format": content["format"] ?? content["format"],
+        "editSource": event.localContent?.editSource ?? content["body"],
         "txnId": config.event.transactionId,
       };
-
-      if (!ref.mounted) return null;
 
       final editedAt = event.relationType == "m.replace"
           ? event.timestamp
@@ -67,12 +62,6 @@ class MessageController extends AsyncNotifier<Message?> {
         return null;
       }
 
-      // TODO: Use server-generated preview if enabled
-
-      // final match = Uri.tryParse(
-      //   RegExp(regexLink, caseSensitive: false).firstMatch(body)?.group(0) ?? "",
-      // );
-
       final replyId =
           config.event.content["m.relates_to"]?["m.in_reply_to"]?["event_id"];
 
@@ -81,12 +70,7 @@ class MessageController extends AsyncNotifier<Message?> {
                 metadata: metadata,
                 id: config.event.eventId,
                 authorId: event.authorId,
-                text:
-                    newContent?["formatted_body"] ??
-                    newContent?["body"] ??
-                    content["formatted_body"] ??
-                    content["body"] ??
-                    "",
+                text: content["formatted_body"] ?? content["body"] ?? "",
                 replyToMessageId: replyId,
                 deliveredAt: config.event.timestamp,
                 editedAt: editedAt,
