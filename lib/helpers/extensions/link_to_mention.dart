@@ -9,7 +9,7 @@ extension LinkToMention on String {
   ///
   /// Returns the decoded identifier (e.g. "#room:matrix.org")
   /// or null if this is not a Matrix link.
-  String get mention {
+  String? get mention {
     final trimmed = trim();
 
     final matrixTo = RegExp(
@@ -39,6 +39,6 @@ extension LinkToMention on String {
       } catch (_) {}
     }
 
-    return this;
+    return null;
   }
 }

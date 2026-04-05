@@ -12,7 +12,7 @@ extension JoinRoomWithSnackbars on ClientController {
     String roomAlias,
     WidgetRef ref,
   ) async {
-    final roomIdOrAlias = roomAlias.mention;
+    final roomIdOrAlias = roomAlias.mention ?? roomAlias;
     // TODO: Parse vias properly
 
     final scaffoldMessenger = ScaffoldMessenger.of(context);
