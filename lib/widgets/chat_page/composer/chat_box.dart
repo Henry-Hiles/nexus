@@ -146,7 +146,6 @@ class ChatBox extends HookConsumerWidget {
                           ),
                           controller: controller.value,
                           key: key,
-                          // TODO: Setting for send on enter on / off
                           onFieldSubmitted: (_) => send(),
                           // Don't defocus on submit
                           onEditingComplete: () {},
