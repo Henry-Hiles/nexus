@@ -2,6 +2,7 @@ import "package:flutter/material.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/members_by_type_controller.dart";
 import "package:nexus/controllers/rooms_controller.dart";
+import "package:nexus/controllers/via_controller.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
 import "package:nexus/models/membership_status.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
@@ -62,7 +63,7 @@ class MentionOverlay extends ConsumerWidget {
                                   title: Text(member.displayName),
                                   subtitle: Text(member.userId),
                                   onTap: () => addTag(
-                                    id: "[@${member.displayName}](https://matrix.to/#/${member.userId})",
+                                    id: "[@${member.displayName}](matrix:u/${member.userId.substring(1)})",
                                     name: member.userId
                                         .substring(1)
                                         .split(":")
@@ -78,36 +79,43 @@ class MentionOverlay extends ConsumerWidget {
                   (query.isEmpty
                           ? rooms.values
                           : rooms.values.where(
-                              (room) => (room.metadata?.name ?? "Unnamed Room")
-                                  .toLowerCase()
-                                  .contains(query.toLowerCase()),
+                              (room) =>
+                                  (room.metadata?.name ?? room.metadata!.id)
+                                      .toLowerCase()
+                                      .contains(query.toLowerCase()),
                             ))
-                      .map(
-                        (room) => ListTile(
+                      .map((room) {
+                        final name =
+                            room.metadata?.name ??
+                            room.metadata!.canonicalAlias ??
+                            room.metadata!.id;
+                        return ListTile(
                           leading: AvatarOrHash(
                             room.metadata?.avatar,
-                            room.metadata?.name ?? "Unnamed Room",
+                            name,
                             fallback: Icon(Icons.numbers),
                           ),
-                          title: Text(room.metadata?.name ?? "Unnamed Room"),
+                          title: Text(name),
                           subtitle: room.metadata?.topic == null
                               ? null
                               : Text(room.metadata!.topic!, maxLines: 1),
-                          onTap: () => addTag(
-                            // Should add vias to generated link, see following:
-                            // https://github.com/gomuks/gomuks/blob/d5deeb5d409181e469eada8b534882576ac78e63/web/src/ui/modal/ShareModal.tsx#L31-L57
-                            // https://github.com/gomuks/gomuks/blob/main/web/src/api/statestore/room.ts#L329
-                            id: "[#${room.metadata?.name ?? "Unnamed Room"}](https://matrix.to/#/${room.metadata?.canonicalAlias ?? room.metadata?.id})",
-                            name:
-                                (room.metadata?.canonicalAlias ??
-                                        room.metadata?.id)
-                                    ?.substring(1)
-                                    .split(":")
-                                    .first ??
-                                "",
-                          ),
-                        ),
-                      )
+                          onTap: () {
+                            final vias = ref.watch(
+                              ViaController.provider(room),
+                            );
+                            addTag(
+                              id: "[#$name](matrix:roomid/${room.metadata?.id.substring(1)}$vias)",
+                              name:
+                                  (room.metadata?.canonicalAlias ??
+                                          room.metadata?.id)
+                                      ?.substring(1)
+                                      .split(":")
+                                      .first ??
+                                  "",
+                            );
+                          },
+                        );
+                      })
                       .toList(),
             ),
 
