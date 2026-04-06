@@ -80,7 +80,7 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
             - [x] Blurhashing
             - [ ] Downloading attachments
             - [x] Opening attachments in their own view
-        - [ ] Polls: Waiting on https://github.com/SwanFlutter/dynamic_polls/issues/1
+        - [ ] Polls
         - [x] Mentions
             - [x] Users
                 - [x] Clickable
@@ -104,7 +104,7 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
 - [ ] Threads
 - [x] Profile popouts
     - [ ] Working actions
-- [ ] Copy link to:
+- [x] Copy link to:
     - [x] Room
     - [x] Space
     - [x] Message
