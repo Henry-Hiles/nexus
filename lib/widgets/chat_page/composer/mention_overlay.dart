@@ -94,6 +94,9 @@ class MentionOverlay extends ConsumerWidget {
                               ? null
                               : Text(room.metadata!.topic!, maxLines: 1),
                           onTap: () => addTag(
+                            // Should add vias to generated link, see following:
+                            // https://github.com/gomuks/gomuks/blob/d5deeb5d409181e469eada8b534882576ac78e63/web/src/ui/modal/ShareModal.tsx#L31-L57
+                            // https://github.com/gomuks/gomuks/blob/main/web/src/api/statestore/room.ts#L329
                             id: "[#${room.metadata?.name ?? "Unnamed Room"}](https://matrix.to/#/${room.metadata?.canonicalAlias ?? room.metadata?.id})",
                             name:
                                 (room.metadata?.canonicalAlias ??
