@@ -63,7 +63,7 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
             - [ ] Inline emoji picker (Putting this here since it'll be implemented the same way as mentions)
         - [ ] Custom emojis/stickers
         - [ ] GIFs using Gomuks' GIF proxies
-    - [x] Recieving
+    - [x] Receiving
         - [x] Plain text
         - [x] Per message profiles
         - [x] HTML
@@ -87,8 +87,6 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
                 - [ ] Plain text (not sure if I want to add this or not, I probably won't unless there's interest)
                 - [x] Matrix URIs
                 - [x] Matrix.to links
-            - [ ] Do some fancy fetching to get nice names
-            - [ ] Make clickable
         - [x] Custom emojis/stickers
         - [x] History loading
             - [x] Backwards
@@ -102,7 +100,7 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
 - [ ] Threads
 - [x] Profile popouts
     - [ ] Working actions
-- [ ] Copy link to [room, space]
+- [ ] Copy link to [room, space, message]
 - [ ] Reporting
     - [x] Events
     - [ ] Rooms
@@ -110,6 +108,7 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
 - [ ] Group calls using [MSC4195](https://github.com/matrix-org/matrix-spec-proposals/pull/4195)
 - [ ] Invites
 - [ ] Settings
+    - [ ] Matrix: URIs vs Matrix.to links
     - [ ] Light/Dark mode
     - [ ] SSD or CSD
     - [ ] Show media by default
