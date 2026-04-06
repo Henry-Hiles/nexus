@@ -8,17 +8,25 @@ import "package:nexus/helpers/extensions/show_user_popover.dart";
 class MessageDisplayname extends ConsumerWidget {
   final Message message;
   final TextStyle? style;
-  const MessageDisplayname(this.message, {this.style, super.key});
+  final bool clickable;
+  const MessageDisplayname(
+    this.message, {
+    this.clickable = true,
+    this.style,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => ref
       .watch(AuthorController.provider(message))
       .betterWhen(
         data: (membership) => InkWell(
-          onTapUp: (details) => context.showUserPopover(
-            membership,
-            globalPosition: details.globalPosition,
-          ),
+          onTapUp: clickable
+              ? (details) => context.showUserPopover(
+                  membership,
+                  globalPosition: details.globalPosition,
+                )
+              : null,
           child: Text(
             "${membership.displayName}${message.metadata?["pmp"] == null ? "" : " (via ${message.authorId})"}",
             style: style,

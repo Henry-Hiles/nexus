@@ -70,6 +70,7 @@ class ReplyWidget extends ConsumerWidget {
                                         Flexible(
                                           child: MessageDisplayname(
                                             replyMessage,
+                                            clickable: false,
                                             style: Theme.of(context)
                                                 .textTheme
                                                 .labelMedium
