@@ -11,6 +11,7 @@ import "package:nexus/controllers/client_state_controller.dart";
 import "package:nexus/controllers/power_level_controller.dart";
 import "package:nexus/controllers/selected_room_controller.dart";
 import "package:nexus/controllers/room_chat_controller.dart";
+import "package:nexus/controllers/via_controller.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
 import "package:nexus/helpers/extensions/show_context_menu.dart";
 import "package:nexus/models/configs/power_level_config.dart";
@@ -100,6 +101,22 @@ class RoomChat extends HookConsumerWidget {
             },
             child: ListTile(leading: Icon(Icons.edit), title: Text("Edit")),
           ),
+        PopupMenuItem(
+          onTap: () async {
+            final room = ref.watch(SelectedRoomController.provider);
+            if (room == null) return;
+
+            final vias = ref.watch(ViaController.provider(room));
+
+            await Clipboard.setData(
+              ClipboardData(
+                text:
+                    "matrix:roomid/${room.metadata?.id.substring(1)}/e/${message.id}$vias)",
+              ),
+            );
+          },
+          child: ListTile(leading: Icon(Icons.link), title: Text("Copy Link")),
+        ),
         if (ref.watch(
           PowerLevelController.provider(
             PowerLevelConfig(eventType: "m.room.redaction"),

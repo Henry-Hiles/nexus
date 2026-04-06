@@ -103,7 +103,7 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
 - [ ] Copy link to:
     - [x] Room
     - [x] Space
-    - [ ] Message
+    - [x] Message
 - [ ] Reporting
     - [x] Events
     - [ ] Rooms
