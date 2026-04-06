@@ -88,7 +88,7 @@ class Sidebar extends HookConsumerWidget {
                       PopupMenuItem(
                         onTap: () => showDialog(
                           context: context,
-                          builder: (_) => JoinDialog(),
+                          builder: (_) => JoinDialog(ref),
                         ),
                         child: ListTile(
                           title: Text("Join an existing room (or space)"),

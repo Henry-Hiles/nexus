@@ -30,7 +30,8 @@ extension LinkToMention on String {
           final identifier = uri.pathSegments.last;
           if (identifier.isNotEmpty) {
             return "${switch (uri.pathSegments.firstOrNull) {
-              "r" || "roomid" => "#",
+              "r" => "#",
+              "roomid" => "!",
               "u" => "@",
               _ => "",
             }}${Uri.decodeComponent(identifier)}";
