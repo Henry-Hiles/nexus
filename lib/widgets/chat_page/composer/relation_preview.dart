@@ -39,13 +39,15 @@ class RelationPreview extends ConsumerWidget {
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
           MessageAvatar(relatedMessage!),
-          MessageDisplayname(
-            relatedMessage!,
-            style: theme.textTheme.labelMedium?.copyWith(
-              fontWeight: FontWeight.bold,
+          Flexible(
+            child: MessageDisplayname(
+              relatedMessage!,
+              style: theme.textTheme.labelMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
-          Expanded(
+          Flexible(
             child: Text(
               relatedMessage?.metadata?["body"] ??
                   relatedMessage?.metadata?["eventType"],
