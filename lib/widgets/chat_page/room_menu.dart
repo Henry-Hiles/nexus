@@ -1,7 +1,9 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/material.dart";
+import "package:flutter/services.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client_controller.dart";
+import "package:nexus/controllers/via_controller.dart";
 import "package:nexus/models/room.dart";
 
 class RoomMenu extends ConsumerWidget {
@@ -16,13 +18,18 @@ class RoomMenu extends ConsumerWidget {
 
     return PopupMenuButton(
       itemBuilder: (_) => [
-        // PopupMenuItem(
-        //   onTap: () async {
-        //     final link = await room.matrixToInviteLink();
-        //     await Clipboard.setData(ClipboardData(text: link.toString()));
-        //   },
-        //   child: ListTile(leading: Icon(Icons.link), title: Text("Copy Link")),
-        // ),
+        PopupMenuItem(
+          onTap: () async {
+            final vias = ref.watch(ViaController.provider(room));
+
+            await Clipboard.setData(
+              ClipboardData(
+                text: "matrix:roomid/${room.metadata?.id.substring(1)}$vias)",
+              ),
+            );
+          },
+          child: ListTile(leading: Icon(Icons.link), title: Text("Copy Link")),
+        ),
         PopupMenuItem(
           onTap: () async {
             await client.markRead(room);
