@@ -83,10 +83,14 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
         - [ ] Polls: Waiting on https://github.com/SwanFlutter/dynamic_polls/issues/1
         - [x] Mentions
             - [x] Users
+                - [x] Clickable
             - [x] Rooms
-                - [ ] Plain text (not sure if I want to add this or not, I probably won't unless there's interest)
+                - [x] Clickable
                 - [x] Matrix URIs
                 - [x] Matrix.to links
+            - [x] Events
+                - [ ] Render more nicely
+                - [ ] Clickable
         - [x] Custom emojis/stickers
         - [x] History loading
             - [x] Backwards
