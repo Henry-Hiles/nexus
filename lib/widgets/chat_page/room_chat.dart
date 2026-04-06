@@ -8,10 +8,12 @@ import "package:flyer_chat_system_message/flyer_chat_system_message.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/client_controller.dart";
 import "package:nexus/controllers/client_state_controller.dart";
+import "package:nexus/controllers/power_level_controller.dart";
 import "package:nexus/controllers/selected_room_controller.dart";
 import "package:nexus/controllers/room_chat_controller.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
 import "package:nexus/helpers/extensions/show_context_menu.dart";
+import "package:nexus/models/configs/power_level_config.dart";
 import "package:nexus/models/relation_type.dart";
 import "package:nexus/models/requests/report_request.dart";
 import "package:nexus/widgets/chat_page/composer/chat_box.dart";
@@ -98,7 +100,11 @@ class RoomChat extends HookConsumerWidget {
             },
             child: ListTile(leading: Icon(Icons.edit), title: Text("Edit")),
           ),
-        if (isSentByMe) // TODO: Or if user has permission to redact others' messages
+        if (ref.watch(
+          PowerLevelController.provider(
+            PowerLevelConfig(eventType: "m.room.redaction"),
+          ),
+        ))
           PopupMenuItem(
             onTap: () => showDialog(
               context: context,
@@ -145,7 +151,10 @@ class RoomChat extends HookConsumerWidget {
                 },
               ),
             ),
-            child: ListTile(leading: Icon(Icons.delete), title: Text("Delete")),
+            child: ListTile(
+              leading: Icon(Icons.delete, color: danger),
+              title: Text("Delete", style: TextStyle(color: danger)),
+            ),
           ),
         PopupMenuItem(
           onTap: () => showDialog(

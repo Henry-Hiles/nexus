@@ -50,6 +50,10 @@ class PowerLevelController extends Notifier<bool> {
       };
     }
 
+    if (config.eventType == "m.room.redaction") {
+      return userLevel >= (event.content["redact"] as int? ?? 50);
+    }
+
     final requiredLevel = events.containsKey(config.eventType)
         ? (events[config.eventType] as int)
         : (config.isStateEvent

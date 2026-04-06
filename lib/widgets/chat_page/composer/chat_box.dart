@@ -63,7 +63,7 @@ class ChatBox extends HookConsumerWidget {
 
     final canSendMessages = ref.watch(
       PowerLevelController.provider(
-        PowerLevelConfig(eventType: "m.room.message"),
+        PowerLevelConfig(eventType: "m.room.redaction"),
       ),
     );
 
