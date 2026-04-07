@@ -33,7 +33,10 @@ class Html extends ConsumerWidget {
         return InlineCustomWidget(child: SpoilerText(text: element.text));
       }
 
-      final height = int.tryParse(element.attributes["height"] ?? "") ?? 300;
+      final height =
+          int.tryParse(element.attributes["height"] ?? "") ??
+          (element.attributes.keys.contains("data-mx-emoticon") ? 32 : null) ??
+          300;
       final width = int.tryParse(element.attributes["width"] ?? "");
       final src = Uri.tryParse(element.attributes["src"] ?? "")
           ?.mxcToHttps(
