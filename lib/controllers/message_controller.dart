@@ -2,9 +2,11 @@ import "package:collection/collection.dart";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
+import "package:nexus/controllers/client_controller.dart";
 import "package:nexus/controllers/client_state_controller.dart";
 import "package:nexus/helpers/extensions/mxc_to_https.dart";
 import "package:nexus/models/configs/message_config.dart";
+import "package:nexus/models/requests/get_related_events_request.dart";
 
 class MessageController extends AsyncNotifier<Message?> {
   final MessageConfig config;
@@ -13,7 +15,8 @@ class MessageController extends AsyncNotifier<Message?> {
   @override
   Future<Message?> build() async {
     try {
-      if (config.event.relationType == "m.replace" && !config.includeEdits) {
+      if ((config.event.relationType == "m.replace" && !config.includeEdits) ||
+          config.room.metadata == null) {
         return null;
       }
 
@@ -65,10 +68,35 @@ class MessageController extends AsyncNotifier<Message?> {
       final replyId =
           config.event.content["m.relates_to"]?["m.in_reply_to"]?["event_id"];
 
+      final reactionEvents = await ref
+          .watch(ClientController.provider.notifier)
+          .getRelatedEvents(
+            GetRelatedEventsRequest(
+              roomId: config.room.metadata!.id,
+              eventId: config.event.eventId,
+              relationType: "m.annotation",
+            ),
+          );
+
+      final reactions = reactionEvents
+          ?.fold<IMap<String, IList<String>>>(IMap(), (acc, event) {
+            final key = event.content["m.relates_to"]?["key"];
+            if (key == null) return acc;
+
+            return acc.update(
+              key,
+              (list) => list.add(event.authorId),
+              ifAbsent: () => IList([event.authorId]),
+            );
+          })
+          .map((key, value) => MapEntry(key, value.unlock))
+          .unlock;
+
       final asText =
           Message.text(
                 metadata: metadata,
                 id: config.event.eventId,
+                reactions: reactions,
                 authorId: event.authorId,
                 text: content["formatted_body"] ?? content["body"] ?? "",
                 replyToMessageId: replyId,
@@ -80,6 +108,7 @@ class MessageController extends AsyncNotifier<Message?> {
       Message toSystemMessage(String content) => Message.system(
         metadata: {...metadata, "body": content},
         id: config.event.eventId,
+        reactions: reactions,
         authorId: event.authorId,
         deliveredAt: config.event.timestamp,
         text: content,
@@ -104,6 +133,7 @@ class MessageController extends AsyncNotifier<Message?> {
           null || "m.image" => Message.image(
             id: config.event.eventId,
             authorId: event.authorId,
+            reactions: reactions,
             source: source,
             replyToMessageId: replyId,
             metadata: metadata,
@@ -116,6 +146,7 @@ class MessageController extends AsyncNotifier<Message?> {
             size: content["info"]["size"],
             metadata: metadata,
             id: config.event.eventId,
+            reactions: reactions,
             authorId: event.authorId,
             source: source,
             replyToMessageId: replyId,
@@ -159,6 +190,7 @@ class MessageController extends AsyncNotifier<Message?> {
                     // ignore: dead_code
                     ? Message.unsupported(
                         metadata: metadata,
+                        reactions: reactions,
                         id: config.event.eventId,
                         authorId: event.authorId,
                         replyToMessageId: replyId,

@@ -77,6 +77,7 @@ class RoomChatController extends AsyncNotifier<InMemoryChatController> {
     ref.onDispose(
       ref.listen(NewEventsController.provider(roomId), (_, next) async {
         for (final event in next) {
+          // TODO: Handle new reactions
           if (event.type == "m.room.redaction") {
             final controller = await future;
             final message = controller.messages.firstWhereOrNull(
