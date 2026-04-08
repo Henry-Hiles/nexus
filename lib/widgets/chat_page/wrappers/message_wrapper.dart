@@ -90,33 +90,37 @@ class MessageWrapper extends ConsumerWidget {
                               clientState!.userId,
                             );
                             return SizedBox(
-                              child: ChoiceChip(
-                                showCheckmark: false,
-                                selected: selected,
-                                label: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  spacing: 8,
-                                  children: [
-                                    reaction.startsWith("mxc://")
-                                        ? Image(
-                                            height: 20,
-                                            image: CachedNetworkImage(
-                                              headers: ref.headers,
-                                              Uri.parse(reaction)
-                                                  .mxcToHttps(
-                                                    clientState.homeserverUrl!,
-                                                  )
-                                                  .toString(),
-                                              ref.watch(
-                                                CrossCacheController.provider,
+                              child: Tooltip(
+                                message: reactors.join(", "),
+                                child: ChoiceChip(
+                                  showCheckmark: false,
+                                  selected: selected,
+                                  label: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    spacing: 8,
+                                    children: [
+                                      reaction.startsWith("mxc://")
+                                          ? Image(
+                                              height: 20,
+                                              image: CachedNetworkImage(
+                                                headers: ref.headers,
+                                                Uri.parse(reaction)
+                                                    .mxcToHttps(
+                                                      clientState
+                                                          .homeserverUrl!,
+                                                    )
+                                                    .toString(),
+                                                ref.watch(
+                                                  CrossCacheController.provider,
+                                                ),
                                               ),
-                                            ),
-                                          )
-                                        : Text(reaction),
-                                    Text(reactors.length.toString()),
-                                  ],
+                                            )
+                                          : Text(reaction),
+                                      Text(reactors.length.toString()),
+                                    ],
+                                  ),
+                                  onSelected: (value) {}, // TODO
                                 ),
-                                onSelected: (value) {}, // TODO
                               ),
                             );
                           }).toList(),
