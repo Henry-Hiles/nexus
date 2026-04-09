@@ -32,28 +32,38 @@ class RelationPreview extends ConsumerWidget {
       child: Row(
         spacing: 8,
         children: [
-          SizedBox(width: 4),
           if (relationType == RelationType.edit)
             Text(
               "Editing message:",
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
+
           MessageAvatar(relatedMessage!),
-          Flexible(
-            child: MessageDisplayname(
-              relatedMessage!,
-              style: theme.textTheme.labelMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          Flexible(
-            child: Text(
-              relatedMessage?.metadata?["body"] ??
-                  relatedMessage?.metadata?["eventType"],
-              overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.labelMedium,
-              maxLines: 1,
+
+          Expanded(
+            child: Row(
+              spacing: 8,
+              children: [
+                Flexible(
+                  child: MessageDisplayname(
+                    relatedMessage!,
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Text(
+                    relatedMessage?.metadata?["body"] ??
+                        relatedMessage?.metadata?["eventType"] ??
+                        "",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    softWrap: false,
+                    style: theme.textTheme.labelMedium,
+                  ),
+                ),
+              ],
             ),
           ),
 
@@ -68,11 +78,12 @@ class RelationPreview extends ConsumerWidget {
                 ),
               ),
             ),
+
           IconButton(
             tooltip:
                 "Cancel ${relationType == RelationType.edit ? "edit" : "reply"}",
             onPressed: onDismiss,
-            icon: Icon(Icons.close),
+            icon: const Icon(Icons.close),
             iconSize: 20,
           ),
         ],
