@@ -15,6 +15,7 @@ import "package:nexus/controllers/space_edges_controller.dart";
 import "package:nexus/controllers/sync_status_controller.dart";
 import "package:nexus/controllers/top_level_spaces_controller.dart";
 import "package:nexus/helpers/extensions/gomuks_buffer.dart";
+import "package:nexus/main.dart";
 import "package:nexus/models/client_state.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/models/paginate.dart";
@@ -122,6 +123,7 @@ class ClientController extends AsyncNotifier<int> {
             debugPrint("Finished handling $muksEventType...");
           } catch (error, stackTrace) {
             debugger();
+            showError(error, stackTrace);
             debugPrintStack(stackTrace: stackTrace, label: error.toString());
           }
         });
