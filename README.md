@@ -37,7 +37,7 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
     - [ ] Searching
     - [ ] Creating (Rooms, Spaces, and DMs)
     - [x] Joining
-        - [ ] Parse vias
+        - [x] Parse vias
         - [x] Using a text/uri/link
             - [x] Plain text
             - [x] `matrix:` Uri
@@ -103,7 +103,7 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
     - [ ] Creating
 - [ ] Threads
 - [x] Profile popouts
-    - [ ] Working actions
+    - [x] Working actions
 - [x] Copy link to:
     - [x] Room
     - [x] Space
