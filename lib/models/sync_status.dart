@@ -14,5 +14,5 @@ abstract class SyncStatus with _$SyncStatus {
       _$SyncStatusFromJson(json);
 }
 
-@JsonEnum(fieldRename: FieldRename.snake)
+@JsonEnum(fieldRename: FieldRename.kebab)
 enum SyncStatusType { ok, waiting, erroring, permanentlyFailed }
