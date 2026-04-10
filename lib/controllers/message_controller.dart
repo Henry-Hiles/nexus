@@ -68,15 +68,17 @@ class MessageController extends AsyncNotifier<Message?> {
       final replyId =
           config.event.content["m.relates_to"]?["m.in_reply_to"]?["event_id"];
 
-      final reactionEvents = await ref
-          .watch(ClientController.provider.notifier)
-          .getRelatedEvents(
-            GetRelatedEventsRequest(
-              roomId: config.room.metadata!.id,
-              eventId: config.event.eventId,
-              relationType: "m.annotation",
-            ),
-          );
+      final reactionEvents = event.reactions.isEmpty
+          ? null
+          : await ref
+                .watch(ClientController.provider.notifier)
+                .getRelatedEvents(
+                  GetRelatedEventsRequest(
+                    roomId: config.room.metadata!.id,
+                    eventId: config.event.eventId,
+                    relationType: "m.annotation",
+                  ),
+                );
 
       final reactions = reactionEvents
           ?.where((event) => event.redactedBy == null)
