@@ -9,6 +9,7 @@ import "package:nexus/controllers/message_controller.dart";
 import "package:nexus/controllers/messages_controller.dart";
 import "package:nexus/controllers/new_events_controller.dart";
 import "package:nexus/controllers/rooms_controller.dart";
+import "package:nexus/controllers/selected_room_controller.dart";
 import "package:nexus/models/configs/messages_config.dart";
 import "package:nexus/models/configs/message_config.dart";
 import "package:nexus/models/requests/get_room_state_request.dart";
@@ -77,15 +78,67 @@ class RoomChatController extends AsyncNotifier<InMemoryChatController> {
     ref.onDispose(
       ref.listen(NewEventsController.provider(roomId), (_, next) async {
         for (final event in next) {
-          // TODO: Handle new reactions
+          if (event.type == "m.reaction") {
+            final message = controller.messages.firstWhereOrNull(
+              (message) =>
+                  message.id == event.content["m.relates_to"]?["event_id"],
+            );
+            final key = event.content["m.relates_to"]?["key"];
+            if (message == null || key == null || !ref.mounted) return;
+
+            return await controller.updateMessage(
+              message,
+              message.copyWith(
+                reactions: IMap(message.reactions)
+                    .update(
+                      key,
+                      (reactors) => [...reactors, event.authorId],
+                      ifAbsent: () => [event.authorId],
+                    )
+                    .unlock,
+              ),
+            );
+          }
+
           if (event.type == "m.room.redaction") {
             final controller = await future;
-            final message = controller.messages.firstWhereOrNull(
-              (message) => message.id == event.content["redacts"],
+            final redactsId = event.content["redacts"];
+            final originalMessage = controller.messages.firstWhereOrNull(
+              (message) => message.id == redactsId,
             );
-            if (message == null || !ref.mounted) return;
+            if (!ref.mounted) return;
 
-            await controller.removeMessage(message);
+            if (originalMessage != null) {
+              return await controller.removeMessage(originalMessage);
+            }
+
+            final redacts = ref
+                .read(SelectedRoomController.provider)
+                ?.events
+                .firstWhere((event) => event.eventId == redactsId);
+
+            if (redacts?.type == "m.reaction") {
+              final message = controller.messages.firstWhereOrNull(
+                (message) =>
+                    message.id == redacts!.content["m.relates_to"]?["event_id"],
+              );
+              final key = redacts!.content["m.relates_to"]?["key"];
+              if (message == null || key == null || !ref.mounted) return;
+
+              return await controller.updateMessage(
+                message,
+                message.copyWith(
+                  reactions: IMap(message.reactions)
+                      .update(
+                        key,
+                        (reactors) =>
+                            IList(reactors).remove(redacts.authorId).unlock,
+                      )
+                      .where((_, value) => value.isNotEmpty)
+                      .unlock,
+                ),
+              );
+            }
           } else {
             final message = await ref.watch(
               MessageController.provider(

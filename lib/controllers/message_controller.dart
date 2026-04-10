@@ -79,7 +79,8 @@ class MessageController extends AsyncNotifier<Message?> {
           );
 
       final reactions = reactionEvents
-          ?.fold<IMap<String, IList<String>>>(IMap(), (acc, event) {
+          ?.where((event) => event.redactedBy == null)
+          .fold<IMap<String, IList<String>>>(IMap(), (acc, event) {
             final key = event.content["m.relates_to"]?["key"];
             if (key == null) return acc;
 
