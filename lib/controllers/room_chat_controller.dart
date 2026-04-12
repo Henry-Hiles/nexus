@@ -12,6 +12,7 @@ import "package:nexus/controllers/rooms_controller.dart";
 import "package:nexus/controllers/selected_room_controller.dart";
 import "package:nexus/models/configs/messages_config.dart";
 import "package:nexus/models/configs/message_config.dart";
+import "package:nexus/models/requests/get_related_events_request.dart";
 import "package:nexus/models/requests/get_room_state_request.dart";
 import "package:nexus/models/requests/paginate_request.dart";
 import "package:nexus/models/requests/redact_event_request.dart";
@@ -327,6 +328,39 @@ class RoomChatController extends AsyncNotifier<InMemoryChatController> {
     Timer(Duration(seconds: 1), () => setFlashing(false));
 
     return await controller.scrollToMessage(message.id);
+  }
+
+  Future<void> removeReaction(
+    String reaction,
+    Message message,
+    String userId,
+  ) async {
+    final client = ref.watch(ClientController.provider.notifier);
+    final allReactionEvents = await client.getRelatedEvents(
+      GetRelatedEventsRequest(
+        roomId: roomId,
+        eventId: message.id,
+        relationType: "m.annotation",
+      ),
+    );
+
+    final reactionEvents = allReactionEvents
+        ?.where((event) => event.redactedBy == null)
+        .toIList();
+
+    final reactionEvent = reactionEvents?.firstWhereOrNull(
+      (event) =>
+          event.authorId == userId &&
+          event.content["m.relates_to"]?["key"] == reaction,
+    );
+
+    if (reactionEvent != null) {
+      await ref
+          .watch(ClientController.provider.notifier)
+          .redactEvent(
+            RedactEventRequest(eventId: reactionEvent.eventId, roomId: roomId),
+          );
+    }
   }
 
   Future<void> sendReaction(String reaction, Message message) async {

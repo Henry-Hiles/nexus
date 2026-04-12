@@ -9,6 +9,7 @@ import "package:nexus/controllers/room_chat_controller.dart";
 import "package:nexus/controllers/selected_room_controller.dart";
 import "package:nexus/helpers/extensions/get_headers.dart";
 import "package:nexus/helpers/extensions/mxc_to_https.dart";
+import "package:nexus/main.dart";
 
 class ReactionRow extends ConsumerWidget {
   final Message message;
@@ -56,16 +57,24 @@ class ReactionRow extends ConsumerWidget {
                           (value) => value?.metadata?.id,
                         ),
                       );
-                      if (roomId == null) return;
+                      if (roomId == null || clientState.userId == null) return;
 
                       final controller = ref.watch(
                         RoomChatController.provider(roomId).notifier,
                       );
 
                       if (selected) {
-                        // TODO: remove
+                        await controller
+                            .removeReaction(
+                              reaction,
+                              message,
+                              clientState.userId!,
+                            )
+                            .onError(showError);
                       } else {
-                        await controller.sendReaction(reaction, message);
+                        await controller
+                            .sendReaction(reaction, message)
+                            .onError(showError);
                       }
                     },
                   ),
