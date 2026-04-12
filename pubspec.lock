@@ -354,6 +354,15 @@ packages:
       url: "https://github.com/hasali19/flutter_dynamic_system_colors"
     source: git
     version: "1.8.0"
+  emoji_text_field:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: "0e90703a6e876939be70bd1816c49cf14474de61"
+      url: "https://github.com/Henry-Hiles/emoji_text_field"
+    source: git
+    version: "1.0.0"
   encrypt:
     dependency: transitive
     description:

@@ -1,3 +1,5 @@
+import "package:emoji_text_field/emoji_text_field.dart";
+import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 import "package:flutter_chat_core/flutter_chat_core.dart";
@@ -6,6 +8,7 @@ import "package:flutter_hooks/flutter_hooks.dart";
 import "package:flyer_chat_file_message/flyer_chat_file_message.dart";
 import "package:flyer_chat_system_message/flyer_chat_system_message.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
+import "package:nexus/controllers/account_data_controller.dart";
 import "package:nexus/controllers/client_controller.dart";
 import "package:nexus/controllers/client_state_controller.dart";
 import "package:nexus/controllers/power_level_controller.dart";
@@ -84,6 +87,62 @@ class RoomChat extends HookConsumerWidget {
     List<PopupMenuEntry> getMessageOptions(Message message) {
       final isSentByMe = message.authorId == userId;
       return [
+        PopupMenuItem(
+          child: Row(
+            children: [
+              ...{
+                    ...ref.watch(
+                      AccountDataController.provider.select(
+                        (value) => IList(
+                          value["m.recent_emoji"]?.content["recent_emoji"] ??
+                              [],
+                        ).map((entry) => entry["emoji"]),
+                      ),
+                    ),
+                    "👍",
+                    "🤣",
+                    "😭",
+                    "🤔",
+                  }
+                  .toIList()
+                  .sublist(0, 4)
+                  .map(
+                    (emoji) => IconButton(
+                      onPressed: () async {
+                        Navigator.of(context).pop();
+                        await notifier
+                            .sendReaction(emoji, message)
+                            .onError(showError);
+                      },
+                      icon: Text(emoji),
+                    ),
+                  ),
+              IconButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  final controller = TextEditingController();
+                  showBottomSheet(
+                    context: context,
+                    builder: (context) => EmojiKeyboardView(
+                      config: EmojiViewConfig(
+                        backgroundColor: theme.colorScheme.surfaceContainer,
+                        height: 600,
+                      ),
+                      textController: controller
+                        ..addListener(() async {
+                          Navigator.of(context).pop();
+                          await notifier
+                              .sendReaction(controller.text, message)
+                              .onError(showError);
+                        }),
+                    ),
+                  );
+                },
+                icon: Icon(Icons.emoji_emotions),
+              ),
+            ],
+          ),
+        ),
         PopupMenuItem(
           onTap: () {
             relatedMessage.value = message;
