@@ -20,6 +20,16 @@ class RoomMenu extends ConsumerWidget {
       itemBuilder: (_) => [
         PopupMenuItem(
           onTap: () async {
+            await client.markRead(room);
+            await Future.wait(children.map((child) => client.markRead(child)));
+          },
+          child: ListTile(
+            leading: Icon(Icons.check),
+            title: Text("Mark as Read"),
+          ),
+        ),
+        PopupMenuItem(
+          onTap: () async {
             final vias = ref.watch(ViaController.provider(room));
 
             await Clipboard.setData(
@@ -29,16 +39,6 @@ class RoomMenu extends ConsumerWidget {
             );
           },
           child: ListTile(leading: Icon(Icons.link), title: Text("Copy Link")),
-        ),
-        PopupMenuItem(
-          onTap: () async {
-            await client.markRead(room);
-            await Future.wait(children.map((child) => client.markRead(child)));
-          },
-          child: ListTile(
-            leading: Icon(Icons.check),
-            title: Text("Mark as Read"),
-          ),
         ),
         PopupMenuItem(
           onTap: () => showDialog(
