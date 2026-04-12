@@ -26,6 +26,7 @@ flutter.buildFlutterApplication {
     dynamic_system_colors = "sha256-es6rjMK1drkqZBKYUP77yw/q5+0uLwWOEDOXRawy3Dc=";
     flutter_chat_ui = "sha256-4fuag7lRH5cMBFD3fUzj2K541JwXLoz8HF/4OMr3uhk=";
     flutter_link_previewer = "sha256-4fuag7lRH5cMBFD3fUzj2K541JwXLoz8HF/4OMr3uhk=";
+    emoji_text_field = "sha256-F0QbIHP3wpKoL6QbJ20Oun0SsOdwnXe84IqsK2ad85w=";
   };
 
   postInstall = ''
