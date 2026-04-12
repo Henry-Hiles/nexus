@@ -20,10 +20,11 @@ class EmojiPickerButton extends HookWidget {
     onPressed: () {
       onPressed?.call();
       final controller = this.controller ?? TextEditingController();
-      showBottomSheet(
+      showModalBottomSheet(
         context: context,
         builder: (context) => EmojiKeyboardView(
           config: EmojiViewConfig(
+            showRecentTab: false,
             backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
             height: 600,
           ),
