@@ -97,7 +97,7 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
             - [ ] Forwards
     - [x] Editing
     - [x] Deleting
-- [ ] Reactions
+- [x] Reactions
 - [ ] Pins
     - [ ] Displaying
     - [ ] Creating
