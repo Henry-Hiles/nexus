@@ -3,9 +3,10 @@
         "Appbar",
         "Displayname",
         "fluttertagger",
+        "Gomuks",
         "Homeserver",
         "localpart",
-        "prefs",
-        "vodozemac"
+        "muks",
+        "prefs"
     ]
 }
