@@ -377,6 +377,7 @@ class RoomChatController extends AsyncNotifier<InMemoryChatController> {
             "key": reaction,
           },
         },
+        synchronous: true,
         disableEncryption: true,
       ),
     );

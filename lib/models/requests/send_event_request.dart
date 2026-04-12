@@ -8,6 +8,7 @@ abstract class SendEventRequest with _$SendEventRequest {
     required String roomId,
     required String type,
     required Map<String, dynamic> content,
+    @Default(false) bool synchronous,
     @Default(false) bool disableEncryption,
   }) = _SendEventRequest;
 
