@@ -15,8 +15,8 @@ class MessageController extends AsyncNotifier<Message?> {
   @override
   Future<Message?> build() async {
     try {
-      if ((config.event.relationType == "m.replace" && !config.includeEdits) ||
-          config.room.metadata == null) {
+      final isEdit = config.event.relationType == "m.replace";
+      if ((isEdit && !config.includeEdits) || config.room.metadata == null) {
         return null;
       }
 
@@ -68,14 +68,16 @@ class MessageController extends AsyncNotifier<Message?> {
       final replyId =
           config.event.content["m.relates_to"]?["m.in_reply_to"]?["event_id"];
 
-      final reactionEvents = event.reactions.isEmpty
+      final reactionEvents = config.event.reactions.isEmpty && !isEdit
           ? null
           : await ref
                 .watch(ClientController.provider.notifier)
                 .getRelatedEvents(
                   GetRelatedEventsRequest(
                     roomId: config.room.metadata!.id,
-                    eventId: config.event.eventId,
+                    eventId:
+                        (isEdit ? config.event.relatesTo : null) ??
+                        config.event.eventId,
                     relationType: "m.annotation",
                   ),
                 );
