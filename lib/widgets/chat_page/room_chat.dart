@@ -1,4 +1,3 @@
-import "package:emoji_text_field/emoji_text_field.dart";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
@@ -21,6 +20,7 @@ import "package:nexus/models/configs/power_level_config.dart";
 import "package:nexus/models/relation_type.dart";
 import "package:nexus/models/requests/report_request.dart";
 import "package:nexus/widgets/chat_page/composer/chat_box.dart";
+import "package:nexus/widgets/chat_page/emoji_picker_button.dart";
 import "package:nexus/widgets/chat_page/expandable_image_message.dart";
 import "package:nexus/widgets/chat_page/member_list.dart";
 import "package:nexus/widgets/chat_page/wrappers/message_wrapper.dart";
@@ -117,28 +117,11 @@ class RoomChat extends HookConsumerWidget {
                       icon: Text(emoji),
                     ),
                   ),
-              IconButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  final controller = TextEditingController();
-                  showBottomSheet(
-                    context: context,
-                    builder: (context) => EmojiKeyboardView(
-                      config: EmojiViewConfig(
-                        backgroundColor: theme.colorScheme.surfaceContainer,
-                        height: 600,
-                      ),
-                      textController: controller
-                        ..addListener(() async {
-                          Navigator.of(context).pop();
-                          await notifier
-                              .sendReaction(controller.text, message)
-                              .onError(showError);
-                        }),
-                    ),
-                  );
-                },
-                icon: Icon(Icons.emoji_emotions),
+              EmojiPickerButton(
+                context: context,
+                onPressed: Navigator.of(context).pop,
+                onSelection: (emoji) =>
+                    notifier.sendReaction(emoji, message).onError(showError),
               ),
             ],
           ),

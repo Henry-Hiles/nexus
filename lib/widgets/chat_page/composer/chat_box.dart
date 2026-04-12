@@ -9,6 +9,7 @@ import "package:nexus/models/configs/power_level_config.dart";
 import "package:nexus/models/relation_type.dart";
 import "package:nexus/widgets/chat_page/composer/mention_overlay.dart";
 import "package:nexus/widgets/chat_page/composer/relation_preview.dart";
+import "package:nexus/widgets/chat_page/emoji_picker_button.dart";
 
 class ChatBox extends HookConsumerWidget {
   final Message? relatedMessage;
@@ -91,6 +92,11 @@ class ChatBox extends HookConsumerWidget {
                 child: Row(
                   spacing: 8,
                   children: [
+                    EmojiPickerButton(
+                      context: context,
+                      onSelection: (_) => node?.requestFocus(),
+                      controller: controller.value,
+                    ),
                     PopupMenuButton(
                       tooltip: "Add media",
                       enabled: canSendMessages,
