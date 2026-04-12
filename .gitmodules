@@ -1,4 +1,4 @@
 [submodule "gomuks"]
 	path = gomuks
-	url = https://github.com/zachatrocity/gomuks
-	branch = init-root-dir
+	url = https://github.com/gomuks/gomuks
+	branch = main
