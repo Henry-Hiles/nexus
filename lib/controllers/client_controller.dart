@@ -28,6 +28,7 @@ import "package:nexus/models/profile.dart";
 import "package:nexus/models/requests/paginate_request.dart";
 import "package:nexus/models/requests/redact_event_request.dart";
 import "package:nexus/models/requests/report_request.dart";
+import "package:nexus/models/requests/send_event_request.dart";
 import "package:nexus/models/requests/send_message_request.dart";
 import "package:nexus/models/requests/set_membership_request.dart";
 import "package:nexus/models/room.dart";
@@ -80,9 +81,13 @@ class ClientController extends AsyncNotifier<int> {
               case "send_complete":
                 final event = Event.fromJson(decodedMuksEvent["event"]);
 
-                ref
-                    .watch(NewEventsController.provider(event.roomId).notifier)
-                    .add(IList([event]));
+                if (event.type == "m.room.message") {
+                  ref
+                      .watch(
+                        NewEventsController.provider(event.roomId).notifier,
+                      )
+                      .add(IList([event]));
+                }
                 break;
               case "sync_complete":
                 final syncData = SyncData.fromJson(decodedMuksEvent);
@@ -163,6 +168,9 @@ class ClientController extends AsyncNotifier<int> {
 
   Future<Event> sendMessage(SendMessageRequest request) async =>
       Event.fromJson(await _sendCommand("send_message", request.toJson()));
+
+  Future<Event> sendEvent(SendEventRequest request) async =>
+      Event.fromJson(await _sendCommand("send_event", request.toJson()));
 
   Future<String?> verify(String recoveryKey) async {
     try {

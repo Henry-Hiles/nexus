@@ -16,6 +16,7 @@ import "package:nexus/models/requests/get_room_state_request.dart";
 import "package:nexus/models/requests/paginate_request.dart";
 import "package:nexus/models/requests/redact_event_request.dart";
 import "package:nexus/models/relation_type.dart";
+import "package:nexus/models/requests/send_event_request.dart";
 import "package:nexus/models/requests/send_message_request.dart";
 import "package:nexus/models/room.dart";
 
@@ -326,6 +327,25 @@ class RoomChatController extends AsyncNotifier<InMemoryChatController> {
     Timer(Duration(seconds: 1), () => setFlashing(false));
 
     return await controller.scrollToMessage(message.id);
+  }
+
+  Future<void> sendReaction(String reaction, Message message) async {
+    final client = ref.watch(ClientController.provider.notifier);
+
+    await client.sendEvent(
+      SendEventRequest(
+        roomId: roomId,
+        type: "m.reaction",
+        content: {
+          "m.relates_to": {
+            "event_id": message.id,
+            "rel_type": "m.annotation",
+            "key": reaction,
+          },
+        },
+        disableEncryption: true,
+      ),
+    );
   }
 
   static final provider = AsyncNotifierProvider.family
