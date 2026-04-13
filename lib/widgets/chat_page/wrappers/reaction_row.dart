@@ -31,17 +31,17 @@ class ReactionRow extends ConsumerWidget {
                     builder: (context) {
                       final enabled = useState(true);
                       final selected = reactors.contains(clientState!.userId);
-                      return SizedBox(
-                        child: Tooltip(
-                          message: reactors.join(", "),
-                          child: ChoiceChip(
-                            showCheckmark: false,
-                            selected: selected,
-                            label: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              spacing: 8,
-                              children: [
-                                reaction.startsWith("mxc://")
+                      return Tooltip(
+                        message: reactors.join(", "),
+                        child: ChoiceChip(
+                          showCheckmark: false,
+                          selected: selected,
+                          label: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            spacing: 8,
+                            children: [
+                              Flexible(
+                                child: reaction.startsWith("mxc://")
                                     ? Image(
                                         height: 20,
                                         image: CachedNetworkImage(
@@ -56,49 +56,55 @@ class ReactionRow extends ConsumerWidget {
                                           ),
                                         ),
                                       )
-                                    : Text(reaction),
-                                Text(reactors.length.toString()),
-                              ],
-                            ),
-                            onSelected: enabled.value
-                                ? (value) async {
-                                    enabled.value = false;
-                                    try {
-                                      final roomId = ref.watch(
-                                        SelectedRoomController.provider.select(
-                                          (value) => value?.metadata?.id,
-                                        ),
-                                      );
-                                      if (roomId == null ||
-                                          clientState.userId == null) {
-                                        return;
-                                      }
-
-                                      final controller = ref.watch(
-                                        RoomChatController.provider(
-                                          roomId,
-                                        ).notifier,
-                                      );
-
-                                      if (selected) {
-                                        await controller
-                                            .removeReaction(
-                                              reaction,
-                                              message,
-                                              clientState.userId!,
-                                            )
-                                            .onError(showError);
-                                      } else {
-                                        await controller
-                                            .sendReaction(reaction, message)
-                                            .onError(showError);
-                                      }
-                                    } finally {
-                                      enabled.value = true;
-                                    }
-                                  }
-                                : null,
+                                    : Text(
+                                        reaction,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                              ),
+                              Text(
+                                reactors.length.toString(),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
                           ),
+                          onSelected: enabled.value
+                              ? (value) async {
+                                  enabled.value = false;
+                                  try {
+                                    final roomId = ref.watch(
+                                      SelectedRoomController.provider.select(
+                                        (value) => value?.metadata?.id,
+                                      ),
+                                    );
+                                    if (roomId == null ||
+                                        clientState.userId == null) {
+                                      return;
+                                    }
+
+                                    final controller = ref.watch(
+                                      RoomChatController.provider(
+                                        roomId,
+                                      ).notifier,
+                                    );
+
+                                    if (selected) {
+                                      await controller
+                                          .removeReaction(
+                                            reaction,
+                                            message,
+                                            clientState.userId!,
+                                          )
+                                          .onError(showError);
+                                    } else {
+                                      await controller
+                                          .sendReaction(reaction, message)
+                                          .onError(showError);
+                                    }
+                                  } finally {
+                                    enabled.value = true;
+                                  }
+                                }
+                              : null,
                         ),
                       );
                     },
