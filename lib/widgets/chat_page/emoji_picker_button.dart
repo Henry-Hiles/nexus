@@ -35,7 +35,7 @@ class EmojiPickerButton extends HookConsumerWidget {
               height: 600,
             ),
             textController: controller
-              ..addListener(() async {
+              ..addListener(() {
                 Navigator.of(context).pop();
                 onSelection?.call(controller.text);
               }),
