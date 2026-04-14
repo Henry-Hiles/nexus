@@ -36,7 +36,10 @@ class EmojiPickerButton extends HookConsumerWidget {
             ),
             textController: controller
               ..addListener(() {
-                Navigator.of(context).pop();
+                // Without this, there will sometimes be a debugLocked is not true error sometimes
+                Future.delayed(Duration.zero, () {
+                  if (context.mounted) Navigator.of(context).pop();
+                });
                 onSelection?.call(controller.text);
               }),
           ),
