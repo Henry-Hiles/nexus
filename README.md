@@ -157,9 +157,39 @@ Or, try the Nix package: `nix run git+https://git.federated.nexus/Henry-Hiles/ne
 - With Nix: Either use direnv and `direnv allow`, or `nix flake develop`
 - Without Nix: Install Flutter, Go, Git, Libclang, and Glibc. Do not use any Snap packages, they cause various compilation issues.
 
-#### Windows / MacOS
+#### Windows
 
-I don't really know. You will need Flutter, Git, Go, and Visual Studio tools, and otherwise I guess just keep installing stuff until there aren't any errors. I will look into this sometimeTM.
+You will need:
+
+- Flutter
+- Android SDK + NDK
+- Git
+- Go
+- Visual Studio 2022 (Desktop development with C++)
+- [MSYS2/MinGW-w64 GCC](https://www.msys2.org/) (for CGO)
+- [LLVM/Clang + libclang](https://clang.llvm.org/get_started.html) (for `ffigen`)
+
+On Windows, make sure these are available in your shell `PATH`:
+
+- `C:\msys64\ucrt64\bin` (or your MinGW bin path containing `x86_64-w64-mingw32-gcc.exe`)
+- `C:\Program Files\LLVM\bin` (contains `clang.exe` and `libclang.dll`)
+
+Also make sure Go build cache env vars are present (PowerShell):
+
+```powershell
+$env:LOCALAPPDATA = "C:\Users\<you>\AppData\Local"
+$env:GOCACHE = "$env:LOCALAPPDATA\go-build"
+```
+
+For `dart scripts/generate.dart`, you may also need:
+
+```powershell
+$env:CPATH = "C:\msys64\ucrt64\include"
+```
+
+#### MacOS
+
+Similar prerequisites apply (Flutter, Git, Go, C toolchain, LLVM/libclang), but exact setup has not been fully documented yet.
 
 ### Clone repo
 
