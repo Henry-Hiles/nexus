@@ -359,7 +359,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "0e90703a6e876939be70bd1816c49cf14474de61"
+      resolved-ref: "5f7baaf8a6f059ec3ab8ff0f5d02339b00bf6997"
       url: "https://github.com/Henry-Hiles/emoji_text_field"
     source: git
     version: "1.0.0"
