@@ -118,6 +118,7 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
     - [ ] Matrix: URIs vs Matrix.to links
     - [ ] Light/Dark mode
     - [ ] SSD or CSD
+    - [ ] Align your message bubbles to left or right
     - [ ] Show media by default
     - [ ] Dynamic Theming
     - [ ] Devices
