@@ -174,13 +174,6 @@ On Windows, make sure these are available in your shell `PATH`:
 - `C:\msys64\ucrt64\bin` (or your MinGW bin path containing `x86_64-w64-mingw32-gcc.exe`)
 - `C:\Program Files\LLVM\bin` (contains `clang.exe` and `libclang.dll`)
 
-Also make sure Go build cache env vars are present (PowerShell):
-
-```powershell
-$env:LOCALAPPDATA = "C:\Users\<you>\AppData\Local"
-$env:GOCACHE = "$env:LOCALAPPDATA\go-build"
-```
-
 For `dart scripts/generate.dart`, you may also need:
 
 ```powershell
