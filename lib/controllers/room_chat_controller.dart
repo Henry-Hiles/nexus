@@ -7,11 +7,11 @@ import "package:fluttertagger/fluttertagger.dart";
 import "package:nexus/controllers/client_controller.dart";
 import "package:nexus/controllers/message_controller.dart";
 import "package:nexus/controllers/messages_controller.dart";
-import "package:nexus/controllers/new_events_controller.dart";
 import "package:nexus/controllers/rooms_controller.dart";
 import "package:nexus/controllers/selected_room_controller.dart";
 import "package:nexus/models/configs/messages_config.dart";
 import "package:nexus/models/configs/message_config.dart";
+import "package:nexus/models/event.dart";
 import "package:nexus/models/requests/get_related_events_request.dart";
 import "package:nexus/models/requests/get_room_state_request.dart";
 import "package:nexus/models/requests/paginate_request.dart";
@@ -77,106 +77,6 @@ class RoomChatController extends AsyncNotifier<InMemoryChatController> {
     );
     final controller = InMemoryChatController(messages: messages.toList());
 
-    ref.onDispose(
-      ref.listen(NewEventsController.provider(roomId), (_, next) async {
-        for (final event in next) {
-          if (event.type == "m.reaction") {
-            final message = controller.messages.firstWhereOrNull(
-              (message) =>
-                  message.id == event.content["m.relates_to"]?["event_id"],
-            );
-            final key = event.content["m.relates_to"]?["key"];
-            if (message == null || key == null || !ref.mounted) return;
-
-            return await controller.updateMessage(
-              message,
-              message.copyWith(
-                reactions: IMap(message.reactions)
-                    .update(
-                      key,
-                      (reactors) => [...reactors, event.authorId],
-                      ifAbsent: () => [event.authorId],
-                    )
-                    .unlock,
-              ),
-            );
-          }
-
-          if (event.type == "m.room.redaction") {
-            final controller = await future;
-            final redactsId = event.content["redacts"];
-            final originalMessage = controller.messages.firstWhereOrNull(
-              (message) => message.id == redactsId,
-            );
-            if (!ref.mounted) return;
-
-            if (originalMessage != null) {
-              return await controller.removeMessage(originalMessage);
-            }
-
-            final redacts = ref
-                .read(SelectedRoomController.provider)
-                ?.events
-                .firstWhere((event) => event.eventId == redactsId);
-
-            if (redacts?.type == "m.reaction") {
-              final message = controller.messages.firstWhereOrNull(
-                (message) =>
-                    message.id == redacts!.content["m.relates_to"]?["event_id"],
-              );
-              final key = redacts!.content["m.relates_to"]?["key"];
-              if (message == null || key == null || !ref.mounted) return;
-
-              return await controller.updateMessage(
-                message,
-                message.copyWith(
-                  reactions: IMap(message.reactions)
-                      .update(
-                        key,
-                        (reactors) =>
-                            IList(reactors).remove(redacts.authorId).unlock,
-                      )
-                      .where((_, value) => value.isNotEmpty)
-                      .unlock,
-                ),
-              );
-            }
-          } else {
-            final message = await ref.watch(
-              MessageController.provider(
-                MessageConfig(event: event, room: room!, includeEdits: true),
-              ).future,
-            );
-            if (event.relationType == "m.replace") {
-              final controller = await future;
-              final oldMessage = controller.messages.firstWhereOrNull(
-                (element) => element.id == event.relatesTo,
-              );
-              if (oldMessage == null || message == null || !ref.mounted) return;
-
-              return await controller.updateMessage(
-                oldMessage,
-                message.copyWith(
-                  id: oldMessage.id,
-                  replyToMessageId: oldMessage.replyToMessageId,
-                  metadata: {
-                    ...(oldMessage.metadata ?? {}),
-                    ...(message.metadata ?? {})
-                        .toIMap()
-                        .where((key, value) => value != null)
-                        .unlock,
-                  },
-                ),
-              );
-            }
-            if (message != null && ref.mounted) {
-              await insertMessage(message);
-            }
-          }
-        }
-      }, weak: true).close,
-    );
-
     ref.onDispose(controller.dispose);
 
     // While there are under 20 messages, try up to load more messages until theres no more or we have 20 messages.
@@ -185,6 +85,105 @@ class RoomChatController extends AsyncNotifier<InMemoryChatController> {
     }
 
     return controller;
+  }
+
+  Future<void> addEvent(Event event) async {
+    final controller = await future;
+    if (event.type == "m.reaction") {
+      final message = controller.messages.firstWhereOrNull(
+        (message) => message.id == event.content["m.relates_to"]?["event_id"],
+      );
+      final key = event.content["m.relates_to"]?["key"];
+      if (message == null || key == null || !ref.mounted) return;
+
+      return await controller.updateMessage(
+        message,
+        message.copyWith(
+          reactions: IMap(message.reactions)
+              .update(
+                key,
+                (reactors) => [...reactors, event.authorId],
+                ifAbsent: () => [event.authorId],
+              )
+              .unlock,
+        ),
+      );
+    }
+
+    if (event.type == "m.room.redaction") {
+      final controller = await future;
+      final redactsId = event.content["redacts"];
+      final originalMessage = controller.messages.firstWhereOrNull(
+        (message) => message.id == redactsId,
+      );
+      if (!ref.mounted) return;
+
+      if (originalMessage != null) {
+        return await controller.removeMessage(originalMessage);
+      }
+
+      final redacts = ref
+          .read(SelectedRoomController.provider)
+          ?.events
+          .firstWhere((event) => event.eventId == redactsId);
+
+      if (redacts?.type == "m.reaction") {
+        final message = controller.messages.firstWhereOrNull(
+          (message) =>
+              message.id == redacts!.content["m.relates_to"]?["event_id"],
+        );
+        final key = redacts!.content["m.relates_to"]?["key"];
+        if (message == null || key == null || !ref.mounted) return;
+
+        return await controller.updateMessage(
+          message,
+          message.copyWith(
+            reactions: IMap(message.reactions)
+                .update(
+                  key,
+                  (reactors) => IList(reactors).remove(redacts.authorId).unlock,
+                )
+                .where((_, value) => value.isNotEmpty)
+                .unlock,
+          ),
+        );
+      }
+    } else {
+      final message = await ref.watch(
+        MessageController.provider(
+          MessageConfig(
+            event: event,
+            room: ref.read(RoomsController.provider)[roomId]!,
+            includeEdits: true,
+          ),
+        ).future,
+      );
+      if (event.relationType == "m.replace") {
+        final controller = await future;
+        final oldMessage = controller.messages.firstWhereOrNull(
+          (element) => element.id == event.relatesTo,
+        );
+        if (oldMessage == null || message == null || !ref.mounted) return;
+
+        return await controller.updateMessage(
+          oldMessage,
+          message.copyWith(
+            id: oldMessage.id,
+            replyToMessageId: oldMessage.replyToMessageId,
+            metadata: {
+              ...(oldMessage.metadata ?? {}),
+              ...(message.metadata ?? {})
+                  .toIMap()
+                  .where((key, value) => value != null)
+                  .unlock,
+            },
+          ),
+        );
+      }
+      if (message != null && ref.mounted) {
+        await insertMessage(message);
+      }
+    }
   }
 
   Future<void> insertMessage(Message message) async {

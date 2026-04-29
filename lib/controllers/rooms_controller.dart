@@ -2,7 +2,7 @@ import "package:collection/collection.dart";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client_state_controller.dart";
-import "package:nexus/controllers/new_events_controller.dart";
+import "package:nexus/controllers/room_chat_controller.dart";
 import "package:nexus/helpers/extensions/mxc_to_https.dart";
 import "package:nexus/models/read_receipt.dart";
 import "package:nexus/models/room.dart";
@@ -34,18 +34,20 @@ class RoomsController extends Notifier<IMap<String, Room>> {
       );
 
       if (addToNewEvents) {
-        ref
-            .watch(NewEventsController.provider(roomId).notifier)
-            .add(
-              incoming.timeline
+        final provider = RoomChatController.provider(roomId);
+        if (ref.exists(provider)) {
+          for (final event
+              in incoming.timeline
                   .map(
                     (timelineTuple) => events?.firstWhereOrNull(
                       (event) => timelineTuple.eventRowId == event.rowId,
                     ),
                   )
                   .nonNulls
-                  .toIList(),
-            );
+                  .toIList()) {
+            ref.read(provider.notifier).addEvent(event);
+          }
+        }
       }
 
       return acc.add(

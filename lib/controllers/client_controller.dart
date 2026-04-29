@@ -9,7 +9,7 @@ import "package:flutter/foundation.dart";
 import "package:nexus/controllers/account_data_controller.dart";
 import "package:nexus/controllers/client_state_controller.dart";
 import "package:nexus/controllers/init_complete_controller.dart";
-import "package:nexus/controllers/new_events_controller.dart";
+import "package:nexus/controllers/room_chat_controller.dart";
 import "package:nexus/controllers/rooms_controller.dart";
 import "package:nexus/controllers/space_edges_controller.dart";
 import "package:nexus/controllers/sync_status_controller.dart";
@@ -82,11 +82,10 @@ class ClientController extends AsyncNotifier<int> {
                 final event = Event.fromJson(decodedMuksEvent["event"]);
 
                 if (event.type == "m.room.message") {
-                  ref
-                      .watch(
-                        NewEventsController.provider(event.roomId).notifier,
-                      )
-                      .add(IList([event]));
+                  final provider = RoomChatController.provider(event.roomId);
+                  if (ref.exists(provider)) {
+                    ref.watch(provider.notifier).addEvent(event);
+                  }
                 }
                 break;
               case "sync_complete":
@@ -127,9 +126,9 @@ class ClientController extends AsyncNotifier<int> {
             }
             debugPrint("Finished handling $muksEventType...");
           } catch (error, stackTrace) {
+            debugPrintStack(stackTrace: stackTrace, label: error.toString());
             debugger();
             showError(error, stackTrace);
-            debugPrintStack(stackTrace: stackTrace, label: error.toString());
           }
         });
 
