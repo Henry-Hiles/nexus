@@ -1,21 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
-   width="100mm"
-   height="100mm"
-   viewBox="0 0 100 100"
+   width="128"
+   height="128"
+   viewBox="0 0 128 128"
+   fill="none"
    version="1.1"
-   id="svg1"
-   xml:space="preserve"
-   inkscape:version="1.4.3 (0d15f75042, 2025-12-25)"
+   id="svg11"
    sodipodi:docname="background.svg"
+   inkscape:version="1.4.3 (0d15f75042, 2025-12-25)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns="http://www.w3.org/2000/svg"
-   xmlns:svg="http://www.w3.org/2000/svg"><sodipodi:namedview
-     id="namedview1"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview11"
      pagecolor="#505050"
      bordercolor="#eeeeee"
      borderopacity="1"
@@ -23,40 +21,177 @@
      inkscape:pageopacity="0"
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#505050"
-     inkscape:document-units="mm"
-     inkscape:zoom="1.0847363"
-     inkscape:cx="57.156749"
-     inkscape:cy="214.33781"
-     inkscape:window-width="1904"
-     inkscape:window-height="971"
+     inkscape:zoom="2.7676601"
+     inkscape:cx="65.217545"
+     inkscape:cy="70.998602"
+     inkscape:window-width="1063"
+     inkscape:window-height="995"
      inkscape:window-x="35"
      inkscape:window-y="32"
      inkscape:window-maximized="0"
-     inkscape:current-layer="layer1" /><defs
-     id="defs1"><linearGradient
-       id="linearGradient10"
-       inkscape:collect="always"><stop
-         style="stop-color:#c7a312;stop-opacity:1;"
-         offset="0"
-         id="stop10" /><stop
-         style="stop-color:#26a0b3;stop-opacity:1;"
+     inkscape:current-layer="svg11" />
+  <rect
+     width="128"
+     height="128"
+     fill="#ffffff"
+     id="rect1"
+     x="0"
+     y="0" />
+  <rect
+     x="-1.5384758"
+     y="-122.66472"
+     width="35.5569"
+     height="291.86301"
+     transform="rotate(30)"
+     fill="#9141ac"
+     id="rect2"
+     clip-path="url(#clipPath16)" />
+  <rect
+     x="34.018467"
+     y="-122.66468"
+     width="26.6677"
+     height="291.86301"
+     transform="rotate(30)"
+     fill="#62a0ea"
+     id="rect3"
+     clip-path="url(#clipPath15)" />
+  <rect
+     x="60.68605"
+     y="-122.66468"
+     width="26.6677"
+     height="291.86301"
+     transform="rotate(30)"
+     fill="#57e389"
+     id="rect4"
+     clip-path="url(#clipPath14)" />
+  <rect
+     x="87.353859"
+     y="-122.66468"
+     width="26.6677"
+     height="291.86301"
+     transform="rotate(30)"
+     fill="#f5c211"
+     id="rect5"
+     clip-path="url(#clipPath13)" />
+  <rect
+     x="114.02161"
+     y="-122.66477"
+     width="26.6677"
+     height="291.86301"
+     transform="rotate(30)"
+     fill="#ff7800"
+     id="rect6"
+     clip-path="url(#clipPath12)" />
+  <rect
+     x="140.68942"
+     y="-122.66477"
+     width="35.5569"
+     height="291.86301"
+     transform="rotate(30)"
+     fill="#ed333b"
+     id="rect7"
+     clip-path="url(#clipPath11)" />
+  <defs
+     id="defs11">
+    <radialGradient
+       id="paint0_radial_4033_8"
+       cx="0"
+       cy="0"
+       r="1"
+       gradientTransform="matrix(3.5,24.5214,-15.8099,2.26053,80,52.9904)"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         stop-color="#72AAEE"
+         id="stop10" />
+      <stop
          offset="1"
-         id="stop11" /></linearGradient><linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient10"
-       id="linearGradient11"
-       x1="20.031296"
-       y1="32.697563"
-       x2="90.709213"
-       y2="66.3423"
-       gradientUnits="userSpaceOnUse" /></defs><g
-     inkscape:label="Layer 1"
-     inkscape:groupmode="layer"
-     id="layer1"><rect
-       style="fill:url(#linearGradient11);fill-opacity:1;stroke:none;stroke-width:7.99999;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none"
-       id="rect10"
-       width="100"
-       height="100"
-       x="0"
-       y="0"
-       ry="28.294127" /></g></svg>
+         stop-color="#3584E4"
+         id="stop11" />
+    </radialGradient>
+    <mask
+       id="mask0_4033_8"
+       style="mask-type:alpha"
+       maskUnits="userSpaceOnUse"
+       x="56"
+       y="46"
+       width="21"
+       height="36">
+      <path
+         d="M76.4223 63.1501C76.7705 63.6624 76.768 64.336 76.416 64.8457L65.0175 81.3524C64.7375 81.7579 64.2761 82 63.7832 82H57.8028C56.6047 82 55.8901 80.6648 56.5547 79.668L66.4453 64.8321C66.7812 64.3282 66.7812 63.6718 66.4453 63.168L57.0729 49.1094C56.1869 47.7803 57.1396 46 58.737 46H63.9704C64.4671 46 64.9317 46.2459 65.2109 46.6568L76.4223 63.1501Z"
+         fill="#2779DD"
+         id="path9" />
+    </mask>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath11">
+      <rect
+         width="128"
+         height="128"
+         fill="#ffffff"
+         id="rect12"
+         x="0"
+         y="0"
+         transform="rotate(-30)" />
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath12">
+      <rect
+         width="128"
+         height="128"
+         fill="#ffffff"
+         id="rect13"
+         x="0"
+         y="0"
+         transform="rotate(-30)" />
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath13">
+      <rect
+         width="128"
+         height="128"
+         fill="#ffffff"
+         id="rect14"
+         x="0"
+         y="0"
+         transform="rotate(-30)" />
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath14">
+      <rect
+         width="128"
+         height="128"
+         fill="#ffffff"
+         id="rect15"
+         x="0"
+         y="0"
+         transform="rotate(-30)" />
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath15">
+      <rect
+         width="128"
+         height="128"
+         fill="#ffffff"
+         id="rect16"
+         x="0"
+         y="0"
+         transform="rotate(-30)" />
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath16">
+      <rect
+         width="128"
+         height="128"
+         fill="#ffffff"
+         id="rect17"
+         x="0"
+         y="0"
+         transform="rotate(-30)" />
+    </clipPath>
+  </defs>
+</svg>

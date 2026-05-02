@@ -1,4 +1,4 @@
-# Nexus Client
+<h1 style="display:flex;gap:10px;align-items:center;"><img src="assets/icon.svg" height="42" /> Nexus Client</h1>
 
 > [!WARNING]
 > Nexus Client is still in development, and doesn't support everything needed for daily use.
@@ -222,3 +222,8 @@ flutter run
 ## Community
 
 Join the [Nexus Client Matrix Room](https://matrix.to/#/#nexus:federated.nexus) for questions or help with developing or using Nexus Client.
+
+# Credits
+
+Thank you Hylke Bons (https://planetpeanut.studio) for making the amazing icon for Nexus!
+Thank you Tulir Asokan for making [Gomuks](https://github.com/gomuks/gomuks), and helping us integrate it into Nexus!
