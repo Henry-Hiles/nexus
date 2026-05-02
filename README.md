@@ -1,4 +1,6 @@
-<h1 style="display:flex;gap:10px;align-items:center;"><img src="assets/icon.svg" height="42" /> Nexus Client</h1>
+<center><img src="assets/icon.svg" height="128" /><center />
+
+# <center>Nexus Client</center>
 
 > [!WARNING]
 > Nexus Client is still in development, and doesn't support everything needed for daily use.
