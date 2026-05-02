@@ -1,6 +1,4 @@
-<center><img src="assets/icon.svg" height="128" /><center />
-
-# <center>Nexus Client</center>
+# Nexus Client
 
 > [!WARNING]
 > Nexus Client is still in development, and doesn't support everything needed for daily use.
