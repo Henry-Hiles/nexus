@@ -17,7 +17,7 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
 
 - [ ] New logo
 - [ ] Make context menus appear as bottom sheets on mobile
-- [x] Move from the Dart SDK to the Gomuks Backend with Dart bindings: https://git.federated.nexus/Henry-Hiles/nexus/pulls/2
+- [x] Move from the Dart SDK to the Gomuks Backend with Dart bindings: https://git.federated.nexus/Nexus/nexus/pulls/2
     - [ ] Allow using remote Gomuks over websocket
 - [ ] Platform Support
     - [x] Linux
@@ -146,7 +146,7 @@ If you want to try out Nexus, grab one of the following artifacts from CI:
     - [AArch64/Arm64](https://nightly.link/Henry-Hiles/nexus/workflows/flatpak/main/flatpak-aarch64.zip)
     - [x86_64/AMD64](https://nightly.link/Henry-Hiles/nexus/workflows/flatpak/main/flatpak-x86_64.zip)
 
-Or, try the Nix package: `nix run git+https://git.federated.nexus/Henry-Hiles/nexus`
+Or, try the Nix package: `nix run git+https://git.federated.nexus/Nexus/nexus`
 
 ## Build it yourself
 
@@ -189,7 +189,7 @@ Similar prerequisites apply (Flutter, Git, Go, C toolchain, LLVM/libclang), but 
 First, clone and open the repo:
 
 ```sh
-git clone --recurse-submodules https://git.federated.nexus/Henry-Hiles/nexus
+git clone --recurse-submodules https://git.federated.nexus/Nexus/nexus
 cd nexus
 ```
 
