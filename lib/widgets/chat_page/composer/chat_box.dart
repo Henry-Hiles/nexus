@@ -91,81 +91,92 @@ class ChatBox extends HookConsumerWidget {
                 padding: EdgeInsets.symmetric(horizontal: 8),
                 child: Row(
                   spacing: 8,
-                  children: [
-                    EmojiPickerButton(
-                      context: context,
-                      onSelection: (_) => node?.requestFocus(),
-                      controller: controller.value,
-                    ),
-                    PopupMenuButton(
-                      tooltip: "Add media",
-                      enabled: canSendMessages,
-                      itemBuilder: (context) => [
-                        PopupMenuItem(
-                          child: ListTile(
-                            title: Text("Camera"),
-                            leading: Icon(Icons.add_a_photo),
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: canSendMessages
+                      ? [
+                          EmojiPickerButton(
+                            context: context,
+                            onSelection: (_) => node?.requestFocus(),
+                            controller: controller.value,
                           ),
-                        ),
-                        PopupMenuItem(
-                          child: ListTile(
-                            title: Text("Gallery"),
-                            leading: Icon(Icons.add_photo_alternate),
+                          PopupMenuButton(
+                            tooltip: "Add media",
+                            enabled: canSendMessages,
+                            itemBuilder: (context) => [
+                              PopupMenuItem(
+                                child: ListTile(
+                                  title: Text("Camera"),
+                                  leading: Icon(Icons.add_a_photo),
+                                ),
+                              ),
+                              PopupMenuItem(
+                                child: ListTile(
+                                  title: Text("Gallery"),
+                                  leading: Icon(Icons.add_photo_alternate),
+                                ),
+                              ),
+                              PopupMenuItem(
+                                child: ListTile(
+                                  title: Text("Files"),
+                                  leading: Icon(Icons.attachment),
+                                ),
+                              ),
+                            ],
+                            icon: Icon(Icons.add),
                           ),
-                        ),
-                        PopupMenuItem(
-                          child: ListTile(
-                            title: Text("Files"),
-                            leading: Icon(Icons.attachment),
+                          Expanded(
+                            child: FlutterTagger(
+                              triggerStrategy: TriggerStrategy.eager,
+                              overlay: MentionOverlay(
+                                query: query.value,
+                                triggerCharacter: triggerCharacter.value,
+                                addTag: ({required id, required name}) {
+                                  controller.value.addTag(id: id, name: name);
+                                  node?.requestFocus();
+                                },
+                              ),
+                              controller: controller.value,
+                              onSearch: (newQuery, newTriggerCharacter) {
+                                triggerCharacter.value = newTriggerCharacter;
+                                query.value = newQuery;
+                              },
+                              triggerCharacterAndStyles: {
+                                "@": style,
+                                "#": style,
+                              },
+                              builder: (context, key) => TextFormField(
+                                enabled: canSendMessages,
+                                maxLines: 12,
+                                minLines: 1,
+                                autofocus: true,
+                                decoration: InputDecoration(
+                                  hintText: "Your message here...",
+                                  border: InputBorder.none,
+                                ),
+                                controller: controller.value,
+                                key: key,
+                                onFieldSubmitted: (_) => send(),
+                                // Don't defocus on submit
+                                onEditingComplete: () {},
+                                textInputAction: TextInputAction.done,
+                                focusNode: node,
+                              ),
+                            ),
                           ),
-                        ),
-                      ],
-                      icon: Icon(Icons.add),
-                    ),
-                    Expanded(
-                      child: FlutterTagger(
-                        triggerStrategy: TriggerStrategy.eager,
-                        overlay: MentionOverlay(
-                          query: query.value,
-                          triggerCharacter: triggerCharacter.value,
-                          addTag: ({required id, required name}) {
-                            controller.value.addTag(id: id, name: name);
-                            node?.requestFocus();
-                          },
-                        ),
-                        controller: controller.value,
-                        onSearch: (newQuery, newTriggerCharacter) {
-                          triggerCharacter.value = newTriggerCharacter;
-                          query.value = newQuery;
-                        },
-                        triggerCharacterAndStyles: {"@": style, "#": style},
-                        builder: (context, key) => TextFormField(
-                          enabled: canSendMessages,
-                          maxLines: 12,
-                          minLines: 1,
-                          autofocus: true,
-                          decoration: InputDecoration(
-                            hintText: canSendMessages
-                                ? "Your message here..."
-                                : "You don't have permission to send messages in this room...",
-                            border: InputBorder.none,
+                          IconButton(
+                            onPressed: !canSendMessages ? null : send,
+                            icon: Icon(Icons.send),
+                            tooltip: "Send message",
                           ),
-                          controller: controller.value,
-                          key: key,
-                          onFieldSubmitted: (_) => send(),
-                          // Don't defocus on submit
-                          onEditingComplete: () {},
-                          textInputAction: TextInputAction.done,
-                          focusNode: node,
-                        ),
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: !canSendMessages ? null : send,
-                      icon: Icon(Icons.send),
-                      tooltip: "Send message",
-                    ),
-                  ],
+                        ]
+                      : [
+                          Padding(
+                            padding: EdgeInsetsGeometry.all(8),
+                            child: Text(
+                              "You don't have permission to send messages in this room...",
+                            ),
+                          ),
+                        ],
                 ),
               ),
             ],

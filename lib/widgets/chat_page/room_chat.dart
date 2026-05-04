@@ -87,53 +87,63 @@ class RoomChat extends HookConsumerWidget {
     List<PopupMenuEntry> getMessageOptions(Message message) {
       final isSentByMe = message.authorId == userId;
       return [
-        PopupMenuItem(
-          child: Row(
-            children: [
-              ...{
-                    ...ref.watch(
-                      AccountDataController.provider.select(
-                        (value) => IList(
-                          value["m.recent_emoji"]?.content["recent_emoji"] ??
-                              [],
-                        ).map((entry) => entry["emoji"]),
+        if (ref.watch(
+          PowerLevelController.provider(
+            PowerLevelConfig(eventType: "m.reaction"),
+          ),
+        ))
+          PopupMenuItem(
+            child: Row(
+              children: [
+                ...{
+                      ...ref.watch(
+                        AccountDataController.provider.select(
+                          (value) => IList(
+                            value["m.recent_emoji"]?.content["recent_emoji"] ??
+                                [],
+                          ).map((entry) => entry["emoji"]),
+                        ),
+                      ),
+                      "👍",
+                      "🤣",
+                      "😭",
+                      "🤔",
+                    }
+                    .toIList()
+                    .sublist(0, 4)
+                    .map(
+                      (emoji) => IconButton(
+                        onPressed: () async {
+                          Navigator.of(context).pop();
+                          await notifier
+                              .sendReaction(emoji, message)
+                              .onError(showError);
+                        },
+                        icon: Text(emoji),
                       ),
                     ),
-                    "👍",
-                    "🤣",
-                    "😭",
-                    "🤔",
-                  }
-                  .toIList()
-                  .sublist(0, 4)
-                  .map(
-                    (emoji) => IconButton(
-                      onPressed: () async {
-                        Navigator.of(context).pop();
-                        await notifier
-                            .sendReaction(emoji, message)
-                            .onError(showError);
-                      },
-                      icon: Text(emoji),
-                    ),
-                  ),
-              EmojiPickerButton(
-                context: context,
-                onPressed: Navigator.of(context).pop,
-                onSelection: (emoji) =>
-                    notifier.sendReaction(emoji, message).onError(showError),
-              ),
-            ],
+                EmojiPickerButton(
+                  context: context,
+                  onPressed: Navigator.of(context).pop,
+                  onSelection: (emoji) =>
+                      notifier.sendReaction(emoji, message).onError(showError),
+                ),
+              ],
+            ),
           ),
-        ),
-        PopupMenuItem(
-          onTap: () {
-            relatedMessage.value = message;
-            relationType.value = RelationType.reply;
-            composerNode.requestFocus();
-          },
-          child: ListTile(leading: Icon(Icons.reply), title: Text("Reply")),
-        ),
+        if (ref.watch(
+          PowerLevelController.provider(
+            PowerLevelConfig(eventType: "m.room.message"),
+          ),
+        ))
+          PopupMenuItem(
+            onTap: () {
+              relatedMessage.value = message;
+              relationType.value = RelationType.reply;
+              composerNode.requestFocus();
+            },
+            child: ListTile(leading: Icon(Icons.reply), title: Text("Reply")),
+          ),
         if (message is TextMessage && isSentByMe)
           PopupMenuItem(
             onTap: () {
