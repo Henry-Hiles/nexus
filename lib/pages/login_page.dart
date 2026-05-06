@@ -62,7 +62,7 @@ class LoginPage extends HookConsumerWidget {
             children: [
               Row(
                 children: [
-                  SvgPicture.asset("assets/icon.svg"),
+                  SvgPicture.asset("assets/icon.svg", width: 128),
                   SizedBox(width: 12),
                   Expanded(
                     child: Column(
