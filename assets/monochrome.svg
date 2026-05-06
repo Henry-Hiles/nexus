@@ -6,13 +6,14 @@
    fill="none"
    version="1.1"
    id="svg11"
-   sodipodi:docname="background.svg"
+   sodipodi:docname="monochrome.svg"
    inkscape:version="1.4.3 (0d15f75042, 2025-12-25)"
-   inkscape:export-filename="background.png"
+   inkscape:export-filename="foreground.png"
    inkscape:export-xdpi="96"
    inkscape:export-ydpi="96"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
   <sodipodi:namedview
@@ -24,23 +25,39 @@
      inkscape:pageopacity="0"
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#505050"
-     inkscape:zoom="0.69191503"
-     inkscape:cx="-71.540576"
-     inkscape:cy="281.10388"
+     inkscape:zoom="1.240199"
+     inkscape:cx="156.02335"
+     inkscape:cy="321.3194"
      inkscape:window-width="2544"
      inkscape:window-height="1363"
      inkscape:window-x="35"
      inkscape:window-y="32"
      inkscape:window-maximized="0"
      inkscape:current-layer="svg11" />
+  <path
+     d="m 256,92 c 90.5748,0 164,73.4252 164,164 0,90.5748 -73.4252,164 -164,164 -34.5828,0 -66.6592,-10.712 -93.1092,-28.9884 l -39.2072,8.7656 c -6.8668,1.5348 -12.9952,-4.594 -11.4608,-11.4608 l 8.7616,-39.2108 C 102.7104,322.6564 92,290.5808 92,256 92,165.4252 165.4252,92 256,92 Z"
+     fill="#ffffff"
+     id="path7"
+     style="stroke-width:4"
+     clip-path="url(#clipPath1)"
+     inkscape:path-effect="#path-effect1" />
   <defs
      id="defs11">
+    <inkscape:path-effect
+       effect="powerclip"
+       message=""
+       id="path-effect1"
+       is_visible="true"
+       lpeversion="1"
+       inverse="true"
+       flatten="false"
+       hide_clip="false" />
     <radialGradient
        id="paint0_radial_4033_8"
        cx="0"
        cy="0"
        r="1"
-       gradientTransform="matrix(3.5,24.5214,-15.8099,2.26053,80,52.9904)"
+       gradientTransform="matrix(14,98.0856,-63.2396,9.04212,320,211.9616)"
        gradientUnits="userSpaceOnUse">
       <stop
          stop-color="#72AAEE"
@@ -134,124 +151,28 @@
          y="0"
          transform="rotate(-30)" />
     </clipPath>
-    <radialGradient
-       id="paint0_radial_4033_8-3"
-       cx="0"
-       cy="0"
-       r="1"
-       gradientTransform="matrix(3.5,24.5214,-15.8099,2.26053,174.26633,65.9904)"
-       gradientUnits="userSpaceOnUse">
-      <stop
-         stop-color="#72AAEE"
-         id="stop10-6" />
-      <stop
-         offset="1"
-         stop-color="#3584E4"
-         id="stop11-7" />
-    </radialGradient>
-    <radialGradient
-       id="paint0_radial_4033_8-35"
-       cx="0"
-       cy="0"
-       r="1"
-       gradientTransform="matrix(3.5,24.5214,-15.8099,2.26053,80,52.9904)"
-       gradientUnits="userSpaceOnUse">
-      <stop
-         stop-color="#72AAEE"
-         id="stop10-62" />
-      <stop
-         offset="1"
-         stop-color="#3584E4"
-         id="stop11-9" />
-    </radialGradient>
-    <mask
-       id="mask0_4033_8-1"
-       maskUnits="userSpaceOnUse"
-       x="56"
-       y="46"
-       width="21"
-       height="36">
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath1">
       <path
-         d="m 76.4223,63.1501 c 0.3482,0.5123 0.3457,1.1859 -0.0063,1.6956 L 65.0175,81.3524 C 64.7375,81.7579 64.2761,82 63.7832,82 h -5.9804 c -1.1981,0 -1.9127,-1.3352 -1.2481,-2.332 l 9.8906,-14.8359 c 0.3359,-0.5039 0.3359,-1.1603 0,-1.6641 L 57.0729,49.1094 C 56.1869,47.7803 57.1396,46 58.737,46 h 5.2334 c 0.4967,0 0.9613,0.2459 1.2405,0.6568 z"
-         fill="#2779dd"
-         id="path9-2" />
-    </mask>
+         d="m 304.9188,251.4672 c 1.8572,2.732 1.844,6.3248 -0.0332,9.0432 L 260.6664,324.546 C 259.1728,326.7088 256.712,328 254.0836,328 H 234.948 c -6.3896,0 -10.2004,-7.1212 -6.6564,-12.4376 l 36.75,-55.1248 c 1.7916,-2.6872 1.7916,-6.188 0,-8.8752 l -36.75,-55.1248 C 224.7476,191.1212 228.5584,184 234.948,184 h 19.8748 c 2.6492,0 5.1268,1.3116 6.616,3.5028 z"
+         fill="url(#paint0_radial_4033_8)"
+         id="path1"
+         style="display:none;fill:url(#radialGradient1);stroke-width:4" />
+      <path
+         id="lpe_path-effect1"
+         style="fill:url(#radialGradient1);stroke-width:4"
+         class="powerclip"
+         d="M 87,87 H 425 V 425 H 87 Z m 217.9188,164.4672 -43.48,-63.9644 C 259.9496,185.3116 257.472,184 254.8228,184 H 234.948 c -6.3896,0 -10.2004,7.1212 -6.6564,12.4376 l 36.75,55.1248 c 1.7916,2.6872 1.7916,6.188 0,8.8752 l -36.75,55.1248 C 224.7476,320.8788 228.5584,328 234.948,328 h 19.1356 c 2.6284,0 5.0892,-1.2912 6.5828,-3.454 l 44.2192,-64.0356 c 1.8772,-2.7184 1.8904,-6.3112 0.0332,-9.0432 z" />
+    </clipPath>
     <radialGradient
-       id="paint0_radial_4033_8-9"
+       inkscape:collect="always"
+       xlink:href="#paint0_radial_4033_8"
+       id="radialGradient1"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(14,98.0856,-63.2396,9.04212,320,211.9616)"
        cx="0"
        cy="0"
-       r="1"
-       gradientTransform="matrix(14,98.0856,-63.2396,9.04212,320,211.9616)"
-       gradientUnits="userSpaceOnUse">
-      <stop
-         stop-color="#72AAEE"
-         id="stop10-3" />
-      <stop
-         offset="1"
-         stop-color="#3584E4"
-         id="stop11-6" />
-    </radialGradient>
+       r="1" />
   </defs>
-  <rect
-     width="512"
-     height="512"
-     fill="#ffffff"
-     id="rect1"
-     x="0"
-     y="0"
-     style="stroke-width:4" />
-  <rect
-     x="-1.5384758"
-     y="-122.66472"
-     width="35.5569"
-     height="291.86301"
-     transform="matrix(3.4641016,2,-2,3.4641016,0,0)"
-     fill="#9141ac"
-     id="rect2"
-     clip-path="url(#clipPath16)" />
-  <rect
-     x="34.018467"
-     y="-122.66468"
-     width="26.6677"
-     height="291.86301"
-     transform="matrix(3.4641016,2,-2,3.4641016,0,0)"
-     fill="#62a0ea"
-     id="rect3"
-     clip-path="url(#clipPath15)" />
-  <rect
-     x="60.68605"
-     y="-122.66468"
-     width="26.6677"
-     height="291.86301"
-     transform="matrix(3.4641016,2,-2,3.4641016,0,0)"
-     fill="#57e389"
-     id="rect4"
-     clip-path="url(#clipPath14)" />
-  <rect
-     x="87.353859"
-     y="-122.66468"
-     width="26.6677"
-     height="291.86301"
-     transform="matrix(3.4641016,2,-2,3.4641016,0,0)"
-     fill="#f5c211"
-     id="rect5"
-     clip-path="url(#clipPath13)" />
-  <rect
-     x="114.02161"
-     y="-122.66477"
-     width="26.6677"
-     height="291.86301"
-     transform="matrix(3.4641016,2,-2,3.4641016,0,0)"
-     fill="#ff7800"
-     id="rect6"
-     clip-path="url(#clipPath12)" />
-  <rect
-     x="140.68942"
-     y="-122.66477"
-     width="35.5569"
-     height="291.86301"
-     transform="matrix(3.4641016,2,-2,3.4641016,0,0)"
-     fill="#ed333b"
-     id="rect7"
-     clip-path="url(#clipPath11)" />
 </svg>

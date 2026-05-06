@@ -10,7 +10,6 @@
    inkscape:version="1.4.3 (0d15f75042, 2025-12-25)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
   <sodipodi:namedview
@@ -22,51 +21,45 @@
      inkscape:pageopacity="0"
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#505050"
-     inkscape:zoom="0.87695312"
-     inkscape:cx="-478.93096"
-     inkscape:cy="363.18931"
+     inkscape:zoom="0.87695313"
+     inkscape:cx="152.23163"
+     inkscape:cy="347.22494"
      inkscape:window-width="2544"
      inkscape:window-height="1363"
      inkscape:window-x="35"
      inkscape:window-y="32"
      inkscape:window-maximized="0"
-     inkscape:current-layer="svg11">
-    <inkscape:page
-       x="0"
-       y="0"
-       width="512"
-       height="512"
-       id="page2"
-       margin="0"
-       bleed="0" />
-  </sodipodi:namedview>
+     inkscape:current-layer="svg11" />
   <path
-     d="m 64,23 c 22.6437,0 41,18.3563 41,41 0,22.6437 -18.3563,41 -41,41 -8.6457,0 -16.6648,-2.678 -23.2773,-7.2471 l -9.8018,2.1914 c -1.7167,0.3837 -3.2488,-1.1485 -2.8652,-2.8652 l 2.1904,-9.8027 C 25.6776,80.6641 23,72.6452 23,64 23,41.3563 41.3563,23 64,23 Z"
+     d="m 256,92 c 90.5748,0 164,73.4252 164,164 0,90.5748 -73.4252,164 -164,164 -34.5828,0 -66.6592,-10.712 -93.1092,-28.9884 l -39.2072,8.7656 c -6.8668,1.5348 -12.9952,-4.594 -11.4608,-11.4608 l 8.7616,-39.2108 C 102.7104,322.6564 92,290.5808 92,256 92,165.4252 165.4252,92 256,92 Z"
      fill="#ffffff"
      id="path7"
-     clip-path="url(#clipPath21)"
-     inkscape:path-effect="#path-effect21"
-     inkscape:export-filename="foreground.png"
-     inkscape:export-xdpi="96"
-     inkscape:export-ydpi="96"
-     transform="scale(4)" />
+     style="stroke-width:4" />
+  <path
+     d="m 304.9188,251.4672 c 1.8572,2.732 1.844,6.3248 -0.0332,9.0432 L 260.6664,324.546 C 259.1728,326.7088 256.712,328 254.0836,328 H 234.948 c -6.3896,0 -10.2004,-7.1212 -6.6564,-12.4376 l 36.75,-55.1248 c 1.7916,-2.6872 1.7916,-6.188 0,-8.8752 l -36.75,-55.1248 C 224.7476,191.1212 228.5584,184 234.948,184 h 19.8748 c 2.6492,0 5.1268,1.3116 6.616,3.5028 z"
+     fill="url(#paint0_radial_4033_8)"
+     id="path8"
+     style="fill:url(#paint0_radial_4033_8);stroke-width:4" />
+  <g
+     mask="url(#mask0_4033_8)"
+     id="g9"
+     transform="scale(4)">
+    <rect
+       x="52"
+       y="46"
+       width="17"
+       height="4"
+       fill="#2779dd"
+       id="rect9" />
+  </g>
   <defs
      id="defs11">
-    <inkscape:path-effect
-       effect="powerclip"
-       message=""
-       id="path-effect21"
-       is_visible="true"
-       lpeversion="1"
-       inverse="true"
-       flatten="false"
-       hide_clip="false" />
     <radialGradient
        id="paint0_radial_4033_8"
        cx="0"
        cy="0"
        r="1"
-       gradientTransform="matrix(3.5,24.5214,-15.8099,2.26053,80,52.9904)"
+       gradientTransform="matrix(14,98.0856,-63.2396,9.04212,320,211.9616)"
        gradientUnits="userSpaceOnUse">
       <stop
          stop-color="#72AAEE"
@@ -76,28 +69,89 @@
          stop-color="#3584E4"
          id="stop11" />
     </radialGradient>
+    <mask
+       id="mask0_4033_8"
+       maskUnits="userSpaceOnUse"
+       x="56"
+       y="46"
+       width="21"
+       height="36">
+      <path
+         d="m 76.4223,63.1501 c 0.3482,0.5123 0.3457,1.1859 -0.0063,1.6956 L 65.0175,81.3524 C 64.7375,81.7579 64.2761,82 63.7832,82 h -5.9804 c -1.1981,0 -1.9127,-1.3352 -1.2481,-2.332 l 9.8906,-14.8359 c 0.3359,-0.5039 0.3359,-1.1603 0,-1.6641 L 57.0729,49.1094 C 56.1869,47.7803 57.1396,46 58.737,46 h 5.2334 c 0.4967,0 0.9613,0.2459 1.2405,0.6568 z"
+         fill="#2779dd"
+         id="path9" />
+    </mask>
     <clipPath
        clipPathUnits="userSpaceOnUse"
-       id="clipPath21">
-      <path
-         d="m 76.2297,62.8668 c 0.4643,0.683 0.461,1.5812 -0.0083,2.2608 L 65.1666,81.1365 C 64.7932,81.6772 64.178,82 63.5209,82 H 58.737 c -1.5974,0 -2.5501,-1.7803 -1.6641,-3.1094 l 9.1875,-13.7812 c 0.4479,-0.6718 0.4479,-1.547 0,-2.2188 L 57.0729,49.1094 C 56.1869,47.7803 57.1396,46 58.737,46 h 4.9687 c 0.6623,0 1.2817,0.3279 1.654,0.8757 z"
-         fill="url(#paint0_radial_4033_8)"
-         id="path21"
-         style="display:none;fill:url(#radialGradient21)" />
-      <path
-         id="lpe_path-effect21"
-         style="fill:url(#radialGradient21)"
-         class="powerclip"
-         d="m 18,18 h 92 v 92 H 18 Z M 76.2297,62.8668 65.3597,46.8757 C 64.9874,46.3279 64.368,46 63.7057,46 H 58.737 c -1.5974,0 -2.5501,1.7803 -1.6641,3.1094 l 9.1875,13.7812 c 0.4479,0.6718 0.4479,1.547 0,2.2188 L 57.0729,78.8906 C 56.1869,80.2197 57.1396,82 58.737,82 h 4.7839 c 0.6571,0 1.2723,-0.3228 1.6457,-0.8635 L 76.2214,65.1276 c 0.4693,-0.6796 0.4726,-1.5778 0.0083,-2.2608 z" />
+       id="clipPath11">
+      <rect
+         width="128"
+         height="128"
+         fill="#ffffff"
+         id="rect12"
+         x="0"
+         y="0"
+         transform="rotate(-30)" />
     </clipPath>
-    <radialGradient
-       inkscape:collect="always"
-       xlink:href="#paint0_radial_4033_8"
-       id="radialGradient21"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(3.5,24.5214,-15.8099,2.26053,80,52.9904)"
-       cx="0"
-       cy="0"
-       r="1" />
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath12">
+      <rect
+         width="128"
+         height="128"
+         fill="#ffffff"
+         id="rect13"
+         x="0"
+         y="0"
+         transform="rotate(-30)" />
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath13">
+      <rect
+         width="128"
+         height="128"
+         fill="#ffffff"
+         id="rect14"
+         x="0"
+         y="0"
+         transform="rotate(-30)" />
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath14">
+      <rect
+         width="128"
+         height="128"
+         fill="#ffffff"
+         id="rect15"
+         x="0"
+         y="0"
+         transform="rotate(-30)" />
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath15">
+      <rect
+         width="128"
+         height="128"
+         fill="#ffffff"
+         id="rect16"
+         x="0"
+         y="0"
+         transform="rotate(-30)" />
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath16">
+      <rect
+         width="128"
+         height="128"
+         fill="#ffffff"
+         id="rect17"
+         x="0"
+         y="0"
+         transform="rotate(-30)" />
+    </clipPath>
   </defs>
 </svg>
