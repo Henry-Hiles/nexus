@@ -22,10 +22,10 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#505050"
      inkscape:zoom="2.7676601"
-     inkscape:cx="65.217545"
-     inkscape:cy="70.998602"
-     inkscape:window-width="1063"
-     inkscape:window-height="995"
+     inkscape:cx="65.036888"
+     inkscape:cy="70.998603"
+     inkscape:window-width="1904"
+     inkscape:window-height="971"
      inkscape:window-x="35"
      inkscape:window-y="32"
      inkscape:window-maximized="0"
@@ -193,5 +193,67 @@
          y="0"
          transform="rotate(-30)" />
     </clipPath>
+    <radialGradient
+       id="paint0_radial_4033_8-3"
+       cx="0"
+       cy="0"
+       r="1"
+       gradientTransform="matrix(3.5,24.5214,-15.8099,2.26053,174.26633,65.9904)"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         stop-color="#72AAEE"
+         id="stop10-6" />
+      <stop
+         offset="1"
+         stop-color="#3584E4"
+         id="stop11-7" />
+    </radialGradient>
+    <radialGradient
+       id="paint0_radial_4033_8-35"
+       cx="0"
+       cy="0"
+       r="1"
+       gradientTransform="matrix(3.5,24.5214,-15.8099,2.26053,80,52.9904)"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         stop-color="#72AAEE"
+         id="stop10-62" />
+      <stop
+         offset="1"
+         stop-color="#3584E4"
+         id="stop11-9" />
+    </radialGradient>
+    <mask
+       id="mask0_4033_8-1"
+       maskUnits="userSpaceOnUse"
+       x="56"
+       y="46"
+       width="21"
+       height="36">
+      <path
+         d="m 76.4223,63.1501 c 0.3482,0.5123 0.3457,1.1859 -0.0063,1.6956 L 65.0175,81.3524 C 64.7375,81.7579 64.2761,82 63.7832,82 h -5.9804 c -1.1981,0 -1.9127,-1.3352 -1.2481,-2.332 l 9.8906,-14.8359 c 0.3359,-0.5039 0.3359,-1.1603 0,-1.6641 L 57.0729,49.1094 C 56.1869,47.7803 57.1396,46 58.737,46 h 5.2334 c 0.4967,0 0.9613,0.2459 1.2405,0.6568 z"
+         fill="#2779dd"
+         id="path9-2" />
+    </mask>
+    <radialGradient
+       id="paint0_radial_4033_8-9"
+       cx="0"
+       cy="0"
+       r="1"
+       gradientTransform="matrix(3.5,24.5214,-15.8099,2.26053,80,52.9904)"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         stop-color="#72AAEE"
+         id="stop10-3" />
+      <stop
+         offset="1"
+         stop-color="#3584E4"
+         id="stop11-6" />
+    </radialGradient>
   </defs>
+  <path
+     d="m 76.2297,62.8668 c 0.4643,0.683 0.461,1.5812 -0.008,2.2608 L 65.1666,81.1365 C 64.7932,81.6772 64.178,82 63.5209,82 H 58.737 c -1.5974,0 -2.5501,-1.7803 -1.6641,-3.1094 l 9.1875,-13.7812 c 0.4479,-0.6718 0.4479,-1.547 0,-2.2188 L 57.0729,49.1094 C 56.1869,47.7803 57.1396,46 58.737,46 h 4.9687 c 0.6623,0 1.2817,0.3279 1.654,0.8757 z"
+     fill="url(#paint0_radial_4033_8)"
+     id="path8"
+     style="fill:url(#paint0_radial_4033_8-9)" />
 </svg>
