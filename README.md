@@ -53,7 +53,7 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
         - [x] HTML/Markdown
         - [x] Replies
             - [x] Choose ping on/off
-        - [ ] Per message profiles
+        - [x] Per message profiles
         - [ ] Attachments
         - [ ] Commands with [MSC4391](https://github.com/matrix-org/matrix-spec-proposals/pull/4391)
         - [x] Mentions
@@ -120,6 +120,7 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
     - [ ] Align your message bubbles to left or right
     - [ ] Show media by default
     - [ ] Dynamic Theming
+    - [ ] Setting per-message profiles for users (MSC4461)
     - [ ] Devices
         - [ ] Viewing devices
         - [ ] Verifying devices
@@ -217,6 +218,8 @@ Run the app:
 ```sh
 flutter run
 ```
+
+Development instructions can be found in [DEVELOPMENT.md](./DEVELOPMENT.md).
 
 ## Community
 
