@@ -140,11 +140,10 @@ class Sidebar extends HookConsumerWidget {
                 ),
                 backgroundColor: Colors.transparent,
                 actions: [
-                  if (selectedSpace.room != null)
-                    RoomMenu(
-                      selectedSpace.room!,
-                      children: selectedSpace.children,
-                    ),
+                  RoomMenu(
+                    selectedSpace.room,
+                    children: selectedSpace.children,
+                  ),
                 ],
               ),
               body: NavigationRail(

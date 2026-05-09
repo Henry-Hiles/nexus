@@ -7,7 +7,7 @@ import "package:nexus/controllers/via_controller.dart";
 import "package:nexus/models/room.dart";
 
 class RoomMenu extends ConsumerWidget {
-  final Room room;
+  final Room? room;
   final IList<Room> children;
   const RoomMenu(this.room, {this.children = const IList.empty(), super.key});
 
@@ -20,7 +20,7 @@ class RoomMenu extends ConsumerWidget {
       itemBuilder: (_) => [
         PopupMenuItem(
           onTap: () async {
-            await client.markRead(room);
+            if (room != null) await client.markRead(room!);
             await Future.wait(children.map((child) => client.markRead(child)));
           },
           child: ListTile(
@@ -28,53 +28,61 @@ class RoomMenu extends ConsumerWidget {
             title: Text("Mark as Read"),
           ),
         ),
-        PopupMenuItem(
-          onTap: () async {
-            final vias = ref.watch(ViaController.provider(room));
+        if (room != null) ...[
+          PopupMenuItem(
+            onTap: () async {
+              final vias = ref.watch(ViaController.provider(room!));
 
-            await Clipboard.setData(
-              ClipboardData(
-                text: "matrix:roomid/${room.metadata?.id.substring(1)}$vias)",
-              ),
-            );
-          },
-          child: ListTile(leading: Icon(Icons.link), title: Text("Copy Link")),
-        ),
-        PopupMenuItem(
-          onTap: () => showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: Text("Leave Room"),
-              content: Text(
-                "Are you sure you want to leave \"${room.metadata?.name ?? "Unnamed Room"}\"?",
-              ),
-              actions: [
-                TextButton(
-                  onPressed: Navigator.of(context).pop,
-                  child: Text("Cancel"),
+              await Clipboard.setData(
+                ClipboardData(
+                  text:
+                      "matrix:roomid/${room!.metadata?.id.substring(1)}$vias)",
                 ),
-                TextButton(
-                  onPressed: () async {
-                    Navigator.of(context).pop();
-                    final snackbar = ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text("Leaving room..."),
-                        duration: Duration(days: 1),
-                      ),
-                    );
-                    await client.leaveRoom(room);
-                    snackbar.close();
-                  },
-                  child: Text("Leave"),
-                ),
-              ],
+              );
+            },
+            child: ListTile(
+              leading: Icon(Icons.link),
+              title: Text("Copy Link"),
             ),
           ),
-          child: ListTile(
-            leading: Icon(Icons.logout, color: danger),
-            title: Text("Leave", style: TextStyle(color: danger)),
+          PopupMenuItem(
+            onTap: () => showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: Text("Leave Room"),
+                content: Text(
+                  "Are you sure you want to leave \"${room!.metadata?.name ?? "Unnamed Room"}\"?",
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: Navigator.of(context).pop,
+                    child: Text("Cancel"),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      Navigator.of(context).pop();
+                      final snackbar = ScaffoldMessenger.of(context)
+                          .showSnackBar(
+                            SnackBar(
+                              content: Text("Leaving room..."),
+                              duration: Duration(days: 1),
+                            ),
+                          );
+                      await client.leaveRoom(room!);
+                      snackbar.close();
+                    },
+                    child: Text("Leave"),
+                  ),
+                ],
+              ),
+            ),
+            child: ListTile(
+              leading: Icon(Icons.logout, color: danger),
+              title: Text("Leave", style: TextStyle(color: danger)),
+            ),
           ),
-        ),
+        ],
+
         // PopupMenuItem(
         //   onTap: () => showDialog(
         //     context: context,
