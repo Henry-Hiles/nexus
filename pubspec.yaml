@@ -9,12 +9,7 @@ flutter:
   uses-material-design: true
 
 environment:
-  sdk: "^3.9.2"
-
-dependency_overrides:
-  analyzer: ^8.4.0
-  source_gen: ^4.0.2
-  flutter_hooks: ^0.21.2
+  sdk: "^3.11.4"
 
 dependencies:
   flutter:
@@ -29,7 +24,7 @@ dependencies:
   url_launcher: ^6.2.6
   freezed_annotation: ^3.1.0
   image_picker: ^1.1.2
-  file_picker: ^10.3.3
+  file_picker: ^11.0.2
   path: ^1.9.0
   dynamic_system_colors:
     git:
@@ -64,7 +59,6 @@ dependencies:
   
 dev_dependencies:
   build_runner: ^2.4.11
-  custom_lint: ^0.8.0
   flutter_lints: ^6.0.0
   freezed: ^3.2.3
   riverpod_lint: ^3.1.3
