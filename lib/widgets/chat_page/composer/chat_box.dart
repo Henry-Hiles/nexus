@@ -62,12 +62,6 @@ class ChatBox extends HookConsumerWidget {
       fontWeight: FontWeight.bold,
     );
 
-    final canSendMessages = ref.watch(
-      PowerLevelController.provider(
-        PowerLevelConfig(eventType: "m.room.message"),
-      ),
-    );
-
     return Positioned(
       bottom: 0,
       left: 0,
@@ -92,7 +86,12 @@ class ChatBox extends HookConsumerWidget {
                 child: Row(
                   spacing: 8,
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: canSendMessages
+                  children:
+                      ref.watch(
+                        PowerLevelController.provider(
+                          PowerLevelConfig(eventType: "m.room.message"),
+                        ),
+                      )
                       ? [
                           EmojiPickerButton(
                             context: context,
@@ -101,7 +100,6 @@ class ChatBox extends HookConsumerWidget {
                           ),
                           PopupMenuButton(
                             tooltip: "Add media",
-                            enabled: canSendMessages,
                             itemBuilder: (context) => [
                               PopupMenuItem(
                                 child: ListTile(
@@ -145,7 +143,6 @@ class ChatBox extends HookConsumerWidget {
                                 "#": style,
                               },
                               builder: (context, key) => TextFormField(
-                                enabled: canSendMessages,
                                 maxLines: 12,
                                 minLines: 1,
                                 autofocus: true,
@@ -164,7 +161,7 @@ class ChatBox extends HookConsumerWidget {
                             ),
                           ),
                           IconButton(
-                            onPressed: !canSendMessages ? null : send,
+                            onPressed: send,
                             icon: Icon(Icons.send),
                             tooltip: "Send message",
                           ),

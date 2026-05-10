@@ -120,7 +120,9 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
     - [ ] Align your message bubbles to left or right
     - [ ] Show media by default
     - [ ] Dynamic Theming
-    - [ ] Setting per-message profiles for users (MSC4461)
+    - [ ] Personas
+        - [ ] Setting per-message profiles for users (MSC4461)
+        - [ ] Explain how to send messages using a certain PMP
     - [ ] Devices
         - [ ] Viewing devices
         - [ ] Verifying devices

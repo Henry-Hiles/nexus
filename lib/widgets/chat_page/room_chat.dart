@@ -365,13 +365,15 @@ class RoomChat extends HookConsumerWidget {
                                     text, {
                                     required shouldMention,
                                     required tags,
-                                  }) => notifier.send(
-                                    text,
-                                    tags: tags,
-                                    relationType: relationType.value,
-                                    shouldMention: shouldMention,
-                                    relation: relatedMessage.value,
-                                  ),
+                                  }) => notifier
+                                      .send(
+                                        text,
+                                        tags: tags,
+                                        relationType: relationType.value,
+                                        shouldMention: shouldMention,
+                                        relation: relatedMessage.value,
+                                      )
+                                      .onError(showError),
                               relationType: relationType.value,
                               relatedMessage: relatedMessage.value,
                               onDismiss: () => relatedMessage.value = null,
