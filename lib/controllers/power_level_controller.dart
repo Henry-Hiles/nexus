@@ -1,8 +1,9 @@
-import "package:collection/collection.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client_state_controller.dart";
-import "package:nexus/controllers/selected_room_controller.dart";
+import "package:nexus/controllers/rooms_controller.dart";
 import "package:nexus/models/configs/power_level_config.dart";
+import "package:nexus/models/content/content.dart";
+import "package:nexus/models/content/power_levels.dart";
 import "package:nexus/models/requests/membership_action.dart";
 
 class PowerLevelController extends Notifier<bool> {
@@ -11,56 +12,60 @@ class PowerLevelController extends Notifier<bool> {
 
   @override
   bool build() {
-    final room = ref.watch(SelectedRoomController.provider);
-    final event = room?.events.firstWhereOrNull(
-      (event) => event.rowId == room.state["m.room.power_levels"]?[""],
+    if (config case EventPowerLevelConfig(:final eventType)) {
+      assert(
+        eventType != EventType.redaction,
+        "Checking power level for a redaction should use [PowerLevelConfig.redaction].",
+      );
+    }
+
+    final room = ref.watch(
+      RoomsController.provider.select((value) => value[config.roomId]),
     );
-    final user = ref.watch(ClientStateController.provider)?.userId;
-    if (event == null || user == null) return false;
 
-    final users = (event.content["users"] as Map<String, dynamic>? ?? {});
-    final events = (event.content["events"] as Map<String, dynamic>? ?? {});
+    final eventRowId = room?.state[EventType.powerLevels.type]?[""];
 
-    int powerLevelOf(String userId) => users.containsKey(userId)
-        ? (users[userId] as int)
-        : (event.content["users_default"] as int? ?? 0);
+    final event = eventRowId == null ? null : room?.events[eventRowId];
+    final content = event?.content is PowerLevelsContent
+        ? event!.content
+        : PowerLevelsContent();
+    final user = ref.watch(
+      ClientStateController.provider.select((value) => value?.userId),
+    );
+    if (user == null || content is! PowerLevelsContent) return false;
+
+    int powerLevelOf(String userId) =>
+        content.users[userId] ?? content.usersDefault;
 
     final userLevel = powerLevelOf(user);
-    final targetLevel = config.targetUser != null
-        ? powerLevelOf(config.targetUser!)
-        : null;
 
-    if (config.action != null) {
-      return switch (config.action!) {
-        MembershipAction.invite =>
-          userLevel >= (event.content["invite"] as int? ?? 0),
+    return switch (config) {
+      EventPowerLevelConfig(:final eventType) =>
+        userLevel >= (content.events[eventType.type] ?? content.eventsDefault),
 
-        MembershipAction.kick =>
-          targetLevel != null &&
-              userLevel >= (event.content["kick"] as int? ?? 50) &&
-              userLevel > targetLevel,
+      MembershipActionPowerLevelConfig(:final action, :final targetUser) =>
+        switch (action) {
+          MembershipAction.invite => userLevel >= content.invite,
 
-        MembershipAction.ban =>
-          targetLevel != null &&
-              userLevel >= (event.content["ban"] as int? ?? 50) &&
-              userLevel > targetLevel,
+          MembershipAction.kick =>
+            userLevel >= content.kick && userLevel > powerLevelOf(targetUser),
 
-        MembershipAction.unban =>
-          userLevel >= (event.content["ban"] as int? ?? 50),
-      };
-    }
+          MembershipAction.ban =>
+            userLevel >= content.ban && userLevel > powerLevelOf(targetUser),
 
-    if (config.eventType == "m.room.redaction") {
-      return userLevel >= (event.content["redact"] as int? ?? 50);
-    }
+          MembershipAction.unban => userLevel >= content.ban,
+        },
 
-    final requiredLevel = events.containsKey(config.eventType)
-        ? (events[config.eventType] as int)
-        : (config.isStateEvent
-              ? (event.content["state_default"] as int? ?? 50)
-              : (event.content["events_default"] as int? ?? 0));
+      StatePowerLevelConfig(:final eventType) =>
+        userLevel >= (content.events[eventType.type] ?? content.stateDefault),
 
-    return userLevel >= requiredLevel;
+      RedactionPowerLevelConfig(:final targetUser) =>
+        userLevel >=
+            (targetUser == user
+                ? (content.events[EventType.redaction.type] ??
+                      content.eventsDefault)
+                : content.redact),
+    };
   }
 
   static final provider = NotifierProvider.autoDispose

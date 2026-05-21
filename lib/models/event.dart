@@ -1,37 +1,69 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:freezed_annotation/freezed_annotation.dart";
+import "package:nexus/models/content/content.dart";
 import "package:nexus/models/epoch_date_time_converter.dart";
+import "package:nexus/models/profile.dart";
 part "event.freezed.dart";
 part "event.g.dart";
 
 @freezed
 abstract class Event with _$Event {
+  static String typeJsonFromJson(Map<dynamic, dynamic> json, _) =>
+      json["decrypted_type"] ?? json["type"];
+
+  static Map<String, dynamic> getContentFromJson(Map<dynamic, dynamic> json) {
+    final content = json["decrypted"] ?? json["content"];
+
+    return content["m.new_content"] ?? content;
+  }
+
   const factory Event({
     @JsonKey(name: "rowid") required int rowId,
     @JsonKey(name: "timeline_rowid") required int timelineRowId,
     required String roomId,
     required String eventId,
-    @JsonKey(name: "sender") required String authorId,
-    required String type,
+    required String sender,
+    @JsonKey(readValue: Event.typeJsonFromJson) required String type,
     String? stateKey,
     @EpochDateTimeConverter() required DateTime timestamp,
-    required IMap<String, dynamic> content,
-    IMap<String, dynamic>? decrypted,
-    String? decryptedType,
     @Default(IMap.empty()) IMap<String, dynamic> unsigned,
     LocalContent? localContent,
     String? transactionId,
     String? redactedBy,
     String? relatesTo,
     String? relationType,
+    String? replyTo,
     String? decryptionError,
     String? sendError,
     @Default(IMap.empty()) IMap<String, int> reactions,
-    @JsonKey(name: "last_edit_rowid") int? lastEditRowId,
+    @JsonKey(name: "last_edit_rowid") @Default(0) int lastEditRowId,
     @UnreadTypeConverter() UnreadType? unreadType,
+    Profile? pmp,
+    required Content content,
+    required Content? previousContent,
   }) = _Event;
 
-  factory Event.fromJson(Map<String, Object?> json) => _$EventFromJson(json);
+  factory Event.fromJson(Map<String, dynamic> json) =>
+      _$EventFromJson(json).copyWith(
+        replyTo: getContentFromJson(
+          json,
+        )["m.relates_to"]?["m.in_reply_to"]?["event_id"],
+        pmp: json["content"]?["com.beeper.per_message_profile"] == null
+            ? null
+            : Profile.fromJsonWithCatch(
+                json["content"]?["com.beeper.per_message_profile"],
+              ),
+        content: Content.fromEventJson(
+          getContentFromJson(json),
+          json["decrypted_type"] ?? json["type"],
+        ),
+        previousContent: json["unsigned"]?["prev_content"] == null
+            ? null
+            : Content.fromEventJson(
+                json["unsigned"]?["prev_content"],
+                json["decrypted_type"] ?? json["type"],
+              ),
+      );
 }
 
 @freezed

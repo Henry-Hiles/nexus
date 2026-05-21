@@ -6,7 +6,9 @@
         "Gomuks",
         "Homeserver",
         "localpart",
+        "msgtype",
         "muks",
-        "prefs"
+        "prefs",
+        "unban"
     ]
 }

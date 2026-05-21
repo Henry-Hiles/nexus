@@ -1,6 +1,8 @@
 {
   lib,
   callPackage,
+  mpv-unwrapped,
+  libass,
   libclang,
   flutter,
   src,
@@ -17,6 +19,11 @@ flutter.buildFlutterApplication {
     packageRun build_runner build
   '';
 
+  buildInputs = [
+    mpv-unwrapped
+    libass
+  ];
+
   env.LIBCLANG_PATH = lib.makeLibraryPath [ libclang ];
 
   autoPubspecLock = src + "/pubspec.lock";
@@ -24,9 +31,8 @@ flutter.buildFlutterApplication {
   gitHashes = {
     window_size = "sha256-XelNtp7tpZ91QCEcvewVphNUtgQX7xrp5QP0oFo6DgM=";
     dynamic_system_colors = "sha256-GInPqU7r4Kj7+CNBQnf95u0BiagOUI6EtcW0A18pfd0=";
-    flutter_chat_ui = "sha256-4fuag7lRH5cMBFD3fUzj2K541JwXLoz8HF/4OMr3uhk=";
-    flutter_link_previewer = "sha256-4fuag7lRH5cMBFD3fUzj2K541JwXLoz8HF/4OMr3uhk=";
     emoji_text_field = "sha256-3TOys09EP2GRo6pUBGPXaqBlE39O2Cmwt42Hs1cTDKo=";
+    linkify = "sha256-mxV/XHLxF9cn7sUPr2SUNjVmDr5lbxkuGCbNdyiZi2c=";
   };
 
   postInstall = ''

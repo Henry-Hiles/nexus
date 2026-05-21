@@ -2,6 +2,10 @@ import "package:collection/collection.dart";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client_state_controller.dart";
+import "package:nexus/models/content/content.dart";
+import "package:nexus/models/content/membership.dart";
+import "package:nexus/models/content/power_levels.dart";
+import "package:nexus/models/membership_status.dart";
 import "package:nexus/models/room.dart";
 
 class ViaController extends Notifier<String> {
@@ -21,23 +25,29 @@ class ViaController extends Notifier<String> {
 
     addUserId(ref.watch(ClientStateController.provider)?.userId);
 
-    final powerLevels = room.events.firstWhereOrNull(
-      (event) => event.rowId == room.state["m.room.power_levels"]?[""],
-    );
+    final powerLevelsEventId = room.state[EventType.powerLevels.type]?[""];
+    final powerLevels = powerLevelsEventId == null
+        ? null
+        : room.events[powerLevelsEventId];
 
-    for (final userId in IMap(powerLevels?.content["users"]).keys) {
-      addUserId(userId);
-      if (servers.length >= 5) break;
+    if (powerLevels?.content case PowerLevelsContent(:final users)) {
+      for (final userId in users.keys) {
+        addUserId(userId);
+        if (servers.length >= 5) break;
+      }
     }
 
-    final members = room.state["m.room.member"]?.values.toIList();
+    final members = room.state[EventType.membership.type]?.values.toIList();
     for (var i = 0; servers.length < 5; i++) {
-      final member = room.events.firstWhereOrNull(
-        (event) => event.rowId == members?.getOrNull(i),
-      );
+      final membershipEventId = members?.getOrNull(i);
+      final member = membershipEventId == null
+          ? null
+          : room.events[membershipEventId];
 
-      if (member?.content["membership"] == "join") {
-        addUserId(member?.stateKey);
+      if (member?.content case MembershipContent(:final status)) {
+        if (status == MembershipStatus.join) {
+          addUserId(member?.stateKey);
+        }
       }
 
       if (members?.getOrNull(i) == null) break;

@@ -15,9 +15,6 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
 
 ## Progress
 
-- [x] New logo
-- [x] Move from the Dart SDK to the Gomuks Backend with Dart bindings: https://git.federated.nexus/Nexus/nexus/pulls/2
-    - [ ] Allow using remote Gomuks over websocket
 - [ ] Platform Support
     - [x] Linux
     - [ ] Windows (WIP)
@@ -42,7 +39,7 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
             - [x] `matrix:` Uri
             - [x] Matrix.to link
         - [ ] From space
-        - [ ] Exploring
+        - [ ] From directory
     - [x] Leaving
     - [x] Subspaces
 - [x] Messages
@@ -116,6 +113,7 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
 - [ ] Settings
     - [ ] Matrix: URIs vs Matrix.to links
     - [ ] Light/Dark mode
+    - [ ] Remote Gomuks instance
     - [ ] SSD or CSD
     - [ ] Align your message bubbles to left or right
     - [ ] Show media by default

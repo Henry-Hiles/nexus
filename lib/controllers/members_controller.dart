@@ -1,52 +1,46 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client_controller.dart";
-import "package:nexus/controllers/client_state_controller.dart";
-import "package:nexus/controllers/selected_room_controller.dart";
-import "package:nexus/models/membership.dart";
+import "package:nexus/controllers/rooms_controller.dart";
+import "package:nexus/models/content/content.dart";
+import "package:nexus/models/event.dart";
 import "package:nexus/models/requests/get_room_state_request.dart";
 
-class MembersController extends AsyncNotifier<IList<Membership>> {
+class MembersController extends AsyncNotifier<ISet<Event>> {
+  final String roomId;
+  MembersController(this.roomId);
+
   @override
-  Future<IList<Membership>> build() async {
-    final data = ref.watch(
-      SelectedRoomController.provider.select(
-        (value) => value?.metadata == null
-            ? null
-            : (value!.metadata!.id, value.metadata!.hasMemberList),
-      ),
+  Future<ISet<Event>> build() async {
+    final room = ref.watch(
+      RoomsController.provider.select((value) => value[roomId]),
     );
-    if (data == null) return const IList.empty();
 
-    final state = await ref
-        .watch(ClientController.provider.notifier)
-        .getRoomState(
-          GetRoomStateRequest(
-            roomId: data.$1,
-            fetchMembers: data.$2 == false,
-            includeMembers: true,
-          ),
-        );
+    if (room == null) return const ISet.empty();
 
-    return state.nonNulls
-        .where((state) => state.type == "m.room.member")
-        .map(
-          (membership) => Membership.fromContent(
-            membership.content,
-            membership.stateKey!,
-            ref.watch(
-                  ClientStateController.provider.select(
-                    (value) => value?.homeserverUrl,
-                  ),
-                ) ??
-                "",
-          ),
-        )
-        .toIList();
+    if (!room.hasFetchedMembers) {
+      final fetchedState = await ref
+          .watch(ClientController.provider.notifier)
+          .getRoomState(
+            GetRoomStateRequest(
+              roomId: roomId,
+              fetchMembers: room.metadata?.hasMemberList ?? true,
+              includeMembers: true,
+            ),
+          );
+
+      await ref
+          .read(RoomsController.provider.notifier)
+          .addState(roomId, fetchedState, isMembers: true);
+    }
+
+    return room.state[EventType.membership.type]?.values
+            .map((rowId) => room.events[rowId])
+            .nonNulls
+            .toISet() ??
+        const ISet.empty();
   }
 
-  static final provider =
-      AsyncNotifierProvider<MembersController, IList<Membership>>(
-        MembersController.new,
-      );
+  static final provider = AsyncNotifierProvider.autoDispose
+      .family<MembersController, ISet<Event>, String>(MembersController.new);
 }

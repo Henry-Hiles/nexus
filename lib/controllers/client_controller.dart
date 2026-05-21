@@ -1,15 +1,13 @@
-import "dart:developer";
 import "dart:ffi";
 import "dart:io";
 import "dart:isolate";
-import "package:collection/collection.dart";
+import "dart:math";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:ffi/ffi.dart";
 import "package:flutter/foundation.dart";
 import "package:nexus/controllers/account_data_controller.dart";
 import "package:nexus/controllers/client_state_controller.dart";
 import "package:nexus/controllers/init_complete_controller.dart";
-import "package:nexus/controllers/new_events_controller.dart";
 import "package:nexus/controllers/rooms_controller.dart";
 import "package:nexus/controllers/space_edges_controller.dart";
 import "package:nexus/controllers/sync_status_controller.dart";
@@ -17,6 +15,7 @@ import "package:nexus/controllers/top_level_spaces_controller.dart";
 import "package:nexus/helpers/extensions/gomuks_buffer.dart";
 import "package:nexus/main.dart";
 import "package:nexus/models/client_state.dart";
+import "package:nexus/models/content/content.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/models/paginate.dart";
 import "package:nexus/models/requests/get_event_request.dart";
@@ -81,12 +80,8 @@ class ClientController extends AsyncNotifier<int> {
               case "send_complete":
                 final event = Event.fromJson(decodedMuksEvent["event"]);
 
-                if (event.type == "m.room.message") {
-                  ref
-                      .watch(
-                        NewEventsController.provider(event.roomId).notifier,
-                      )
-                      .add(IList([event]));
+                if (event.type == EventType.message.type) {
+                  // ref.watch(provider.notifier).addEvent(event); TODO
                 }
                 break;
               case "sync_complete":
@@ -127,9 +122,12 @@ class ClientController extends AsyncNotifier<int> {
             }
             debugPrint("Finished handling $muksEventType...");
           } catch (error, stackTrace) {
-            debugger();
-            showError(error, stackTrace);
-            debugPrintStack(stackTrace: stackTrace, label: error.toString());
+            if (kDebugMode) {
+              debugPrintStack(stackTrace: stackTrace, label: error.toString());
+              rethrow;
+            } else {
+              showError(error, stackTrace);
+            }
           }
         });
 
@@ -220,11 +218,6 @@ class ClientController extends AsyncNotifier<int> {
   }
 
   Future<Event?> getEvent(GetEventRequest request) async {
-    final event = request.room.events.firstWhereOrNull(
-      (event) => event.eventId == request.eventId,
-    );
-    if (event != null) return event;
-
     final json = await _sendCommand("get_event", request.toJson());
     return json == null ? null : Event.fromJson(json);
   }
@@ -232,8 +225,10 @@ class ClientController extends AsyncNotifier<int> {
   Future<Paginate> paginate(PaginateRequest request) async =>
       Paginate.fromJson(await _sendCommand("paginate", request.toJson()));
 
-  Future<Profile> getProfile(String userId) async =>
-      Profile.fromJson(await _sendCommand("get_profile", {"user_id": userId}));
+  Future<Profile> getProfile(String userId) async => Profile.fromJsonWithCatch({
+    ...(await _sendCommand("get_profile", {"user_id": userId})),
+    "id": userId,
+  });
 
   Future<void> reportEvent(ReportRequest request) =>
       _sendCommand("report_event", request.toJson());
@@ -242,9 +237,8 @@ class ClientController extends AsyncNotifier<int> {
       _sendCommand("set_membership", request.toJson());
 
   Future<void> markRead(Room room) async {
-    final event = room.events.firstWhereOrNull(
-      (event) => event.rowId == room.timeline.last.eventRowId,
-    );
+    final eventRowId = room.timeline[room.timeline.keys.reduce(max)];
+    final event = eventRowId == null ? null : room.events[eventRowId];
     if (event == null || room.metadata == null) return;
 
     await _sendCommand("mark_read", {

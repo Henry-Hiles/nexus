@@ -8,29 +8,48 @@ part "room.g.dart";
 
 @freezed
 abstract class Room with _$Room {
+  static IMap<int, int?> timelineTupleJsonToIMap(List<dynamic> json) =>
+      IMap.fromEntries(
+        json.map(
+          (timelineTuple) => MapEntry(
+            timelineTuple["timeline_rowid"],
+            timelineTuple["event_rowid"],
+          ),
+        ),
+      );
+
+  static IMap<int, Event> eventsJsonToIMap(List<dynamic> json) =>
+      IMap.fromEntries(
+        json.map((eventJson) {
+          final event = Event.fromJson(eventJson);
+          return MapEntry(event.rowId, event);
+        }),
+      );
+
+  /// [timeline] is an IMap of timelineRowId to eventRowId
+  /// [events] is an IMap of eventRowId to event
   const factory Room({
     @JsonKey(name: "meta") RoomMetadata? metadata,
-    @Default(IList.empty()) IList<TimelineRowTuple> timeline,
+    @Default(IMap.empty())
+    @JsonKey(fromJson: Room.timelineTupleJsonToIMap)
+    IMap<int, int?> timeline,
+
+    @Default(IMap.empty())
+    @JsonKey(fromJson: Room.eventsJsonToIMap)
+    IMap<int, Event> events,
+
     @Default(false) bool reset,
+    @Default(false) bool hasFetchedState,
+    @Default(false) bool hasFetchedMembers,
     @Default(IMap.empty()) IMap<String, IMap<String, int>> state,
-    // required IMap<String, AccountData> accountData,
-    @Default(IList.empty()) IList<Event> events,
+
     @Default(IMap.empty()) IMap<String, IList<ReadReceipt>> receipts,
     @Default(false) bool dismissNotifications,
     @Default(true) bool hasMore,
+
+    // required IMap<String, AccountData> accountData,
     // required IList<Notification> notifications,
   }) = _Room;
 
   factory Room.fromJson(Map<String, Object?> json) => _$RoomFromJson(json);
-}
-
-@freezed
-abstract class TimelineRowTuple with _$TimelineRowTuple {
-  const factory TimelineRowTuple({
-    @JsonKey(name: "timeline_rowid") required int timelineRowId,
-    @JsonKey(name: "event_rowid") int? eventRowId,
-  }) = _TimelineRowTuple;
-
-  factory TimelineRowTuple.fromJson(Map<String, Object?> json) =>
-      _$TimelineRowTupleFromJson(json);
 }

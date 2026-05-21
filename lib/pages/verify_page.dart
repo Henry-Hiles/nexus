@@ -21,7 +21,7 @@ class VerifyPage extends HookConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Enter your recovery key or passphrase below to unlock encrypted messages.\nYour passphrase is usually not the same as your password.",
+              "Enter your recovery key or passphrase below to unlock encrypted events.\nYour passphrase is usually not the same as your password.",
             ),
             SizedBox(height: 12),
             FormTextInput(

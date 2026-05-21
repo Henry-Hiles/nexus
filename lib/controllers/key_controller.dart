@@ -12,14 +12,14 @@ class KeyController extends Notifier<String?> {
   String? build() =>
       ref.watch(SharedPrefsController.provider).requireValue.getString(key);
 
-  Future<void> set(String? id) async {
+  Future<void> set(String? value) async {
     final prefs = ref.watch(SharedPrefsController.provider).requireValue;
-    state = id;
+    state = value;
 
-    if (id == null) {
+    if (value == null) {
       prefs.remove(key);
     } else {
-      prefs.setString(key, id);
+      prefs.setString(key, value);
     }
   }
 

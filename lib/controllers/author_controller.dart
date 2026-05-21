@@ -1,47 +1,31 @@
 import "dart:async";
-import "package:fast_immutable_collections/fast_immutable_collections.dart";
-import "package:flutter_chat_core/flutter_chat_core.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
-import "package:nexus/controllers/client_state_controller.dart";
 import "package:nexus/controllers/user_controller.dart";
-import "package:nexus/helpers/extensions/get_localpart.dart";
-import "package:nexus/models/membership.dart";
-import "package:nexus/models/membership_status.dart";
+import "package:nexus/models/configs/user_config.dart";
+import "package:nexus/models/content/membership.dart";
+import "package:nexus/models/event.dart";
 
-class AuthorController extends AsyncNotifier<Membership> {
-  final Message message;
-  AuthorController(this.message);
+class AuthorController extends AsyncNotifier<MembershipContent> {
+  final Event event;
+  AuthorController(this.event);
 
   @override
-  Future<Membership> build() async {
+  Future<MembershipContent> build() async {
     final member = await ref.watch(
-      UserController.provider(message.authorId).future,
+      UserController.provider(
+        UserConfig(roomId: event.roomId, userId: event.sender),
+      ).future,
     );
 
-    final pmp = message.metadata?["pmp"] == null
-        ? null
-        : Membership.fromContent(
-            IMap(message.metadata?["pmp"]),
-            message.authorId,
-            ref.watch(
-                  ClientStateController.provider.select(
-                    (value) => value?.homeserverUrl,
-                  ),
-                ) ??
-                "",
-          );
-
-    return Membership(
-      status: member?.status ?? MembershipStatus.leave,
-      avatarUrl: pmp?.avatarUrl ?? member?.avatarUrl,
-      displayName:
-          pmp?.displayName ?? member?.displayName ?? message.authorId.localpart,
-      userId: message.authorId,
+    return MembershipContent(
+      status: member.status,
+      avatarUrl: event.pmp?.avatarUrl ?? member.avatarUrl,
+      displayName: event.pmp?.displayName ?? member.displayName,
     );
   }
 
   static final provider =
-      AsyncNotifierProvider.family<AuthorController, Membership, Message>(
+      AsyncNotifierProvider.family<AuthorController, MembershipContent, Event>(
         AuthorController.new,
       );
 }

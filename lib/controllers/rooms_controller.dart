@@ -1,9 +1,8 @@
-import "package:collection/collection.dart";
+import "dart:isolate";
+
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
-import "package:nexus/controllers/client_state_controller.dart";
-import "package:nexus/controllers/new_events_controller.dart";
-import "package:nexus/helpers/extensions/mxc_to_https.dart";
+import "package:nexus/models/event.dart";
 import "package:nexus/models/read_receipt.dart";
 import "package:nexus/models/room.dart";
 
@@ -11,55 +10,50 @@ class RoomsController extends Notifier<IMap<String, Room>> {
   @override
   IMap<String, Room> build() => const IMap.empty();
 
-  void update(
-    IMap<String, Room> rooms,
-    ISet<String> leftRooms, {
-    bool addToNewEvents = true,
-  }) {
-    final homeserver =
-        ref.watch(
-          ClientStateController.provider.select(
-            (value) => value?.homeserverUrl,
-          ),
-        ) ??
-        "";
+  Future<void> addState(
+    String roomId,
+    IList<Event> state, {
+    bool isMembers = false,
+  }) async => update(
+    {
+      roomId: Room(
+        events: IMap.fromEntries(
+          state.map((event) => MapEntry(event.rowId, event)),
+        ),
+        hasFetchedState: true,
+        hasFetchedMembers: isMembers,
+        state: await Isolate.run(() {
+          final newState = state.fold(
+            const IMap<String, IMap<String, int>>.empty(),
+            (previousValue, stateEvent) => previousValue.add(
+              stateEvent.type,
+              (previousValue[stateEvent.type] ?? const IMap.empty()).add(
+                stateEvent.stateKey!,
+                stateEvent.rowId,
+              ),
+            ),
+          );
+          return newState;
+        }),
+      ),
+    }.toIMap(),
+    const ISet.empty(),
+  );
+
+  void update(IMap<String, Room> rooms, ISet<String> leftRooms) {
     final merged = rooms.entries.fold(state, (acc, entry) {
       final roomId = entry.key;
       final incoming = entry.value;
       final existing = acc[roomId];
 
-      final events = existing?.events.updateById(
-        incoming.events,
-        (item) => item.eventId,
-      );
-
-      if (addToNewEvents) {
-        ref
-            .watch(NewEventsController.provider(roomId).notifier)
-            .add(
-              incoming.timeline
-                  .map(
-                    (timelineTuple) => events?.firstWhereOrNull(
-                      (event) => timelineTuple.eventRowId == event.rowId,
-                    ),
-                  )
-                  .nonNulls
-                  .toIList(),
-            );
-      }
-
       return acc.add(
         roomId,
         existing?.copyWith(
               hasMore: incoming.hasMore,
-              metadata:
-                  incoming.metadata?.copyWith(
-                    avatar:
-                        incoming.metadata?.avatar?.mxcToHttps(homeserver) ??
-                        existing.metadata?.avatar,
-                  ) ??
-                  existing.metadata,
-              events: events!,
+              metadata: incoming.metadata ?? existing.metadata,
+              events: incoming.events.isEmpty
+                  ? existing.events
+                  : existing.events.addAll(incoming.events),
               state: incoming.state.entries.fold(
                 existing.state,
                 (previousValue, event) => previousValue.add(
@@ -69,15 +63,14 @@ class RoomsController extends Notifier<IMap<String, Room>> {
                   ),
                 ),
               ),
-              timeline:
-                  (incoming.reset
-                          ? incoming.timeline
-                          : existing.timeline.updateById(
-                              incoming.timeline,
-                              (item) => item.timelineRowId,
-                            ))
-                      .sortedBy((element) => element.timelineRowId)
-                      .toIList(),
+              reset: false,
+              hasFetchedMembers:
+                  incoming.hasFetchedMembers || existing.hasFetchedMembers,
+              hasFetchedState:
+                  incoming.hasFetchedState || existing.hasFetchedState,
+              timeline: (incoming.reset
+                  ? incoming.timeline
+                  : existing.timeline.addAll(incoming.timeline)),
               receipts: incoming.receipts.entries.fold(
                 existing.receipts,
                 (receiptAcc, event) => receiptAcc.add(
@@ -88,11 +81,7 @@ class RoomsController extends Notifier<IMap<String, Room>> {
                 ),
               ),
             ) ??
-            incoming.copyWith(
-              metadata: incoming.metadata?.copyWith(
-                avatar: incoming.metadata?.avatar?.mxcToHttps(homeserver),
-              ),
-            ),
+            incoming,
       );
     });
 
@@ -100,6 +89,7 @@ class RoomsController extends Notifier<IMap<String, Room>> {
       merged,
       (acc, roomId) => acc.remove(roomId),
     );
+
     state = prunedList;
   }
 

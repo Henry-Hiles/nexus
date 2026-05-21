@@ -22,7 +22,14 @@ pkgs.mkShell {
     go
     git
     jdk17
-    flutter
+    libGL
+    wayland
+    (flutter.override {
+      extraPkgConfigPackages = [
+        mpv-unwrapped
+        libass
+      ];
+    })
     android.platform-tools
   ];
 

@@ -12,18 +12,28 @@ Object? readTimezone(Map<dynamic, dynamic> map, _) =>
 @freezed
 abstract class Profile with _$Profile {
   const factory Profile({
-    String? avatarUrl,
+    required String id,
+    String? parseError,
+    Uri? avatarUrl,
     @JsonKey(name: "displayname") String? displayName,
 
-    @JsonKey(readValue: readTimezone) String? timezone,
+    @JsonKey(readValue: readTimezone, name: "m.tz") String? timezone,
 
     @Default(IList.empty())
-    @JsonKey(readValue: readPronouns)
+    @JsonKey(readValue: readPronouns, name: "io.fsky.nyx.pronouns")
     IList<Pronoun> pronouns,
   }) = _Profile;
 
-  factory Profile.fromJson(Map<String, Object?> json) =>
+  factory Profile.fromJson(Map<String, dynamic> json) =>
       _$ProfileFromJson(json);
+
+  factory Profile.fromJsonWithCatch(Map<String, dynamic> json) {
+    try {
+      return Profile.fromJson(json);
+    } catch (error) {
+      return Profile(id: json["id"], parseError: error.toString());
+    }
+  }
 }
 
 @freezed
