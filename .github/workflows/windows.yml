@@ -26,6 +26,13 @@ jobs:
         with:
           go-version-file: gomuks/go.mod
 
+      - name: Setup MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          install: >-
+            mingw-w64-x86_64-gcc
+
       - name: Go build
         run: |
           cd gomuks/pkg/ffi
@@ -37,6 +44,13 @@ jobs:
           dart scripts/generate.dart
           flutter pub run build_runner build
           flutter build windows --release
+
+      - name: Copy MinGW runtime DLLs
+        shell: msys2 {0}
+        run: |
+          cp /mingw64/bin/libgcc_s_seh-1.dll build/windows/x64/runner/Release/
+          cp /mingw64/bin/libwinpthread-1.dll build/windows/x64/runner/Release/
+          cp /mingw64/bin/libstdc++-6.dll build/windows/x64/runner/Release/
 
       - name: Upload exe zip
         uses: actions/upload-artifact@v6
