@@ -2,7 +2,7 @@
 
 ## Build instructions
 
-CBuild instructions can be found in [README.md](./README.md#build-it-yourself).
+Build instructions can be found in [README.md](./README.md#build-it-yourself).
 
 ## Updating Gomuks
 
