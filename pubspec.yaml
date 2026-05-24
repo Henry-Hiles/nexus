@@ -63,6 +63,7 @@ dependencies:
   media_kit: 1.2.6
   media_kit_video: 2.0.1
   media_kit_libs_video: 1.0.7
+  measure_size: ^5.0.2
   
 dev_dependencies:
   build_runner: 2.15.0

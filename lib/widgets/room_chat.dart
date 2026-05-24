@@ -3,6 +3,7 @@ import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
+import "package:measure_size/measure_size.dart";
 import "package:nexus/controllers/account_data_controller.dart";
 import "package:nexus/controllers/client_controller.dart";
 import "package:nexus/controllers/client_state_controller.dart";
@@ -44,6 +45,8 @@ class RoomChat extends HookConsumerWidget {
     final relatedEvent = useState<Event?>(null);
     final relationType = useState(RelationType.reply);
     final flashingEvent = useState<String?>(null);
+
+    final composerSize = useState<double>(64);
 
     final memberListOpened = useState<bool>(showMembersByDefault);
 
@@ -346,7 +349,9 @@ class RoomChat extends HookConsumerWidget {
                         controller: scrollController,
                         slivers: [
                           SliverPadding(
-                            padding: EdgeInsetsGeometry.only(bottom: 64),
+                            padding: EdgeInsetsGeometry.only(
+                              bottom: composerSize.value,
+                            ),
                           ),
 
                           SuperSliverList.builder(
@@ -416,22 +421,30 @@ class RoomChat extends HookConsumerWidget {
                     },
                   ),
                 ),
-                ChatBox(
-                  roomId,
-                  node: composerNode,
-                  onSend: (text, {required shouldMention, required tags}) =>
-                      notifier
-                          .send(
-                            text,
-                            tags: tags,
-                            relationType: relationType.value,
-                            shouldMention: shouldMention,
-                            relation: relatedEvent.value,
-                          )
-                          .onError(showError),
-                  relationType: relationType.value,
-                  relatedEvent: relatedEvent.value,
-                  onDismiss: () => relatedEvent.value = null,
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: MeasureSize(
+                    onChange: (size) => composerSize.value = size.height,
+                    child: ChatBox(
+                      roomId,
+                      node: composerNode,
+                      onSend: (text, {required shouldMention, required tags}) =>
+                          notifier
+                              .send(
+                                text,
+                                tags: tags,
+                                relationType: relationType.value,
+                                shouldMention: shouldMention,
+                                relation: relatedEvent.value,
+                              )
+                              .onError(showError),
+                      relationType: relationType.value,
+                      relatedEvent: relatedEvent.value,
+                      onDismiss: () => relatedEvent.value = null,
+                    ),
+                  ),
                 ),
               ],
             ),

@@ -63,126 +63,118 @@ class ChatBox extends HookConsumerWidget {
       fontWeight: FontWeight.bold,
     );
 
-    return Positioned(
-      bottom: 0,
-      left: 0,
-      right: 0,
-      child: Padding(
-        padding: EdgeInsetsGeometry.all(12),
-        child: ClipRRect(
-          borderRadius: BorderRadius.all(Radius.circular(12)),
-          child: Column(
-            children: [
-              RelationPreview(
-                relatedEvent,
-                shouldMention: shouldMention.value,
-                toggleShouldMention: () =>
-                    shouldMention.value = !shouldMention.value,
-                relationType: relationType,
-                onDismiss: onDismiss,
-              ),
-              Container(
-                color: theme.colorScheme.surfaceContainerHighest,
-                padding: EdgeInsets.symmetric(horizontal: 8),
-                child: Row(
-                  spacing: 8,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children:
-                      ref.watch(
-                        PowerLevelController.provider(
-                          PowerLevelConfig(
-                            eventType: EventType.message,
-                            roomId: roomId,
-                          ),
+    return Padding(
+      padding: EdgeInsetsGeometry.all(12),
+      child: ClipRRect(
+        borderRadius: BorderRadius.all(Radius.circular(12)),
+        child: Column(
+          children: [
+            RelationPreview(
+              relatedEvent,
+              shouldMention: shouldMention.value,
+              toggleShouldMention: () =>
+                  shouldMention.value = !shouldMention.value,
+              relationType: relationType,
+              onDismiss: onDismiss,
+            ),
+            Container(
+              color: theme.colorScheme.surfaceContainerHighest,
+              padding: EdgeInsets.symmetric(horizontal: 8),
+              child: Row(
+                spacing: 8,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children:
+                    ref.watch(
+                      PowerLevelController.provider(
+                        PowerLevelConfig(
+                          eventType: EventType.message,
+                          roomId: roomId,
                         ),
-                      )
-                      ? [
-                          EmojiPickerButton(
-                            context: context,
-                            onSelection: (_) => node?.requestFocus(),
+                      ),
+                    )
+                    ? [
+                        EmojiPickerButton(
+                          context: context,
+                          onSelection: (_) => node?.requestFocus(),
+                          controller: controller.value,
+                        ),
+                        PopupMenuButton(
+                          tooltip: "Add media",
+                          itemBuilder: (context) => [
+                            PopupMenuItem(
+                              child: ListTile(
+                                title: Text("Camera"),
+                                leading: Icon(Icons.add_a_photo),
+                              ),
+                            ),
+                            PopupMenuItem(
+                              child: ListTile(
+                                title: Text("Gallery"),
+                                leading: Icon(Icons.add_photo_alternate),
+                              ),
+                            ),
+                            PopupMenuItem(
+                              child: ListTile(
+                                title: Text("Files"),
+                                leading: Icon(Icons.attachment),
+                              ),
+                            ),
+                          ],
+                          icon: Icon(Icons.add),
+                        ),
+                        Expanded(
+                          child: FlutterTagger(
+                            triggerStrategy: TriggerStrategy.eager,
+                            overlay: MentionOverlay(
+                              roomId,
+                              query: query.value,
+                              triggerCharacter: triggerCharacter.value,
+                              addTag: ({required id, required name}) {
+                                controller.value.addTag(id: id, name: name);
+                                node?.requestFocus();
+                              },
+                            ),
                             controller: controller.value,
-                          ),
-                          PopupMenuButton(
-                            tooltip: "Add media",
-                            itemBuilder: (context) => [
-                              PopupMenuItem(
-                                child: ListTile(
-                                  title: Text("Camera"),
-                                  leading: Icon(Icons.add_a_photo),
-                                ),
-                              ),
-                              PopupMenuItem(
-                                child: ListTile(
-                                  title: Text("Gallery"),
-                                  leading: Icon(Icons.add_photo_alternate),
-                                ),
-                              ),
-                              PopupMenuItem(
-                                child: ListTile(
-                                  title: Text("Files"),
-                                  leading: Icon(Icons.attachment),
-                                ),
-                              ),
-                            ],
-                            icon: Icon(Icons.add),
-                          ),
-                          Expanded(
-                            child: FlutterTagger(
-                              triggerStrategy: TriggerStrategy.eager,
-                              overlay: MentionOverlay(
-                                roomId,
-                                query: query.value,
-                                triggerCharacter: triggerCharacter.value,
-                                addTag: ({required id, required name}) {
-                                  controller.value.addTag(id: id, name: name);
-                                  node?.requestFocus();
-                                },
+                            onSearch: (newQuery, newTriggerCharacter) {
+                              triggerCharacter.value = newTriggerCharacter;
+                              query.value = newQuery;
+                            },
+                            triggerCharacterAndStyles: {"@": style, "#": style},
+                            builder: (context, key) => TextFormField(
+                              maxLines: 12,
+                              minLines: 1,
+                              autofocus: true,
+                              decoration: InputDecoration(
+                                hintText: "Your message here...",
+                                border: InputBorder.none,
                               ),
                               controller: controller.value,
-                              onSearch: (newQuery, newTriggerCharacter) {
-                                triggerCharacter.value = newTriggerCharacter;
-                                query.value = newQuery;
-                              },
-                              triggerCharacterAndStyles: {
-                                "@": style,
-                                "#": style,
-                              },
-                              builder: (context, key) => TextFormField(
-                                maxLines: 12,
-                                minLines: 1,
-                                autofocus: true,
-                                decoration: InputDecoration(
-                                  hintText: "Your message here...",
-                                  border: InputBorder.none,
-                                ),
-                                controller: controller.value,
-                                key: key,
-                                onFieldSubmitted: (_) => send(),
-                                // Don't defocus on submit
-                                onEditingComplete: () {},
-                                textInputAction: TextInputAction.done,
-                                focusNode: node,
-                              ),
+                              key: key,
+                              onFieldSubmitted: (_) => send(),
+                              // Don't defocus on submit
+                              onEditingComplete: () {},
+                              textInputAction: TextInputAction.done,
+                              focusNode: node,
                             ),
                           ),
-                          IconButton(
-                            onPressed: send,
-                            icon: Icon(Icons.send),
-                            tooltip: "Send message",
+                        ),
+                        IconButton(
+                          onPressed: send,
+                          icon: Icon(Icons.send),
+                          tooltip: "Send message",
+                        ),
+                      ]
+                    : [
+                        Padding(
+                          padding: EdgeInsetsGeometry.all(8),
+                          child: Text(
+                            "You don't have permission to send messages in this room...",
                           ),
-                        ]
-                      : [
-                          Padding(
-                            padding: EdgeInsetsGeometry.all(8),
-                            child: Text(
-                              "You don't have permission to send messages in this room...",
-                            ),
-                          ),
-                        ],
-                ),
+                        ),
+                      ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
