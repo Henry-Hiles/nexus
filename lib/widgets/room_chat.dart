@@ -17,7 +17,7 @@ import "package:nexus/models/content/message.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/models/relation_type.dart";
 import "package:nexus/models/requests/report_request.dart";
-import "package:nexus/widgets/composer/chat_box.dart";
+import "package:nexus/widgets/composer/composer.dart";
 import "package:nexus/widgets/emoji_picker_button.dart";
 import "package:nexus/widgets/renderers/event.dart";
 import "package:nexus/widgets/member_list.dart";
@@ -427,7 +427,7 @@ class RoomChat extends HookConsumerWidget {
                   right: 0,
                   child: MeasureSize(
                     onChange: (size) => composerSize.value = size.height,
-                    child: ChatBox(
+                    child: Composer(
                       roomId,
                       node: composerNode,
                       onSend: (text, {required shouldMention, required tags}) =>

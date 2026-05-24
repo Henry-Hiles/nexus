@@ -12,7 +12,7 @@ import "package:nexus/widgets/composer/mention_overlay.dart";
 import "package:nexus/widgets/composer/relation_preview.dart";
 import "package:nexus/widgets/emoji_picker_button.dart";
 
-class ChatBox extends HookConsumerWidget {
+class Composer extends HookConsumerWidget {
   final String roomId;
   final Event? relatedEvent;
   final RelationType relationType;
@@ -24,7 +24,7 @@ class ChatBox extends HookConsumerWidget {
     required IList<Tag> tags,
   })
   onSend;
-  const ChatBox(
+  const Composer(
     this.roomId, {
     required this.relatedEvent,
     required this.relationType,
