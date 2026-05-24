@@ -9,7 +9,7 @@ flutter:
   uses-material-design: true
 
 environment:
-  sdk: "3.11.5"
+  sdk: "^3.11.5"
 
 dependency_overrides:
   linkify:
