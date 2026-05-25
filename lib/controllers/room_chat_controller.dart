@@ -6,6 +6,7 @@ import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:fluttertagger/fluttertagger.dart";
 import "package:nexus/controllers/client_controller.dart";
 import "package:nexus/controllers/rooms_controller.dart";
+import "package:nexus/models/content/content.dart";
 import "package:nexus/models/content/reaction.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/models/requests/get_related_events_request.dart";
@@ -212,7 +213,7 @@ class RoomChatController extends AsyncNotifier<IList<Event>> {
     await client.sendEvent(
       SendEventRequest(
         roomId: roomId,
-        type: "m.reaction",
+        type: EventType.reaction.type,
         content: {
           "m.relates_to": {
             "event_id": event.eventId,
