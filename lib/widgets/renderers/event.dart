@@ -12,6 +12,7 @@ import "package:nexus/helpers/extensions/get_headers.dart";
 import "package:nexus/helpers/extensions/mxc_to_https.dart";
 import "package:nexus/helpers/extensions/show_context_menu.dart";
 import "package:nexus/models/content/avatar.dart";
+import "package:nexus/models/content/canonical_alias.dart";
 import "package:nexus/models/content/content.dart";
 import "package:nexus/models/content/encrypted.dart";
 import "package:nexus/models/content/membership.dart";
@@ -404,14 +405,38 @@ class EventRenderer extends ConsumerWidget {
                           content.status
                   ? null
                   : MembershipRenderer(event),
-            AvatarContent() => GenericEventRenderer(Icons.numbers, [
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 4),
-                child: Icon(Icons.numbers),
-              ),
-              Flexible(child: MessageDisplayname(event)),
-              Expanded(child: Text("changed the room avatar")),
+            AvatarContent() => GenericEventRenderer(Icons.interests, [
+              MessageDisplayname(event),
+              Text("changed the room avatar"),
             ]),
+            CanonicalAliasContent(:final alias, :final altAliases) =>
+              GenericEventRenderer(Icons.numbers, [
+                MessageDisplayname(event),
+                Text(switch ([
+                  if (event.previousContent case CanonicalAliasContent(
+                    alias: final prevAlias,
+                    altAliases: final prevAltAliases,
+                  )) ...[
+                    if (prevAlias != alias)
+                      if (alias == null)
+                        "removed the room's canonical alias"
+                      else
+                        "changed the room's canonical alias to $alias",
+
+                    if (prevAltAliases
+                            .remove(alias ?? "")
+                            .remove(prevAlias ?? "") !=
+                        altAliases.remove(alias ?? "").remove(prevAlias ?? ""))
+                      "changed the room's aliases",
+                  ] else ...[
+                    if (alias != null) "set the room's canonical alias",
+                    if (altAliases.isNotEmpty) "set the room's aliases",
+                  ],
+                ]) {
+                  [] => "did something related to room aliases",
+                  List prev => prev.join(" and "),
+                }),
+              ]),
             _ => null,
           };
 
