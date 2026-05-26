@@ -15,13 +15,11 @@ class MessageAvatar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) =>
       switch (ref.watch(AuthorController.provider(event))) {
         AsyncData(:final value) || AsyncLoading(:final value?) => InkWell(
-          onTapUp: (details) {
-            context.showUserPopover(
-              value,
-              event.sender,
-              globalPosition: details.globalPosition,
-            );
-          },
+          onTapUp: (details) => context.showUserPopover(
+            value,
+            event.sender,
+            globalPosition: details.globalPosition,
+          ),
           child: AvatarOrHash(
             value.avatarUrl,
             value.displayName ?? event.sender.localpart,
