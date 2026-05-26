@@ -140,7 +140,7 @@ class Composer extends HookConsumerWidget {
                               query.value = newQuery;
                             },
                             triggerCharacterAndStyles: {"@": style, "#": style},
-                            builder: (context, key) => TextFormField(
+                            builder: (context, key) => TextField(
                               maxLines: 12,
                               minLines: 1,
                               autofocus: true,
@@ -150,7 +150,7 @@ class Composer extends HookConsumerWidget {
                               ),
                               controller: controller.value,
                               key: key,
-                              onFieldSubmitted: (_) => send(),
+                              onSubmitted: (_) => send(),
                               // Don't defocus on submit
                               onEditingComplete: () {},
                               textInputAction: TextInputAction.done,

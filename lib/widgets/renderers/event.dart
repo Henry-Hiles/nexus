@@ -11,7 +11,6 @@ import "package:nexus/controllers/event_controller.dart";
 import "package:nexus/helpers/extensions/get_headers.dart";
 import "package:nexus/helpers/extensions/mxc_to_https.dart";
 import "package:nexus/helpers/extensions/show_context_menu.dart";
-import "package:nexus/helpers/launch_helper.dart";
 import "package:nexus/models/content/avatar.dart";
 import "package:nexus/models/content/content.dart";
 import "package:nexus/models/content/encrypted.dart";
@@ -24,6 +23,7 @@ import "package:nexus/widgets/expandable_image.dart";
 import "package:nexus/widgets/html/html.dart";
 import "package:nexus/widgets/lazy_loading/message_avatar.dart";
 import "package:nexus/widgets/lazy_loading/message_displayname.dart";
+import "package:nexus/widgets/linkified_text.dart";
 import "package:nexus/widgets/url_preview.dart";
 import "package:nexus/widgets/loading.dart";
 import "package:nexus/widgets/players/video.dart";
@@ -33,7 +33,6 @@ import "package:nexus/widgets/renderers/membership.dart";
 import "package:nexus/widgets/renderers/generic_event.dart";
 import "package:nexus/widgets/file_card.dart";
 import "package:timeago/timeago.dart";
-import "package:flutter_linkify/flutter_linkify.dart";
 
 class EventRenderer extends ConsumerWidget {
   final Event event;
@@ -232,24 +231,10 @@ class EventRenderer extends ConsumerWidget {
                                               },
                                             ),
                                           )
-                                        : Linkify(
+                                        : LinkifiedText(
+                                            body,
                                             style: textStyle,
-                                            text: body,
                                             maxLines: maxLines,
-                                            overflow: maxLines == null
-                                                ? null
-                                                : TextOverflow.ellipsis,
-                                            options: LinkifyOptions(
-                                              humanize: false,
-                                            ),
-                                            onOpen: (link) => ref
-                                                .watch(LaunchHelper.provider)
-                                                .launchUrl(Uri.parse(link.url)),
-                                            linkStyle: TextStyle(
-                                              color: Theme.of(
-                                                context,
-                                              ).colorScheme.primary,
-                                            ),
                                           ),
 
                                     if (!textOnly) ...[

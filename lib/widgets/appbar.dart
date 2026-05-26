@@ -9,10 +9,12 @@ class Appbar extends StatelessWidget implements PreferredSizeWidget {
   final Color? backgroundColor;
   final double? scrolledUnderElevation;
   final IList<Widget> actions;
+  final VoidCallback? onTap;
 
   const Appbar({
     super.key,
     this.title,
+    this.onTap,
     this.backgroundColor,
     this.scrolledUnderElevation,
     this.leading,
@@ -37,11 +39,14 @@ class Appbar extends StatelessWidget implements PreferredSizeWidget {
     return GestureDetector(
       onPanStart: (_) => windowManager.startDragging(),
       child: AppBar(
-        leading: leading,
+        leading: InkWell(onTap: onTap, child: leading),
         backgroundColor: backgroundColor,
         scrolledUnderElevation: scrolledUnderElevation,
         actionsPadding: const EdgeInsets.symmetric(horizontal: 8),
-        title: IgnorePointer(child: title),
+        title: InkWell(
+          onTap: onTap,
+          child: IgnorePointer(child: title),
+        ),
         flexibleSpace: GestureDetector(onDoubleTap: maximize),
         actions: [
           ...actions,
