@@ -13,6 +13,7 @@ import "package:nexus/models/content/membership.dart";
 import "package:nexus/models/content/message.dart";
 import "package:nexus/models/content/pinned_events.dart";
 import "package:nexus/models/content/power_levels.dart";
+import "package:nexus/models/content/server_acl.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/widgets/lazy_loading/message_displayname.dart";
 import "package:nexus/widgets/renderers/message.dart";
@@ -102,6 +103,11 @@ class EventRenderer extends ConsumerWidget {
             PinnedEventsContent() => GenericEventRenderer(Icons.push_pin, [
               MessageDisplayname(event),
               Text("pinned/unpinned some events"),
+            ]),
+
+            ServerACLContent() => GenericEventRenderer(Icons.list, [
+              MessageDisplayname(event),
+              Text("updated the server ban list"),
             ]),
 
             CanonicalAliasContent(:final alias, :final altAliases) =>
