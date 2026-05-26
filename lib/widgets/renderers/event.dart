@@ -14,6 +14,7 @@ import "package:nexus/models/content/message.dart";
 import "package:nexus/models/content/pinned_events.dart";
 import "package:nexus/models/content/power_levels.dart";
 import "package:nexus/models/content/server_acl.dart";
+import "package:nexus/models/content/topic.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/widgets/lazy_loading/message_displayname.dart";
 import "package:nexus/widgets/renderers/message.dart";
@@ -85,6 +86,11 @@ class EventRenderer extends ConsumerWidget {
             JoinRulesContent() => GenericEventRenderer(Icons.add, [
               MessageDisplayname(event),
               Text("changed the room's join rules"),
+            ]),
+
+            TopicContent() => GenericEventRenderer(Icons.description, [
+              MessageDisplayname(event),
+              Text("updated the room topic"),
             ]),
 
             HistoryVisibilityContent(:final historyVisibility) =>
