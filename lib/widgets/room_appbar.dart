@@ -119,7 +119,6 @@ class RoomAppbar extends ConsumerWidget implements PreferredSizeWidget {
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.labelMedium?.copyWith(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      decoration: TextDecoration.underline,
                     ),
                   ),
               ],
