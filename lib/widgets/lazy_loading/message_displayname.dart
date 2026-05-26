@@ -30,16 +30,31 @@ class MessageDisplayname extends ConsumerWidget {
                   globalPosition: details.globalPosition,
                 )
               : null,
-          child: Text(
-            "${membership.displayName ?? event.sender.localpart}${event.pmp == null ? "" : " (via ${event.sender})"}",
-            style:
-                style ??
-                TextStyle(
-                  color: event.sender.colorHash,
-                  fontWeight: FontWeight.bold,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            spacing: 4,
+            children: [
+              Text(
+                membership.displayName ?? event.sender.localpart,
+                style:
+                    style ??
+                    TextStyle(
+                      color: event.sender.colorHash,
+                      fontWeight: FontWeight.bold,
+                    ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+
+              if (event.pmp != null)
+                Text(
+                  "(via ${event.sender})",
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: event.sender.colorHash,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+            ],
           ),
         ),
         loading: () => Text(""),
