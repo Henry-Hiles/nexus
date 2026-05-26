@@ -7,8 +7,11 @@ import "package:nexus/models/content/canonical_alias.dart";
 import "package:nexus/models/content/content.dart";
 import "package:nexus/models/content/create.dart";
 import "package:nexus/models/content/encrypted.dart";
+import "package:nexus/models/content/history_visibility.dart";
+import "package:nexus/models/content/join_rules.dart";
 import "package:nexus/models/content/membership.dart";
 import "package:nexus/models/content/message.dart";
+import "package:nexus/models/content/power_levels.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/widgets/lazy_loading/message_displayname.dart";
 import "package:nexus/widgets/renderers/message.dart";
@@ -67,6 +70,26 @@ class EventRenderer extends ConsumerWidget {
               MessageDisplayname(event),
               Text("created the room"),
             ]),
+            PowerLevelsContent() => GenericEventRenderer(Icons.add, [
+              MessageDisplayname(event),
+              Text("changed the room's power levels"),
+            ]),
+            JoinRulesContent() => GenericEventRenderer(Icons.add, [
+              MessageDisplayname(event),
+              Text("changed the room's join rules"),
+            ]),
+            HistoryVisibilityContent(:final historyVisibility) =>
+              GenericEventRenderer(Icons.history, [
+                MessageDisplayname(event),
+                Text(
+                  "changed the room's history visibility to ${switch (historyVisibility) {
+                    HistoryVisibility.invited => "since invited",
+                    HistoryVisibility.joined => "since joined",
+                    HistoryVisibility.shared => "all history visible (shared)",
+                    HistoryVisibility.worldReadable => "all history visible (world readable)",
+                  }}",
+                ),
+              ]),
             CanonicalAliasContent(:final alias, :final altAliases) =>
               GenericEventRenderer(Icons.numbers, [
                 MessageDisplayname(event),

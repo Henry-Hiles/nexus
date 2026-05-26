@@ -14,6 +14,7 @@ import "package:nexus/models/content/encrypted.dart";
 import "package:nexus/models/content/redaction.dart";
 import "package:nexus/models/content/server_acl.dart";
 import "package:nexus/models/content/topic.dart";
+import "package:nexus/models/content/history_visibility.dart";
 
 class Content {
   final Error? parseError;
@@ -44,6 +45,10 @@ enum EventType {
   encryption("m.room.encryption", EncryptionContent.fromJson),
   membership("m.room.member", MembershipContent.fromJson),
   create("m.room.create", CreateContent.fromJson),
+  historyVisibility(
+    "m.room.history_visibility",
+    HistoryVisibilityContent.fromJson,
+  ),
   canonicalAlias("m.room.canonical_alias", CanonicalAliasContent.fromJson),
   joinRules("m.room.join_rules", JoinRulesContent.fromJson),
   powerLevels("m.room.power_levels", PowerLevelsContent.fromJson),
