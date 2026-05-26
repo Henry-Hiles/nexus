@@ -30,6 +30,7 @@ class MessageDisplayname extends ConsumerWidget {
               : null,
           child: Wrap(
             spacing: 4,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               Text(
                 value.displayName ?? event.sender.localpart,
