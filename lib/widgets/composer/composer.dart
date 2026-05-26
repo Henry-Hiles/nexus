@@ -165,10 +165,12 @@ class Composer extends HookConsumerWidget {
                         ),
                       ]
                     : [
-                        Padding(
-                          padding: EdgeInsetsGeometry.all(8),
-                          child: Text(
-                            "You don't have permission to send messages in this room...",
+                        Expanded(
+                          child: Padding(
+                            padding: EdgeInsetsGeometry.all(8),
+                            child: Text(
+                              "You don't have permission to send messages in this room...",
+                            ),
                           ),
                         ),
                       ],
