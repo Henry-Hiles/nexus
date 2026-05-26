@@ -13,7 +13,7 @@ class GenericEventRenderer extends StatelessWidget {
       children: [
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 4),
-          child: Icon(Icons.people),
+          child: Icon(icon),
         ),
         Expanded(child: Wrap(spacing: 4, children: children)),
       ],

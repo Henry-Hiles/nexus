@@ -39,13 +39,6 @@ class EventRenderer extends ConsumerWidget {
     final colorScheme = theme.colorScheme;
     final errorStyle = TextStyle(color: colorScheme.error);
 
-    final contextMenuCallback = getEventOptions == null
-        ? null
-        : (details) => context.showContextMenu(
-            globalPosition: details.globalPosition,
-            children: getEventOptions!(event).toList(),
-          );
-
     final child = event.redactedBy != null || event.relationType == "m.replace"
         ? null
         : switch (event.content) {
@@ -104,6 +97,13 @@ class EventRenderer extends ConsumerWidget {
               ]),
             _ => null,
           };
+
+    final contextMenuCallback = getEventOptions == null
+        ? null
+        : (details) => context.showContextMenu(
+            globalPosition: details.globalPosition,
+            children: getEventOptions!(event).toList(),
+          );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
