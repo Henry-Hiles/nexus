@@ -14,11 +14,12 @@ class EventPreview extends StatelessWidget {
     child: Padding(
       padding: EdgeInsets.symmetric(vertical: 4),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         spacing: 12,
         children: [
           if (event.content is MessageContent) MessageAvatar(event),
 
-          Expanded(
+          Flexible(
             child: Wrap(
               crossAxisAlignment: WrapCrossAlignment.center,
               spacing: 8,

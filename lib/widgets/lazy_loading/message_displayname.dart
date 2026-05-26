@@ -30,8 +30,7 @@ class MessageDisplayname extends ConsumerWidget {
                   globalPosition: details.globalPosition,
                 )
               : null,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
+          child: Wrap(
             spacing: 4,
             children: [
               Text(
