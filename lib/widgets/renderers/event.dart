@@ -316,19 +316,35 @@ class EventRenderer extends ConsumerWidget {
                                                         ) => loadingProgress == null
                                                         ? child
                                                         : switch (info?.blurHash) {
-                                                            final blurHash? => SizedBox(
-                                                              width:
-                                                                  info?.width ??
-                                                                  info?.height ??
-                                                                  200,
-                                                              height:
-                                                                  info?.height ??
-                                                                  info?.width ??
-                                                                  200,
-                                                              child: BlurHash(
-                                                                hash: blurHash,
-                                                              ),
-                                                            ),
+                                                            final blurHash? =>
+                                                              info?.width ==
+                                                                          null ||
+                                                                      info?.height ==
+                                                                          null
+                                                                  ? SizedBox(
+                                                                      width:
+                                                                          200,
+                                                                      height:
+                                                                          200,
+                                                                      child: BlurHash(
+                                                                        hash:
+                                                                            blurHash,
+                                                                      ),
+                                                                    )
+                                                                  : AspectRatio(
+                                                                      aspectRatio:
+                                                                          info!
+                                                                              .width! /
+                                                                          info.height!,
+                                                                      child: SizedBox(
+                                                                        width: info
+                                                                            .width,
+                                                                        child: BlurHash(
+                                                                          hash:
+                                                                              blurHash,
+                                                                        ),
+                                                                      ),
+                                                                    ),
                                                             _ => Loading(),
                                                           },
                                                     errorBuilder:
