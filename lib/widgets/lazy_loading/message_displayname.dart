@@ -51,6 +51,8 @@ class MessageDisplayname extends ConsumerWidget {
                     color: event.sender.colorHash,
                     fontWeight: FontWeight.bold,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
             ],
           ),
