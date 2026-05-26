@@ -11,6 +11,7 @@ import "package:nexus/models/content/history_visibility.dart";
 import "package:nexus/models/content/join_rules.dart";
 import "package:nexus/models/content/membership.dart";
 import "package:nexus/models/content/message.dart";
+import "package:nexus/models/content/pinned_events.dart";
 import "package:nexus/models/content/power_levels.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/widgets/lazy_loading/message_displayname.dart";
@@ -49,6 +50,7 @@ class EventRenderer extends ConsumerWidget {
               "An error occurred while parsing this event:\n$parseError\n${parseError.stackTrace}",
               style: errorStyle,
             ),
+
             MessageContent() || EncryptedContent() => MessageRenderer(
               event,
               onTapReply: onTapReply,
@@ -56,28 +58,34 @@ class EventRenderer extends ConsumerWidget {
               maxLines: maxLines,
               textOnly: textOnly,
             ),
+
             MembershipContent content =>
               event.previousContent is MembershipContent &&
                       (event.previousContent as MembershipContent).status ==
                           content.status
                   ? null
                   : MembershipRenderer(event),
+
             AvatarContent() => GenericEventRenderer(Icons.interests, [
               MessageDisplayname(event),
               Text("changed the room avatar"),
             ]),
+
             CreateContent() => GenericEventRenderer(Icons.add, [
               MessageDisplayname(event),
               Text("created the room"),
             ]),
+
             PowerLevelsContent() => GenericEventRenderer(Icons.add, [
               MessageDisplayname(event),
               Text("changed the room's power levels"),
             ]),
+
             JoinRulesContent() => GenericEventRenderer(Icons.add, [
               MessageDisplayname(event),
               Text("changed the room's join rules"),
             ]),
+
             HistoryVisibilityContent(:final historyVisibility) =>
               GenericEventRenderer(Icons.history, [
                 MessageDisplayname(event),
@@ -90,6 +98,12 @@ class EventRenderer extends ConsumerWidget {
                   }}",
                 ),
               ]),
+
+            PinnedEventsContent() => GenericEventRenderer(Icons.push_pin, [
+              MessageDisplayname(event),
+              Text("pinned/unpinned some events"),
+            ]),
+
             CanonicalAliasContent(:final alias, :final altAliases) =>
               GenericEventRenderer(Icons.numbers, [
                 MessageDisplayname(event),
