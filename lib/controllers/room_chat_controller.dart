@@ -44,12 +44,16 @@ class RoomChatController extends AsyncNotifier<IList<Event>> {
       loadOlder();
     }
 
-    return room.timeline
+    return IMap<int, int?>.fromValues(
+          keyMapper: (id) => 9999999 + (id ?? 0),
+          values: room.sticky,
+        )
+        .addAll(room.timeline)
         .toEntryIList(compare: (a, b) => (b?.key ?? 0).compareTo(a?.key ?? 0))
         .map((entry) {
-          if (entry.value == null) return null;
-
-          final foundEvent = room.events[entry.value!];
+          final foundEvent = entry.value == null
+              ? null
+              : room.events[entry.value!];
 
           final editedEvent =
               foundEvent == null || foundEvent.lastEditRowId == 0
@@ -153,23 +157,17 @@ class RoomChatController extends AsyncNotifier<IList<Event>> {
       ),
     );
 
-    // TODO: Add new event to timeline whilst its sending
-    // ref
-    //     .watch(RoomsController.provider.notifier)
-    //     .update(
-    //       {
-    //         roomId: Room(
-    //           events: [event].toIList(),
-    //           timeline: [
-    //             TimelineRowTuple(
-    //               timelineRowId: event.timelineRowId,
-    //               eventRowId: event.rowId,
-    //             ),
-    //           ].toIList(),
-    //         ),
-    //       }.toIMap(),
-    //       const ISet.empty(),
-    //     );
+    ref
+        .watch(RoomsController.provider.notifier)
+        .update(
+          {
+            roomId: Room(
+              events: {event.rowId: event}.toIMap(),
+              sticky: {event.rowId}.toISet(),
+            ),
+          }.toIMap(),
+          const ISet.empty(),
+        );
   }
 
   Future<void> removeReaction(

@@ -50,6 +50,13 @@ class RoomsController extends Notifier<IMap<String, Room>> {
         roomId,
         existing?.copyWith(
               hasMore: incoming.hasMore,
+              sticky:
+                  (incoming.sticky.isEmpty == true
+                          ? existing.sticky
+                          : existing.sticky.addAll(incoming.sticky))
+                      .removeWhere(
+                        (rowId) => incoming.timeline.values.contains(rowId),
+                      ),
               metadata: incoming.metadata ?? existing.metadata,
               events: incoming.events.isEmpty
                   ? existing.events

@@ -28,11 +28,13 @@ abstract class Room with _$Room {
 
   /// [timeline] is an IMap of timelineRowId to eventRowId
   /// [events] is an IMap of eventRowId to event
+  /// [sticky] is an ISet of eventRowId
   const factory Room({
     @JsonKey(name: "meta") RoomMetadata? metadata,
     @Default(IMap.empty())
     @JsonKey(fromJson: Room.timelineTupleJsonToIMap)
     IMap<int, int?> timeline,
+    @Default(ISet.empty()) ISet<int> sticky,
 
     @Default(IMap.empty())
     @JsonKey(fromJson: Room.eventsJsonToIMap)

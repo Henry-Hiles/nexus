@@ -15,7 +15,6 @@ import "package:nexus/controllers/top_level_spaces_controller.dart";
 import "package:nexus/helpers/extensions/gomuks_buffer.dart";
 import "package:nexus/main.dart";
 import "package:nexus/models/client_state.dart";
-import "package:nexus/models/content/content.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/models/paginate.dart";
 import "package:nexus/models/requests/get_event_request.dart";
@@ -79,10 +78,17 @@ class ClientController extends AsyncNotifier<int> {
                 break;
               case "send_complete":
                 final event = Event.fromJson(decodedMuksEvent["event"]);
+                ref
+                    .watch(RoomsController.provider.notifier)
+                    .update(
+                      {
+                        event.roomId: Room(
+                          events: {event.rowId: event}.toIMap(),
+                        ),
+                      }.toIMap(),
+                      const ISet.empty(),
+                    );
 
-                if (event.type == EventType.message.type) {
-                  // ref.watch(provider.notifier).addEvent(event); TODO
-                }
                 break;
               case "sync_complete":
                 final syncData = SyncData.fromJson(decodedMuksEvent);

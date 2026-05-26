@@ -446,19 +446,22 @@ class EventRenderer extends ConsumerWidget {
               ),
             ),
 
-          if (event.content is! MessageContent)
-            Padding(
-              padding: EdgeInsetsGeometry.only(left: 12),
-              child: ReactionRow(event),
-            ),
+          ...[
+            if (event.content is! MessageContent) ReactionRow(event),
 
-          if (event.sendError != null && event.sendError != "not sent")
-            Text(
-              event.sendError!,
-              style: theme.textTheme.labelSmall?.copyWith(
-                color: theme.colorScheme.error,
+            if (event.sendError != null && event.sendError != "not sent")
+              Text(
+                event.sendError!,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: theme.colorScheme.error,
+                ),
               ),
+          ].map(
+            (child) => Padding(
+              padding: EdgeInsetsGeometry.only(left: 4),
+              child: child,
             ),
+          ),
         ] else if (textOnly)
           Text("Unknown event type", style: errorStyle),
       ],
