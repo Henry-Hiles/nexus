@@ -61,6 +61,8 @@ class AvatarOrHash extends ConsumerWidget {
                         headers: ref.headers,
                       ),
                       fit: BoxFit.cover,
+                      loadingBuilder: (_, child, loadingProgress) =>
+                          loadingProgress == null ? child : box,
                       errorBuilder: (_, _, _) => box,
                     ),
             ),
