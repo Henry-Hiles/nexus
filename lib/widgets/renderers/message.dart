@@ -1,25 +1,21 @@
 import "package:collection/collection.dart";
-import "package:cross_cache/cross_cache.dart";
 import "package:flutter/material.dart";
-import "package:flutter_blurhash/flutter_blurhash.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:linkify/linkify.dart";
 import "package:nexus/controllers/client_state_controller.dart";
-import "package:nexus/controllers/cross_cache_controller.dart";
 import "package:nexus/controllers/event_controller.dart";
-import "package:nexus/helpers/extensions/get_headers.dart";
 import "package:nexus/helpers/extensions/mxc_to_https.dart";
 import "package:nexus/models/content/encrypted.dart";
 import "package:nexus/models/content/message.dart";
+import "package:nexus/models/content/sticker.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/models/requests/get_event_request.dart";
-import "package:nexus/widgets/expandable_image.dart";
 import "package:nexus/widgets/file_card.dart";
 import "package:nexus/widgets/html/html.dart";
 import "package:nexus/widgets/lazy_loading/message_avatar.dart";
 import "package:nexus/widgets/lazy_loading/message_displayname.dart";
 import "package:nexus/widgets/linkified_text.dart";
-import "package:nexus/widgets/loading.dart";
+import "package:nexus/widgets/message_image.dart";
 import "package:nexus/widgets/reaction_row.dart";
 import "package:nexus/widgets/url_preview.dart";
 import "package:timeago/timeago.dart";
@@ -144,6 +140,20 @@ class MessageRenderer extends ConsumerWidget {
                           "Unable to decrypt event",
                           style: errorStyle,
                         ),
+                        StickerContent(:final url, :final info) =>
+                          ConstrainedBox(
+                            constraints: BoxConstraints.loose(Size.square(200)),
+                            child: MessageImage(
+                              url.mxcToHttps(
+                                ref.watch(
+                                  ClientStateController.provider.select(
+                                    (value) => value!.homeserverUrl!,
+                                  ),
+                                ),
+                              ),
+                              info: info,
+                            ),
+                          ),
                         // TODO: Handle locations
                         // LocationMessageContent(:final body , :final geoUri) =>
                         TextMessageContent(
@@ -239,75 +249,7 @@ class MessageRenderer extends ConsumerWidget {
                                       ) =>
                                         FileCard(url, info, filename: filename),
                                       ImageMessageContent(:final info) =>
-                                        ExpandableImage(
-                                          url.toString(),
-                                          child: ClipRRect(
-                                            borderRadius: BorderRadius.all(
-                                              Radius.circular(8),
-                                            ),
-                                            child: Image(
-                                              image: CachedNetworkImage(
-                                                url.toString(),
-                                                ref.watch(
-                                                  CrossCacheController.provider,
-                                                ),
-                                                headers: ref.headers,
-                                              ),
-                                              width: info?.width,
-                                              loadingBuilder:
-                                                  (
-                                                    _,
-                                                    child,
-                                                    loadingProgress,
-                                                  ) => loadingProgress == null
-                                                  ? child
-                                                  : switch (info?.blurHash) {
-                                                      final blurHash? =>
-                                                        info?.width == null ||
-                                                                info?.height ==
-                                                                    null
-                                                            ? SizedBox(
-                                                                width: 200,
-                                                                height: 200,
-                                                                child: BlurHash(
-                                                                  hash:
-                                                                      blurHash,
-                                                                ),
-                                                              )
-                                                            : AspectRatio(
-                                                                aspectRatio:
-                                                                    info!
-                                                                        .width! /
-                                                                    info.height!,
-                                                                child: SizedBox(
-                                                                  width: info
-                                                                      .width,
-                                                                  child: BlurHash(
-                                                                    hash:
-                                                                        blurHash,
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                      _ => Loading(),
-                                                    },
-                                              errorBuilder:
-                                                  (
-                                                    context,
-                                                    error,
-                                                    stackTrace,
-                                                  ) => Center(
-                                                    child: Text(
-                                                      "Image Failed to Load",
-                                                      style: TextStyle(
-                                                        color: Theme.of(
-                                                          context,
-                                                        ).colorScheme.error,
-                                                      ),
-                                                    ),
-                                                  ),
-                                            ),
-                                          ),
-                                        ),
+                                        MessageImage(url, info: info),
                                       _ => SizedBox.shrink(),
                                     },
                                   ),

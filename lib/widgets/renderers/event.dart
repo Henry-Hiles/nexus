@@ -14,6 +14,7 @@ import "package:nexus/models/content/message.dart";
 import "package:nexus/models/content/pinned_events.dart";
 import "package:nexus/models/content/power_levels.dart";
 import "package:nexus/models/content/server_acl.dart";
+import "package:nexus/models/content/sticker.dart";
 import "package:nexus/models/content/topic.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/widgets/lazy_loading/message_displayname.dart";
@@ -53,7 +54,9 @@ class EventRenderer extends ConsumerWidget {
               style: errorStyle,
             ),
 
-            MessageContent() || EncryptedContent() => MessageRenderer(
+            MessageContent() ||
+            EncryptedContent() ||
+            StickerContent() => MessageRenderer(
               event,
               onTapReply: onTapReply,
               isGrouped: isGrouped,
