@@ -402,7 +402,7 @@ class RoomChat extends HookConsumerWidget {
 
                           SliverToBoxAdapter(
                             child: Padding(
-                              padding: EdgeInsets.only(bottom: 36),
+                              padding: EdgeInsets.symmetric(vertical: 36),
                               child: Center(
                                 child: controllerData is AsyncLoading
                                     ? Loading()
