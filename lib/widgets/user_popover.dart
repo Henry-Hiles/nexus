@@ -114,7 +114,6 @@ class UserPopover extends ConsumerWidget {
               ),
             ),
             Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SelectableText(
                   member.displayName ?? userId.localpart,
@@ -127,7 +126,9 @@ class UserPopover extends ConsumerWidget {
                     .betterWhen(
                       loading: SizedBox.shrink,
                       data: (profile) => Wrap(
+                        alignment: WrapAlignment.center,
                         spacing: 4,
+                        runSpacing: 4,
                         children: [
                           for (final pronoun in profile.pronouns.where(
                             (pronoun) => pronoun.language == "en",

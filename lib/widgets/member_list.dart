@@ -28,7 +28,6 @@ class MemberList extends HookConsumerWidget {
     return Drawer(
       shape: Border(),
       child: Column(
-        spacing: 8,
         children: [
           AppBar(
             scrolledUnderElevation: 0,
@@ -44,9 +43,10 @@ class MemberList extends HookConsumerWidget {
                 ),
             ],
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          Wrap(
+            alignment: WrapAlignment.center,
             spacing: 8,
+            runSpacing: 8,
             children: [
               FilterChip(
                 label: Text("Joined"),
