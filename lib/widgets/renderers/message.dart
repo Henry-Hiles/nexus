@@ -140,20 +140,28 @@ class MessageRenderer extends ConsumerWidget {
                           "Unable to decrypt event",
                           style: errorStyle,
                         ),
-                        StickerContent(:final url, :final info) =>
-                          ConstrainedBox(
-                            constraints: BoxConstraints.loose(Size.square(200)),
-                            child: MessageImage(
-                              url.mxcToHttps(
-                                ref.watch(
-                                  ClientStateController.provider.select(
-                                    (value) => value!.homeserverUrl!,
+                        StickerContent(:final body, :final url, :final info) =>
+                          textOnly
+                              ? Text(
+                                  body,
+                                  maxLines: maxLines,
+                                  overflow: TextOverflow.ellipsis,
+                                )
+                              : ConstrainedBox(
+                                  constraints: BoxConstraints.loose(
+                                    Size.square(200),
+                                  ),
+                                  child: MessageImage(
+                                    url.mxcToHttps(
+                                      ref.watch(
+                                        ClientStateController.provider.select(
+                                          (value) => value!.homeserverUrl!,
+                                        ),
+                                      ),
+                                    ),
+                                    info: info,
                                   ),
                                 ),
-                              ),
-                              info: info,
-                            ),
-                          ),
                         // TODO: Handle locations
                         // LocationMessageContent(:final body , :final geoUri) =>
                         TextMessageContent(
@@ -272,7 +280,7 @@ class MessageRenderer extends ConsumerWidget {
                                 UrlPreview(link.url),
 
                               SizedBox(height: 4),
-                              ReactionRow(event),
+                              if (!textOnly) ReactionRow(event),
                             ],
                           ],
                         ),
