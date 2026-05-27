@@ -7,10 +7,9 @@ extension SchemeToTheme on ColorScheme {
       titleSpacing: 0,
       backgroundColor: surfaceContainerLow,
     ),
-    menuTheme: MenuThemeData(
-      style: MenuStyle(
-        backgroundColor: WidgetStatePropertyAll(primaryContainer),
-      ),
+    popupMenuTheme: PopupMenuThemeData(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      color: surfaceContainerHigh,
     ),
     textTheme: ThemeData(
       fontFamilyFallback: ["sans", "emoji"],

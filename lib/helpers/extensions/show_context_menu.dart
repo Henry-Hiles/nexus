@@ -16,7 +16,6 @@ extension ShowContextMenu on BuildContext {
         overlay.size.width - globalPosition.dx,
         overlay.size.height - globalPosition.dy,
       ),
-      color: Theme.of(this).colorScheme.surfaceContainerHighest,
       items: children,
     );
   }
