@@ -25,6 +25,7 @@ class MessageDisplayname extends ConsumerWidget {
               ? (details) => context.showUserPopover(
                   value,
                   event.sender,
+                  roomId: event.roomId,
                   globalPosition: details.globalPosition,
                 )
               : null,

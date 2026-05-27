@@ -31,6 +31,7 @@ class MentionChip extends ConsumerWidget {
                 context.showUserPopover(
                   membership,
                   mention,
+                  roomId: roomId,
                   globalPosition: details.globalPosition,
                 );
               }

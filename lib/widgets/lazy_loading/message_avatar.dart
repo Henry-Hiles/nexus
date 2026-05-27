@@ -18,6 +18,7 @@ class MessageAvatar extends ConsumerWidget {
           onTapUp: (details) => context.showUserPopover(
             value,
             event.sender,
+            roomId: event.roomId,
             globalPosition: details.globalPosition,
           ),
           child: AvatarOrHash(

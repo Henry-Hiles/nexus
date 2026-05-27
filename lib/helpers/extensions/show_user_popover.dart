@@ -7,6 +7,7 @@ extension ShowUserPopover on BuildContext {
   void showUserPopover(
     MembershipContent member,
     String userId, {
+    String? roomId,
     required Offset globalPosition,
   }) => showContextMenu(
     globalPosition: globalPosition,
@@ -16,7 +17,7 @@ extension ShowUserPopover on BuildContext {
         padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         child: IconTheme(
           data: IconThemeData(),
-          child: UserPopover(member, userId),
+          child: UserPopover(member, userId, roomId: roomId),
         ),
       ),
     ],

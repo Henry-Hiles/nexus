@@ -83,6 +83,7 @@ class MemberList extends HookConsumerWidget {
                             onTapUp: (details) => context.showUserPopover(
                               member.content as MembershipContent,
                               member.stateKey!,
+                              roomId: roomId,
                               globalPosition: details.globalPosition,
                             ),
                             child: ListTile(

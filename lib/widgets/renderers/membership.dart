@@ -25,6 +25,7 @@ class MembershipRenderer extends StatelessWidget {
           onTapUp: (details) => context.showUserPopover(
             content,
             event.stateKey!,
+            roomId: event.roomId,
             globalPosition: details.globalPosition,
           ),
           child: Text(
