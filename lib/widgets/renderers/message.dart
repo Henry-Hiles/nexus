@@ -280,7 +280,7 @@ class MessageRenderer extends ConsumerWidget {
                                 UrlPreview(link.url),
 
                               SizedBox(height: 4),
-                              if (!textOnly) ReactionRow(event),
+                              ReactionRow(event),
                             ],
                           ],
                         ),
