@@ -79,6 +79,15 @@ class UserPopover extends ConsumerWidget {
       ),
     );
 
+    final actionButton = ButtonStyle(
+      padding: WidgetStatePropertyAll(
+        EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+      ),
+      shape: WidgetStatePropertyAll(
+        RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+    );
+
     return Column(
       spacing: 16,
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -152,10 +161,16 @@ class UserPopover extends ConsumerWidget {
         if (userId != ref.watch(ClientStateController.provider)?.userId &&
             roomId != null)
           Wrap(
+            alignment: WrapAlignment.center,
             spacing: 8,
             runSpacing: 8,
             children: [
-              FilledButton.icon(onPressed: null, label: Text("Message")),
+              FilledButton.icon(
+                onPressed: null,
+                label: Text("Message"),
+                icon: Icon(Icons.message),
+                style: actionButton,
+              ),
 
               if (ref.watch(
                         PowerLevelController.provider(
@@ -171,7 +186,7 @@ class UserPopover extends ConsumerWidget {
                 FilledButton.icon(
                   onPressed: () => showMembershipDialog(MembershipAction.kick),
                   label: Text("Kick"),
-                  style: ButtonStyle(
+                  style: actionButton.copyWith(
                     backgroundColor: WidgetStatePropertyAll(
                       theme.colorScheme.error,
                     ),
@@ -179,6 +194,7 @@ class UserPopover extends ConsumerWidget {
                       theme.colorScheme.onError,
                     ),
                   ),
+                  icon: Icon(Icons.sports_martial_arts),
                 ),
               if (ref.watch(
                 PowerLevelController.provider(
@@ -195,10 +211,11 @@ class UserPopover extends ConsumerWidget {
                         ? MembershipAction.unban
                         : MembershipAction.ban,
                   ),
+                  icon: Icon(Icons.gavel),
                   label: Text(
                     member.status == MembershipStatus.ban ? "Unban" : "Ban",
                   ),
-                  style: ButtonStyle(
+                  style: actionButton.copyWith(
                     backgroundColor: WidgetStatePropertyAll(
                       theme.colorScheme.errorContainer,
                     ),
