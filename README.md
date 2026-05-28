@@ -107,6 +107,9 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
 - [ ] Reporting
     - [x] Events
     - [ ] Rooms
+- [x] Member list
+    - [ ] Colors based off of power level
+    - [ ] Sort by power level
 - [ ] Notifications using UnifiedPush
 - [ ] Group calls using [MSC4195](https://github.com/matrix-org/matrix-spec-proposals/pull/4195)
 - [ ] Invites
