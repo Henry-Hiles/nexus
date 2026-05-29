@@ -59,6 +59,10 @@ When possible, use immutable collections instead of the mutable equivalent. For 
 
 When possible, we prefer not to create global variables or methods. You can usually replace a global variable with a Riverpod controller, and a global method with an extension method.
 
+## LLM/AI Assisted Contributions
+
+Largely LLM generated code is NOT allowed. All contributions should be written by humans, with minimal to no LLM assistance. Please disclose any usage of LLMs.
+
 ## Code of Conduct
 
 All contributions must follow the [Federated Nexus Code of Conduct](https://federated.nexus/code/).
