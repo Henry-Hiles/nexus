@@ -213,7 +213,7 @@ dart scripts/generate.dart
 Build generated files, and watch for new changes:
 
 ```sh
-flutter pub run build_runner watch --delete-conflicting-outputs
+flutter pub run build_runner watch
 ```
 
 Run the app:
