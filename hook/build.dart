@@ -3,6 +3,7 @@ import "package:hooks/hooks.dart";
 import "package:code_assets/code_assets.dart";
 
 Future<void> main(List<String> args) => build(args, (input, output) async {
+  if (!input.config.buildCodeAssets) return;
   final codeConfig = input.config.code;
   final targetOS = codeConfig.targetOS;
   final targetArch = codeConfig.targetArchitecture;
