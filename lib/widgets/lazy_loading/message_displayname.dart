@@ -58,6 +58,12 @@ class MessageDisplayname extends ConsumerWidget {
             ],
           ),
         ),
-        _ => Text(""),
+        _ => Text(
+          event.sender.localpart,
+          style: TextStyle(
+            color: event.sender.colorHash,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       };
 }
