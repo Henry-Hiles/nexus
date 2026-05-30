@@ -389,8 +389,9 @@ class RoomChat extends HookConsumerWidget {
                                   isGrouped:
                                       previousEvent?.content
                                           is MessageContent &&
-                                      event.redactedBy == null &&
-                                      event.relationType != "m.replace" &&
+                                      previousEvent?.redactedBy == null &&
+                                      previousEvent?.relationType !=
+                                          "m.replace" &&
                                       "${event.sender}${event.pmp?.id}" ==
                                           "${previousEvent?.sender}${previousEvent?.pmp?.id}",
                                 ),
