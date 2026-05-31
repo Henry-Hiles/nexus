@@ -14,6 +14,8 @@ git submodule update --remote
 
 ## Code Style
 
+See [Effective Dart: Style](https://dart.dev/effective-dart/style) for general rules. There are some extra rules detailed below:
+
 ### Controllers and Helpers ([Riverpod](https://pub.dev/packages/riverpod))
 
 Controllers live in `lib/controllers/` and provide a source that exposes data and logic via Riverpod providers, allowing other parts of the code to watch state changes with ref.watch (`ref.watch(MyController.provider)`), access the current value with ref.read (`ref.read(MyController.provider)`), and run helper methods on those classes using the notifier:
