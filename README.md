@@ -210,6 +210,13 @@ Generate Gomuks bindings:
 dart scripts/generate.dart
 ```
 
+> [!NOTE]
+> If you are having issues with `stddef.h` not being found, try setting CPATH manually:
+>
+> ```sh
+> export CPATH="$(clang -v 2>&1 | grep "Selected GCC installation" | rev | cut -d' ' -f1 | rev)/include"
+> ```
+
 Build generated files, and watch for new changes:
 
 ```sh
