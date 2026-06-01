@@ -42,8 +42,10 @@ class UrlPreviewController extends AsyncNotifier<OpenGraphData?> {
     return null;
   }
 
-  static final provider = AsyncNotifierProvider.autoDispose
-      .family<UrlPreviewController, OpenGraphData?, String>(
-        UrlPreviewController.new,
-      );
+  static final provider =
+      AsyncNotifierProvider.family<
+        UrlPreviewController,
+        OpenGraphData?,
+        String
+      >(UrlPreviewController.new);
 }
