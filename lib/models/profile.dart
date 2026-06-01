@@ -1,26 +1,32 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:freezed_annotation/freezed_annotation.dart";
+import "package:nexus/models/content/membership.dart";
 part "profile.freezed.dart";
 part "profile.g.dart";
 
-Object? readPronouns(Map<dynamic, dynamic> map, _) =>
-    map["m.pronouns"] ?? map["io.fsky.nyx.pronouns"];
-
-Object? readTimezone(Map<dynamic, dynamic> map, _) =>
-    map["m.tz"] ?? map["us.cloke.msc4175.tz"];
-
 @freezed
 abstract class Profile with _$Profile {
+  static Object? readPronouns(Map<dynamic, dynamic> map, _) =>
+      map["m.pronouns"] ?? map["io.fsky.nyx.pronouns"];
+
+  static Object? readTimezone(Map<dynamic, dynamic> map, _) =>
+      map["m.tz"] ?? map["us.cloke.msc4175.tz"];
+
   const factory Profile({
     required String id,
     String? parseError,
     Uri? avatarUrl,
-    @JsonKey(name: "displayname") String? displayName,
 
-    @JsonKey(readValue: readTimezone, name: "m.tz") String? timezone,
+    @JsonKey(
+      name: "displayname",
+      fromJson: MembershipContent.displaynameFromJson,
+    )
+    String? displayName,
+
+    @JsonKey(readValue: Profile.readTimezone, name: "m.tz") String? timezone,
 
     @Default(IList.empty())
-    @JsonKey(readValue: readPronouns, name: "io.fsky.nyx.pronouns")
+    @JsonKey(readValue: Profile.readPronouns, name: "io.fsky.nyx.pronouns")
     IList<Pronoun> pronouns,
   }) = _Profile;
 

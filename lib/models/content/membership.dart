@@ -7,8 +7,16 @@ part "membership.g.dart";
 @freezed
 abstract class MembershipContent extends Content with _$MembershipContent {
   MembershipContent._();
+
+  static String? displaynameFromJson(String? displayName) =>
+      displayName?.isEmpty == true ? null : displayName;
+
   factory MembershipContent({
-    @JsonKey(name: "displayname") required String? displayName,
+    @JsonKey(
+      name: "displayname",
+      fromJson: MembershipContent.displaynameFromJson,
+    )
+    required String? displayName,
     @JsonKey(name: "membership") required MembershipStatus status,
     Uri? avatarUrl,
     String? reason,

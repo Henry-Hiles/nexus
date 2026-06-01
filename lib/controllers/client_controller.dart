@@ -231,10 +231,10 @@ class ClientController extends AsyncNotifier<int> {
   Future<Paginate> paginate(PaginateRequest request) async =>
       Paginate.fromJson(await _sendCommand("paginate", request.toJson()));
 
-  Future<Profile> getProfile(String userId) async => Profile.fromJsonWithCatch({
-    ...(await _sendCommand("get_profile", {"user_id": userId})),
-    "id": userId,
-  });
+  Future<Profile> getProfile(String userId) async {
+    final json = await _sendCommand("get_profile", {"user_id": userId});
+    return Profile.fromJsonWithCatch({...json, "id": userId});
+  }
 
   Future<void> reportEvent(ReportRequest request) =>
       _sendCommand("report_event", request.toJson());

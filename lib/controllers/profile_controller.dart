@@ -12,8 +12,6 @@ class ProfileController extends AsyncNotifier<Profile> {
     return client.getProfile(userId);
   }
 
-  static final provider =
-      AsyncNotifierProvider.family<ProfileController, Profile, String>(
-        ProfileController.new,
-      );
+  static final provider = AsyncNotifierProvider.family
+      .autoDispose<ProfileController, Profile, String>(ProfileController.new);
 }
