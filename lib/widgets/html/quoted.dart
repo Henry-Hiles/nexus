@@ -8,9 +8,9 @@ class Quoted extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     decoration: BoxDecoration(
       border: Border(
-        left: BorderSide(width: 4, color: Theme.of(context).dividerColor),
+        left: .new(width: 4, color: Theme.of(context).dividerColor),
       ),
     ),
-    child: Padding(padding: EdgeInsets.only(left: 8), child: child),
+    child: Padding(padding: .only(left: 8), child: child),
   );
 }

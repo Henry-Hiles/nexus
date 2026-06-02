@@ -3,7 +3,6 @@ import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/user_controller.dart";
 import "package:nexus/helpers/extensions/link_to_mention.dart";
 import "package:nexus/helpers/extensions/show_user_popover.dart";
-import "package:nexus/models/configs/user_config.dart";
 
 class MentionChip extends ConsumerWidget {
   final String? roomId;
@@ -16,9 +15,7 @@ class MentionChip extends ConsumerWidget {
     final membership = mention?.startsWith("@") == true
         ? ref
               .watch(
-                UserController.provider(
-                  UserConfig(roomId: roomId, userId: mention!),
-                ),
+                UserController.provider(.new(roomId: roomId, userId: mention!)),
               )
               .whenOrNull(data: (data) => data)
         : null;
@@ -41,8 +38,8 @@ class MentionChip extends ConsumerWidget {
                 label: Text(
                   (membership == null ? null : "@${membership.displayName}") ??
                       mention,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
+                  style: .new(
+                    fontWeight: .bold,
                     color: Theme.of(context).colorScheme.onPrimary,
                   ),
                 ),

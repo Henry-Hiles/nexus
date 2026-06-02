@@ -48,7 +48,7 @@ class AvatarOrHash extends ConsumerWidget {
           smallSize: 12,
           backgroundColor: Theme.of(context).colorScheme.primary,
           child: ClipRRect(
-            borderRadius: BorderRadius.all(Radius.circular((height - 8) / 2.5)),
+            borderRadius: .all(.circular((height - 8) / 2.5)),
             child: SizedBox(
               width: height,
               height: height,
@@ -60,7 +60,7 @@ class AvatarOrHash extends ConsumerWidget {
                         ref.watch(CrossCacheController.provider),
                         headers: ref.headers,
                       ),
-                      fit: BoxFit.cover,
+                      fit: .cover,
                       loadingBuilder: (_, child, loadingProgress) =>
                           loadingProgress == null ? child : box,
                       errorBuilder: (_, _, _) => box,

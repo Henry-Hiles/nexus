@@ -5,7 +5,6 @@ import "package:nexus/controllers/members_by_status_controller.dart";
 import "package:nexus/helpers/extensions/get_localpart.dart";
 import "package:nexus/helpers/extensions/show_user_popover.dart";
 import "package:nexus/helpers/extensions/string_to_color.dart";
-import "package:nexus/models/configs/members_by_status_config.dart";
 import "package:nexus/models/content/membership.dart";
 import "package:nexus/models/membership_status.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
@@ -21,7 +20,7 @@ class MemberList extends HookConsumerWidget {
     final status = useState(MembershipStatus.join);
     final membersProvider = ref.watch(
       MembersByStatusController.provider(
-        MembersByStatusConfig(roomId: roomId, status: status.value),
+        .new(roomId: roomId, status: status.value),
       ),
     );
 
@@ -33,7 +32,7 @@ class MemberList extends HookConsumerWidget {
             scrolledUnderElevation: 0,
             leading: Icon(Icons.people),
             title: Text("Members"),
-            actionsPadding: EdgeInsets.only(right: 4),
+            actionsPadding: .only(right: 4),
             actions: [
               if (Scaffold.of(context).hasEndDrawer)
                 IconButton(
@@ -44,24 +43,24 @@ class MemberList extends HookConsumerWidget {
             ],
           ),
           Wrap(
-            alignment: WrapAlignment.center,
+            alignment: .center,
             spacing: 8,
             runSpacing: 8,
             children: [
               FilterChip(
                 label: Text("Joined"),
-                onSelected: (value) => status.value = MembershipStatus.join,
-                selected: status.value == MembershipStatus.join,
+                onSelected: (value) => status.value = .join,
+                selected: status.value == .join,
               ),
               FilterChip(
                 label: Text("Invited"),
-                onSelected: (value) => status.value = MembershipStatus.invite,
-                selected: status.value == MembershipStatus.invite,
+                onSelected: (value) => status.value = .invite,
+                selected: status.value == .invite,
               ),
               FilterChip(
                 label: Text("Banned"),
-                onSelected: (value) => status.value = MembershipStatus.ban,
-                selected: status.value == MembershipStatus.ban,
+                onSelected: (value) => status.value = .ban,
+                selected: status.value == .ban,
               ),
             ],
           ),
@@ -93,15 +92,15 @@ class MemberList extends HookConsumerWidget {
                               ),
                               title: Text(
                                 displayName ?? member.stateKey!.localpart,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
+                                overflow: .ellipsis,
+                                style: .new(
                                   color: member.stateKey!.colorHash,
-                                  fontWeight: FontWeight.bold,
+                                  fontWeight: .bold,
                                 ),
                               ),
                               subtitle: Text(
                                 member.stateKey!,
-                                overflow: TextOverflow.ellipsis,
+                                overflow: .ellipsis,
                               ),
                             ),
                           ),

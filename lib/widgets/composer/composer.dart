@@ -4,8 +4,6 @@ import "package:flutter_hooks/flutter_hooks.dart";
 import "package:fluttertagger/fluttertagger.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/power_level_controller.dart";
-import "package:nexus/models/configs/power_level_config.dart";
-import "package:nexus/models/content/content.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/models/relation_type.dart";
 import "package:nexus/widgets/composer/mention_overlay.dart";
@@ -42,7 +40,7 @@ class Composer extends HookConsumerWidget {
     final shouldMention = useState(true);
     final query = useState("");
 
-    if (relationType == RelationType.edit && controller.value.text.isEmpty) {
+    if (relationType == .edit && controller.value.text.isEmpty) {
       controller.value.text = relatedEvent?.localContent?.editSource ?? "";
     }
 
@@ -51,7 +49,7 @@ class Composer extends HookConsumerWidget {
       onSend(
         controller.value.formattedText,
         shouldMention: shouldMention.value,
-        tags: controller.value.tags.toIList(),
+        tags: .new(controller.value.tags),
       );
 
       onDismiss();
@@ -60,13 +58,13 @@ class Composer extends HookConsumerWidget {
 
     final style = TextStyle(
       color: theme.colorScheme.primary,
-      fontWeight: FontWeight.bold,
+      fontWeight: .bold,
     );
 
     return Padding(
-      padding: EdgeInsetsGeometry.all(12),
+      padding: .all(12),
       child: ClipRRect(
-        borderRadius: BorderRadius.all(Radius.circular(12)),
+        borderRadius: .all(.circular(12)),
         child: Column(
           children: [
             RelationPreview(
@@ -79,17 +77,14 @@ class Composer extends HookConsumerWidget {
             ),
             Container(
               color: theme.colorScheme.surfaceContainerHighest,
-              padding: EdgeInsets.symmetric(horizontal: 8),
+              padding: .symmetric(horizontal: 8),
               child: Row(
                 spacing: 8,
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: .center,
                 children:
                     ref.watch(
                       PowerLevelController.provider(
-                        PowerLevelConfig(
-                          eventType: EventType.message,
-                          roomId: roomId,
-                        ),
+                        .new(eventType: .message, roomId: roomId),
                       ),
                     )
                     ? [
@@ -124,7 +119,7 @@ class Composer extends HookConsumerWidget {
                         ),
                         Expanded(
                           child: FlutterTagger(
-                            triggerStrategy: TriggerStrategy.eager,
+                            triggerStrategy: .eager,
                             overlay: MentionOverlay(
                               roomId,
                               query: query.value,
@@ -144,16 +139,16 @@ class Composer extends HookConsumerWidget {
                               maxLines: 12,
                               minLines: 1,
                               autofocus: true,
-                              decoration: InputDecoration(
+                              decoration: .new(
                                 hintText: "Your message here...",
-                                border: InputBorder.none,
+                                border: .none,
                               ),
                               controller: controller.value,
                               key: key,
                               onSubmitted: (_) => send(),
                               // Don't defocus on submit
                               onEditingComplete: () {},
-                              textInputAction: TextInputAction.done,
+                              textInputAction: .done,
                               focusNode: node,
                             ),
                           ),
@@ -167,10 +162,7 @@ class Composer extends HookConsumerWidget {
                     : [
                         Expanded(
                           child: Padding(
-                            padding: EdgeInsetsGeometry.symmetric(
-                              horizontal: 8,
-                              vertical: 12,
-                            ),
+                            padding: .symmetric(horizontal: 8, vertical: 12),
                             child: Text(
                               "You don't have permission to send messages in this room...",
                             ),

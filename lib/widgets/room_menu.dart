@@ -34,7 +34,7 @@ class RoomMenu extends ConsumerWidget {
               final vias = ref.watch(ViaController.provider(room!));
 
               await Clipboard.setData(
-                ClipboardData(
+                .new(
                   text:
                       "matrix:roomid/${room!.metadata?.id.substring(1)}$vias)",
                 ),
@@ -63,7 +63,7 @@ class RoomMenu extends ConsumerWidget {
                       Navigator.of(context).pop();
                       final snackbar = ScaffoldMessenger.of(context)
                           .showSnackBar(
-                            SnackBar(
+                            .new(
                               content: Text("Leaving room..."),
                               duration: Duration(days: 1),
                             ),

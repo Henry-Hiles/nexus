@@ -20,14 +20,14 @@ class EmojiPickerButton extends HookConsumerWidget {
   Widget build(_, WidgetRef ref) => IconButton(
     onPressed: () async {
       onPressed?.call();
-      final controller = this.controller ?? TextEditingController();
+      final controller = this.controller ?? .new();
 
       final emojis = await ref.watch(EmojiController.provider.future);
       if (context.mounted) {
         showModalBottomSheet(
           context: context,
           builder: (context) => EmojiKeyboardView(
-            config: EmojiViewConfig(
+            config: .new(
               showRecentTab: false,
               customCategories: emojis.$1.unlock,
               customKeywords: emojis.$2.unlock,
@@ -37,7 +37,8 @@ class EmojiPickerButton extends HookConsumerWidget {
             textController: controller
               ..addListener(() {
                 // Without this, there will sometimes be a debugLocked is not true error sometimes
-                Future.delayed(Duration.zero, () {
+                // It might be preferable to use a microtask instead of a `Future.delayed`.
+                Future.delayed(.zero, () {
                   if (context.mounted) Navigator.of(context).pop();
                 });
                 onSelection?.call(controller.text);

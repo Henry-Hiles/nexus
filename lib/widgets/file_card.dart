@@ -15,11 +15,7 @@ class FileCard extends StatelessWidget {
       color: Theme.of(context).colorScheme.surfaceContainer,
       child: ListTile(
         leading: Icon(Icons.file_copy),
-        title: Text(
-          filename ?? "file",
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
+        title: Text(filename ?? "file", maxLines: 1, overflow: .ellipsis),
         subtitle: info?.size == null ? null : Text(info!.size!.sizeAsString),
         // TODO: Downloading files
         trailing: IconButton(onPressed: null, icon: Icon(Icons.download)),

@@ -16,9 +16,7 @@ class VideoPlayer extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final player = useMemoized(
-      () => Player(
-        configuration: PlayerConfiguration(bufferSize: 128 * 1024 * 1024),
-      ),
+      () => Player(configuration: .new(bufferSize: 128 * 1024 * 1024)),
     );
     final controller = useMemoized(() => VideoController(player));
 

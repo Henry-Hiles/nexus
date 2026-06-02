@@ -38,17 +38,17 @@ class RoomAppbar extends ConsumerWidget implements PreferredSizeWidget {
           : () => showDialog(
               context: context,
               builder: (context) => Dialog(
-                constraints: BoxConstraints.loose(Size.fromWidth(400)),
+                constraints: .loose(.fromWidth(400)),
                 child: Padding(
-                  padding: EdgeInsetsGeometry.all(24),
+                  padding: .all(24),
                   child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: .min,
+                    crossAxisAlignment: .start,
                     spacing: 8,
                     children: [
                       Row(
                         spacing: 12,
-                        mainAxisSize: MainAxisSize.min,
+                        mainAxisSize: .min,
                         children: [
                           if (room.metadata?.avatar != null)
                             ExpandableImage(
@@ -71,7 +71,7 @@ class RoomAppbar extends ConsumerWidget implements PreferredSizeWidget {
                           Expanded(
                             child: Text(
                               room.metadata?.name ?? "Unnamed Room",
-                              overflow: TextOverflow.ellipsis,
+                              overflow: .ellipsis,
                               maxLines: 3,
                               style: Theme.of(context).textTheme.headlineSmall,
                             ),
@@ -105,18 +105,18 @@ class RoomAppbar extends ConsumerWidget implements PreferredSizeWidget {
       title: room == null
           ? null
           : Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: .start,
               children: [
                 Text(
                   room.metadata?.name ?? "Unnamed Room",
-                  overflow: TextOverflow.ellipsis,
+                  overflow: .ellipsis,
                   maxLines: 1,
                 ),
                 if (room.metadata?.topic?.isNotEmpty == true)
                   Text(
                     room.metadata!.topic!,
                     maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                    overflow: .ellipsis,
                     style: Theme.of(context).textTheme.labelMedium?.copyWith(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),

@@ -74,14 +74,14 @@ class Sidebar extends HookConsumerWidget {
                       ),
                     ),
                     label: Text(space.title),
-                    padding: EdgeInsets.only(top: 4),
+                    padding: .only(top: 4),
                   ),
                 )
                 .toList(),
             selectedIndex: selectedIndex,
             trailingAtBottom: true,
             trailing: Padding(
-              padding: EdgeInsets.symmetric(vertical: 16),
+              padding: .symmetric(vertical: 16),
               child: Column(
                 spacing: 8,
                 children: [
@@ -136,10 +136,7 @@ class Sidebar extends HookConsumerWidget {
 
                   selectedSpace.title,
                 ),
-                title: Text(
-                  selectedSpace.title,
-                  overflow: TextOverflow.ellipsis,
-                ),
+                title: Text(selectedSpace.title, overflow: .ellipsis),
                 backgroundColor: Colors.transparent,
                 actions: [
                   RoomMenu(

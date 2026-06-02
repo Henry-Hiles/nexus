@@ -2,14 +2,7 @@ import "package:fast_immutable_collections/fast_immutable_collections.dart";
 
 extension SizeToString on int {
   String get sizeAsString {
-    const IListConst<String> suffixes = IListConst([
-      "B",
-      "KB",
-      "MB",
-      "GB",
-      "TB",
-      "PB",
-    ]);
+    const suffixes = IListConst(["B", "KB", "MB", "GB", "TB", "PB"]);
 
     var i = 0;
     var size = toDouble();

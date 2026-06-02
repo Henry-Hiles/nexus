@@ -9,12 +9,8 @@ import "package:nexus/controllers/rooms_controller.dart";
 import "package:nexus/models/content/content.dart";
 import "package:nexus/models/content/reaction.dart";
 import "package:nexus/models/event.dart";
-import "package:nexus/models/requests/get_related_events_request.dart";
-import "package:nexus/models/requests/get_room_state_request.dart";
-import "package:nexus/models/requests/paginate_request.dart";
 import "package:nexus/models/requests/redact_event_request.dart";
 import "package:nexus/models/relation_type.dart";
-import "package:nexus/models/requests/send_event_request.dart";
 import "package:nexus/models/requests/send_message_request.dart";
 import "package:nexus/models/room.dart";
 
@@ -28,12 +24,10 @@ class RoomChatController extends AsyncNotifier<IList<Event>> {
     final room = ref.watch(
       RoomsController.provider.select((rooms) => rooms[roomId]),
     );
-    if (room == null) return const IList.empty();
+    if (room == null) return .new();
 
     if (!room.hasFetchedState) {
-      final state = await client.getRoomState(
-        GetRoomStateRequest(roomId: roomId),
-      );
+      final state = await client.getRoomState(.new(roomId: roomId));
 
       await ref.read(RoomsController.provider.notifier).addState(roomId, state);
     }
@@ -45,7 +39,7 @@ class RoomChatController extends AsyncNotifier<IList<Event>> {
     }
 
     return IMap<int, int?>.fromValues(
-          keyMapper: (id) => 9999999 + (id ?? 0),
+          keyMapper: (id) => 9999999999 + (id ?? 0),
           values: room.sticky,
         )
         .addAll(room.timeline)
@@ -86,7 +80,7 @@ class RoomChatController extends AsyncNotifier<IList<Event>> {
     final response = await ref
         .watch(ClientController.provider.notifier)
         .paginate(
-          PaginateRequest(
+          .new(
             roomId: roomId,
             maxTimelineId: timelineKeys?.isNotEmpty == true
                 ? timelineKeys?.reduce(min)
@@ -112,7 +106,7 @@ class RoomChatController extends AsyncNotifier<IList<Event>> {
               ),
             ),
           }),
-          const ISet.empty(),
+          .new(),
         );
 
     return response.hasMore;
@@ -153,20 +147,20 @@ class RoomChatController extends AsyncNotifier<IList<Event>> {
         text: taggedMessage,
         relation: relation == null
             ? null
-            : Relation(eventId: relation.eventId, relationType: relationType),
+            : .new(eventId: relation.eventId, relationType: relationType),
       ),
     );
 
     ref
         .watch(RoomsController.provider.notifier)
         .update(
-          {
-            roomId: Room(
-              events: {event.rowId: event}.toIMap(),
-              sticky: {event.rowId}.toISet(),
+          .new({
+            roomId: .new(
+              events: .new({event.rowId: event}),
+              sticky: .new({event.rowId}),
             ),
-          }.toIMap(),
-          const ISet.empty(),
+          }),
+          .new(),
         );
   }
 
@@ -177,7 +171,7 @@ class RoomChatController extends AsyncNotifier<IList<Event>> {
   ) async {
     final client = ref.watch(ClientController.provider.notifier);
     final allReactionEvents = await client.getRelatedEvents(
-      GetRelatedEventsRequest(
+      .new(
         roomId: roomId,
         eventId: event.eventId,
         relationType: "m.annotation",
@@ -199,9 +193,7 @@ class RoomChatController extends AsyncNotifier<IList<Event>> {
     if (reactionEvent != null) {
       await ref
           .watch(ClientController.provider.notifier)
-          .redactEvent(
-            RedactEventRequest(eventId: reactionEvent.eventId, roomId: roomId),
-          );
+          .redactEvent(.new(eventId: reactionEvent.eventId, roomId: roomId));
     }
   }
 
@@ -209,7 +201,7 @@ class RoomChatController extends AsyncNotifier<IList<Event>> {
     final client = ref.watch(ClientController.provider.notifier);
 
     await client.sendEvent(
-      SendEventRequest(
+      .new(
         roomId: roomId,
         type: EventType.reaction.type,
         content: {

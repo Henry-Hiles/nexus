@@ -4,7 +4,6 @@ import "package:nexus/controllers/client_controller.dart";
 import "package:nexus/controllers/rooms_controller.dart";
 import "package:nexus/models/configs/reactions_config.dart";
 import "package:nexus/models/content/reaction.dart";
-import "package:nexus/models/requests/get_related_events_request.dart";
 
 class ReactionsController extends AsyncNotifier<IMap<String, IList<String>>> {
   final ReactionsConfig config;
@@ -23,7 +22,7 @@ class ReactionsController extends AsyncNotifier<IMap<String, IList<String>>> {
         ? await ref
               .watch(ClientController.provider.notifier)
               .getRelatedEvents(
-                GetRelatedEventsRequest(
+                .new(
                   roomId: config.roomId,
                   eventId: eventInfo!.$1,
                   relationType: "m.annotation",
@@ -33,18 +32,18 @@ class ReactionsController extends AsyncNotifier<IMap<String, IList<String>>> {
 
     return reactionEvents
             ?.where((event) => event.redactedBy == null)
-            .fold<IMap<String, IList<String>>>(IMap(), (acc, event) {
+            .fold<IMap<String, IList<String>>>(.new(), (acc, event) {
               if (event.content case ReactionContent(:final key?)) {
                 return acc.update(
                   key,
                   (list) => list.add(event.sender),
-                  ifAbsent: () => IList([event.sender]),
+                  ifAbsent: () => .new([event.sender]),
                 );
               }
 
               return acc;
             }) ??
-        const IMap.empty();
+        .new();
   }
 
   static final provider =

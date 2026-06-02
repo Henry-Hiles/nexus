@@ -86,9 +86,7 @@ class Html extends ConsumerWidget {
                       ),
                       errorBuilder: (_, error, _) => Text(
                         "Image Failed to Load",
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.error,
-                        ),
+                        style: .new(color: Theme.of(context).colorScheme.error),
                       ),
                       height: height.toDouble(),
                       width: width?.toDouble(),
@@ -146,15 +144,14 @@ class Html extends ConsumerWidget {
         element.attributes
             .mapTo<MapEntry<String, String>?>(
               (key, value) => switch (key) {
-                "data-mx-color" => MapEntry("color", value),
-                "data-mx-bg-color" => MapEntry("background-color", value),
+                "data-mx-color" => .new("color", value),
+                "data-mx-bg-color" => .new("background-color", value),
                 _ => null,
               },
             )
             .nonNulls,
       ),
     },
-    onTapUrl: (url) =>
-        ref.watch(LaunchHelper.provider).launchUrl(Uri.parse(url)),
+    onTapUrl: (url) => ref.watch(LaunchHelper.provider).launchUrl(.parse(url)),
   );
 }

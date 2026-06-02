@@ -16,7 +16,7 @@ class MembersController extends AsyncNotifier<ISet<Event>> {
       RoomsController.provider.select((value) => value[roomId]),
     );
 
-    if (room == null) return const ISet.empty();
+    if (room == null) return .new();
 
     if (!room.hasFetchedMembers) {
       final fetchedState = await ref
@@ -38,7 +38,7 @@ class MembersController extends AsyncNotifier<ISet<Event>> {
             .map((rowId) => room.events[rowId])
             .nonNulls
             .toISet() ??
-        const ISet.empty();
+        .new();
   }
 
   static final provider = AsyncNotifierProvider.autoDispose

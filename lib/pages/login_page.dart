@@ -5,7 +5,6 @@ import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/client_controller.dart";
 import "package:nexus/helpers/launch_helper.dart";
 import "package:nexus/models/homeserver.dart";
-import "package:nexus/models/requests/login_request.dart";
 import "package:nexus/widgets/appbar.dart";
 import "package:nexus/widgets/divider_text.dart";
 import "package:nexus/widgets/loading.dart";
@@ -36,7 +35,7 @@ class LoginPage extends HookConsumerWidget {
 
       if (homeserver.value == null && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          .new(
             content: Text(
               "Homeserver verification failed. Is your homeserver down?",
               style: TextStyle(color: theme.colorScheme.onErrorContainer),
@@ -56,9 +55,9 @@ class LoginPage extends HookConsumerWidget {
       appBar: Appbar(),
       body: Center(
         child: ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: 600),
+          constraints: .new(maxWidth: 600),
           child: ListView(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 64),
+            padding: .symmetric(horizontal: 16, vertical: 64),
             children: [
               Row(
                 children: [
@@ -66,23 +65,20 @@ class LoginPage extends HookConsumerWidget {
                   SizedBox(width: 12),
                   Expanded(
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment: .start,
                       children: [
                         Text("Nexus", style: theme.textTheme.displayMedium),
                         Text(
                           "A Simple Matrix Client",
                           style: theme.textTheme.headlineMedium,
-                          overflow: TextOverflow.ellipsis,
+                          overflow: .ellipsis,
                         ),
                       ],
                     ),
                   ),
                 ],
               ),
-              Padding(
-                padding: EdgeInsetsGeometry.symmetric(vertical: 12),
-                child: Divider(),
-              ),
+              Padding(padding: .symmetric(vertical: 12), child: Divider()),
 
               DividerText("Enter a homeserver domain:"),
               Row(
@@ -91,7 +87,7 @@ class LoginPage extends HookConsumerWidget {
                   Expanded(
                     child: TextField(
                       controller: homeserverUrl,
-                      decoration: InputDecoration(
+                      decoration: .new(
                         labelText: "Homeserver URL (e.g. matrix.org)",
                       ),
                     ),
@@ -100,7 +96,7 @@ class LoginPage extends HookConsumerWidget {
                     tooltip: "Confirm homeserver choice",
                     onPressed: isLoading.value
                         ? null
-                        : () => setHomeserver(Uri.tryParse(homeserverUrl.text)),
+                        : () => setHomeserver(.tryParse(homeserverUrl.text)),
                     icon: Icon(Icons.check),
                   ),
                 ],
@@ -108,26 +104,26 @@ class LoginPage extends HookConsumerWidget {
 
               DividerText("Or, choose from some popular homeservers:"),
               ...(<Homeserver>[
-                Homeserver(
+                .new(
                   name: "Matrix.org",
                   description:
                       "The Matrix.org Foundation offers the matrix.org homeserver as an easy entry point for anyone wanting to try out Matrix.",
-                  url: Uri.https("matrix.org"),
+                  url: .https("matrix.org"),
                   iconUrl:
                       "https://raw.githubusercontent.com/element-hq/logos/refs/heads/master/matrix/matrix-favicon${Theme.brightnessOf(context) == Brightness.dark ? "-white" : ""}.png",
                 ),
-                Homeserver(
+                .new(
                   name: "Federated Nexus",
                   description:
                       "Federated Nexus is a community resource hosting multiple FOSS (especially federated) services, including Matrix and Forgejo. By the same developers who made Nexus client.",
-                  url: Uri.https("federated.nexus"),
+                  url: .https("federated.nexus"),
                   iconUrl: "https://federated.nexus/images/icon.png",
                 ),
-                Homeserver(
+                .new(
                   name: "Unredacted",
                   description:
                       "Unredacted is a 501(c)(3) non-profit organization that builds Internet infrastructure and services to help people evade censorship and protect their right to privacy.",
-                  url: Uri.https("unredacted.org", "services/si/matrix"),
+                  url: .https("unredacted.org", "services/si/matrix"),
                   iconUrl: "https://unredacted.org/favicon.ico",
                 ),
               ].map(
@@ -153,21 +149,21 @@ class LoginPage extends HookConsumerWidget {
               )),
               SizedBox(height: 8),
               TextButton(
-                onPressed: () => launch(Uri.https("servers.joinmatrix.org")),
+                onPressed: () => launch(.https("servers.joinmatrix.org")),
                 child: Text("See more homeservers..."),
               ),
               if (isLoading.value)
-                Padding(padding: EdgeInsets.only(top: 32), child: Loading())
+                Padding(padding: .only(top: 32), child: Loading())
               else if (homeserver.value != null) ...[
                 DividerText("Then, sign in:"),
                 SizedBox(height: 4),
                 TextField(
-                  decoration: InputDecoration(label: Text("Username")),
+                  decoration: .new(label: Text("Username")),
                   controller: username,
                 ),
                 SizedBox(height: 12),
                 TextField(
-                  decoration: InputDecoration(label: Text("Password")),
+                  decoration: .new(label: Text("Password")),
                   controller: password,
                   obscureText: true,
                 ),
@@ -176,7 +172,7 @@ class LoginPage extends HookConsumerWidget {
                   onPressed: () async {
                     isLoading.value = true;
                     final error = await client.login(
-                      LoginRequest(
+                      .new(
                         username: username.text,
                         password: password.text,
                         homeserverUrl: homeserver.value!,
@@ -185,10 +181,10 @@ class LoginPage extends HookConsumerWidget {
 
                     if (error != null && context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
+                        .new(
                           content: Text(
                             "Login failed. Is your password right?\nError: $error",
-                            style: TextStyle(
+                            style: .new(
                               color: theme.colorScheme.onErrorContainer,
                             ),
                           ),

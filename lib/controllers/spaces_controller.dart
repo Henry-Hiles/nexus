@@ -7,8 +7,6 @@ import "package:nexus/controllers/rooms_controller.dart";
 import "package:nexus/controllers/top_level_spaces_controller.dart";
 import "package:nexus/controllers/space_edges_controller.dart";
 import "package:nexus/models/space.dart";
-import "package:nexus/models/room.dart";
-import "package:nexus/models/space_edge.dart";
 
 class SpacesController extends Notifier<IList<Space>> {
   @override
@@ -20,15 +18,15 @@ class SpacesController extends Notifier<IList<Space>> {
     final childRoomsBySpaceId = IMap.fromEntries(
       topLevelSpaceIds.map((spaceId) {
         ISet<String> walk(String currentId) {
-          final children = spaceEdges[currentId] ?? IList<SpaceEdge>();
+          final children = spaceEdges[currentId] ?? .new();
 
-          return children.fold<ISet<String>>(const ISet.empty(), (acc, edge) {
+          return children.fold<ISet<String>>(.new(), (acc, edge) {
             final childId = edge.childId;
             final isSpace = spaceEdges.containsKey(childId);
 
             return acc
-                .addAll(!isSpace ? ISet([childId]) : const ISet.empty())
-                .addAll(isSpace ? walk(childId) : const ISet.empty());
+                .addAll(!isSpace ? ISet([childId]) : const .empty())
+                .addAll(isSpace ? walk(childId) : const .empty());
           });
         }
 
@@ -88,7 +86,7 @@ class SpacesController extends Notifier<IList<Space>> {
           final room = rooms[id];
           if (room == null) return null;
 
-          final children = childRoomsBySpaceId[id] ?? IList<Room>();
+          final children = childRoomsBySpaceId[id] ?? .new();
           return Space(
             id: id,
             title: room.metadata?.name ?? "Unnamed Room",
@@ -100,13 +98,13 @@ class SpacesController extends Notifier<IList<Space>> {
         .toIList();
 
     return <Space>[
-          Space(
+          .new(
             id: "home",
             title: "Home",
             icon: Icons.home,
             children: homeRooms,
           ),
-          Space(
+          .new(
             id: "dms",
             title: "Direct Messages",
             icon: Icons.people,
@@ -116,18 +114,19 @@ class SpacesController extends Notifier<IList<Space>> {
         ]
         .map(
           (space) => space.copyWith(
-            children: space.children
-                .sortedBy(
-                  (element) =>
-                      element
-                          .metadata
-                          ?.sortingTimestamp
-                          .millisecondsSinceEpoch ??
-                      0,
-                )
-                .sortedBy((room) => room.metadata?.unreadMessages ?? 0)
-                .reversed
-                .toIList(),
+            children: .new(
+              space.children
+                  .sortedBy(
+                    (element) =>
+                        element
+                            .metadata
+                            ?.sortingTimestamp
+                            .millisecondsSinceEpoch ??
+                        0,
+                  )
+                  .sortedBy((room) => room.metadata?.unreadMessages ?? 0)
+                  .reversed,
+            ),
           ),
         )
         .toIList();

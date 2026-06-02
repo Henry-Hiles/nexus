@@ -7,9 +7,8 @@ class MultiProviderController extends AsyncNotifier<void> {
   final IList<AsyncNotifierProvider> providers;
 
   @override
-  FutureOr<void> build() async => await Future.wait(
-    providers.map((provider) => ref.watch(provider.future)),
-  );
+  Future<void> build() =>
+      .wait(providers.map((provider) => ref.watch(provider.future)));
 
   static final provider =
       AsyncNotifierProvider.family<

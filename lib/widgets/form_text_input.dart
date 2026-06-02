@@ -55,14 +55,12 @@ class FormTextInput extends StatelessWidget {
     maxLines: maxLines,
     maxLength: maxLength,
     inputFormatters: formatters,
-    textCapitalization: capitalize
-        ? TextCapitalization.sentences
-        : TextCapitalization.none,
+    textCapitalization: capitalize ? .sentences : .none,
     initialValue: initialValue,
     autocorrect: autocorrect,
     obscureText: obscure,
     onTap: onTap,
-    decoration: InputDecoration(
+    decoration: .new(
       labelText: title,
       border: border ?? (outlined ? null : const UnderlineInputBorder()),
       suffixIcon: trailing,

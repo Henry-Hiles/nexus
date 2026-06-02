@@ -17,7 +17,7 @@ class MessageImage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => ExpandableImage(
     url.toString(),
     child: ClipRRect(
-      borderRadius: BorderRadius.all(Radius.circular(8)),
+      borderRadius: .all(.circular(8)),
       child: Image(
         image: CachedNetworkImage(
           url.toString(),
@@ -47,7 +47,7 @@ class MessageImage extends ConsumerWidget {
         errorBuilder: (context, error, stackTrace) => Center(
           child: Text(
             "Image Failed to Load",
-            style: TextStyle(color: Theme.of(context).colorScheme.error),
+            style: .new(color: Theme.of(context).colorScheme.error),
           ),
         ),
       ),

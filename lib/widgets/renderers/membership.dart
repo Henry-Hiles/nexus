@@ -4,7 +4,6 @@ import "package:nexus/helpers/extensions/show_user_popover.dart";
 import "package:nexus/helpers/extensions/string_to_color.dart";
 import "package:nexus/models/content/membership.dart";
 import "package:nexus/models/event.dart";
-import "package:nexus/models/membership_status.dart";
 import "package:nexus/widgets/lazy_loading/message_displayname.dart";
 import "package:nexus/widgets/renderers/generic_event.dart";
 
@@ -29,24 +28,21 @@ class MembershipRenderer extends StatelessWidget {
             globalPosition: details.globalPosition,
           ),
           child: Text(
-            overflow: TextOverflow.ellipsis,
+            overflow: .ellipsis,
             content.displayName ?? event.stateKey!.localpart,
             maxLines: 1,
-            style: TextStyle(
-              color: event.sender.colorHash,
-              fontWeight: FontWeight.bold,
-            ),
+            style: .new(color: event.sender.colorHash, fontWeight: .bold),
           ),
         ),
         Text(
-          overflow: TextOverflow.ellipsis,
+          overflow: .ellipsis,
           maxLines: 1,
           "${switch (content.status) {
-            MembershipStatus.invite => "was invited to",
-            MembershipStatus.join => "joined",
-            MembershipStatus.leave => event.sender == event.stateKey ? "left" : (event.unsigned["prev_content"]?["membership"] == "ban" ? "was unbanned from" : "was kicked from"),
-            MembershipStatus.ban => "was banned from",
-            MembershipStatus.knock => "asked to join",
+            .invite => "was invited to",
+            .join => "joined",
+            .leave => event.sender == event.stateKey ? "left" : (event.unsigned["prev_content"]?["membership"] == "ban" ? "was unbanned from" : "was kicked from"),
+            .ban => "was banned from",
+            .knock => "asked to join",
           }} the room${event.sender == event.stateKey ? "" : " by "}",
         ),
         if (event.sender != event.stateKey) MessageDisplayname(event),

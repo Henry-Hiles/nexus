@@ -4,10 +4,10 @@ import "package:nexus/models/account_data.dart";
 
 class AccountDataController extends Notifier<IMap<String, AccountData>> {
   @override
-  IMap<String, AccountData> build() => const IMap.empty();
+  IMap<String, AccountData> build() => .new();
 
   void update(IMap<String, AccountData> newData) =>
-      state = IMap({...state.unlock, ...newData.unlock});
+      state = .new({...state.unlock, ...newData.unlock});
 
   static final provider =
       NotifierProvider<AccountDataController, IMap<String, AccountData>>(

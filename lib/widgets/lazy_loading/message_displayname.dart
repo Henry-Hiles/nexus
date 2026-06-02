@@ -18,52 +18,46 @@ class MessageDisplayname extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) =>
-      switch (ref.watch(AuthorController.provider(event))) {
-        AsyncData(:final value) || AsyncLoading(:final value?) => InkWell(
-          onTapUp: clickable
-              ? (details) => context.showUserPopover(
-                  value,
-                  event.sender,
-                  roomId: event.roomId,
-                  globalPosition: details.globalPosition,
-                )
-              : null,
-          child: Wrap(
-            spacing: 4,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              Text(
-                value.displayName ?? event.sender.localpart,
-                style:
-                    style ??
-                    TextStyle(
-                      color: event.sender.colorHash,
-                      fontWeight: FontWeight.bold,
-                    ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
+  Widget build(BuildContext context, WidgetRef ref) => switch (ref.watch(
+    AuthorController.provider(event),
+  )) {
+    AsyncData(:final value) || AsyncLoading(:final value?) => InkWell(
+      onTapUp: clickable
+          ? (details) => context.showUserPopover(
+              value,
+              event.sender,
+              roomId: event.roomId,
+              globalPosition: details.globalPosition,
+            )
+          : null,
+      child: Wrap(
+        spacing: 4,
+        crossAxisAlignment: .center,
+        children: [
+          Text(
+            value.displayName ?? event.sender.localpart,
+            style:
+                style ?? .new(color: event.sender.colorHash, fontWeight: .bold),
+            maxLines: 1,
+            overflow: .ellipsis,
+          ),
 
-              if (event.pmp != null)
-                Text(
-                  "(via ${event.sender})",
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: event.sender.colorHash,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-            ],
-          ),
-        ),
-        _ => Text(
-          event.sender.localpart,
-          style: TextStyle(
-            color: event.sender.colorHash,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      };
+          if (event.pmp != null)
+            Text(
+              "(via ${event.sender})",
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: event.sender.colorHash,
+                fontWeight: .bold,
+              ),
+              maxLines: 1,
+              overflow: .ellipsis,
+            ),
+        ],
+      ),
+    ),
+    _ => Text(
+      event.sender.localpart,
+      style: .new(color: event.sender.colorHash, fontWeight: .bold),
+    ),
+  };
 }

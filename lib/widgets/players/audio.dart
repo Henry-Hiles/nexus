@@ -16,9 +16,7 @@ class AudioPlayer extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final player = useMemoized(
-      () => Player(
-        configuration: PlayerConfiguration(bufferSize: 128 * 1024 * 1024),
-      ),
+      () => Player(configuration: .new(bufferSize: 128 * 1024 * 1024)),
     );
 
     final playing = useState(false);
@@ -66,7 +64,7 @@ class AudioPlayer extends HookConsumerWidget {
       child: Card(
         color: Theme.of(context).colorScheme.surfaceContainer,
         child: Padding(
-          padding: EdgeInsetsGeometry.only(left: 8, right: 16),
+          padding: .only(left: 8, right: 16),
           child: Row(
             children: [
               IconButton(
@@ -88,7 +86,7 @@ class AudioPlayer extends HookConsumerWidget {
                       : duration.value.inMilliseconds.toDouble(),
                   value: position.value.inMilliseconds.toDouble(),
                   onChanged: (value) =>
-                      player.seek(Duration(milliseconds: value.toInt())),
+                      player.seek(.new(milliseconds: value.toInt())),
                 ),
               ),
               Text(

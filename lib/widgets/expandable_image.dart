@@ -20,14 +20,12 @@ class ExpandableImage extends ConsumerWidget {
             builder: (_) => LayoutBuilder(
               builder: (context, constraints) => Dialog(
                 backgroundColor: Colors.transparent,
-                insetPadding: EdgeInsets.all(constraints.maxWidth / 100),
+                insetPadding: .all(constraints.maxWidth / 100),
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minWidth: min(constraints.maxWidth, 1000),
-                  ),
+                  constraints: .new(minWidth: min(constraints.maxWidth, 1000)),
                   child: InteractiveViewer(
                     child: Image(
-                      fit: BoxFit.contain,
+                      fit: .contain,
                       errorBuilder: (_, error, stackTrace) => ErrorDialog(
                         "Loading failed for $source\nError: $error",
                         stackTrace,

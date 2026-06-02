@@ -12,11 +12,9 @@ import "package:nexus/controllers/rooms_controller.dart";
 import "package:nexus/controllers/room_chat_controller.dart";
 import "package:nexus/controllers/via_controller.dart";
 import "package:nexus/models/configs/power_level_config.dart";
-import "package:nexus/models/content/content.dart";
 import "package:nexus/models/content/message.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/models/relation_type.dart";
-import "package:nexus/models/requests/report_request.dart";
 import "package:nexus/widgets/composer/composer.dart";
 import "package:nexus/widgets/emoji_picker_button.dart";
 import "package:nexus/widgets/renderers/event.dart";
@@ -102,8 +100,7 @@ class RoomChat extends HookConsumerWidget {
 
     final composerNode = useFocusNode(
       onKeyEvent: (_, event) {
-        if (event is KeyDownEvent &&
-            event.logicalKey == LogicalKeyboardKey.escape) {
+        if (event is KeyDownEvent && event.logicalKey == .escape) {
           relatedEvent.value = null;
           return KeyEventResult.handled;
         }
@@ -118,7 +115,7 @@ class RoomChat extends HookConsumerWidget {
       return [
         if (ref.watch(
           PowerLevelController.provider(
-            PowerLevelConfig(eventType: EventType.reaction, roomId: roomId),
+            .new(eventType: .reaction, roomId: roomId),
           ),
         ))
           PopupMenuItem(
@@ -134,7 +131,7 @@ class RoomChat extends HookConsumerWidget {
                               value["m.recent_emoji"]
                                       ?.content["recent_emoji"] ??
                                   [],
-                            ).map((entry) => entry["emoji"]),
+                            ).map((entry) => entry["emoji"]).toIList(),
                           ),
                         ),
                         "👍",
@@ -167,13 +164,13 @@ class RoomChat extends HookConsumerWidget {
           ),
         if (ref.watch(
           PowerLevelController.provider(
-            PowerLevelConfig(eventType: EventType.message, roomId: roomId),
+            PowerLevelConfig(eventType: .message, roomId: roomId),
           ),
         ))
           PopupMenuItem(
             onTap: () {
               relatedEvent.value = event;
-              relationType.value = RelationType.reply;
+              relationType.value = .reply;
               composerNode.requestFocus();
             },
             child: ListTile(leading: Icon(Icons.reply), title: Text("Reply")),
@@ -182,7 +179,7 @@ class RoomChat extends HookConsumerWidget {
           PopupMenuItem(
             onTap: () {
               relatedEvent.value = event;
-              relationType.value = RelationType.edit;
+              relationType.value = .edit;
               composerNode.requestFocus();
             },
             child: ListTile(leading: Icon(Icons.edit), title: Text("Edit")),
@@ -207,10 +204,7 @@ class RoomChat extends HookConsumerWidget {
         ),
         if (ref.watch(
           PowerLevelController.provider(
-            PowerLevelConfig.redaction(
-              targetUser: event.sender,
-              roomId: roomId,
-            ),
+            .redaction(targetUser: event.sender, roomId: roomId),
           ),
         ))
           PopupMenuItem(
@@ -222,8 +216,8 @@ class RoomChat extends HookConsumerWidget {
                   return AlertDialog(
                     title: Text("Delete Message"),
                     content: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: .min,
+                      crossAxisAlignment: .start,
                       children: [
                         Text(
                           "Are you sure you want to delete this message? This can not be reversed.",
@@ -261,7 +255,7 @@ class RoomChat extends HookConsumerWidget {
             ),
             child: ListTile(
               leading: Icon(Icons.delete, color: danger),
-              title: Text("Delete", style: TextStyle(color: danger)),
+              title: Text("Delete", style: .new(color: danger)),
             ),
           ),
         PopupMenuItem(
@@ -273,8 +267,8 @@ class RoomChat extends HookConsumerWidget {
                 return AlertDialog(
                   title: Text("Report"),
                   content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: .min,
+                    crossAxisAlignment: .start,
                     children: [
                       Text(
                         "Report this event to your server administrators, who can take action like banning this server or room.",
@@ -297,7 +291,7 @@ class RoomChat extends HookConsumerWidget {
                     TextButton(
                       onPressed: () {
                         client.reportEvent(
-                          ReportRequest(
+                          .new(
                             roomId: roomId,
                             eventId: event.eventId,
                             reason: reasonController.text.isEmpty
@@ -316,7 +310,7 @@ class RoomChat extends HookConsumerWidget {
           ),
           child: ListTile(
             leading: Icon(Icons.report, color: danger),
-            title: Text("Report", style: TextStyle(color: danger)),
+            title: Text("Report", style: .new(color: danger)),
           ),
         ),
       ].toIList();
@@ -341,7 +335,7 @@ class RoomChat extends HookConsumerWidget {
               children: [
                 Positioned.fill(
                   child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 12),
+                    padding: .symmetric(horizontal: 12),
                     child: switch (controllerData) {
                       AsyncData(:final value) ||
                       AsyncLoading(:final value?) => CustomScrollView(
@@ -349,9 +343,7 @@ class RoomChat extends HookConsumerWidget {
                         controller: scrollController,
                         slivers: [
                           SliverPadding(
-                            padding: EdgeInsetsGeometry.only(
-                              bottom: composerSize.value,
-                            ),
+                            padding: .only(bottom: composerSize.value),
                           ),
 
                           SuperSliverList.builder(
@@ -371,19 +363,15 @@ class RoomChat extends HookConsumerWidget {
                                       ),
                                       scrollController: scrollController,
                                       alignment: 0.5,
-                                      duration: (_) =>
-                                          Duration(milliseconds: 700),
+                                      duration: (_) => .new(milliseconds: 700),
                                       curve: (_) => Curves.easeInOut,
                                     );
                                     flashingEvent.value = replyId;
-                                    await Future.delayed(
-                                      Duration(seconds: 1),
-                                      () {
-                                        if (flashingEvent.value == replyId) {
-                                          flashingEvent.value = null;
-                                        }
-                                      },
-                                    );
+                                    await Future.delayed(.new(seconds: 1), () {
+                                      if (flashingEvent.value == replyId) {
+                                        flashingEvent.value = null;
+                                      }
+                                    });
                                   },
                                   getEventOptions: getEventOptions,
                                   isGrouped:
@@ -403,7 +391,7 @@ class RoomChat extends HookConsumerWidget {
 
                           SliverToBoxAdapter(
                             child: Padding(
-                              padding: EdgeInsets.symmetric(vertical: 36),
+                              padding: .symmetric(vertical: 36),
                               child: Center(
                                 child: controllerData is AsyncLoading
                                     ? Loading()

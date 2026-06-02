@@ -1,33 +1,29 @@
 import "dart:isolate";
-
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/models/event.dart";
-import "package:nexus/models/read_receipt.dart";
 import "package:nexus/models/room.dart";
 
 class RoomsController extends Notifier<IMap<String, Room>> {
   @override
-  IMap<String, Room> build() => const IMap.empty();
+  IMap<String, Room> build() => .new();
 
   Future<void> addState(
     String roomId,
     IList<Event> state, {
     bool isMembers = false,
   }) async => update(
-    {
+    .new({
       roomId: Room(
-        events: IMap.fromEntries(
-          state.map((event) => MapEntry(event.rowId, event)),
-        ),
+        events: .fromEntries(state.map((event) => .new(event.rowId, event))),
         hasFetchedState: true,
         hasFetchedMembers: isMembers,
         state: await Isolate.run(() {
-          final newState = state.fold(
-            const IMap<String, IMap<String, int>>.empty(),
+          final newState = state.fold<IMap<String, IMap<String, int>>>(
+            .new(),
             (previousValue, stateEvent) => previousValue.add(
               stateEvent.type,
-              (previousValue[stateEvent.type] ?? const IMap.empty()).add(
+              (previousValue[stateEvent.type] ?? .new()).add(
                 stateEvent.stateKey!,
                 stateEvent.rowId,
               ),
@@ -36,8 +32,8 @@ class RoomsController extends Notifier<IMap<String, Room>> {
           return newState;
         }),
       ),
-    }.toIMap(),
-    const ISet.empty(),
+    }),
+    .new(),
   );
 
   void update(IMap<String, Room> rooms, ISet<String> leftRooms) {
@@ -65,9 +61,7 @@ class RoomsController extends Notifier<IMap<String, Room>> {
                 existing.state,
                 (previousValue, event) => previousValue.add(
                   event.key,
-                  (previousValue[event.key] ?? const IMap.empty()).addAll(
-                    event.value,
-                  ),
+                  (previousValue[event.key] ?? .new()).addAll(event.value),
                 ),
               ),
               reset: false,
@@ -82,9 +76,7 @@ class RoomsController extends Notifier<IMap<String, Room>> {
                 existing.receipts,
                 (receiptAcc, event) => receiptAcc.add(
                   event.key,
-                  (receiptAcc[event.key] ?? IList<ReadReceipt>()).addAll(
-                    event.value,
-                  ),
+                  (receiptAcc[event.key] ?? .new()).addAll(event.value),
                 ),
               ),
             ) ??

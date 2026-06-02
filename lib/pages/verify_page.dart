@@ -17,8 +17,8 @@ class VerifyPage extends HookConsumerWidget {
       body: AlertDialog(
         title: Text("Verify"),
         content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: .min,
+          crossAxisAlignment: .start,
           children: [
             Text(
               "Enter your recovery key or passphrase below to unlock encrypted events.\nYour passphrase is usually not the same as your password.",
@@ -41,11 +41,11 @@ class VerifyPage extends HookConsumerWidget {
                 : () async {
                     final scaffoldMessenger = ScaffoldMessenger.of(context);
                     final snackbar = scaffoldMessenger.showSnackBar(
-                      SnackBar(
+                      .new(
                         content: Text(
                           "Attempting to verify with recovery key...",
                         ),
-                        duration: Duration(days: 999),
+                        duration: .new(days: 999),
                       ),
                     );
 
@@ -60,13 +60,13 @@ class VerifyPage extends HookConsumerWidget {
                       isVerifying.value = false;
                       if (context.mounted) {
                         scaffoldMessenger.showSnackBar(
-                          SnackBar(
+                          .new(
                             backgroundColor: Theme.of(
                               context,
                             ).colorScheme.errorContainer,
                             content: Text(
                               "Verification failed. Is your passphrase correct?\nError: $error",
-                              style: TextStyle(
+                              style: .new(
                                 color: Theme.of(
                                   context,
                                 ).colorScheme.onErrorContainer,

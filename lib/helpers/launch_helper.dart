@@ -10,9 +10,7 @@ class LaunchHelper {
     try {
       return await ul.launchUrl(
         url,
-        mode: useWebview
-            ? ul.LaunchMode.inAppBrowserView
-            : ul.LaunchMode.externalApplication,
+        mode: useWebview ? .inAppBrowserView : .externalApplication,
       );
     } on PlatformException catch (_) {
       return false;

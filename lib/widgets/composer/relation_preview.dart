@@ -27,38 +27,34 @@ class RelationPreview extends ConsumerWidget {
 
     return Container(
       color: theme.colorScheme.surfaceContainerHigh,
-      padding: EdgeInsets.symmetric(horizontal: 12),
+      padding: .symmetric(horizontal: 12),
       child: Row(
         spacing: 8,
         children: [
-          if (relationType == RelationType.edit)
-            Text(
-              "Editing message:",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
+          if (relationType == .edit)
+            Text("Editing message:", style: .new(fontWeight: .bold)),
 
           Expanded(
             child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 8),
+              padding: .symmetric(vertical: 8),
               child: EventPreview(relatedEvent!),
             ),
           ),
 
-          if (relationType == RelationType.reply)
+          if (relationType == .reply)
             TextButton(
               onPressed: toggleShouldMention,
               child: Text(
                 shouldMention ? "@On" : "@Off",
                 style: TextStyle(
-                  fontWeight: FontWeight.w900,
+                  fontWeight: .w900,
                   color: shouldMention ? null : Theme.of(context).disabledColor,
                 ),
               ),
             ),
 
           IconButton(
-            tooltip:
-                "Cancel ${relationType == RelationType.edit ? "edit" : "reply"}",
+            tooltip: "Cancel ${relationType == .edit ? "edit" : "reply"}",
             onPressed: onDismiss,
             icon: const Icon(Icons.close),
             iconSize: 20,

@@ -4,7 +4,7 @@ import "package:nexus/models/space_edge.dart";
 
 class SpaceEdgesController extends Notifier<IMap<String, IList<SpaceEdge>>> {
   @override
-  IMap<String, IList<SpaceEdge>> build() => const IMap.empty();
+  IMap<String, IList<SpaceEdge>> build() => .new();
 
   void set(IMap<String, IList<SpaceEdge>> newEdges) =>
       state = state.addAll(newEdges);

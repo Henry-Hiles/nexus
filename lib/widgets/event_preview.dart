@@ -12,16 +12,16 @@ class EventPreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) => IgnorePointer(
     child: Padding(
-      padding: EdgeInsets.symmetric(vertical: 4),
+      padding: .symmetric(vertical: 4),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisSize: .min,
         spacing: 12,
         children: [
           if (event.content is MessageContent) MessageAvatar(event),
 
           Flexible(
             child: Wrap(
-              crossAxisAlignment: WrapCrossAlignment.center,
+              crossAxisAlignment: .center,
               spacing: 8,
               runSpacing: 2,
               children: [

@@ -5,9 +5,7 @@ import "package:nexus/controllers/rooms_controller.dart";
 import "package:nexus/controllers/via_controller.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
 import "package:nexus/helpers/extensions/get_localpart.dart";
-import "package:nexus/models/configs/members_by_status_config.dart";
 import "package:nexus/models/content/membership.dart";
-import "package:nexus/models/membership_status.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/widgets/loading.dart";
 
@@ -29,21 +27,18 @@ class MentionOverlay extends ConsumerWidget {
     final rooms = ref.watch(RoomsController.provider);
 
     return Padding(
-      padding: EdgeInsets.all(8),
+      padding: .all(8),
       child: ClipRRect(
-        borderRadius: BorderRadius.all(Radius.circular(12)),
+        borderRadius: .all(.circular(12)),
         child: Container(
           color: Theme.of(context).colorScheme.surfaceContainerHigh,
-          padding: EdgeInsets.all(8),
+          padding: .all(8),
           child: switch (triggerCharacter) {
             "@" =>
               ref
                   .watch(
                     MembersByStatusController.provider(
-                      MembersByStatusConfig(
-                        roomId: roomId,
-                        status: MembershipStatus.join,
-                      ),
+                      .new(roomId: roomId, status: .join),
                     ),
                   )
                   .betterWhen(

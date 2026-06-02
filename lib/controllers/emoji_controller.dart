@@ -12,10 +12,7 @@ class EmojiController extends AsyncNotifier<EmojiTuple> {
   @override
   Future<EmojiTuple> build() async {
     final response = await get(
-      Uri.https(
-        "github.com",
-        "github/gemoji/raw/refs/heads/master/db/emoji.json",
-      ),
+      .https("github.com", "github/gemoji/raw/refs/heads/master/db/emoji.json"),
     );
 
     if (response.statusCode != 200) {
@@ -30,19 +27,19 @@ class EmojiController extends AsyncNotifier<EmojiTuple> {
         .toIList();
 
     final categoryMap = entries.fold<IMap<String, IList<String>>>(
-      const IMap.empty(),
+      .new(),
       (acc, entry) => acc.update(
         entry.category,
         (list) => list.add(entry.emoji),
-        ifAbsent: () => IList([entry.emoji]),
+        ifAbsent: () => .new([entry.emoji]),
       ),
     );
 
     final keywordMap = entries.fold<IMap<String, IList<String>>>(
-      const IMap.empty(),
+      .new(),
       (acc, entry) => acc.add(
         entry.emoji,
-        IList<String>([...entry.tags, ...entry.aliases, entry.description]),
+        .new([...entry.tags, ...entry.aliases, entry.description]),
       ),
     );
 
@@ -71,9 +68,9 @@ class EmojiController extends AsyncNotifier<EmojiTuple> {
     );
 
     final customKeywords = IMap(
-      Map.fromEntries(
+      .fromEntries(
         keywordMap.entries.map(
-          (e) => MapEntry(e.key, e.value.toList(growable: false)),
+          (e) => .new(e.key, e.value.toList(growable: false)),
         ),
       ),
     );

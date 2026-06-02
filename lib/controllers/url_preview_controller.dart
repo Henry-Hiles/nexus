@@ -19,7 +19,7 @@ class UrlPreviewController extends AsyncNotifier<OpenGraphData?> {
     if (homeserver != null && !link.contains("matrix.to")) {
       {
         final response = await get(
-          Uri.parse(homeserver)
+          .parse(homeserver)
               .resolve("/_matrix/client/v1/media/preview_url")
               .replace(queryParameters: {"url": link}),
           headers: await ref.watch(HeaderController.provider.future),
@@ -34,7 +34,7 @@ class UrlPreviewController extends AsyncNotifier<OpenGraphData?> {
               ? null
               : Uri.tryParse(mxc)?.mxcToHttps(homeserver);
 
-          return OpenGraphData.fromJson(decodedValue).copyWith(imageUrl: image);
+          return .fromJson(decodedValue).copyWith(imageUrl: image);
         }
       }
     }

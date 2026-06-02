@@ -14,7 +14,6 @@ import "package:nexus/controllers/sync_status_controller.dart";
 import "package:nexus/controllers/top_level_spaces_controller.dart";
 import "package:nexus/helpers/extensions/gomuks_buffer.dart";
 import "package:nexus/main.dart";
-import "package:nexus/models/client_state.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/models/paginate.dart";
 import "package:nexus/models/requests/get_event_request.dart";
@@ -31,7 +30,6 @@ import "package:nexus/models/requests/send_message_request.dart";
 import "package:nexus/models/requests/set_membership_request.dart";
 import "package:nexus/models/room.dart";
 import "package:nexus/models/sync_data.dart";
-import "package:nexus/models/sync_status.dart";
 import "package:nexus/src/third_party/gomuks.g.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:path_provider/path_provider.dart";
@@ -66,12 +64,12 @@ class ClientController extends AsyncNotifier<int> {
               case "client_state":
                 ref
                     .watch(ClientStateController.provider.notifier)
-                    .set(ClientState.fromJson(decodedMuksEvent));
+                    .set(.fromJson(decodedMuksEvent));
                 break;
               case "sync_status":
                 ref
                     .watch(SyncStatusController.provider.notifier)
-                    .set(SyncStatus.fromJson(decodedMuksEvent));
+                    .set(.fromJson(decodedMuksEvent));
                 break;
               case "init_complete":
                 ref.watch(InitCompleteController.provider.notifier).complete();
@@ -81,12 +79,10 @@ class ClientController extends AsyncNotifier<int> {
                 ref
                     .watch(RoomsController.provider.notifier)
                     .update(
-                      {
-                        event.roomId: Room(
-                          events: {event.rowId: event}.toIMap(),
-                        ),
-                      }.toIMap(),
-                      const ISet.empty(),
+                      .new({
+                        event.roomId: .new(events: .new({event.rowId: event})),
+                      }),
+                      .new(),
                     );
 
                 break;
@@ -210,9 +206,11 @@ class ClientController extends AsyncNotifier<int> {
         (await _sendCommand("get_room_state", request.toJson())) as List?;
     final response = await getState(request);
 
-    return (response ?? await getState(request.copyWith(refetch: true)) ?? [])
-        .map((event) => Event.fromJson(event))
-        .toIList();
+    return .new(
+      (response ?? await getState(request.copyWith(refetch: true)) ?? []).map(
+        (event) => .fromJson(event),
+      ),
+    );
   }
 
   Future<IList<Event>?> getRelatedEvents(
@@ -220,20 +218,20 @@ class ClientController extends AsyncNotifier<int> {
   ) async {
     final response =
         (await _sendCommand("get_related_events", request.toJson())) as List?;
-    return response?.map((event) => Event.fromJson(event)).toIList();
+    return .new(response?.map((event) => .fromJson(event)));
   }
 
   Future<Event?> getEvent(GetEventRequest request) async {
     final json = await _sendCommand("get_event", request.toJson());
-    return json == null ? null : Event.fromJson(json);
+    return json == null ? null : .fromJson(json);
   }
 
   Future<Paginate> paginate(PaginateRequest request) async =>
-      Paginate.fromJson(await _sendCommand("paginate", request.toJson()));
+      .fromJson(await _sendCommand("paginate", request.toJson()));
 
   Future<Profile> getProfile(String userId) async {
     final json = await _sendCommand("get_profile", {"user_id": userId});
-    return Profile.fromJsonWithCatch({...json, "id": userId});
+    return .fromJsonWithCatch({...json, "id": userId});
   }
 
   Future<void> reportEvent(ReportRequest request) =>

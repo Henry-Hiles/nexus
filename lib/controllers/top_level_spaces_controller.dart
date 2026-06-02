@@ -3,7 +3,7 @@ import "package:flutter_riverpod/flutter_riverpod.dart";
 
 class TopLevelSpacesController extends Notifier<IList<String>> {
   @override
-  IList<String> build() => const IList.empty();
+  IList<String> build() => .new();
 
   void set(IList<String> newSpaces) => state = newSpaces;
 

@@ -9,11 +9,8 @@ import "package:nexus/controllers/profile_controller.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
 import "package:nexus/helpers/extensions/get_localpart.dart";
 import "package:nexus/helpers/extensions/mxc_to_https.dart";
-import "package:nexus/models/configs/power_level_config.dart";
 import "package:nexus/models/content/membership.dart";
-import "package:nexus/models/membership_status.dart";
 import "package:nexus/models/requests/membership_action.dart";
-import "package:nexus/models/requests/set_membership_request.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/main.dart";
 import "package:nexus/widgets/expandable_image.dart";
@@ -39,8 +36,8 @@ class UserPopover extends ConsumerWidget {
           return AlertDialog(
             title: Text("${toBeginningOfSentenceCase(action.name)} $userId"),
             content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: .min,
+              crossAxisAlignment: .start,
               children: [
                 Text("Are you sure you want to ${action.name} $userId?"),
                 SizedBox(height: 12),
@@ -62,7 +59,7 @@ class UserPopover extends ConsumerWidget {
                   Navigator.of(context).pop();
                   client
                       .setMembership(
-                        SetMembershipRequest(
+                        .new(
                           userId: userId,
                           roomId: roomId!,
                           action: action,
@@ -80,20 +77,18 @@ class UserPopover extends ConsumerWidget {
     );
 
     final actionButton = ButtonStyle(
-      padding: WidgetStatePropertyAll(
-        EdgeInsets.symmetric(horizontal: 24, vertical: 18),
-      ),
+      padding: WidgetStatePropertyAll(.symmetric(horizontal: 24, vertical: 18)),
       shape: WidgetStatePropertyAll(
-        RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        RoundedRectangleBorder(borderRadius: .circular(8)),
       ),
     );
 
     return Column(
       spacing: 16,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+      crossAxisAlignment: .stretch,
       children: [
         Wrap(
-          alignment: WrapAlignment.center,
+          alignment: .center,
           spacing: 16,
           runSpacing: 8,
           children: [
@@ -126,7 +121,7 @@ class UserPopover extends ConsumerWidget {
                     .betterWhen(
                       loading: SizedBox.shrink,
                       data: (profile) => Wrap(
-                        alignment: WrapAlignment.center,
+                        alignment: .center,
                         spacing: 4,
                         runSpacing: 4,
                         children: [
@@ -135,7 +130,7 @@ class UserPopover extends ConsumerWidget {
                           ))
                             Chip(
                               label: Text(pronoun.summary),
-                              labelStyle: TextStyle(
+                              labelStyle: .new(
                                 color: theme.colorScheme.onPrimary,
                               ),
                               color: WidgetStatePropertyAll(
@@ -145,7 +140,7 @@ class UserPopover extends ConsumerWidget {
                           if (profile.timezone != null)
                             Chip(
                               label: Text(profile.timezone!),
-                              labelStyle: TextStyle(
+                              labelStyle: .new(
                                 color: theme.colorScheme.onPrimary,
                               ),
                               color: WidgetStatePropertyAll(
@@ -162,7 +157,7 @@ class UserPopover extends ConsumerWidget {
         if (userId != ref.watch(ClientStateController.provider)?.userId &&
             roomId != null)
           Wrap(
-            alignment: WrapAlignment.center,
+            alignment: .center,
             spacing: 8,
             runSpacing: 8,
             children: [
@@ -175,17 +170,17 @@ class UserPopover extends ConsumerWidget {
 
               if (ref.watch(
                         PowerLevelController.provider(
-                          PowerLevelConfig.membershipAction(
-                            action: MembershipAction.kick,
+                          .membershipAction(
+                            action: .kick,
                             roomId: roomId!,
                             targetUser: userId,
                           ),
                         ),
                       ) &&
-                      member.status == MembershipStatus.join ||
-                  member.status == MembershipStatus.invite)
+                      member.status == .join ||
+                  member.status == .invite)
                 FilledButton.icon(
-                  onPressed: () => showMembershipDialog(MembershipAction.kick),
+                  onPressed: () => showMembershipDialog(.kick),
                   label: Text("Kick"),
                   style: actionButton.copyWith(
                     backgroundColor: WidgetStatePropertyAll(
@@ -199,23 +194,19 @@ class UserPopover extends ConsumerWidget {
                 ),
               if (ref.watch(
                 PowerLevelController.provider(
-                  PowerLevelConfig.membershipAction(
+                  .membershipAction(
                     roomId: roomId!,
-                    action: MembershipAction.ban,
+                    action: .ban,
                     targetUser: userId,
                   ),
                 ),
               ))
                 ElevatedButton.icon(
                   onPressed: () => showMembershipDialog(
-                    member.status == MembershipStatus.ban
-                        ? MembershipAction.unban
-                        : MembershipAction.ban,
+                    member.status == .ban ? .unban : .ban,
                   ),
                   icon: Icon(Icons.gavel),
-                  label: Text(
-                    member.status == MembershipStatus.ban ? "Unban" : "Ban",
-                  ),
+                  label: Text(member.status == .ban ? "Unban" : "Ban"),
                   style: actionButton.copyWith(
                     backgroundColor: WidgetStatePropertyAll(
                       theme.colorScheme.errorContainer,

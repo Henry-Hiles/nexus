@@ -18,11 +18,11 @@ class Appbar extends StatelessWidget implements PreferredSizeWidget {
     this.backgroundColor,
     this.scrolledUnderElevation,
     this.leading,
-    this.actions = const IList.empty(),
+    this.actions = const .empty(),
   });
 
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+  Size get preferredSize => const .fromHeight(kToolbarHeight);
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +42,7 @@ class Appbar extends StatelessWidget implements PreferredSizeWidget {
         leading: InkWell(onTap: onTap, child: leading),
         backgroundColor: backgroundColor,
         scrolledUnderElevation: scrolledUnderElevation,
-        actionsPadding: const EdgeInsets.symmetric(horizontal: 8),
+        actionsPadding: const .symmetric(horizontal: 8),
         title: InkWell(
           onTap: onTap,
           child: IgnorePointer(child: title),

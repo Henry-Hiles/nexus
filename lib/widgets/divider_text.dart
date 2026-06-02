@@ -14,9 +14,9 @@ class DividerText extends StatelessWidget {
           child: Divider(color: Theme.of(context).colorScheme.onSurface),
         ),
         ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: constraints.maxWidth - 32),
+          constraints: .new(maxWidth: constraints.maxWidth - 32),
           child: Padding(
-            padding: const EdgeInsets.all(8),
+            padding: const .all(8),
             child: Text(text, style: Theme.of(context).textTheme.labelLarge),
           ),
         ),

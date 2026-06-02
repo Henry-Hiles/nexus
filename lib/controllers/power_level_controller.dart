@@ -4,7 +4,6 @@ import "package:nexus/controllers/rooms_controller.dart";
 import "package:nexus/models/configs/power_level_config.dart";
 import "package:nexus/models/content/content.dart";
 import "package:nexus/models/content/power_levels.dart";
-import "package:nexus/models/requests/membership_action.dart";
 
 class PowerLevelController extends Notifier<bool> {
   final PowerLevelConfig config;
@@ -14,7 +13,7 @@ class PowerLevelController extends Notifier<bool> {
   bool build() {
     if (config case EventPowerLevelConfig(:final eventType)) {
       assert(
-        eventType != EventType.redaction,
+        eventType != .redaction,
         "Checking power level for a redaction should use [PowerLevelConfig.redaction].",
       );
     }
@@ -29,6 +28,7 @@ class PowerLevelController extends Notifier<bool> {
     final content = event?.content is PowerLevelsContent
         ? event!.content
         : PowerLevelsContent();
+
     final user = ref.watch(
       ClientStateController.provider.select((value) => value?.userId),
     );
@@ -45,15 +45,15 @@ class PowerLevelController extends Notifier<bool> {
 
       MembershipActionPowerLevelConfig(:final action, :final targetUser) =>
         switch (action) {
-          MembershipAction.invite => userLevel >= content.invite,
+          .invite => userLevel >= content.invite,
 
-          MembershipAction.kick =>
+          .kick =>
             userLevel >= content.kick && userLevel > powerLevelOf(targetUser),
 
-          MembershipAction.ban =>
+          .ban =>
             userLevel >= content.ban && userLevel > powerLevelOf(targetUser),
 
-          MembershipAction.unban => userLevel >= content.ban,
+          .unban => userLevel >= content.ban,
         },
 
       StatePowerLevelConfig(:final eventType) =>

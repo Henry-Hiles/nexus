@@ -5,7 +5,6 @@ import "package:nexus/controllers/client_state_controller.dart";
 import "package:nexus/models/content/content.dart";
 import "package:nexus/models/content/membership.dart";
 import "package:nexus/models/content/power_levels.dart";
-import "package:nexus/models/membership_status.dart";
 import "package:nexus/models/room.dart";
 
 class ViaController extends Notifier<String> {
@@ -45,7 +44,7 @@ class ViaController extends Notifier<String> {
           : room.events[membershipEventId];
 
       if (member?.content case MembershipContent(:final status)) {
-        if (status == MembershipStatus.join) {
+        if (status == .join) {
           addUserId(member?.stateKey);
         }
       }

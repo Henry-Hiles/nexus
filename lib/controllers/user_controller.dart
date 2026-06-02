@@ -6,7 +6,6 @@ import "package:nexus/controllers/profile_controller.dart";
 import "package:nexus/helpers/extensions/get_localpart.dart";
 import "package:nexus/models/configs/user_config.dart";
 import "package:nexus/models/content/membership.dart";
-import "package:nexus/models/membership_status.dart";
 
 class UserController extends AsyncNotifier<MembershipContent> {
   final UserConfig config;
@@ -31,8 +30,9 @@ class UserController extends AsyncNotifier<MembershipContent> {
     final profile = await ref.watch(
       ProfileController.provider(config.userId).future,
     );
-    return MembershipContent(
-      status: MembershipStatus.leave,
+
+    return .new(
+      status: .leave,
       avatarUrl: profile.avatarUrl,
       displayName: profile.displayName ?? config.userId.localpart,
     );

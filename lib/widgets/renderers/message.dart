@@ -9,7 +9,6 @@ import "package:nexus/models/content/encrypted.dart";
 import "package:nexus/models/content/message.dart";
 import "package:nexus/models/content/sticker.dart";
 import "package:nexus/models/event.dart";
-import "package:nexus/models/requests/get_event_request.dart";
 import "package:nexus/widgets/file_card.dart";
 import "package:nexus/widgets/html/html.dart";
 import "package:nexus/widgets/lazy_loading/message_avatar.dart";
@@ -49,19 +48,19 @@ class MessageRenderer extends ConsumerWidget {
       child: Text(
         format(event.timestamp),
         maxLines: 1,
-        overflow: TextOverflow.ellipsis,
+        overflow: .ellipsis,
         style: theme.textTheme.labelSmall?.copyWith(color: Colors.grey),
       ),
     );
 
     final textStyle = TextStyle(
       fontSize: event.localContent?.bigEmoji == true ? 32 : null,
-      fontStyle: event.content is EmoteMessageContent ? FontStyle.italic : null,
+      fontStyle: event.content is EmoteMessageContent ? .italic : null,
     );
 
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: .start,
+      mainAxisSize: .min,
       spacing: 8,
       children: [
         if (!textOnly)
@@ -72,7 +71,7 @@ class MessageRenderer extends ConsumerWidget {
         Flexible(
           child: Column(
             spacing: 4,
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: .start,
             children: [
               if (!isGrouped && !textOnly)
                 Row(
@@ -83,7 +82,7 @@ class MessageRenderer extends ConsumerWidget {
                   ],
                 ),
               Card(
-                margin: textOnly ? EdgeInsets.zero : EdgeInsets.only(bottom: 4),
+                margin: textOnly ? .zero : .only(bottom: 4),
                 color: textOnly
                     ? Colors.transparent
                     : ref.watch(
@@ -99,24 +98,21 @@ class MessageRenderer extends ConsumerWidget {
                 elevation: textOnly ? 0 : null,
 
                 child: Padding(
-                  padding: textOnly ? EdgeInsets.zero : EdgeInsets.all(12),
+                  padding: textOnly ? .zero : .all(12),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: .start,
                     children: [
                       if (!textOnly && event.replyTo != null)
                         Card(
-                          margin: EdgeInsets.only(bottom: 8),
+                          margin: .only(bottom: 8),
                           color: theme.colorScheme.surfaceContainerHigh,
                           child: InkWell(
                             onTap: onTapReply,
                             child: Padding(
-                              padding: EdgeInsetsGeometry.symmetric(
-                                vertical: 8,
-                                horizontal: 12,
-                              ),
+                              padding: .symmetric(vertical: 8, horizontal: 12),
                               child: switch (ref.watch(
                                 EventController.provider(
-                                  GetEventRequest(
+                                  .new(
                                     roomId: event.roomId,
                                     eventId: event.replyTo!,
                                   ),
@@ -145,12 +141,10 @@ class MessageRenderer extends ConsumerWidget {
                               ? Text(
                                   body,
                                   maxLines: maxLines,
-                                  overflow: TextOverflow.ellipsis,
+                                  overflow: .ellipsis,
                                 )
                               : ConstrainedBox(
-                                  constraints: BoxConstraints.loose(
-                                    Size.square(200),
-                                  ),
+                                  constraints: .loose(.square(200)),
                                   child: MessageImage(
                                     url.mxcToHttps(
                                       ref.watch(
@@ -199,9 +193,9 @@ class MessageRenderer extends ConsumerWidget {
                           :final formattedBody,
                           :final format,
                         ) => Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment: .start,
                           children: [
-                            format == MessageFormat.html && !textOnly
+                            format == .html && !textOnly
                                 ? Html(
                                     roomId: event.roomId,
                                     textStyle: textStyle,
@@ -243,9 +237,7 @@ class MessageRenderer extends ConsumerWidget {
                                   ),
                                 )) {
                                   final url? => ConstrainedBox(
-                                    constraints: BoxConstraints.loose(
-                                      Size.square(500),
-                                    ),
+                                    constraints: .loose(.square(500)),
                                     child: switch (event.content) {
                                       VideoMessageContent(:final info) =>
                                         VideoPlayer(url, info),
@@ -286,7 +278,7 @@ class MessageRenderer extends ConsumerWidget {
                         ),
                         MessageContent(:final body) => Row(
                           spacing: 8,
-                          mainAxisSize: MainAxisSize.min,
+                          mainAxisSize: .min,
                           children: [
                             Text("Unknown message type:", style: errorStyle),
                             Text(body),

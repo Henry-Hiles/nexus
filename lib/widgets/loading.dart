@@ -7,7 +7,7 @@ class Loading extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Center(
     child: Padding(
-      padding: EdgeInsets.all(16),
+      padding: .all(16),
       child: SizedBox(height: height, child: CircularProgressIndicator()),
     ),
   );

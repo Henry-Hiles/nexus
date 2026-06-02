@@ -14,9 +14,9 @@ extension ShowUserPopover on BuildContext {
     children: [
       PopupMenuItem(
         enabled: false,
-        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: .symmetric(horizontal: 16, vertical: 8),
         child: IconTheme(
-          data: IconThemeData(),
+          data: .new(),
           child: UserPopover(member, userId, roomId: roomId),
         ),
       ),

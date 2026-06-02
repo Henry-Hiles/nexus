@@ -13,15 +13,15 @@ class SpoilerText extends HookWidget {
     return InkWell(
       onTap: () => revealed.value = !revealed.value,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 100),
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+        duration: const .new(milliseconds: 100),
+        padding: const .symmetric(horizontal: 4, vertical: 2),
         decoration: BoxDecoration(
           color: revealed.value ? Colors.transparent : Colors.blueGrey,
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: .circular(4),
         ),
         child: Text(
           text,
-          style: TextStyle(color: revealed.value ? null : Colors.transparent),
+          style: .new(color: revealed.value ? null : Colors.transparent),
         ),
       ),
     );

@@ -1,7 +1,6 @@
 import "dart:async";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/user_controller.dart";
-import "package:nexus/models/configs/user_config.dart";
 import "package:nexus/models/content/membership.dart";
 import "package:nexus/models/event.dart";
 
@@ -13,11 +12,11 @@ class AuthorController extends AsyncNotifier<MembershipContent> {
   Future<MembershipContent> build() async {
     final member = await ref.watch(
       UserController.provider(
-        UserConfig(roomId: event.roomId, userId: event.sender),
+        .new(roomId: event.roomId, userId: event.sender),
       ).future,
     );
 
-    return MembershipContent(
+    return .new(
       status: member.status,
       avatarUrl: event.pmp?.avatarUrl ?? member.avatarUrl,
       displayName: event.pmp?.displayName ?? member.displayName,

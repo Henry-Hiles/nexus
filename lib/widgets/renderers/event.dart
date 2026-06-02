@@ -64,12 +64,11 @@ class EventRenderer extends ConsumerWidget {
               textOnly: textOnly,
             ),
 
-            MembershipContent content =>
-              event.previousContent is MembershipContent &&
-                      (event.previousContent as MembershipContent).status ==
-                          content.status
-                  ? null
-                  : MembershipRenderer(event),
+            MembershipContent content => switch (event.previousContent) {
+              MembershipContent(:final status) =>
+                status == content.status ? null : MembershipRenderer(event),
+              _ => null,
+            },
 
             AvatarContent() => GenericEventRenderer(Icons.interests, [
               MessageDisplayname(event),
@@ -101,10 +100,10 @@ class EventRenderer extends ConsumerWidget {
                 MessageDisplayname(event),
                 Text(
                   "changed the room's history visibility to ${switch (historyVisibility) {
-                    HistoryVisibility.invited => "since invited",
-                    HistoryVisibility.joined => "since joined",
-                    HistoryVisibility.shared => "all history visible (shared)",
-                    HistoryVisibility.worldReadable => "all history visible (world readable)",
+                    .invited => "since invited",
+                    .joined => "since joined",
+                    .shared => "all history visible (shared)",
+                    .worldReadable => "all history visible (world readable)",
                   }}",
                 ),
               ]),
@@ -158,7 +157,7 @@ class EventRenderer extends ConsumerWidget {
           );
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: .start,
       children: [
         if (child != null) ...[
           if (textOnly)
@@ -168,7 +167,7 @@ class EventRenderer extends ConsumerWidget {
               onSecondaryTapUp: contextMenuCallback,
               onLongPressStart: contextMenuCallback,
               child: Padding(
-                padding: isGrouped ? EdgeInsets.zero : EdgeInsets.only(top: 8),
+                padding: isGrouped ? .zero : .only(top: 8),
                 child: child,
               ),
             ),
@@ -183,12 +182,7 @@ class EventRenderer extends ConsumerWidget {
                     color: theme.colorScheme.error,
                   ),
                 ),
-            ].map(
-              (child) => Padding(
-                padding: EdgeInsetsGeometry.only(left: 4),
-                child: child,
-              ),
-            ),
+            ].map((child) => Padding(padding: .only(left: 4), child: child)),
           ],
         ] else if (textOnly)
           Text("Unknown event type", style: errorStyle),

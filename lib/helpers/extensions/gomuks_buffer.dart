@@ -7,8 +7,8 @@ import "package:nexus/src/third_party/gomuks.g.dart";
 extension GomuksOwnedBufferToX on GomuksOwnedBuffer {
   Uint8List toBytes() {
     try {
-      if (base == nullptr || length <= 0) return Uint8List(0);
-      return Uint8List.fromList(base.asTypedList(length));
+      if (base == nullptr || length <= 0) return .new(0);
+      return .fromList(base.asTypedList(length));
     } finally {
       calloc.free(base);
     }

@@ -13,25 +13,24 @@ class UrlPreview extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => ConstrainedBox(
-    constraints: BoxConstraints.loose(Size.fromWidth(400)),
+    constraints: .loose(.fromWidth(400)),
     child: ref
         .watch(UrlPreviewController.provider(link))
         .betterWhen(
           data: (preview) => preview == null
               ? SizedBox.shrink()
               : InkWell(
-                  onTap: () => ref
-                      .watch(LaunchHelper.provider)
-                      .launchUrl(Uri.parse(link)),
+                  onTap: () =>
+                      ref.watch(LaunchHelper.provider).launchUrl(.parse(link)),
                   child: Card(
-                    margin: EdgeInsets.symmetric(vertical: 4),
+                    margin: .symmetric(vertical: 4),
                     color: Theme.of(
                       context,
                     ).colorScheme.surfaceContainerHighest,
                     child: Padding(
-                      padding: EdgeInsetsGeometry.all(16),
+                      padding: .all(16),
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment: .start,
                         spacing: 4,
                         children: [
                           if (preview.title != null)
@@ -45,9 +44,7 @@ class UrlPreview extends ConsumerWidget {
                           ],
                           if (preview.imageUrl != null)
                             ClipRRect(
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(8),
-                              ),
+                              borderRadius: .all(.circular(8)),
                               child: Image(
                                 errorBuilder: (_, _, _) => SizedBox.shrink(),
                                 width: preview.width,
@@ -56,7 +53,7 @@ class UrlPreview extends ConsumerWidget {
                                   ref.watch(CrossCacheController.provider),
                                   headers: ref.headers,
                                 ),
-                                fit: BoxFit.fitWidth,
+                                fit: .fitWidth,
                               ),
                             ),
                         ],

@@ -14,10 +14,10 @@ class LinkifiedText extends ConsumerWidget {
     text: text,
     maxLines: maxLines,
     style: style,
-    options: LinkifyOptions(humanize: false),
+    options: .new(humanize: false),
     onOpen: (link) =>
-        ref.watch(LaunchHelper.provider).launchUrl(Uri.parse(link.url)),
-    linkStyle: TextStyle(color: Theme.of(context).colorScheme.primary),
-    overflow: maxLines == null ? null : TextOverflow.ellipsis,
+        ref.watch(LaunchHelper.provider).launchUrl(.parse(link.url)),
+    linkStyle: .new(color: Theme.of(context).colorScheme.primary),
+    overflow: maxLines == null ? null : .ellipsis,
   );
 }

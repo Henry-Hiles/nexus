@@ -7,7 +7,7 @@ class SyncStatusController extends Notifier<SyncStatus?> {
   Null build() => null;
 
   void set(SyncStatus newStatus) {
-    if (newStatus.type == SyncStatusType.permanentlyFailed) {
+    if (newStatus.type == .permanentlyFailed) {
       showError(newStatus.error ?? "Syncing failed");
     }
     state = newStatus;

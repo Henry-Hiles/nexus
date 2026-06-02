@@ -1,5 +1,4 @@
 import "package:collection/collection.dart";
-import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/material.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
@@ -7,7 +6,6 @@ import "package:nexus/controllers/client_controller.dart";
 import "package:nexus/controllers/key_controller.dart";
 import "package:nexus/controllers/spaces_controller.dart";
 import "package:nexus/helpers/extensions/link_to_mention.dart";
-import "package:nexus/models/requests/join_room_request.dart";
 import "package:nexus/widgets/form_text_input.dart";
 
 class JoinDialog extends HookWidget {
@@ -20,8 +18,8 @@ class JoinDialog extends HookWidget {
     return AlertDialog(
       title: Text("Join a Room"),
       content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: .min,
+        crossAxisAlignment: .start,
         children: [
           Text("Enter the room alias, Matrix URI, or Matrix.to link."),
           SizedBox(height: 12),
@@ -45,7 +43,7 @@ class JoinDialog extends HookWidget {
               final scaffoldMessenger = ScaffoldMessenger.of(context);
 
               final snackbar = scaffoldMessenger.showSnackBar(
-                SnackBar(
+                .new(
                   content: Text("Joining room $roomIdOrAlias."),
                   duration: Duration(days: 999),
                 ),
@@ -55,9 +53,9 @@ class JoinDialog extends HookWidget {
                 final id = await ref
                     .watch(ClientController.provider.notifier)
                     .joinRoom(
-                      JoinRoomRequest(
+                      .new(
                         roomIdOrAlias: roomIdOrAlias,
-                        via: IList(
+                        via: .new(
                           Uri.tryParse(
                                 roomAlias.text.replaceAll("/#", ""),
                               )?.queryParametersAll["via"] ??
@@ -69,9 +67,9 @@ class JoinDialog extends HookWidget {
                 snackbar.close();
 
                 scaffoldMessenger.showSnackBar(
-                  SnackBar(
+                  .new(
                     content: Text("Room $roomIdOrAlias successfully joined."),
-                    action: SnackBarAction(
+                    action: .new(
                       label: "Open",
                       onPressed: () async {
                         final spaces = ref.watch(SpacesController.provider);
@@ -113,13 +111,13 @@ class JoinDialog extends HookWidget {
                 snackbar.close();
                 if (context.mounted) {
                   scaffoldMessenger.showSnackBar(
-                    SnackBar(
+                    .new(
                       backgroundColor: Theme.of(
                         context,
                       ).colorScheme.errorContainer,
                       content: Text(
                         error.toString(),
-                        style: TextStyle(
+                        style: .new(
                           color: Theme.of(context).colorScheme.onErrorContainer,
                         ),
                       ),

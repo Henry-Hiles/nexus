@@ -9,8 +9,8 @@ extension ShowContextMenu on BuildContext {
 
     showMenu(
       context: this,
-      constraints: BoxConstraints.loose(Size.infinite),
-      position: RelativeRect.fromLTRB(
+      constraints: .loose(Size.infinite),
+      position: .fromLTRB(
         globalPosition.dx,
         globalPosition.dy,
         overlay.size.width - globalPosition.dx,

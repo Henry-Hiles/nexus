@@ -35,7 +35,7 @@ class ChatPage extends ConsumerWidget {
               )
             : Center(
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
+                  mainAxisSize: .min,
                   children: [Loading(), Text("Syncing...")],
                 ),
               ),

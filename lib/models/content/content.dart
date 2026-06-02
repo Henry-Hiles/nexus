@@ -34,7 +34,7 @@ class Content {
               ?.contentFromJson ??
           Content.fromJson)(json);
     } catch (error) {
-      if (error is Error) return Content(parseError: error);
+      if (error is Error) return .new(parseError: error);
       rethrow;
     }
   }

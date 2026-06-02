@@ -5,9 +5,7 @@ class ClientStateController extends Notifier<ClientState?> {
   @override
   Null build() => null;
 
-  void set(ClientState newState) {
-    state = newState;
-  }
+  void set(ClientState newState) => state = newState;
 
   static final provider = NotifierProvider<ClientStateController, ClientState?>(
     ClientStateController.new,

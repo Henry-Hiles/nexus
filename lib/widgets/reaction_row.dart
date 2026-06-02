@@ -8,7 +8,6 @@ import "package:nexus/controllers/reactions_controller.dart";
 import "package:nexus/controllers/room_chat_controller.dart";
 import "package:nexus/helpers/extensions/get_headers.dart";
 import "package:nexus/helpers/extensions/mxc_to_https.dart";
-import "package:nexus/models/configs/reactions_config.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/widgets/error_dialog.dart";
 import "package:nexus/main.dart";
@@ -24,7 +23,7 @@ class ReactionRow extends ConsumerWidget {
 
     return switch (ref.watch(
       ReactionsController.provider(
-        ReactionsConfig(roomId: event.roomId, eventRowId: event.rowId),
+        .new(roomId: event.roomId, eventRowId: event.rowId),
       ),
     )) {
       AsyncData(value: final IMap<String, IList<String>>? reactors) ||
@@ -47,7 +46,7 @@ class ReactionRow extends ConsumerWidget {
                       showCheckmark: false,
                       selected: selected,
                       label: Row(
-                        mainAxisSize: MainAxisSize.min,
+                        mainAxisSize: .min,
                         spacing: 8,
                         children: [
                           Flexible(
@@ -64,15 +63,9 @@ class ReactionRow extends ConsumerWidget {
                                       ref.watch(CrossCacheController.provider),
                                     ),
                                   )
-                                : Text(
-                                    reaction,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
+                                : Text(reaction, overflow: .ellipsis),
                           ),
-                          Text(
-                            count.toString(),
-                            overflow: TextOverflow.ellipsis,
-                          ),
+                          Text(count.toString(), overflow: .ellipsis),
                         ],
                       ),
                       onSelected: enabled.value

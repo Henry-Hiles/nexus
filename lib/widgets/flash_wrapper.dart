@@ -7,13 +7,13 @@ class FlashWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ClipRRect(
-    borderRadius: BorderRadius.all(Radius.circular(12)),
+    borderRadius: .all(.circular(12)),
     child: AnimatedContainer(
-      padding: isFlashing ? EdgeInsets.all(8) : EdgeInsets.all(0),
+      padding: isFlashing ? .all(8) : .all(0),
       color: isFlashing
           ? Theme.of(context).colorScheme.onSurface.withAlpha(50)
           : Colors.transparent,
-      duration: Duration(milliseconds: 250),
+      duration: .new(milliseconds: 250),
       child: child,
     ),
   );
