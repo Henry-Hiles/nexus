@@ -92,7 +92,9 @@ class RoomChat extends HookConsumerWidget {
     useEffect(() {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (scrollController.hasClients) {
-          scrollController.jumpTo(scrollController.position.maxScrollExtent);
+          scrollController.jumpTo(
+            scrollController.position.maxScrollExtent - .000001,
+          );
         }
       });
 
