@@ -38,16 +38,13 @@ class RoomChatController extends AsyncNotifier<IList<Event>> {
       loadOlder();
     }
 
-    return IMap<int, int?>.fromValues(
-          keyMapper: (id) => 9999999999 + (id ?? 0),
-          values: room.sticky,
-        )
-        .addAll(room.timeline)
-        .toEntryIList(compare: (a, b) => (b?.key ?? 0).compareTo(a?.key ?? 0))
+    return room.timeline
+        .toEntryIList(compare: (a, b) => (a?.key ?? 0).compareTo(b?.key ?? 0))
+        .map((element) => element.value)
+        .toIList()
+        .addAll(room.sticky)
         .map((entry) {
-          final foundEvent = entry.value == null
-              ? null
-              : room.events[entry.value!];
+          final foundEvent = entry == null ? null : room.events[entry];
 
           final editedEvent =
               foundEvent == null || foundEvent.lastEditRowId == 0

@@ -77,10 +77,68 @@ class RoomChat extends HookConsumerWidget {
 
     final listController = useRef(ListController());
     final scrollController = useScrollController();
+    final controllerData = ref.watch(controllerProvider);
+
+    final topEventBeforeLoad = useState<String?>(null);
+
+    Future<void> loadOlder() async {
+      if (controllerData
+          case AsyncData(:final value) || AsyncLoading(:final value?)) {
+        topEventBeforeLoad.value = value.firstOrNull?.eventId;
+        await notifier.loadOlder();
+      }
+    }
+
+    useEffect(() {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (scrollController.hasClients) {
+          scrollController.jumpTo(scrollController.position.maxScrollExtent);
+        }
+      });
+
+      return null;
+    }, [scrollController.hasClients]);
+
+    useEffect(() {
+      if (controllerData case AsyncData(
+        :final value,
+      ) when scrollController.hasClients) {
+        if (topEventBeforeLoad.value != null) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (scrollController.hasClients) {
+              final index = value.indexWhere(
+                (event) => event.eventId == topEventBeforeLoad.value,
+              );
+              if (index != -1) {
+                listController.value.jumpToItem(
+                  index: index,
+                  scrollController: scrollController,
+                  alignment: 0,
+                );
+              }
+            }
+            topEventBeforeLoad.value = null;
+          });
+        } else if (scrollController.position.atEdge &&
+            scrollController.position.pixels != 0) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (scrollController.hasClients) {
+              scrollController.jumpTo(
+                scrollController.position.maxScrollExtent,
+              );
+            }
+          });
+        }
+      }
+
+      return null;
+    }, [controllerData]);
 
     useEffect(() {
       Future<void> listener() async {
-        if (!scrollController.position.atEdge) return;
+        if (!scrollController.hasClients || !scrollController.position.atEdge) {
+          return;
+        }
 
         final room = ref.watch(
           RoomsController.provider.select((value) => value[roomId]),
@@ -88,15 +146,17 @@ class RoomChat extends HookConsumerWidget {
         if (room == null) return;
 
         if (scrollController.position.pixels == 0) {
-          await client.markRead(room);
+          if (room.hasMore) {
+            await loadOlder();
+          }
         } else {
-          if (room.hasMore) await notifier.loadOlder();
+          await client.markRead(room);
         }
       }
 
       scrollController.addListener(listener);
       return () => scrollController.removeListener(listener);
-    }, [roomId]);
+    }, [roomId, controllerData]);
 
     final composerNode = useFocusNode(
       onKeyEvent: (_, event) {
@@ -316,8 +376,6 @@ class RoomChat extends HookConsumerWidget {
       ].toIList();
     }
 
-    final controllerData = ref.watch(controllerProvider);
-
     return Scaffold(
       appBar: RoomAppbar(
         roomId: roomId,
@@ -339,11 +397,20 @@ class RoomChat extends HookConsumerWidget {
                     child: switch (controllerData) {
                       AsyncData(:final value) ||
                       AsyncLoading(:final value?) => CustomScrollView(
-                        reverse: true,
                         controller: scrollController,
                         slivers: [
-                          SliverPadding(
-                            padding: .only(bottom: composerSize.value),
+                          SliverToBoxAdapter(
+                            child: Padding(
+                              padding: .symmetric(vertical: 36),
+                              child: Center(
+                                child: ElevatedButton(
+                                  onPressed: controllerData is AsyncData
+                                      ? loadOlder
+                                      : null,
+                                  child: Text("Load More"),
+                                ),
+                              ),
+                            ),
                           ),
 
                           SuperSliverList.builder(
@@ -351,7 +418,7 @@ class RoomChat extends HookConsumerWidget {
                             itemCount: value.length,
                             itemBuilder: (_, index) {
                               final event = value[index];
-                              final previousEvent = value.getOrNull(index + 1);
+                              final previousEvent = value.getOrNull(index - 1);
                               return FlashWrapper(
                                 EventRenderer(
                                   event,
@@ -389,18 +456,8 @@ class RoomChat extends HookConsumerWidget {
                             },
                           ),
 
-                          SliverToBoxAdapter(
-                            child: Padding(
-                              padding: .symmetric(vertical: 36),
-                              child: Center(
-                                child: controllerData is AsyncLoading
-                                    ? Loading()
-                                    : ElevatedButton(
-                                        onPressed: notifier.loadOlder,
-                                        child: Text("Load More"),
-                                      ),
-                              ),
-                            ),
+                          SliverPadding(
+                            padding: .only(bottom: composerSize.value),
                           ),
                         ],
                       ),
