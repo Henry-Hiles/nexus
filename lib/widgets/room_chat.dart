@@ -82,21 +82,24 @@ class RoomChat extends HookConsumerWidget {
     final topEventBeforeLoad = useState<String?>(null);
 
     Future<void> loadOlder() async {
-      if (controllerData
-          case AsyncData(:final value) || AsyncLoading(:final value?)) {
+      if (controllerData case AsyncData(:final value)) {
         topEventBeforeLoad.value = value.firstOrNull?.eventId;
         await notifier.loadOlder();
       }
     }
 
     useEffect(() {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (scrollController.hasClients) {
-          scrollController.jumpTo(
-            scrollController.position.maxScrollExtent - .000001,
+      ref
+          .read(controllerProvider.future)
+          .then(
+            (_) => WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (scrollController.hasClients) {
+                scrollController.jumpTo(
+                  scrollController.position.maxScrollExtent - .000001,
+                );
+              }
+            }),
           );
-        }
-      });
 
       return null;
     }, [scrollController.hasClients]);
