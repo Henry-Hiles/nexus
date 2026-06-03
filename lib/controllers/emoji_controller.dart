@@ -78,8 +78,7 @@ class EmojiController extends AsyncNotifier<EmojiTuple> {
     return (customCategories, customKeywords);
   }
 
-  static final provider =
-      AsyncNotifierProvider.autoDispose<EmojiController, EmojiTuple>(
-        EmojiController.new,
-      );
+  static final provider = AsyncNotifierProvider<EmojiController, EmojiTuple>(
+    EmojiController.new,
+  );
 }
