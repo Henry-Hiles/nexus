@@ -80,12 +80,12 @@ class EventRenderer extends ConsumerWidget {
               Text("created the room"),
             ]),
 
-            PowerLevelsContent() => GenericEventRenderer(Icons.add, [
+            PowerLevelsContent() => GenericEventRenderer(Icons.power, [
               MessageDisplayname(event),
               Text("changed the room's power levels"),
             ]),
 
-            JoinRulesContent() => GenericEventRenderer(Icons.add, [
+            JoinRulesContent() => GenericEventRenderer(Icons.rule, [
               MessageDisplayname(event),
               Text("changed the room's join rules"),
             ]),
