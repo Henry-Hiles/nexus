@@ -67,7 +67,7 @@ class EventRenderer extends ConsumerWidget {
             MembershipContent content => switch (event.previousContent) {
               MembershipContent(:final status) =>
                 status == content.status ? null : MembershipRenderer(event),
-              _ => null,
+              _ => MembershipRenderer(event),
             },
 
             AvatarContent() => GenericEventRenderer(Icons.interests, [
