@@ -760,6 +760,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.13.0"
+  material_segmented_list:
+    dependency: "direct main"
+    description:
+      name: material_segmented_list
+      sha256: "384bfd41a78e745397ceff1dd39700961e6a5419ad911d1797bcc13ea3824241"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.5"
   measure_size:
     dependency: "direct main"
     description:
