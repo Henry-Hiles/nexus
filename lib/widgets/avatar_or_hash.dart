@@ -30,6 +30,7 @@ class AvatarOrHash extends ConsumerWidget {
       color: ColorHash(title).color,
       child: Center(child: Text(title.isEmpty ? "" : title[0])),
     );
+
     final parsedAvatar = avatar?.mxcToHttps(
       ref.watch(
             ClientStateController.provider.select(
@@ -38,6 +39,7 @@ class AvatarOrHash extends ConsumerWidget {
           ) ??
           "",
     );
+
     return SizedBox(
       width: height,
       height: height,

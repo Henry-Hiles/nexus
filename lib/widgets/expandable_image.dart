@@ -21,9 +21,12 @@ class ExpandableImage extends ConsumerWidget {
               builder: (context, constraints) => Dialog(
                 backgroundColor: Colors.transparent,
                 insetPadding: .all(constraints.maxWidth / 100),
-                child: ConstrainedBox(
-                  constraints: .new(minWidth: min(constraints.maxWidth, 1000)),
-                  child: InteractiveViewer(
+                child: InteractiveViewer(
+                  maxScale: 5,
+                  child: ConstrainedBox(
+                    constraints: .new(
+                      minWidth: min(constraints.maxWidth, 1000),
+                    ),
                     child: Image(
                       fit: .contain,
                       errorBuilder: (_, error, stackTrace) => ErrorDialog(
