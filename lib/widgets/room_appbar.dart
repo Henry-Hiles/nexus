@@ -1,4 +1,3 @@
-import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/material.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/rooms_controller.dart";
@@ -93,13 +92,15 @@ class RoomAppbar extends ConsumerWidget implements PreferredSizeWidget {
                 ),
               ),
             ),
-      leading: isDesktop && room != null
-          ? AvatarOrHash(
-              room.metadata?.avatar,
-              room.metadata?.name ?? "Unnamed Room",
-              height: 24,
-              fallback: Icon(Icons.numbers),
-            )
+      leading: isDesktop
+          ? room == null
+                ? null
+                : AvatarOrHash(
+                    room.metadata?.avatar,
+                    room.metadata?.name ?? "Unnamed Room",
+                    height: 24,
+                    fallback: Icon(Icons.numbers),
+                  )
           : DrawerButton(onPressed: () => onOpenDrawer(context)),
       scrolledUnderElevation: 0,
       title: room == null
@@ -123,19 +124,21 @@ class RoomAppbar extends ConsumerWidget implements PreferredSizeWidget {
                   ),
               ],
             ),
-      actions: [
-        IconButton(
-          onPressed: null,
-          icon: Icon(Icons.push_pin),
-          tooltip: "Open pinned messages",
-        ),
-        IconButton(
-          onPressed: () => onOpenMemberList?.call(context),
-          tooltip: "Open member list",
-          icon: Icon(Icons.people),
-        ),
-        if (room != null) RoomMenu(room),
-      ].toIList(),
+      actions: room == null
+          ? .new()
+          : .new([
+              IconButton(
+                onPressed: null,
+                icon: Icon(Icons.push_pin),
+                tooltip: "Open pinned messages",
+              ),
+              IconButton(
+                onPressed: () => onOpenMemberList?.call(context),
+                tooltip: "Open member list",
+                icon: Icon(Icons.people),
+              ),
+              RoomMenu(room),
+            ]),
     );
   }
 }

@@ -50,6 +50,12 @@ class RoomChat extends HookConsumerWidget {
     final userId = ref.watch(ClientStateController.provider)?.userId;
     final theme = Theme.of(context);
 
+    final nothing = Center(
+      child: Text(
+        "Nothing to see here...",
+        style: theme.textTheme.headlineMedium,
+      ),
+    );
     if (userId == null || this.roomId == null) {
       return Scaffold(
         appBar: RoomAppbar(
@@ -58,12 +64,7 @@ class RoomChat extends HookConsumerWidget {
           onOpenDrawer: (_) => Scaffold.of(context).openDrawer(),
           onOpenMemberList: null,
         ),
-        body: Center(
-          child: Text(
-            "Nothing to see here...",
-            style: theme.textTheme.headlineMedium,
-          ),
-        ),
+        body: nothing,
       );
     }
 
@@ -81,7 +82,7 @@ class RoomChat extends HookConsumerWidget {
     final topEventBeforeLoad = useState<String?>(null);
 
     Future<void> loadOlder() async {
-      if (controllerData case AsyncData(:final value)) {
+      if (controllerData case AsyncData(:final value?)) {
         topEventBeforeLoad.value = value.firstOrNull?.eventId;
         await notifier.loadOlder();
       }
@@ -105,7 +106,7 @@ class RoomChat extends HookConsumerWidget {
 
     useEffect(() {
       if (controllerData case AsyncData(
-        :final value,
+        :final value?,
       ) when scrollController.hasClients) {
         if (topEventBeforeLoad.value != null) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -401,7 +402,7 @@ class RoomChat extends HookConsumerWidget {
                   child: Padding(
                     padding: .symmetric(horizontal: 12),
                     child: switch (controllerData) {
-                      AsyncData(:final value) ||
+                      AsyncData(:final value?) ||
                       AsyncLoading(:final value?) => CustomScrollView(
                         controller: scrollController,
                         slivers: [
@@ -467,6 +468,7 @@ class RoomChat extends HookConsumerWidget {
                           ),
                         ],
                       ),
+                      AsyncData() => nothing,
                       AsyncLoading() => Loading(),
                       AsyncError(:final error, :final stackTrace) =>
                         ErrorDialog(error, stackTrace),

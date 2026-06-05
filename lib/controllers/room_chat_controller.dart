@@ -14,18 +14,20 @@ import "package:nexus/models/relation_type.dart";
 import "package:nexus/models/requests/send_message_request.dart";
 import "package:nexus/models/room.dart";
 
-class RoomChatController extends AsyncNotifier<IList<Event>> {
+class RoomChatController extends AsyncNotifier<IList<Event>?> {
   final String roomId;
   RoomChatController(this.roomId);
 
   @override
-  Future<IList<Event>> build() async {
+  Future<IList<Event>?> build() async {
     final client = ref.watch(ClientController.provider.notifier);
     final room = ref.watch(
       RoomsController.provider.select((rooms) => rooms[roomId]),
     );
 
-    if (!room!.hasFetchedState) {
+    if (room == null) return null;
+
+    if (!room.hasFetchedState) {
       final state = await client.getRoomState(.new(roomId: roomId));
 
       await ref.read(RoomsController.provider.notifier).addState(roomId, state);
@@ -214,7 +216,7 @@ class RoomChatController extends AsyncNotifier<IList<Event>> {
   }
 
   static final provider = AsyncNotifierProvider.family
-      .autoDispose<RoomChatController, IList<Event>, String>(
+      .autoDispose<RoomChatController, IList<Event>?, String>(
         RoomChatController.new,
       );
 }

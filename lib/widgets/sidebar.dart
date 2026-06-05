@@ -39,9 +39,7 @@ class Sidebar extends HookConsumerWidget {
       (room) => room.metadata?.id == selectedRoomId,
     );
     final selectedRoomIndex = indexOfSelectedRoom == -1
-        ? selectedSpace.children.isEmpty
-              ? null
-              : 0
+        ? null
         : indexOfSelectedRoom;
 
     return Drawer(
