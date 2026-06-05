@@ -62,8 +62,8 @@ class AvatarOrHash extends ConsumerWidget {
                       ),
                       fit: .cover,
                       loadingBuilder: (_, child, loadingProgress) =>
-                          loadingProgress == null ? child : box,
-                      errorBuilder: (_, _, _) => box,
+                          loadingProgress == null ? child : fallback ?? box,
+                      errorBuilder: (_, _, _) => fallback ?? box,
                     ),
             ),
           ),
