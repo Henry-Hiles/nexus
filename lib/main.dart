@@ -11,7 +11,7 @@ import "package:nexus/controllers/shared_prefs_controller.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
 import "package:nexus/helpers/extensions/scheme_to_theme.dart";
 import "package:nexus/pages/chat_page.dart";
-import "package:nexus/pages/login_page.dart";
+import "package:nexus/pages/select_server_page.dart";
 import "package:nexus/pages/verify_page.dart";
 import "package:nexus/widgets/error_dialog.dart";
 import "package:nexus/widgets/loading.dart";
@@ -124,7 +124,7 @@ class App extends StatelessWidget {
                     }
 
                     if (!clientState.isLoggedIn) {
-                      return LoginPage();
+                      return SelectServerPage();
                     } else if (!clientState.isVerified) {
                       return VerifyPage();
                     } else {

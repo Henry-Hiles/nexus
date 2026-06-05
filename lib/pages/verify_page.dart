@@ -3,7 +3,7 @@ import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/client_controller.dart";
 import "package:nexus/widgets/appbar.dart";
-import "package:nexus/widgets/form_text_input.dart";
+import "package:nexus/helpers/required_validator_helper.dart";
 
 class VerifyPage extends HookConsumerWidget {
   const VerifyPage({super.key});
@@ -11,70 +11,56 @@ class VerifyPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final passphraseController = useTextEditingController();
-    final isVerifying = useState(false);
+    final isLoading = useState(false);
+    final inputError = useState<String?>(null);
+    final formKey = useRef(GlobalKey<FormState>());
+
     return Scaffold(
       appBar: Appbar(),
       body: AlertDialog(
         title: Text("Verify"),
-        content: Column(
-          mainAxisSize: .min,
-          crossAxisAlignment: .start,
-          children: [
-            Text(
-              "Enter your recovery key or passphrase below to unlock encrypted events.\nYour passphrase is usually not the same as your password.",
-            ),
-            SizedBox(height: 12),
-            FormTextInput(
-              required: false,
-              autofocus: true,
-              capitalize: true,
-              controller: passphraseController,
-              obscure: true,
-              title: "Recovery Key or Passphrase",
-            ),
-          ],
+        content: Form(
+          key: formKey.value,
+          child: Column(
+            mainAxisSize: .min,
+            crossAxisAlignment: .start,
+            children: [
+              Text(
+                "Enter your recovery key or passphrase below to unlock encrypted events.\nYour passphrase is usually not the same as your password.",
+              ),
+              SizedBox(height: 12),
+              TextFormField(
+                autofocus: true,
+                controller: passphraseController,
+                textInputAction: .done,
+                autovalidateMode: .onUserInteraction,
+                validator: requiredValidator,
+                obscureText: true,
+                decoration: .new(
+                  label: Text("Recovery Key or Passphrase"),
+                  errorText: inputError.value,
+                ),
+              ),
+            ],
+          ),
         ),
         actions: [
           TextButton(
-            onPressed: isVerifying.value
+            onPressed: isLoading.value
                 ? null
                 : () async {
-                    final scaffoldMessenger = ScaffoldMessenger.of(context);
-                    final snackbar = scaffoldMessenger.showSnackBar(
-                      .new(
-                        content: Text(
-                          "Attempting to verify with recovery key...",
-                        ),
-                        duration: .new(days: 999),
-                      ),
-                    );
+                    isLoading.value = true;
 
-                    isVerifying.value = true;
-
-                    final error = await ref
-                        .watch(ClientController.provider.notifier)
-                        .verify(passphraseController.text);
-
-                    snackbar.close();
-                    if (error != null) {
-                      isVerifying.value = false;
-                      if (context.mounted) {
-                        scaffoldMessenger.showSnackBar(
-                          .new(
-                            backgroundColor: Theme.of(
-                              context,
-                            ).colorScheme.errorContainer,
-                            content: Text(
-                              "Verification failed. Is your passphrase correct?\nError: $error",
-                              style: .new(
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.onErrorContainer,
-                              ),
-                            ),
-                          ),
-                        );
+                    try {
+                      if (formKey.value.currentState?.validate() != true) {
+                        return;
                       }
+
+                      inputError.value = await ref
+                          .watch(ClientController.provider.notifier)
+                          .verify(passphraseController.text);
+                    } finally {
+                      isLoading.value = false;
                     }
                   },
             child: Text("Verify"),

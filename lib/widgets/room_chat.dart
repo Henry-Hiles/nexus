@@ -22,7 +22,6 @@ import "package:nexus/widgets/member_list.dart";
 import "package:nexus/widgets/room_appbar.dart";
 import "package:nexus/widgets/flash_wrapper.dart";
 import "package:nexus/widgets/error_dialog.dart";
-import "package:nexus/widgets/form_text_input.dart";
 import "package:nexus/main.dart";
 import "package:nexus/widgets/loading.dart";
 import "package:super_sliver_list/super_sliver_list.dart";
@@ -288,11 +287,12 @@ class RoomChat extends HookConsumerWidget {
                           "Are you sure you want to delete this message? This can not be reversed.",
                         ),
                         SizedBox(height: 12),
-                        FormTextInput(
-                          required: false,
-                          capitalize: true,
+                        TextField(
                           controller: deleteReasonController,
-                          title: "Reason for deletion (optional)",
+                          textCapitalization: .sentences,
+                          decoration: .new(
+                            labelText: "Reason for deletion (optional)",
+                          ),
                         ),
                       ],
                     ),
@@ -340,11 +340,12 @@ class RoomChat extends HookConsumerWidget {
                       ),
 
                       SizedBox(height: 12),
-                      FormTextInput(
-                        required: false,
-                        capitalize: true,
+                      TextField(
                         controller: reasonController,
-                        title: "Reason for report (optional)",
+                        textCapitalization: .sentences,
+                        decoration: .new(
+                          labelText: "Reason for report (optional)",
+                        ),
                       ),
                     ],
                   ),

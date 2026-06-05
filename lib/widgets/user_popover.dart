@@ -14,7 +14,6 @@ import "package:nexus/models/requests/membership_action.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/main.dart";
 import "package:nexus/widgets/expandable_image.dart";
-import "package:nexus/widgets/form_text_input.dart";
 
 class UserPopover extends ConsumerWidget {
   final MembershipContent member;
@@ -41,11 +40,12 @@ class UserPopover extends ConsumerWidget {
               children: [
                 Text("Are you sure you want to ${action.name} $userId?"),
                 SizedBox(height: 12),
-                FormTextInput(
-                  required: false,
-                  capitalize: true,
+                TextField(
+                  textCapitalization: .sentences,
                   controller: actionReasonController,
-                  title: "Reason for ${action.name} (optional)",
+                  decoration: .new(
+                    labelText: "Reason for ${action.name} (optional)",
+                  ),
                 ),
               ],
             ),

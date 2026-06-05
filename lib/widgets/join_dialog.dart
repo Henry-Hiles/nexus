@@ -6,7 +6,6 @@ import "package:nexus/controllers/client_controller.dart";
 import "package:nexus/controllers/key_controller.dart";
 import "package:nexus/controllers/spaces_controller.dart";
 import "package:nexus/helpers/extensions/link_to_mention.dart";
-import "package:nexus/widgets/form_text_input.dart";
 
 class JoinDialog extends HookWidget {
   final WidgetRef ref;
@@ -23,11 +22,9 @@ class JoinDialog extends HookWidget {
         children: [
           Text("Enter the room alias, Matrix URI, or Matrix.to link."),
           SizedBox(height: 12),
-          FormTextInput(
-            required: false,
-            capitalize: true,
+          TextField(
             controller: roomAlias,
-            title: "#room:server",
+            decoration: .new(hintText: "#room:server"),
           ),
         ],
       ),
