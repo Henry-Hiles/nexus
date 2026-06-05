@@ -1,5 +1,6 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/material.dart";
+import "package:flutter/services.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:fluttertagger/fluttertagger.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
@@ -135,21 +136,34 @@ class Composer extends HookConsumerWidget {
                               query.value = newQuery;
                             },
                             triggerCharacterAndStyles: {"@": style, "#": style},
-                            builder: (context, key) => TextField(
-                              maxLines: 12,
-                              minLines: 1,
-                              autofocus: true,
-                              decoration: .new(
-                                hintText: "Your message here...",
-                                border: .none,
+                            builder: (context, key) => Focus(
+                              onKeyEvent: (_, event) {
+                                if (event is KeyDownEvent &&
+                                    event.logicalKey ==
+                                        LogicalKeyboardKey.enter) {
+                                  final shiftPressed =
+                                      HardwareKeyboard.instance.isShiftPressed;
+
+                                  if (!shiftPressed) {
+                                    send();
+                                    return KeyEventResult.handled;
+                                  }
+                                }
+
+                                return KeyEventResult.ignored;
+                              },
+                              child: TextField(
+                                maxLines: 12,
+                                minLines: 1,
+                                autofocus: true,
+                                decoration: .new(
+                                  hintText: "Your message here...",
+                                  border: .none,
+                                ),
+                                controller: controller.value,
+                                key: key,
+                                focusNode: node,
                               ),
-                              controller: controller.value,
-                              key: key,
-                              onSubmitted: (_) => send(),
-                              // Don't defocus on submit
-                              onEditingComplete: () {},
-                              textInputAction: .done,
-                              focusNode: node,
                             ),
                           ),
                         ),
