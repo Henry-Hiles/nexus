@@ -78,10 +78,13 @@ class MemberList extends HookConsumerWidget {
                         compare: (a, b) => (b?.key ?? double.infinity)
                             .compareTo(a?.key ?? double.infinity),
                       )) ...[
-                    DividerText(
-                      powerLevel == null
-                          ? "Creators"
-                          : "Power Level $powerLevel",
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 4),
+                      child: DividerText(
+                        powerLevel == null
+                            ? "Creators"
+                            : "Power Level $powerLevel",
+                      ),
                     ),
                     SegmentedListSection(
                       children: members
@@ -123,6 +126,7 @@ class MemberList extends HookConsumerWidget {
                           )
                           .toList(),
                     ),
+                    SizedBox(height: 4),
                   ],
                 ],
               ),
