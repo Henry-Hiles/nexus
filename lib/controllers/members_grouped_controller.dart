@@ -4,33 +4,48 @@ import "package:nexus/controllers/members_by_status_controller.dart";
 import "package:nexus/controllers/rooms_controller.dart";
 import "package:nexus/models/configs/members_by_status_config.dart";
 import "package:nexus/models/content/content.dart";
+import "package:nexus/models/content/create.dart";
 import "package:nexus/models/content/power_levels.dart";
 import "package:nexus/models/event.dart";
 
-class MembersGroupedController extends AsyncNotifier<IMap<int, ISet<Event>>> {
+class MembersGroupedController extends AsyncNotifier<IMap<int?, ISet<Event>>> {
   final MembersByStatusConfig config;
   MembersGroupedController(this.config);
 
   @override
-  Future<IMap<int, ISet<Event>>> build() async {
-    final event = ref.watch(
-      RoomsController.provider.select((value) {
-        final room = value[config.roomId];
-        final eventRowId = room?.state[EventType.powerLevels.type]?[""];
-        return eventRowId == null ? null : room?.events[eventRowId];
-      }),
+  Future<IMap<int?, ISet<Event>>> build() async {
+    final room = ref.watch(
+      RoomsController.provider.select((value) => value[config.roomId]),
     );
 
-    final content = event?.content is PowerLevelsContent
-        ? event!.content as PowerLevelsContent
-        : PowerLevelsContent();
+    final createRowId = room?.state[EventType.create.type]?[""];
+    final createEvent = createRowId == null ? null : room?.events[createRowId];
+    final createEventContent = switch (createEvent?.content) {
+      CreateContent content => content,
+      _ => null,
+    };
+    final creators = createEventContent?.additionalCreatorIds.add(
+      createEvent!.sender,
+    );
+
+    final powerLevelsRowId = room?.state[EventType.powerLevels.type]?[""];
+    final powerLevelsEvent = powerLevelsRowId == null
+        ? null
+        : room?.events[powerLevelsRowId];
+
+    final content = switch (powerLevelsEvent?.content) {
+      PowerLevelsContent content => content,
+      _ => PowerLevelsContent(),
+    };
 
     final members = await ref.watch(
       MembersByStatusController.provider(config).future,
     );
 
-    return members.fold<IMap<int, ISet<Event>>>(.new(), (result, event) {
-      final groupKey = content.users[event.stateKey!] ?? content.usersDefault;
+    return members.fold<IMap<int?, ISet<Event>>>(.new(), (result, event) {
+      final groupKey = creators?.contains(event.stateKey!) == true
+          ? null
+          : content.users[event.stateKey!] ?? content.usersDefault;
 
       return result.update(
         groupKey,
@@ -43,7 +58,7 @@ class MembersGroupedController extends AsyncNotifier<IMap<int, ISet<Event>>> {
   static final provider =
       AsyncNotifierProvider.family<
         MembersGroupedController,
-        IMap<int, ISet<Event>>,
+        IMap<int?, ISet<Event>>,
         MembersByStatusConfig
       >(MembersGroupedController.new);
 }

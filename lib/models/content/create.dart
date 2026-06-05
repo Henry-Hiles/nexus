@@ -8,8 +8,6 @@ part "create.g.dart";
 abstract class CreateContent extends Content with _$CreateContent {
   CreateContent._();
   factory CreateContent({
-    @JsonKey(name: "creator") String? creatorId,
-
     @JsonKey(name: "additional_creators")
     @Default(IList.empty())
     IList<String> additionalCreatorIds,

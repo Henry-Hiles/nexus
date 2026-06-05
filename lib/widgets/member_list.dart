@@ -75,10 +75,14 @@ class MemberList extends HookConsumerWidget {
                 children: [
                   for (final MapEntry(key: powerLevel, value: members)
                       in value.toEntryIList(
-                        compare: (a, b) => (b?.key ?? double.negativeInfinity)
-                            .compareTo(a?.key ?? double.negativeInfinity),
+                        compare: (a, b) => (b?.key ?? double.infinity)
+                            .compareTo(a?.key ?? double.infinity),
                       )) ...[
-                    DividerText("Power Level $powerLevel"),
+                    DividerText(
+                      powerLevel == null
+                          ? "Creators"
+                          : "Power Level $powerLevel",
+                    ),
                     SegmentedListSection(
                       children: members
                           .map(
