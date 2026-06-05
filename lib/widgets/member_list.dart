@@ -1,6 +1,8 @@
+import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/material.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
+import "package:m3e_buttons/m3e_buttons.dart";
 import "package:material_segmented_list/material_segmented_list.dart";
 import "package:nexus/controllers/members_grouped_controller.dart";
 import "package:nexus/helpers/extensions/get_localpart.dart";
@@ -20,6 +22,18 @@ class MemberList extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final status = useState(MembershipStatus.join);
 
+    final membersData = ref.watch(
+      MembersGroupedController.provider(
+        .new(roomId: roomId, status: status.value),
+      ),
+    );
+
+    final options = {
+      "Joined": MembershipStatus.join,
+      "Invited": MembershipStatus.invite,
+      "Banned": MembershipStatus.ban,
+    };
+
     return Drawer(
       shape: Border(),
       child: Column(
@@ -38,99 +52,107 @@ class MemberList extends HookConsumerWidget {
                 ),
             ],
           ),
-          Wrap(
-            alignment: .center,
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              FilterChip(
-                label: Text("Joined"),
-                onSelected: (value) => status.value = .join,
-                selected: status.value == .join,
-              ),
-              FilterChip(
-                label: Text("Invited"),
-                onSelected: (value) => status.value = .invite,
-                selected: status.value == .invite,
-              ),
-              FilterChip(
-                label: Text("Banned"),
-                onSelected: (value) => status.value = .ban,
-                selected: status.value == .ban,
-              ),
-            ],
+          M3EToggleButtonGroup(
+            type: M3EButtonGroupType.connected,
+            selectedIndex: options.values.toIList().indexOf(status.value),
+            onSelectedIndexChanged: (index) =>
+                status.value = options.values.elementAt(index ?? 0),
+            // overflow: M3EButtonGroupOverflow.menu,
+            actions: options
+                .mapTo(
+                  (name, value) => M3EToggleButtonGroupAction(
+                    checkedLabel: Text(
+                      "$name${switch (membersData) {
+                        AsyncData(:final value) || AsyncLoading(:final value?) => " (${value.values.expand((element) => element).length})",
+                        _ => "",
+                      }}",
+                    ),
+                    label: Text(name),
+                  ),
+                )
+                .toList(),
           ),
-          switch (ref.watch(
-            MembersGroupedController.provider(
-              .new(roomId: roomId, status: status.value),
-            ),
-          )) {
+
+          switch (membersData) {
             AsyncError(:final error, :final stackTrace) => ErrorDialog(
               error,
               stackTrace,
             ),
-            AsyncData(:final value) || AsyncLoading(:final value?) => Expanded(
-              child: ListView(
-                padding: .all(12),
-                children: [
-                  for (final MapEntry(key: powerLevel, value: members)
-                      in value.toEntryIList(
-                        compare: (a, b) => (b?.key ?? double.infinity)
-                            .compareTo(a?.key ?? double.infinity),
-                      )) ...[
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 4),
-                      child: DividerText(
-                        powerLevel == null
-                            ? "Creators"
-                            : "Power Level $powerLevel",
+            AsyncData(:final value) || AsyncLoading(:final value?) =>
+              value.isEmpty
+                  ? Center(
+                      child: Padding(
+                        padding: .symmetric(vertical: 18),
+                        child: Text(
+                          "No ${options.keys.toIList()[options.values.toIList().indexOf(status.value)]} Members",
+                          style: Theme.of(context).textTheme.headlineSmall,
+                        ),
+                      ),
+                    )
+                  : Expanded(
+                      child: ListView(
+                        padding: .all(12),
+                        children: [
+                          for (final MapEntry(key: powerLevel, value: members)
+                              in value.toEntryIList(
+                                compare: (a, b) => (b?.key ?? double.infinity)
+                                    .compareTo(a?.key ?? double.infinity),
+                              )) ...[
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 4),
+                              child: DividerText(
+                                powerLevel == null
+                                    ? "Creators"
+                                    : "Power Level $powerLevel",
+                              ),
+                            ),
+                            SegmentedListSection(
+                              children: members
+                                  .map(
+                                    (member) => switch (member.content) {
+                                      MembershipContent(
+                                        :final avatarUrl,
+                                        :final displayName,
+                                      ) =>
+                                        SegmentedListTile(
+                                          onTap: () {},
+                                          //  context.showUserPopover(
+                                          //   member.content as MembershipContent,
+                                          //   member.stateKey!,
+                                          //   roomId: roomId,
+                                          //   globalPosition: details.globalPosition,
+                                          // ),
+                                          title: Text(
+                                            displayName ??
+                                                member.stateKey!.localpart,
+                                            overflow: .ellipsis,
+                                            style: .new(
+                                              color: member.stateKey!.colorHash,
+                                              fontWeight: .bold,
+                                            ),
+                                          ),
+                                          subtitle: Text(
+                                            member.stateKey!,
+                                            overflow: .ellipsis,
+                                          ),
+                                          leading: AvatarOrHash(
+                                            avatarUrl,
+                                            displayName ??
+                                                member.sender.localpart,
+                                          ),
+                                        ),
+                                      _ => throw Exception(
+                                        "Member content was not MembershipContent",
+                                      ),
+                                    },
+                                  )
+                                  .toList(),
+                            ),
+                            SizedBox(height: 4),
+                          ],
+                        ],
                       ),
                     ),
-                    SegmentedListSection(
-                      children: members
-                          .map(
-                            (member) => switch (member.content) {
-                              MembershipContent(
-                                :final avatarUrl,
-                                :final displayName,
-                              ) =>
-                                SegmentedListTile(
-                                  onTap: () {},
-                                  //  context.showUserPopover(
-                                  //   member.content as MembershipContent,
-                                  //   member.stateKey!,
-                                  //   roomId: roomId,
-                                  //   globalPosition: details.globalPosition,
-                                  // ),
-                                  title: Text(
-                                    displayName ?? member.stateKey!.localpart,
-                                    overflow: .ellipsis,
-                                    style: .new(
-                                      color: member.stateKey!.colorHash,
-                                      fontWeight: .bold,
-                                    ),
-                                  ),
-                                  subtitle: Text(
-                                    member.stateKey!,
-                                    overflow: .ellipsis,
-                                  ),
-                                  leading: AvatarOrHash(
-                                    avatarUrl,
-                                    displayName ?? member.sender.localpart,
-                                  ),
-                                ),
-                              _ => throw Exception(
-                                "Member content was not MembershipContent",
-                              ),
-                            },
-                          )
-                          .toList(),
-                    ),
-                    SizedBox(height: 4),
-                  ],
-                ],
-              ),
-            ),
             AsyncLoading _ => Loading(),
           },
         ],

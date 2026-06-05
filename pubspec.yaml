@@ -65,6 +65,7 @@ dependencies:
   media_kit_libs_video: 1.0.7
   measure_size: ^5.0.2
   material_segmented_list: ^1.0.5
+  m3e_buttons: ^0.0.3
   
 dev_dependencies:
   build_runner: 2.15.0
