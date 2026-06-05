@@ -24,7 +24,7 @@ class MembersController extends AsyncNotifier<ISet<Event>> {
           .getRoomState(
             GetRoomStateRequest(
               roomId: roomId,
-              fetchMembers: room.metadata?.hasMemberList ?? true,
+              fetchMembers: !(room.metadata?.hasMemberList ?? false),
               includeMembers: true,
             ),
           );
