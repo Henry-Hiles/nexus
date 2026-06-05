@@ -24,9 +24,8 @@ class RoomChatController extends AsyncNotifier<IList<Event>> {
     final room = ref.watch(
       RoomsController.provider.select((rooms) => rooms[roomId]),
     );
-    if (room == null) return .new();
 
-    if (!room.hasFetchedState) {
+    if (!room!.hasFetchedState) {
       final state = await client.getRoomState(.new(roomId: roomId));
 
       await ref.read(RoomsController.provider.notifier).addState(roomId, state);
