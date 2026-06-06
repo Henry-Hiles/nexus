@@ -7,6 +7,7 @@ import "package:nexus/controllers/key_controller.dart";
 import "package:nexus/controllers/spaces_controller.dart";
 import "package:nexus/models/room.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
+import "package:nexus/widgets/divider_widget.dart";
 import "package:nexus/widgets/join_dialog.dart";
 import "package:nexus/widgets/room_menu.dart";
 
@@ -214,26 +215,35 @@ class Sidebar extends HookConsumerWidget {
                   selectedIndex: selectedRoomIndex ?? 0,
                   sections: [
                     .new(
-                      header: selectedSpace.room == null ? null : Text("Rooms"),
+                      header: selectedSpace.room == null
+                          ? null
+                          : DividerWidget(Text("Rooms")),
                       destinations: roomsToDestinations(selectedSpace.children),
                     ),
                     for (final subSpace in selectedSpace.subSpaces)
                       .new(
-                        header: Row(
-                          spacing: 8,
-                          children: [
-                            SizedBox(width: 16, child: Divider()),
-                            if (subSpace.room.metadata?.avatar != null)
-                              AvatarOrHash(
-                                subSpace.room.metadata?.avatar,
-                                subSpace.room.metadata?.name ?? "Unnamed Room",
-                                height: 16,
+                        header: DividerWidget(
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            spacing: 8,
+                            children: [
+                              if (subSpace.room.metadata?.avatar != null)
+                                AvatarOrHash(
+                                  subSpace.room.metadata?.avatar,
+                                  subSpace.room.metadata?.name ??
+                                      "Unnamed Room",
+                                  height: 16,
+                                ),
+                              Flexible(
+                                child: Text(
+                                  subSpace.room.metadata?.name ??
+                                      "Unnamed Space",
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
-                            Text(
-                              subSpace.room.metadata?.name ?? "Unnamed Space",
-                            ),
-                            Expanded(child: Divider()),
-                          ],
+                            ],
+                          ),
                         ),
                         destinations: roomsToDestinations(subSpace.children),
                       ),
