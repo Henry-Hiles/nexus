@@ -48,25 +48,28 @@ class MemberList extends HookConsumerWidget {
                 ),
             ],
           ),
-          M3EToggleButtonGroup(
-            type: .connected,
-            selectedIndex: statusIndex.value,
-            onSelectedIndexChanged: (index) =>
-                statusIndex.value = index ?? statusIndex.value,
-            // overflow: M3EButtonGroupOverflow.menu,
-            actions: options
-                .mapTo(
-                  (name, value) => M3EToggleButtonGroupAction(
-                    checkedLabel: Text(
-                      "$name${switch (ref.watch(MembersByStatusController.provider(.new(roomId: roomId, status: value)))) {
-                        AsyncData(:final value) || AsyncLoading(:final value?) => " (${value.length})",
-                        _ => "",
-                      }}",
+          Padding(
+            padding: .symmetric(vertical: 8),
+            child: M3EToggleButtonGroup(
+              type: .connected,
+              selectedIndex: statusIndex.value,
+              onSelectedIndexChanged: (index) =>
+                  statusIndex.value = index ?? statusIndex.value,
+              // overflow: M3EButtonGroupOverflow.menu,
+              actions: options
+                  .mapTo(
+                    (name, value) => M3EToggleButtonGroupAction(
+                      checkedLabel: Text(
+                        "$name${switch (ref.watch(MembersByStatusController.provider(.new(roomId: roomId, status: value)))) {
+                          AsyncData(:final value) || AsyncLoading(:final value?) => " (${value.length})",
+                          _ => "",
+                        }}",
+                      ),
+                      label: Text(name),
                     ),
-                    label: Text(name),
-                  ),
-                )
-                .toList(),
+                  )
+                  .toList(),
+            ),
           ),
 
           switch (ref.watch(
