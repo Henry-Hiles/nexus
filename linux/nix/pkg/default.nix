@@ -30,9 +30,9 @@ flutter.buildFlutterApplication {
 
   gitHashes = {
     window_size = "sha256-XelNtp7tpZ91QCEcvewVphNUtgQX7xrp5QP0oFo6DgM=";
-    dynamic_system_colors = "sha256-GInPqU7r4Kj7+CNBQnf95u0BiagOUI6EtcW0A18pfd0=";
     emoji_text_field = "sha256-3TOys09EP2GRo6pUBGPXaqBlE39O2Cmwt42Hs1cTDKo=";
     linkify = "sha256-mxV/XHLxF9cn7sUPr2SUNjVmDr5lbxkuGCbNdyiZi2c=";
+    navigation_rail_m3e = "sha256-Zkqo8RkNSWiELB+Bk6iLsgft9THuJiMtysEwXNS/ZgY=";
   };
 
   postInstall = ''
