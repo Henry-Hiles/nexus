@@ -1,9 +1,11 @@
 import "package:collection/collection.dart";
+import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/material.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:navigation_rail_m3e/navigation_rail_m3e.dart";
 import "package:nexus/controllers/key_controller.dart";
 import "package:nexus/controllers/spaces_controller.dart";
+import "package:nexus/models/room.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/widgets/join_dialog.dart";
 import "package:nexus/widgets/room_menu.dart";
@@ -42,6 +44,27 @@ class Sidebar extends HookConsumerWidget {
     final selectedRoomIndex = indexOfSelectedRoom == -1
         ? null
         : indexOfSelectedRoom;
+
+    List<NavigationRailM3EDestination> roomsToDestinations(IList<Room> rooms) =>
+        rooms
+            .map(
+              (room) => NavigationRailM3EDestination(
+                label: room.metadata?.name ?? "Unnamed Room",
+                badgeCount: switch (room.metadata?.unreadNotifications) {
+                  0 || null => room.metadata?.unreadMessages == 0 ? null : 0,
+                  int unread => unread,
+                },
+                icon: AvatarOrHash(
+                  room.metadata?.avatar,
+                  room.metadata?.name ?? "Unnamed Room",
+                  fallback: selectedSpaceId == "dms"
+                      ? null
+                      : Icon(Icons.numbers),
+                  //  space.client.headers,
+                ),
+              ),
+            )
+            .toList();
 
     return Drawer(
       width: 340,
@@ -189,29 +212,15 @@ class Sidebar extends HookConsumerWidget {
                   selectedIndex: selectedRoomIndex ?? 0,
                   sections: [
                     .new(
-                      destinations: selectedSpace.children
-                          .map(
-                            (room) => NavigationRailM3EDestination(
-                              label: room.metadata?.name ?? "Unnamed Room",
-                              badgeCount: switch (room
-                                  .metadata
-                                  ?.unreadNotifications) {
-                                0 || null =>
-                                  room.metadata?.unreadMessages == 0 ? null : 0,
-                                int unread => unread,
-                              },
-                              icon: AvatarOrHash(
-                                room.metadata?.avatar,
-                                room.metadata?.name ?? "Unnamed Room",
-                                fallback: selectedSpaceId == "dms"
-                                    ? null
-                                    : Icon(Icons.numbers),
-                                //  space.client.headers,
-                              ),
-                            ),
-                          )
-                          .toList(),
+                      destinations: roomsToDestinations(selectedSpace.children),
                     ),
+                    for (final subSpace in selectedSpace.subSpaces)
+                      .new(
+                        header: Text(
+                          subSpace.room.metadata?.name ?? "Unnamed Room",
+                        ),
+                        destinations: roomsToDestinations(subSpace.children),
+                      ),
                   ],
                   onDestinationSelected: (value) {
                     selectedRoomIdNotifier.set(

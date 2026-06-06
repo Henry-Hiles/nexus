@@ -103,12 +103,14 @@ class SpacesController extends Notifier<IList<Space>> {
             title: "Home",
             icon: Icons.home,
             children: homeRooms,
+            subSpaces: .new(),
           ),
           .new(
             id: "dms",
             title: "Direct Messages",
             icon: Icons.people,
             children: dmRooms,
+            subSpaces: .new(),
           ),
           ...topLevelSpacesList,
         ]

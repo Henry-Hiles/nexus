@@ -84,9 +84,15 @@ class JoinDialog extends HookWidget {
                               space?.id ??
                                   spaces
                                       .firstWhere(
-                                        (space) => space.children.any(
-                                          (child) => child.metadata?.id == id,
-                                        ),
+                                        (space) =>
+                                            space.children.any(
+                                              (child) =>
+                                                  child.metadata?.id == id,
+                                            ) ||
+                                            space.subSpaces.any(
+                                              (child) =>
+                                                  child.room.metadata?.id == id,
+                                            ),
                                       )
                                       .id,
                             );

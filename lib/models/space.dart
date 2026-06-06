@@ -2,6 +2,7 @@ import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/widgets.dart";
 import "package:freezed_annotation/freezed_annotation.dart";
 import "package:nexus/models/room.dart";
+import "package:nexus/models/subspace.dart";
 part "space.freezed.dart";
 
 @freezed
@@ -12,5 +13,6 @@ abstract class Space with _$Space {
     IconData? icon,
     Room? room,
     required IList<Room> children,
+    required IList<Subspace> subSpaces,
   }) = _Space;
 }
