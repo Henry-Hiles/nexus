@@ -18,36 +18,37 @@ class MessageImage extends ConsumerWidget {
     url.toString(),
     child: ClipRRect(
       borderRadius: .all(.circular(8)),
-      child: Image(
-        image: CachedNetworkImage(
-          url.toString(),
-          ref.watch(CrossCacheController.provider),
-          headers: ref.headers,
-        ),
-        width: info?.width,
-        loadingBuilder: (_, child, loadingProgress) => loadingProgress == null
-            ? child
-            : switch (info?.blurHash) {
-                final blurHash? =>
-                  info?.width == null || info?.height == null
-                      ? SizedBox(
-                          width: 200,
-                          height: 200,
-                          child: BlurHash(hash: blurHash),
-                        )
-                      : AspectRatio(
-                          aspectRatio: info!.width! / info!.height!,
-                          child: SizedBox(
+      child: AspectRatio(
+        aspectRatio: info!.width! / info!.height!,
+        child: Image(
+          image: CachedNetworkImage(
+            url.toString(),
+            ref.watch(CrossCacheController.provider),
+            headers: ref.headers,
+          ),
+          width: info?.width,
+          fit: BoxFit.fitWidth,
+          loadingBuilder: (_, child, loadingProgress) => loadingProgress == null
+              ? child
+              : switch (info?.blurHash) {
+                  final blurHash? =>
+                    info?.width == null || info?.height == null
+                        ? SizedBox(
+                            width: 200,
+                            height: 200,
+                            child: BlurHash(hash: blurHash),
+                          )
+                        : SizedBox(
                             width: info!.width,
                             child: BlurHash(hash: blurHash),
                           ),
-                        ),
-                _ => Loading(),
-              },
-        errorBuilder: (context, error, stackTrace) => Center(
-          child: Text(
-            "Image Failed to Load",
-            style: .new(color: Theme.of(context).colorScheme.error),
+                  _ => Loading(),
+                },
+          errorBuilder: (context, error, stackTrace) => Center(
+            child: Text(
+              "Image Failed to Load",
+              style: .new(color: Theme.of(context).colorScheme.error),
+            ),
           ),
         ),
       ),
