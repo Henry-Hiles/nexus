@@ -62,7 +62,6 @@ class Sidebar extends HookConsumerWidget {
                   fallback: selectedSpaceId == "dms"
                       ? null
                       : Icon(Icons.numbers),
-                  //  space.client.headers,
                 ),
               ),
             )
@@ -220,8 +219,21 @@ class Sidebar extends HookConsumerWidget {
                     ),
                     for (final subSpace in selectedSpace.subSpaces)
                       .new(
-                        header: Text(
-                          subSpace.room.metadata?.name ?? "Unnamed Space",
+                        header: Row(
+                          spacing: 8,
+                          children: [
+                            SizedBox(width: 16, child: Divider()),
+                            if (subSpace.room.metadata?.avatar != null)
+                              AvatarOrHash(
+                                subSpace.room.metadata?.avatar,
+                                subSpace.room.metadata?.name ?? "Unnamed Room",
+                                height: 16,
+                              ),
+                            Text(
+                              subSpace.room.metadata?.name ?? "Unnamed Space",
+                            ),
+                            Expanded(child: Divider()),
+                          ],
                         ),
                         destinations: roomsToDestinations(subSpace.children),
                       ),
