@@ -3,7 +3,8 @@ import "package:flutter/material.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:m3e_buttons/m3e_buttons.dart";
-import "package:material_segmented_list/material_segmented_list.dart";
+import "package:m3e_card_list/m3e_card_list.dart";
+import "package:nexus/controllers/members_by_status_controller.dart";
 import "package:nexus/controllers/members_grouped_controller.dart";
 import "package:nexus/helpers/extensions/get_localpart.dart";
 import "package:nexus/helpers/extensions/string_to_color.dart";
@@ -20,19 +21,14 @@ class MemberList extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final status = useState(MembershipStatus.join);
-
-    final membersData = ref.watch(
-      MembersGroupedController.provider(
-        .new(roomId: roomId, status: status.value),
-      ),
-    );
+    final statusIndex = useState(0);
 
     final options = <String, MembershipStatus>{
       "Joined": .join,
       "Invited": .invite,
       "Banned": .ban,
     };
+    final status = options.values.toIList()[statusIndex.value];
 
     return Drawer(
       shape: Border(),
@@ -54,16 +50,16 @@ class MemberList extends HookConsumerWidget {
           ),
           M3EToggleButtonGroup(
             type: .connected,
-            selectedIndex: options.values.toIList().indexOf(status.value),
+            selectedIndex: statusIndex.value,
             onSelectedIndexChanged: (index) =>
-                status.value = options.values.elementAt(index ?? 0),
+                statusIndex.value = index ?? statusIndex.value,
             // overflow: M3EButtonGroupOverflow.menu,
             actions: options
                 .mapTo(
                   (name, value) => M3EToggleButtonGroupAction(
                     checkedLabel: Text(
-                      "$name${switch (membersData) {
-                        AsyncData(:final value) || AsyncLoading(:final value?) => " (${value.values.expand((element) => element).length})",
+                      "$name${switch (ref.watch(MembersByStatusController.provider(.new(roomId: roomId, status: value)))) {
+                        AsyncData(:final value) || AsyncLoading(:final value?) => " (${value.length})",
                         _ => "",
                       }}",
                     ),
@@ -73,7 +69,11 @@ class MemberList extends HookConsumerWidget {
                 .toList(),
           ),
 
-          switch (membersData) {
+          switch (ref.watch(
+            MembersGroupedController.provider(
+              .new(roomId: roomId, status: status),
+            ),
+          )) {
             AsyncError(:final error, :final stackTrace) => ErrorDialog(
               error,
               stackTrace,
@@ -84,71 +84,76 @@ class MemberList extends HookConsumerWidget {
                       child: Padding(
                         padding: .symmetric(vertical: 18),
                         child: Text(
-                          "No ${options.keys.toIList()[options.values.toIList().indexOf(status.value)]} Members",
+                          "No ${options.keys.toIList()[statusIndex.value]} Members",
                           style: Theme.of(context).textTheme.headlineSmall,
                         ),
                       ),
                     )
                   : Expanded(
-                      child: ListView(
-                        padding: .all(12),
-                        children: [
+                      child: CustomScrollView(
+                        slivers: [
                           for (final MapEntry(key: powerLevel, value: members)
-                              in value.toEntryIList(
-                                compare: (a, b) => (b?.key ?? double.infinity)
-                                    .compareTo(a?.key ?? double.infinity),
-                              )) ...[
-                            Padding(
-                              padding: .symmetric(horizontal: 4),
-                              child: DividerText(
-                                powerLevel == null
-                                    ? "Creators"
-                                    : "Power Level $powerLevel",
+                              in value) ...[
+                            SliverToBoxAdapter(
+                              child: Padding(
+                                padding: .symmetric(horizontal: 16),
+                                child: DividerText(
+                                  powerLevel == null
+                                      ? "Creators"
+                                      : "Power Level $powerLevel",
+                                ),
                               ),
                             ),
-                            SegmentedListSection(
-                              children: members
-                                  .map(
-                                    (member) => switch (member.content) {
-                                      MembershipContent(
-                                        :final avatarUrl,
-                                        :final displayName,
-                                      ) =>
-                                        SegmentedListTile(
-                                          onTap: () {},
-                                          //  context.showUserPopover(
-                                          //   member.content as MembershipContent,
-                                          //   member.stateKey!,
-                                          //   roomId: roomId,
-                                          //   globalPosition: details.globalPosition,
-                                          // ),
-                                          title: Text(
-                                            displayName ??
-                                                member.stateKey!.localpart,
-                                            overflow: .ellipsis,
-                                            style: .new(
-                                              color: member.stateKey!.colorHash,
-                                              fontWeight: .bold,
-                                            ),
-                                          ),
-                                          subtitle: Text(
-                                            member.stateKey!,
-                                            overflow: .ellipsis,
-                                          ),
-                                          leading: AvatarOrHash(
-                                            avatarUrl,
-                                            displayName ??
-                                                member.sender.localpart,
+                            SliverM3ECardList(
+                              padding: .all(4),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.surfaceContainerHigh,
+                              margin: .symmetric(horizontal: 12, vertical: 4),
+                              itemCount: members.length,
+                              itemBuilder: (context, index) =>
+                                  switch (members[index].content) {
+                                    MembershipContent(
+                                      :final avatarUrl,
+                                      :final displayName,
+                                    ) =>
+                                      ListTile(
+                                        title: Text(
+                                          displayName ??
+                                              members[index]
+                                                  .stateKey!
+                                                  .localpart,
+                                          overflow: .ellipsis,
+                                          style: .new(
+                                            color: members[index]
+                                                .stateKey!
+                                                .colorHash,
+                                            fontWeight: .bold,
                                           ),
                                         ),
-                                      _ => throw Exception(
-                                        "Member content was not MembershipContent",
+                                        subtitle: Text(
+                                          members[index].stateKey!,
+                                          overflow: .ellipsis,
+                                        ),
+                                        leading: AvatarOrHash(
+                                          avatarUrl,
+                                          displayName ??
+                                              members[index].sender.localpart,
+                                        ),
                                       ),
-                                    },
-                                  )
-                                  .toList(),
+                                    _ => throw Exception(
+                                      "Member content was not MembershipContent",
+                                    ),
+                                  },
+                              onTap: (index) {
+                                //  context.showUserPopover(
+                                //   member.content as MembershipContent,
+                                //   member.stateKey!,
+                                //   roomId: roomId,
+                                //   globalPosition: details.globalPosition,
+                                // ),
+                              },
                             ),
-                            SizedBox(height: 4),
                           ],
                         ],
                       ),

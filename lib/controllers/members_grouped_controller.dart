@@ -8,12 +8,13 @@ import "package:nexus/models/content/create.dart";
 import "package:nexus/models/content/power_levels.dart";
 import "package:nexus/models/event.dart";
 
-class MembersGroupedController extends AsyncNotifier<IMap<int?, ISet<Event>>> {
+class MembersGroupedController
+    extends AsyncNotifier<IList<MapEntry<int?, ISet<Event>>>> {
   final MembersByStatusConfig config;
   MembersGroupedController(this.config);
 
   @override
-  Future<IMap<int?, ISet<Event>>> build() async {
+  Future<IList<MapEntry<int?, ISet<Event>>>> build() async {
     final room = ref.watch(
       RoomsController.provider.select((value) => value[config.roomId]),
     );
@@ -42,23 +43,28 @@ class MembersGroupedController extends AsyncNotifier<IMap<int?, ISet<Event>>> {
       MembersByStatusController.provider(config).future,
     );
 
-    return members.fold<IMap<int?, ISet<Event>>>(.new(), (result, event) {
-      final groupKey = creators?.contains(event.stateKey!) == true
-          ? null
-          : content.users[event.stateKey!] ?? content.usersDefault;
+    return members
+        .fold<IMap<int?, ISet<Event>>>(.new(), (result, event) {
+          final groupKey = creators?.contains(event.stateKey!) == true
+              ? null
+              : content.users[event.stateKey!] ?? content.usersDefault;
 
-      return result.update(
-        groupKey,
-        (value) => value.add(event),
-        ifAbsent: () => .new({event}),
-      );
-    });
+          return result.update(
+            groupKey,
+            (value) => value.add(event),
+            ifAbsent: () => .new({event}),
+          );
+        })
+        .toEntryIList(
+          compare: (a, b) =>
+              (b?.key ?? double.infinity).compareTo(a?.key ?? double.infinity),
+        );
   }
 
   static final provider =
       AsyncNotifierProvider.family<
         MembersGroupedController,
-        IMap<int?, ISet<Event>>,
+        IList<MapEntry<int?, ISet<Event>>>,
         MembersByStatusConfig
       >(MembersGroupedController.new);
 }
