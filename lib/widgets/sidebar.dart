@@ -67,7 +67,7 @@ class Sidebar extends HookConsumerWidget {
             .toList();
 
     return Drawer(
-      width: 340,
+      width: 330,
       shape: Border(),
       child: Row(
         children: [
