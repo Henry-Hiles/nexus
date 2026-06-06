@@ -32,7 +32,7 @@ flutter.buildFlutterApplication {
     window_size = "sha256-XelNtp7tpZ91QCEcvewVphNUtgQX7xrp5QP0oFo6DgM=";
     emoji_text_field = "sha256-3TOys09EP2GRo6pUBGPXaqBlE39O2Cmwt42Hs1cTDKo=";
     linkify = "sha256-mxV/XHLxF9cn7sUPr2SUNjVmDr5lbxkuGCbNdyiZi2c=";
-    navigation_rail_m3e = "sha256-Zkqo8RkNSWiELB+Bk6iLsgft9THuJiMtysEwXNS/ZgY=";
+    navigation_rail_m3e = "sha256-+2awDTQnK58gGRY1nuHckG/jjxarsYSRu9ovR4i4TEc=";
   };
 
   postInstall = ''
