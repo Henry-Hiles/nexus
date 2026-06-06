@@ -1,4 +1,5 @@
 import "dart:io";
+import "package:dynamic_color/dynamic_color.dart";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/foundation.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
@@ -17,7 +18,6 @@ import "package:nexus/widgets/error_dialog.dart";
 import "package:nexus/widgets/loading.dart";
 import "package:window_manager/window_manager.dart";
 import "package:flutter/material.dart";
-import "package:dynamic_system_colors/dynamic_system_colors.dart";
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 

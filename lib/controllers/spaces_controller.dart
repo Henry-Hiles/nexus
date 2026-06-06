@@ -88,6 +88,7 @@ class SpacesController extends Notifier<IList<Space>> {
 
           final children = childRoomsBySpaceId[id] ?? .new();
           return Space(
+            subSpaces: const IList.empty(), // TODO
             id: id,
             title: room.metadata?.name ?? "Unnamed Room",
             room: room,
