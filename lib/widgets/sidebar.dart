@@ -213,12 +213,13 @@ class Sidebar extends HookConsumerWidget {
                   selectedIndex: selectedRoomIndex ?? 0,
                   sections: [
                     .new(
+                      header: selectedSpace.room == null ? null : Text("Rooms"),
                       destinations: roomsToDestinations(selectedSpace.children),
                     ),
                     for (final subSpace in selectedSpace.subSpaces)
                       .new(
                         header: Text(
-                          subSpace.room.metadata?.name ?? "Unnamed Room",
+                          subSpace.room.metadata?.name ?? "Unnamed Space",
                         ),
                         destinations: roomsToDestinations(subSpace.children),
                       ),

@@ -6,7 +6,9 @@ import "package:nexus/controllers/account_data_controller.dart";
 import "package:nexus/controllers/rooms_controller.dart";
 import "package:nexus/controllers/top_level_spaces_controller.dart";
 import "package:nexus/controllers/space_edges_controller.dart";
+import "package:nexus/models/room.dart";
 import "package:nexus/models/space.dart";
+import "package:nexus/models/subspace.dart";
 
 class SpacesController extends Notifier<IList<Space>> {
   @override
@@ -14,107 +16,115 @@ class SpacesController extends Notifier<IList<Space>> {
     final rooms = ref.watch(RoomsController.provider);
     final topLevelSpaceIds = ref.watch(TopLevelSpacesController.provider);
     final spaceEdges = ref.watch(SpaceEdgesController.provider);
+    final accountData = ref.watch(AccountDataController.provider);
 
-    final childRoomsBySpaceId = IMap.fromEntries(
-      topLevelSpaceIds.map((spaceId) {
-        ISet<String> walk(String currentId) {
-          final children = spaceEdges[currentId] ?? .new();
+    final childrenById = {
+      for (final entry in spaceEdges.entries)
+        entry.key: entry.value.map((e) => e.childId).toList(),
+    };
 
-          return children.fold<ISet<String>>(.new(), (acc, edge) {
-            final childId = edge.childId;
-            final isSpace = spaceEdges.containsKey(childId);
+    Set<String> collectDescendants(String startId) {
+      final visited = <String>{};
+      final stack = [startId];
 
-            return acc
-                .addAll(!isSpace ? ISet([childId]) : const .empty())
-                .addAll(isSpace ? walk(childId) : const .empty());
-          });
+      while (stack.isNotEmpty) {
+        final current = stack.removeLast();
+        final children = childrenById[current] ?? const [];
+
+        for (final child in children) {
+          if (visited.add(child)) {
+            stack.add(child);
+          }
         }
+      }
 
-        return MapEntry(
-          spaceId,
-          walk(spaceId).map((id) => rooms[id]).nonNulls.toIList(),
-        );
-      }),
-    );
+      return visited;
+    }
 
-    final allNestedRoomIds = childRoomsBySpaceId.values
-        .expand((l) => l)
-        .map(
-          (room) => rooms.entries
-              .firstWhere(
-                (entry) => entry.value.metadata?.id == room.metadata?.id,
-              )
-              .key,
-        )
-        .toISet();
+    Space buildSpace(String spaceId) {
+      final space = rooms[spaceId];
+      final directChildrenIds = childrenById[spaceId] ?? const [];
+
+      final directRooms = <Room>[];
+      final subSpaces = <Subspace>[];
+
+      for (final childId in directChildrenIds) {
+        final room = rooms[childId];
+        if (room == null) continue;
+
+        if (childrenById.containsKey(childId)) {
+          final descendants = collectDescendants(childId);
+
+          subSpaces.add(
+            .new(
+              room: room,
+              children: .new(descendants.map((id) => rooms[id]).nonNulls),
+            ),
+          );
+        } else {
+          directRooms.add(room);
+        }
+      }
+
+      return .new(
+        id: spaceId,
+        room: space,
+        title: space?.metadata?.name ?? "Unnamed Space",
+        children: .new(directRooms),
+        subSpaces: .new(subSpaces),
+      );
+    }
+
+    final spaces = topLevelSpaceIds.map(buildSpace).toIList();
+
+    final usedRoomIds = {
+      for (final space in spaces) ...[
+        ...space.children.map((r) => r.metadata?.id),
+        ...space.subSpaces.expand((s) => s.children.map((r) => r.metadata?.id)),
+      ],
+    }.nonNulls.toISet();
+
+    final directMessages = IMap(
+      accountData["m.direct"]?.content ?? {},
+    ).values.expand((e) => e).toISet();
 
     final otherRooms = rooms.entries
         .where(
           (e) =>
-              !allNestedRoomIds.contains(e.key) &&
+              !usedRoomIds.contains(e.key) &&
               !topLevelSpaceIds.contains(e.key) &&
-              !spaceEdges.containsKey(e.key),
+              !childrenById.containsKey(e.key),
         )
-        .map((e) => e.value);
-
-    final accountData = ref.watch(AccountDataController.provider);
-
-    final directMessages = IMap(
-      accountData["m.direct"]?.content ?? {},
-    ).values.expand((element) => element);
+        .map((e) => e.value)
+        .toIList();
 
     final homeRooms = otherRooms
-        .where(
-          (room) =>
-              directMessages.any(
-                (directMessage) => directMessage == room.metadata?.id,
-              ) ==
-              false,
-        )
+        .where((r) => !directMessages.contains(r.metadata?.id))
         .toIList();
 
     final dmRooms = otherRooms
-        .where(
-          (room) => directMessages.any(
-            (directMessage) => directMessage == room.metadata?.id,
-          ),
-        )
+        .where((r) => directMessages.contains(r.metadata?.id))
         .toIList();
 
-    final topLevelSpacesList = topLevelSpaceIds
-        .map((id) {
-          final room = rooms[id];
-          if (room == null) return null;
+    final allSpaces = <Space>[
+      .new(
+        id: "home",
+        title: "Home",
+        icon: Icons.home,
+        children: homeRooms,
+        subSpaces: .new(),
+      ),
+      .new(
+        id: "dms",
+        title: "Direct Messages",
+        icon: Icons.people,
+        children: dmRooms,
+        subSpaces: .new(),
+      ),
+      ...spaces,
+    ];
 
-          final children = childRoomsBySpaceId[id] ?? .new();
-          return Space(
-            subSpaces: const IList.empty(), // TODO
-            id: id,
-            title: room.metadata?.name ?? "Unnamed Room",
-            room: room,
-            children: children,
-          );
-        })
-        .nonNulls
-        .toIList();
-
-    return <Space>[
-          .new(
-            id: "home",
-            title: "Home",
-            icon: Icons.home,
-            children: homeRooms,
-            subSpaces: .new(),
-          ),
-          .new(
-            id: "dms",
-            title: "Direct Messages",
-            icon: Icons.people,
-            children: dmRooms,
-            subSpaces: .new(),
-          ),
-          ...topLevelSpacesList,
-        ]
+    return allSpaces
         .map(
           (space) => space.copyWith(
             children: .new(
