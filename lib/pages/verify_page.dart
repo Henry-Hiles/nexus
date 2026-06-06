@@ -15,6 +15,22 @@ class VerifyPage extends HookConsumerWidget {
     final inputError = useState<String?>(null);
     final formKey = useRef(GlobalKey<FormState>());
 
+    Future<void> verify() async {
+      isLoading.value = true;
+
+      try {
+        if (formKey.value.currentState?.validate() != true) {
+          return;
+        }
+
+        inputError.value = await ref
+            .watch(ClientController.provider.notifier)
+            .verify(passphraseController.text);
+      } finally {
+        isLoading.value = false;
+      }
+    }
+
     return Scaffold(
       appBar: Appbar(),
       body: AlertDialog(
@@ -40,29 +56,16 @@ class VerifyPage extends HookConsumerWidget {
                   label: Text("Recovery Key or Passphrase"),
                   errorText: inputError.value,
                 ),
+                onFieldSubmitted: (_) => verify(),
+                // Don't defocus on submit
+                onEditingComplete: () {},
               ),
             ],
           ),
         ),
         actions: [
           TextButton(
-            onPressed: isLoading.value
-                ? null
-                : () async {
-                    isLoading.value = true;
-
-                    try {
-                      if (formKey.value.currentState?.validate() != true) {
-                        return;
-                      }
-
-                      inputError.value = await ref
-                          .watch(ClientController.provider.notifier)
-                          .verify(passphraseController.text);
-                    } finally {
-                      isLoading.value = false;
-                    }
-                  },
+            onPressed: isLoading.value ? null : verify,
             child: Text("Verify"),
           ),
         ],

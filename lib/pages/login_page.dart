@@ -80,6 +80,9 @@ class LoginPage extends HookConsumerWidget {
                 validator: requiredValidator,
                 controller: password,
                 obscureText: true,
+                onFieldSubmitted: (_) => tryLogin(),
+                // Don't defocus on submit
+                onEditingComplete: () {},
               ),
             ],
           ),
