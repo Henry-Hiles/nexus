@@ -55,7 +55,6 @@ class MemberList extends HookConsumerWidget {
               selectedIndex: statusIndex.value,
               onSelectedIndexChanged: (index) =>
                   statusIndex.value = index ?? statusIndex.value,
-              // overflow: M3EButtonGroupOverflow.menu,
               actions: options
                   .mapTo(
                     (name, value) => M3EToggleButtonGroupAction(
