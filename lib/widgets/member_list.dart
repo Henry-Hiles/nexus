@@ -51,7 +51,6 @@ class MemberList extends HookConsumerWidget {
           Padding(
             padding: .symmetric(vertical: 8),
             child: M3EToggleButtonGroup(
-              type: .connected,
               selectedIndex: statusIndex.value,
               onSelectedIndexChanged: (index) =>
                   statusIndex.value = index ?? statusIndex.value,
