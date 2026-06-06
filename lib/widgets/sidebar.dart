@@ -225,8 +225,13 @@ class Sidebar extends HookConsumerWidget {
                       ),
                   ],
                   onDestinationSelected: (value) {
+                    final children = selectedSpace.children.addAll(
+                      selectedSpace.subSpaces
+                          .map((element) => element.children)
+                          .flattened,
+                    );
                     selectedRoomIdNotifier.set(
-                      selectedSpace.children[value].metadata?.id,
+                      children[value].metadata?.id, //
                     );
                     if (!isDesktop) Navigator.of(context).pop();
                   },
