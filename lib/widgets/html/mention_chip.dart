@@ -36,7 +36,9 @@ class MentionChip extends ConsumerWidget {
             child: IgnorePointer(
               child: Chip(
                 label: Text(
-                  (membership == null ? null : "@${membership.displayName}") ??
+                  (membership?.displayName == null
+                          ? null
+                          : "@${membership!.displayName}") ??
                       mention,
                   style: .new(
                     fontWeight: .bold,
