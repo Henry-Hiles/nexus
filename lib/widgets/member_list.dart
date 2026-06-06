@@ -34,20 +34,20 @@ class MemberList extends HookConsumerWidget {
       shape: Border(),
       child: Column(
         children: [
-          AppBar(
-            scrolledUnderElevation: 0,
-            leading: Icon(Icons.people),
-            title: Text("Members"),
-            actionsPadding: .only(right: 4),
-            actions: [
-              if (Scaffold.of(context).hasEndDrawer)
+          if (Scaffold.of(context).hasEndDrawer)
+            AppBar(
+              scrolledUnderElevation: 0,
+              leading: Icon(Icons.people),
+              title: Text("Members"),
+              actionsPadding: .only(right: 4),
+              actions: [
                 IconButton(
                   onPressed: Scaffold.of(context).closeEndDrawer,
                   icon: Icon(Icons.close),
                   tooltip: "Close member list",
                 ),
-            ],
-          ),
+              ],
+            ),
           Padding(
             padding: .symmetric(vertical: 8),
             child: M3EToggleButtonGroup(
