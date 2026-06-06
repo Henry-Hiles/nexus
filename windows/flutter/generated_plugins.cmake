@@ -3,6 +3,7 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  dynamic_color
   dynamic_system_colors
   file_selector_windows
   media_kit_libs_windows_video

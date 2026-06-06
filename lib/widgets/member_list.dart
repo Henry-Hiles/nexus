@@ -28,10 +28,10 @@ class MemberList extends HookConsumerWidget {
       ),
     );
 
-    final options = {
-      "Joined": MembershipStatus.join,
-      "Invited": MembershipStatus.invite,
-      "Banned": MembershipStatus.ban,
+    final options = <String, MembershipStatus>{
+      "Joined": .join,
+      "Invited": .invite,
+      "Banned": .ban,
     };
 
     return Drawer(
@@ -53,7 +53,7 @@ class MemberList extends HookConsumerWidget {
             ],
           ),
           M3EToggleButtonGroup(
-            type: M3EButtonGroupType.connected,
+            type: .connected,
             selectedIndex: options.values.toIList().indexOf(status.value),
             onSelectedIndexChanged: (index) =>
                 status.value = options.values.elementAt(index ?? 0),
@@ -99,7 +99,7 @@ class MemberList extends HookConsumerWidget {
                                     .compareTo(a?.key ?? double.infinity),
                               )) ...[
                             Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 4),
+                              padding: .symmetric(horizontal: 4),
                               child: DividerText(
                                 powerLevel == null
                                     ? "Creators"

@@ -11,15 +11,11 @@ class AvatarOrHash extends ConsumerWidget {
   final Uri? avatar;
   final String title;
   final Widget? fallback;
-  final bool hasBadge;
-  final int badgeNumber;
   final double height;
   const AvatarOrHash(
     this.avatar,
     this.title, {
     this.fallback,
-    this.badgeNumber = 0,
-    this.hasBadge = false,
     this.height = 24,
     super.key,
   });
@@ -44,30 +40,24 @@ class AvatarOrHash extends ConsumerWidget {
       width: height,
       height: height,
       child: Center(
-        child: Badge(
-          isLabelVisible: hasBadge,
-          label: badgeNumber != 0 ? Text(badgeNumber.toString()) : null,
-          smallSize: 12,
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          child: ClipRRect(
-            borderRadius: .all(.circular((height - 8) / 2.5)),
-            child: SizedBox(
-              width: height,
-              height: height,
-              child: parsedAvatar == null
-                  ? fallback ?? box
-                  : Image(
-                      image: CachedNetworkImage(
-                        parsedAvatar.toString(),
-                        ref.watch(CrossCacheController.provider),
-                        headers: ref.headers,
-                      ),
-                      fit: .cover,
-                      loadingBuilder: (_, child, loadingProgress) =>
-                          loadingProgress == null ? child : fallback ?? box,
-                      errorBuilder: (_, _, _) => fallback ?? box,
+        child: ClipRRect(
+          borderRadius: .all(.circular((height - 8) / 2.5)),
+          child: SizedBox(
+            width: height,
+            height: height,
+            child: parsedAvatar == null
+                ? fallback ?? box
+                : Image(
+                    image: CachedNetworkImage(
+                      parsedAvatar.toString(),
+                      ref.watch(CrossCacheController.provider),
+                      headers: ref.headers,
                     ),
-            ),
+                    fit: .cover,
+                    loadingBuilder: (_, child, loadingProgress) =>
+                        loadingProgress == null ? child : fallback ?? box,
+                    errorBuilder: (_, _, _) => fallback ?? box,
+                  ),
           ),
         ),
       ),
