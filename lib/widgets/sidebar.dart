@@ -206,7 +206,7 @@ class Sidebar extends HookConsumerWidget {
                   ],
                 ),
                 child: NavigationRailM3E(
-                  expandedWidth: 360,
+                  expandedWidth: double.infinity,
                   scrollable: true,
                   background: Colors.transparent,
                   type: .alwaysExpand,
