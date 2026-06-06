@@ -17,6 +17,7 @@ import "package:nexus/models/content/server_acl.dart";
 import "package:nexus/models/content/sticker.dart";
 import "package:nexus/models/content/topic.dart";
 import "package:nexus/models/event.dart";
+import "package:nexus/widgets/error_dialog.dart";
 import "package:nexus/widgets/lazy_loading/message_displayname.dart";
 import "package:nexus/widgets/renderers/message.dart";
 import "package:nexus/widgets/reaction_row.dart";
@@ -49,9 +50,13 @@ class EventRenderer extends ConsumerWidget {
     final child = event.redactedBy != null || event.relationType == "m.replace"
         ? null
         : switch (event.content) {
-            Content(:final parseError?) => SelectableText(
-              "An error occurred while parsing this event:\n$parseError\n${parseError.stackTrace}",
-              style: errorStyle,
+            Content(:final parseError?) => Row(
+              children: [
+                ErrorDialog(
+                  "An error occurred while parsing event ${event.eventId}:\n$parseError",
+                  parseError.stackTrace,
+                ),
+              ],
             ),
 
             MessageContent() ||

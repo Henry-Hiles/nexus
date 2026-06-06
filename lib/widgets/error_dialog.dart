@@ -21,11 +21,12 @@ class ErrorDialog extends ConsumerWidget {
             onPressed: () => ref.invalidate(provider!),
             child: const Text("Try Again"),
           ),
-        TextButton(
-          onPressed: () =>
-              Navigator.of(context).popUntil((route) => route.isFirst),
-          child: const Text("Go Back"),
-        ),
+        if (Navigator.of(context).canPop())
+          TextButton(
+            onPressed: () =>
+                Navigator.of(context).popUntil((route) => route.isFirst),
+            child: const Text("Go Back"),
+          ),
       ],
     );
   }
