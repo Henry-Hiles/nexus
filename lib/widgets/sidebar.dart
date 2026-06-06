@@ -80,7 +80,8 @@ class Sidebar extends HookConsumerWidget {
                 ),
               ],
             ),
-            child: Padding(
+            child: Container(
+              color: NavigationRailTokensAdapter(context).containerColor,
               padding: EdgeInsets.only(top: 16),
               child: NavigationRailM3E(
                 type: .alwaysCollapse,
