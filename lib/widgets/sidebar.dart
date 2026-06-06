@@ -38,9 +38,11 @@ class Sidebar extends HookConsumerWidget {
         spaces.firstWhereOrNull((space) => space.id == selectedSpaceId) ??
         spaces.first;
 
-    final indexOfSelectedRoom = selectedSpace.children.indexWhere(
-      (room) => room.metadata?.id == selectedRoomId,
-    );
+    final indexOfSelectedRoom = selectedSpace.children
+        .addAll(
+          selectedSpace.subSpaces.map((element) => element.children).flattened,
+        )
+        .indexWhere((room) => room.metadata?.id == selectedRoomId);
     final selectedRoomIndex = indexOfSelectedRoom == -1
         ? null
         : indexOfSelectedRoom;
