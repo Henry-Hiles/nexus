@@ -100,17 +100,32 @@ class Sidebar extends HookConsumerWidget {
                     destinations: spaces
                         .map(
                           (space) => NavigationRailM3EDestination(
-                            badgeCount: switch (space.children.fold(
-                              0,
-                              (previousValue, room) =>
-                                  previousValue +
-                                  (room.metadata?.unreadNotifications ?? 0),
-                            )) {
+                            badgeCount: switch (space.children
+                                .addAll(
+                                  space.subSpaces
+                                      .map((element) => element.children)
+                                      .flattened,
+                                )
+                                .fold(
+                                  0,
+                                  (previousValue, room) =>
+                                      previousValue +
+                                      (room.metadata?.unreadNotifications ?? 0),
+                                )) {
                               0 =>
-                                space.children.any(
-                                      (room) =>
-                                          room.metadata?.unreadMessages != 0,
-                                    )
+                                space.children
+                                        .addAll(
+                                          space.subSpaces
+                                              .map(
+                                                (element) => element.children,
+                                              )
+                                              .flattened,
+                                        )
+                                        .any(
+                                          (room) =>
+                                              room.metadata?.unreadMessages !=
+                                              0,
+                                        )
                                     ? 0
                                     : null,
                               int badgeCount => badgeCount,
