@@ -113,7 +113,7 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
 - [ ] Notifications using UnifiedPush ([#35](https://git.federated.nexus/Nexus/nexus/issues/35))
 - [ ] Group calls using [MSC4195](https://github.com/matrix-org/matrix-spec-proposals/pull/4195)
 - [ ] Invites
-- [ ] Settings
+- [ ] Settings ([#37](https://git.federated.nexus/Nexus/nexus/issues/37))
     - [ ] Matrix: URIs vs Matrix.to links
     - [ ] Light/Dark mode
     - [ ] Remote Gomuks instance
