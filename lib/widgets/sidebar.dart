@@ -209,7 +209,11 @@ class Sidebar extends HookConsumerWidget {
                 actions: [
                   RoomMenu(
                     selectedSpace.room,
-                    children: selectedSpace.children,
+                    children: selectedSpace.children.addAll(
+                      selectedSpace.subSpaces
+                          .map((element) => element.children)
+                          .flattened,
+                    ),
                   ),
                 ],
               ),
