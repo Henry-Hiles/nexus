@@ -20,7 +20,7 @@ import "package:nexus/widgets/emoji_picker_button.dart";
 import "package:nexus/widgets/renderers/event.dart";
 import "package:nexus/widgets/member_list.dart";
 import "package:nexus/widgets/room_appbar.dart";
-import "package:nexus/widgets/flash_wrapper.dart";
+import "package:nexus/widgets/highlight_wrapper.dart";
 import "package:nexus/widgets/error_dialog.dart";
 import "package:nexus/main.dart";
 import "package:nexus/widgets/loading.dart";
@@ -41,7 +41,7 @@ class RoomChat extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final relatedEvent = useState<Event?>(null);
     final relationType = useState(RelationType.reply);
-    final flashingEvent = useState<String?>(null);
+    final highlightedEvent = useState<String?>(null);
 
     final composerSize = useState<double>(64);
 
@@ -426,7 +426,7 @@ class RoomChat extends HookConsumerWidget {
                             itemBuilder: (_, index) {
                               final event = value[index];
                               final previousEvent = value.getOrNull(index - 1);
-                              return FlashWrapper(
+                              return HighlightWrapper(
                                 EventRenderer(
                                   event,
                                   onTapReply: () async {
@@ -440,10 +440,10 @@ class RoomChat extends HookConsumerWidget {
                                       duration: (_) => .new(milliseconds: 700),
                                       curve: (_) => Curves.easeInOut,
                                     );
-                                    flashingEvent.value = replyId;
+                                    highlightedEvent.value = replyId;
                                     await Future.delayed(.new(seconds: 1), () {
-                                      if (flashingEvent.value == replyId) {
-                                        flashingEvent.value = null;
+                                      if (highlightedEvent.value == replyId) {
+                                        highlightedEvent.value = null;
                                       }
                                     });
                                   },
@@ -457,8 +457,8 @@ class RoomChat extends HookConsumerWidget {
                                       "${event.sender}${event.pmp?.id}" ==
                                           "${previousEvent?.sender}${previousEvent?.pmp?.id}",
                                 ),
-                                isFlashing:
-                                    flashingEvent.value == event.eventId,
+                                isHighlighted:
+                                    highlightedEvent.value == event.eventId,
                               );
                             },
                           ),
