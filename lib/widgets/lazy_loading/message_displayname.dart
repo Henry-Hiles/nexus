@@ -22,8 +22,8 @@ class MessageDisplayname extends ConsumerWidget {
     AuthorController.provider(event),
   )) {
     AsyncData(:final value) || AsyncLoading(:final value?) => InkWell(
-      onTapUp: clickable
-          ? (details) => context.showUserPopover(
+      onTap: clickable
+          ? () => context.showUserPopover(
               value,
               event.sender,
               roomId: event.roomId,

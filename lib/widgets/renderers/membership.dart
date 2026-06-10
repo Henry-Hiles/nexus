@@ -21,7 +21,7 @@ class MembershipRenderer extends StatelessWidget {
     return switch (event.content) {
       MembershipContent content => GenericEventRenderer(Icons.people, [
         InkWell(
-          onTapUp: (details) => context.showUserPopover(
+          onTap: () => context.showUserPopover(
             content,
             event.stateKey!,
             roomId: event.roomId,

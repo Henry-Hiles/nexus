@@ -23,7 +23,7 @@ class MentionChip extends ConsumerWidget {
     return mention == null
         ? SizedBox.shrink()
         : InkWell(
-            onTapUp: (details) {
+            onTap: () {
               if (membership != null) {
                 context.showUserPopover(membership, mention, roomId: roomId);
               }

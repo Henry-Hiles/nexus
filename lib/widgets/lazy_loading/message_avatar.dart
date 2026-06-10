@@ -16,7 +16,7 @@ class MessageAvatar extends ConsumerWidget {
     AuthorController.provider(event),
   )) {
     AsyncData(:final value) || AsyncLoading(:final value?) => InkWell(
-      onTapUp: (details) =>
+      onTap: () =>
           context.showUserPopover(value, event.sender, roomId: event.roomId),
       child: AvatarOrHash(
         value.avatarUrl,
