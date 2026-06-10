@@ -131,9 +131,11 @@ class UserBottomSheet extends ConsumerWidget {
           ref
               .watch(ProfileController.provider(userId))
               .betterWhen(
-                loading: SizedBox.shrink,
+                loading: () => Text(""),
                 data: (profile) => Column(
                   children: [
+                    if (profile.timezone == null && profile.pronouns.isEmpty)
+                      Text(""),
                     Wrap(
                       crossAxisAlignment: .center,
                       alignment: .center,
