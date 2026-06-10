@@ -24,7 +24,7 @@ class AvatarOrHash extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final box = ColoredBox(
       color: ColorHash(title).color,
-      child: Center(child: Text(title.isEmpty ? "" : title[0])),
+      child: Center(child: Icon(Icons.person, size: height / 2)),
     );
 
     final parsedAvatar = avatar?.mxcToHttps(

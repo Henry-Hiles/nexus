@@ -14,6 +14,7 @@ import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/widgets/divider_text.dart";
 import "package:nexus/widgets/error_dialog.dart";
 import "package:nexus/widgets/loading.dart";
+import "package:nexus/widgets/user_bottom_sheet.dart";
 
 class MemberList extends HookConsumerWidget {
   final String roomId;
@@ -138,8 +139,11 @@ class MemberList extends HookConsumerWidget {
                                         ),
                                         leading: AvatarOrHash(
                                           avatarUrl,
+                                          height: 36,
                                           displayName ??
-                                              members[index].sender.localpart,
+                                              members[index]
+                                                  .stateKey!
+                                                  .localpart,
                                         ),
                                       ),
                                     _ => throw Exception(
@@ -147,12 +151,25 @@ class MemberList extends HookConsumerWidget {
                                     ),
                                   },
                               onTap: (index) {
-                                //  context.showUserPopover(
-                                //   member.content as MembershipContent,
-                                //   member.stateKey!,
-                                //   roomId: roomId,
-                                //   globalPosition: details.globalPosition,
-                                // ),
+                                final member = members[index];
+                                if (member.content
+                                    case MembershipContent content) {
+                                  showModalBottomSheet(
+                                    constraints: BoxConstraints.loose(
+                                      Size(
+                                        500,
+                                        (context.size?.height ?? 1000) - 80,
+                                      ),
+                                    ),
+                                    isScrollControlled: true,
+                                    context: context,
+                                    builder: (context) => UserBottomSheet(
+                                      content,
+                                      member.stateKey!,
+                                      roomId: roomId,
+                                    ),
+                                  );
+                                }
                               },
                             ),
                           ],

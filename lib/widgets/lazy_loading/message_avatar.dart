@@ -12,21 +12,18 @@ class MessageAvatar extends ConsumerWidget {
   const MessageAvatar(this.event, {this.height = 24, super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) =>
-      switch (ref.watch(AuthorController.provider(event))) {
-        AsyncData(:final value) || AsyncLoading(:final value?) => InkWell(
-          onTapUp: (details) => context.showUserPopover(
-            value,
-            event.sender,
-            roomId: event.roomId,
-            globalPosition: details.globalPosition,
-          ),
-          child: AvatarOrHash(
-            value.avatarUrl,
-            value.displayName ?? event.sender.localpart,
-            height: height,
-          ),
-        ),
-        _ => AvatarOrHash(null, event.sender.localpart, height: height),
-      };
+  Widget build(BuildContext context, WidgetRef ref) => switch (ref.watch(
+    AuthorController.provider(event),
+  )) {
+    AsyncData(:final value) || AsyncLoading(:final value?) => InkWell(
+      onTapUp: (details) =>
+          context.showUserPopover(value, event.sender, roomId: event.roomId),
+      child: AvatarOrHash(
+        value.avatarUrl,
+        value.displayName ?? event.sender.localpart,
+        height: height,
+      ),
+    ),
+    _ => AvatarOrHash(null, event.sender.localpart, height: height),
+  };
 }

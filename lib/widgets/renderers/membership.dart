@@ -25,7 +25,6 @@ class MembershipRenderer extends StatelessWidget {
             content,
             event.stateKey!,
             roomId: event.roomId,
-            globalPosition: details.globalPosition,
           ),
           child: Text(
             overflow: .ellipsis,

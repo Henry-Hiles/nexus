@@ -25,12 +25,7 @@ class MentionChip extends ConsumerWidget {
         : InkWell(
             onTapUp: (details) {
               if (membership != null) {
-                context.showUserPopover(
-                  membership,
-                  mention,
-                  roomId: roomId,
-                  globalPosition: details.globalPosition,
-                );
+                context.showUserPopover(membership, mention, roomId: roomId);
               }
             },
             child: IgnorePointer(

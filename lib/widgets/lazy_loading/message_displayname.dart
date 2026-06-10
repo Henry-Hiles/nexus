@@ -27,7 +27,6 @@ class MessageDisplayname extends ConsumerWidget {
               value,
               event.sender,
               roomId: event.roomId,
-              globalPosition: details.globalPosition,
             )
           : null,
       child: Wrap(
