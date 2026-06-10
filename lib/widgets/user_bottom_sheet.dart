@@ -193,6 +193,20 @@ class UserBottomSheet extends ConsumerWidget {
           SizedBox(height: 8),
           if (userId != ref.watch(ClientStateController.provider)?.userId &&
               roomId != null) ...[
+            Row(
+              children: [
+                Expanded(
+                  child: M3EButton.icon(
+                    onPressed: null,
+                    shape: .square,
+                    style: .tonal,
+                    icon: Icon(Icons.message),
+                    label: Text("Message"),
+                  ),
+                ),
+              ],
+            ),
+
             if (ref.watch(
                       PowerLevelController.provider(
                         .membershipAction(
@@ -205,7 +219,7 @@ class UserBottomSheet extends ConsumerWidget {
                     member.status == .join ||
                 member.status == .invite)
               Padding(
-                padding: .only(bottom: 8),
+                padding: .only(top: 4),
                 child: Row(
                   mainAxisSize: MainAxisSize.max,
                   spacing: 8,
@@ -242,20 +256,6 @@ class UserBottomSheet extends ConsumerWidget {
                   ].map((e) => Expanded(child: e)).toList(),
                 ),
               ),
-
-            Row(
-              children: [
-                Expanded(
-                  child: M3EButton.icon(
-                    onPressed: null,
-                    shape: .square,
-                    style: .tonal,
-                    icon: Icon(Icons.message),
-                    label: Text("Message"),
-                  ),
-                ),
-              ],
-            ),
           ],
         ],
       ),
