@@ -118,9 +118,11 @@ class UserBottomSheet extends ConsumerWidget {
           SelectableText(
             member.displayName ?? userId.localpart,
             style: textTheme.headlineLarge,
+            textAlign: .center,
           ),
           SelectableText(
             userId,
+            textAlign: .center,
             style: textTheme.titleSmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -134,6 +136,7 @@ class UserBottomSheet extends ConsumerWidget {
                   children: [
                     Wrap(
                       crossAxisAlignment: .center,
+                      alignment: .center,
                       spacing: 4,
                       runSpacing: 4,
                       children: [
@@ -149,6 +152,7 @@ class UserBottomSheet extends ConsumerWidget {
                                   ),
                                 Text(
                                   pronoun.summary,
+                                  textAlign: .center,
                                   style: textTheme.titleSmall?.copyWith(
                                     color: theme.colorScheme.onSurfaceVariant,
                                   ),
@@ -169,6 +173,7 @@ class UserBottomSheet extends ConsumerWidget {
                             ),
                           Text(
                             profile.timezone!,
+                            textAlign: .center,
                             style: textTheme.titleSmall?.copyWith(
                               color: theme.colorScheme.onSurfaceVariant,
                             ),
