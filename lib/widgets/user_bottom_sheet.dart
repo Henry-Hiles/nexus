@@ -141,7 +141,10 @@ class UserBottomSheet extends ConsumerWidget {
                       runSpacing: 4,
                       children: [
                         ...profile.pronouns
-                            .where((pronoun) => pronoun.language == "en")
+                            .where(
+                              // TODO: Check system language (l10n)
+                              (pronoun) => pronoun.language == "en",
+                            )
                             .mapIndexed(
                               (index, pronoun) => [
                                 if (index != 0)
