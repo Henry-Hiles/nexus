@@ -132,6 +132,7 @@ class Sidebar extends HookConsumerWidget {
                             },
                             short: true,
                             icon: AvatarOrHash(
+                              height: 28,
                               space.room?.metadata?.avatar,
                               fallback: space.icon == null
                                   ? null
