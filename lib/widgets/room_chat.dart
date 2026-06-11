@@ -400,7 +400,7 @@ class RoomChat extends HookConsumerWidget {
               children: [
                 Positioned.fill(
                   child: Padding(
-                    padding: .symmetric(horizontal: 12),
+                    padding: .symmetric(horizontal: 4),
                     child: switch (controllerData) {
                       AsyncData(:final value?) ||
                       AsyncLoading(:final value?) => CustomScrollView(

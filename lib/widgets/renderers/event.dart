@@ -1,6 +1,7 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/material.dart";
-import "package:flutter_riverpod/flutter_riverpod.dart";
+import "package:flutter_hooks/flutter_hooks.dart";
+import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/helpers/extensions/show_context_menu.dart";
 import "package:nexus/models/content/avatar.dart";
 import "package:nexus/models/content/canonical_alias.dart";
@@ -24,7 +25,7 @@ import "package:nexus/widgets/reaction_row.dart";
 import "package:nexus/widgets/renderers/membership.dart";
 import "package:nexus/widgets/renderers/generic_event.dart";
 
-class EventRenderer extends ConsumerWidget {
+class EventRenderer extends HookConsumerWidget {
   final Event event;
   final bool textOnly;
   final bool isGrouped;
@@ -46,6 +47,8 @@ class EventRenderer extends ConsumerWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final errorStyle = TextStyle(color: colorScheme.error);
+    final focusNode = useFocusNode();
+    useListenable(focusNode);
 
     final child = event.redactedBy != null || event.relationType == "m.replace"
         ? null
@@ -168,12 +171,44 @@ class EventRenderer extends ConsumerWidget {
           if (textOnly)
             child
           else ...[
-            GestureDetector(
-              onSecondaryTapUp: contextMenuCallback,
-              onLongPressStart: contextMenuCallback,
-              child: Padding(
-                padding: isGrouped ? .zero : .only(top: 8),
-                child: child,
+            Builder(
+              builder: (context) => FocusableActionDetector(
+                focusNode: focusNode,
+                actions: contextMenuCallback == null
+                    ? null
+                    : {
+                        ActivateIntent: CallbackAction(
+                          onInvoke: (_) {
+                            final renderBox =
+                                context.findRenderObject() as RenderBox;
+                            final topLeft = renderBox.localToGlobal(
+                              Offset.zero,
+                            );
+                            context.showContextMenu(
+                              globalPosition: topLeft,
+                              children: getEventOptions!(event).toList(),
+                            );
+                            return null;
+                          },
+                        ),
+                      },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: focusNode.hasPrimaryFocus
+                        ? theme.colorScheme.surfaceContainerHighest
+                        : null,
+                  ),
+                  child: GestureDetector(
+                    onSecondaryTapUp: contextMenuCallback,
+                    onLongPressStart: contextMenuCallback,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 8,
+                      ).copyWith(top: isGrouped ? 0 : 8),
+                      child: child,
+                    ),
+                  ),
+                ),
               ),
             ),
 
