@@ -17,36 +17,38 @@ class ExpandableImage extends ConsumerWidget {
         ? null
         : () => showDialog(
             context: context,
-            builder: (_) => Stack(
-              children: [
-                Align(
-                  alignment: .topRight,
-                  child: Padding(
-                    padding: .all(32),
-                    child: M3EButton(
-                      onPressed: Navigator.of(context).pop,
-                      child: Icon(Icons.close),
-                    ),
-                  ),
-                ),
-                Center(
-                  child: InteractiveViewer(
-                    maxScale: 10,
-                    child: Image(
-                      fit: .contain,
-                      errorBuilder: (_, error, stackTrace) => ErrorDialog(
-                        "Loading failed for $source\nError: $error",
-                        stackTrace,
-                      ),
-                      image: CachedNetworkImage(
-                        source!,
-                        ref.watch(CrossCacheController.provider),
-                        headers: ref.headers,
+            builder: (_) => SafeArea(
+              child: Stack(
+                children: [
+                  Align(
+                    alignment: .topRight,
+                    child: Padding(
+                      padding: .all(32),
+                      child: M3EButton(
+                        onPressed: Navigator.of(context).pop,
+                        child: Icon(Icons.close),
                       ),
                     ),
                   ),
-                ),
-              ],
+                  Center(
+                    child: InteractiveViewer(
+                      maxScale: 10,
+                      child: Image(
+                        fit: .contain,
+                        errorBuilder: (_, error, stackTrace) => ErrorDialog(
+                          "Loading failed for $source\nError: $error",
+                          stackTrace,
+                        ),
+                        image: CachedNetworkImage(
+                          source!,
+                          ref.watch(CrossCacheController.provider),
+                          headers: ref.headers,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
     child: child,
