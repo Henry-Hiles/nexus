@@ -20,6 +20,25 @@ class ExpandableImage extends ConsumerWidget {
             builder: (_) => SafeArea(
               child: Stack(
                 children: [
+                  Positioned.fill(
+                    child: GestureDetector(
+                      onTap: Navigator.of(context).pop,
+                      child: InteractiveViewer(
+                        maxScale: 10,
+                        child: Image(
+                          errorBuilder: (_, error, stackTrace) => ErrorDialog(
+                            "Loading failed for $source\nError: $error",
+                            stackTrace,
+                          ),
+                          image: CachedNetworkImage(
+                            source!,
+                            ref.watch(CrossCacheController.provider),
+                            headers: ref.headers,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                   Align(
                     alignment: .topRight,
                     child: Padding(
@@ -27,23 +46,6 @@ class ExpandableImage extends ConsumerWidget {
                       child: M3EButton(
                         onPressed: Navigator.of(context).pop,
                         child: Icon(Icons.close),
-                      ),
-                    ),
-                  ),
-                  Center(
-                    child: InteractiveViewer(
-                      maxScale: 10,
-                      child: Image(
-                        fit: .contain,
-                        errorBuilder: (_, error, stackTrace) => ErrorDialog(
-                          "Loading failed for $source\nError: $error",
-                          stackTrace,
-                        ),
-                        image: CachedNetworkImage(
-                          source!,
-                          ref.watch(CrossCacheController.provider),
-                          headers: ref.headers,
-                        ),
                       ),
                     ),
                   ),
