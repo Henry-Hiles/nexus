@@ -1,10 +1,10 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/members_by_status_controller.dart";
+import "package:nexus/controllers/room_creators_controller.dart";
 import "package:nexus/controllers/rooms_controller.dart";
 import "package:nexus/models/configs/members_by_status_config.dart";
 import "package:nexus/models/content/content.dart";
-import "package:nexus/models/content/create.dart";
 import "package:nexus/models/content/power_levels.dart";
 import "package:nexus/models/event.dart";
 
@@ -19,15 +19,9 @@ class MembersGroupedController
       RoomsController.provider.select((value) => value[config.roomId]),
     );
 
-    final createRowId = room?.state[EventType.create.type]?[""];
-    final createEvent = createRowId == null ? null : room?.events[createRowId];
-    final createEventContent = switch (createEvent?.content) {
-      CreateContent content => content,
-      _ => null,
-    };
-    final creators = createEventContent?.additionalCreatorIds.add(
-      createEvent!.sender,
-    );
+    final roomCreators = room == null
+        ? null
+        : ref.watch((RoomCreatorsController.provider(room)));
 
     final powerLevelsRowId = room?.state[EventType.powerLevels.type]?[""];
     final powerLevelsEvent = powerLevelsRowId == null
@@ -45,7 +39,7 @@ class MembersGroupedController
 
     return members
         .fold<IMap<int?, ISet<Event>>>(.new(), (result, event) {
-          final groupKey = creators?.contains(event.stateKey!) == true
+          final groupKey = roomCreators?.contains(event.stateKey!) == true
               ? null
               : content.users[event.stateKey!] ?? content.usersDefault;
 

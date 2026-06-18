@@ -1,5 +1,6 @@
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client_state_controller.dart";
+import "package:nexus/controllers/room_creators_controller.dart";
 import "package:nexus/controllers/rooms_controller.dart";
 import "package:nexus/models/configs/power_level_config.dart";
 import "package:nexus/models/content/content.dart";
@@ -22,6 +23,10 @@ class PowerLevelController extends Notifier<bool> {
       RoomsController.provider.select((value) => value[config.roomId]),
     );
 
+    final roomCreators = room == null
+        ? null
+        : ref.watch(RoomCreatorsController.provider(room));
+
     final eventRowId = room?.state[EventType.powerLevels.type]?[""];
 
     final event = eventRowId == null ? null : room?.events[eventRowId];
@@ -37,7 +42,10 @@ class PowerLevelController extends Notifier<bool> {
     int powerLevelOf(String userId) =>
         content.users[userId] ?? content.usersDefault;
 
-    final userLevel = powerLevelOf(user);
+    // room creators get power level infinite
+    final userLevel = roomCreators?.contains(user) == true
+        ? double.infinity
+        : powerLevelOf(user);
 
     return switch (config) {
       EventPowerLevelConfig(:final eventType) =>
