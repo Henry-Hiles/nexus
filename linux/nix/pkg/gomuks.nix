@@ -16,7 +16,7 @@ buildGoModule (finalAttrs: {
   buildPhase = ''
     runHook preBuild
 
-    go build -buildmode=c-shared -o libgomuks.so -tags goolm,noheic ./pkg/ffi 
+    go build -buildmode=c-shared -o libgomuks.so -tags goolm,noheic,sqlite_fts5 ./pkg/ffi 
 
     runHook postBuild
   '';
