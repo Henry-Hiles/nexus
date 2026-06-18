@@ -36,7 +36,7 @@ jobs:
       - name: Go build
         run: |
           cd gomuks/pkg/ffi
-          go build -tags goolm -o ../../../libgomuks.dll -buildmode=c-shared
+          go build -tags goolm,sqlite_fts5 -o ../../../libgomuks.dll -buildmode=c-shared
 
       - name: Build with Flutter
         run: |
