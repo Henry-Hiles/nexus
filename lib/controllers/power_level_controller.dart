@@ -39,13 +39,11 @@ class PowerLevelController extends Notifier<bool> {
     );
     if (user == null || content is! PowerLevelsContent) return false;
 
-    int powerLevelOf(String userId) =>
-        content.users[userId] ?? content.usersDefault;
-
-    // room creators get power level infinite
-    final userLevel = roomCreators?.contains(user) == true
+    double powerLevelOf(String userId) => roomCreators?.contains(userId) == true
         ? double.infinity
-        : powerLevelOf(user);
+        : (content.users[userId] ?? content.usersDefault).toDouble();
+
+    final userLevel = powerLevelOf(user);
 
     return switch (config) {
       EventPowerLevelConfig(:final eventType) =>
