@@ -19,7 +19,7 @@ class MessageImage extends ConsumerWidget {
     child: ClipRRect(
       borderRadius: .all(.circular(8)),
       child: AspectRatio(
-        aspectRatio: info?.width ?? 1 / (info?.height ?? 1),
+        aspectRatio: (info?.width ?? 1) / (info?.height ?? 1),
         child: Image(
           image: CachedNetworkImage(
             url.toString(),
