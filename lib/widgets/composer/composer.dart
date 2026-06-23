@@ -5,6 +5,7 @@ import "package:flutter_hooks/flutter_hooks.dart";
 import "package:fluttertagger/fluttertagger.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/power_level_controller.dart";
+import "package:nexus/models/content/message.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/models/relation_type.dart";
 import "package:nexus/widgets/composer/mention_overlay.dart";
@@ -42,7 +43,12 @@ class Composer extends HookConsumerWidget {
     final query = useState("");
 
     if (relationType == .edit && controller.value.text.isEmpty) {
-      controller.value.text = relatedEvent?.localContent?.editSource ?? "";
+      controller.value.text =
+          relatedEvent?.localContent?.editSource ??
+          switch (relatedEvent?.content) {
+            TextMessageContent(:final body) => body,
+            _ => "",
+          };
     }
 
     void send() {

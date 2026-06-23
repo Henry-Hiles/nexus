@@ -54,7 +54,10 @@ class RoomChatController extends AsyncNotifier<IList<Event>?> {
 
           return editedEvent == null
               ? foundEvent
-              : foundEvent?.copyWith(content: editedEvent.content);
+              : foundEvent?.copyWith(
+                  content: editedEvent.content,
+                  localContent: editedEvent.localContent,
+                );
         })
         .nonNulls
         .toIList();
