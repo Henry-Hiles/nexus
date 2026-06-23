@@ -58,6 +58,7 @@
                 permissions = {
                   share = [ "network" ];
                   sockets = [
+                    "pulseaudio"
                     "fallback-x11"
                     "wayland"
                   ];
