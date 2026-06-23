@@ -182,8 +182,9 @@ class Sidebar extends HookConsumerWidget {
                       ),
                       IconButton(
                         tooltip: "Open settings",
-                        onPressed: () => Navigator.of(context).push(
-                          MaterialPageRoute(builder: (_) => SettingsPage()),
+                        onPressed: () => showDialog(
+                          context: context,
+                          builder: (_) => SettingsPage(),
                         ),
                         icon: Icon(Icons.settings),
                       ),
