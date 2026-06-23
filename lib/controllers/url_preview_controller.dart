@@ -12,33 +12,36 @@ class UrlPreviewController extends AsyncNotifier<OpenGraphData?> {
 
   @override
   Future<OpenGraphData?> build() async {
-    final homeserver = ref.watch(
-      ClientStateController.provider.select((value) => value?.homeserverUrl),
-    );
+    try {
+      final homeserver = ref.watch(
+        ClientStateController.provider.select((value) => value?.homeserverUrl),
+      );
 
-    if (homeserver != null && !link.contains("matrix.to")) {
-      {
-        final response = await get(
-          .parse(homeserver)
-              .resolve("/_matrix/client/v1/media/preview_url")
-              .replace(queryParameters: {"url": link}),
-          headers: await ref.watch(HeaderController.provider.future),
-        );
+      if (homeserver != null && !link.contains("matrix.to")) {
+        {
+          final response = await get(
+            .parse(homeserver)
+                .resolve("/_matrix/client/v1/media/preview_url")
+                .replace(queryParameters: {"url": link}),
+            headers: await ref.watch(HeaderController.provider.future),
+          );
 
-        if (response.statusCode == 200) {
-          final decodedValue = json.decode(response.body);
-          if (decodedValue is! Map<String, dynamic>) return null;
+          if (response.statusCode == 200) {
+            final decodedValue = json.decode(response.body);
+            if (decodedValue is! Map<String, dynamic>) return null;
 
-          final mxc = decodedValue["og:image"];
-          final image = mxc == null
-              ? null
-              : Uri.tryParse(mxc)?.mxcToHttps(homeserver);
+            final mxc = decodedValue["og:image"];
+            final image = mxc == null
+                ? null
+                : Uri.tryParse(mxc)?.mxcToHttps(homeserver);
 
-          return .fromJson(decodedValue).copyWith(imageUrl: image);
+            return .fromJson(decodedValue).copyWith(imageUrl: image);
+          }
         }
       }
+    } catch (_) {
+      return null;
     }
-
     return null;
   }
 

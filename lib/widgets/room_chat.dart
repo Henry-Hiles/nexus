@@ -508,7 +508,6 @@ class RoomChat extends HookConsumerWidget {
             MemberList(roomId),
         ],
       ),
-
       endDrawer: showMembersByDefault ? null : MemberList(roomId),
     );
   }
