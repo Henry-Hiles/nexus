@@ -6,6 +6,7 @@ import "package:navigation_rail_m3e/navigation_rail_m3e.dart";
 import "package:nexus/controllers/key_controller.dart";
 import "package:nexus/controllers/spaces_controller.dart";
 import "package:nexus/models/room.dart";
+import "package:nexus/pages/settings_page.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/widgets/divider_widget.dart";
 import "package:nexus/widgets/join_dialog.dart";
@@ -181,10 +182,9 @@ class Sidebar extends HookConsumerWidget {
                       ),
                       IconButton(
                         tooltip: "Open settings",
-                        onPressed: null,
-                        //  () => Navigator.of(
-                        //   context,
-                        // ).push(MaterialPageRoute(builder: (_) => SettingsPage())),
+                        onPressed: () => Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => SettingsPage()),
+                        ),
                         icon: Icon(Icons.settings),
                       ),
                     ],
