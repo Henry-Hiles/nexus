@@ -28,11 +28,11 @@ class SettingsPage extends ConsumerWidget {
           ],
         ),
         body: Padding(
-          padding: .symmetric(vertical: 8),
+          padding: .symmetric(vertical: 12),
           child: Row(
             children: [
               Padding(
-                padding: .symmetric(vertical: 4),
+                padding: .symmetric(vertical: 8),
                 child: NavigationRailM3E(
                   type: .alwaysExpand,
                   sections: [
