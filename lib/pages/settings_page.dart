@@ -1,16 +1,17 @@
 import "package:flutter/material.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:navigation_rail_m3e/navigation_rail_m3e.dart";
+import "package:super_sliver_list/super_sliver_list.dart";
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => Dialog(
-    constraints: .loose(Size(900, 600)),
-    child: ClipRRect(
-      borderRadius: BorderRadiusGeometry.circular(12),
-      child: Scaffold(
+  Widget build(BuildContext context, WidgetRef ref) => LayoutBuilder(
+    builder: (context, constraints) {
+      final categoriesArePages = constraints.maxWidth < 550;
+
+      final settingsContent = Scaffold(
         appBar: AppBar(
           title: Text("Settings"),
           actionsPadding: .symmetric(horizontal: 12),
@@ -52,10 +53,31 @@ class SettingsPage extends ConsumerWidget {
                 ),
               ),
               VerticalDivider(),
+              Expanded(
+                child: SuperListView(
+                  children: [
+                    SwitchListTile(
+                      title: Text("Settings Title"),
+                      value: false,
+                      onChanged: (value) {},
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
-      ),
-    ),
+      );
+
+      return constraints.maxWidth < 650
+          ? settingsContent
+          : Dialog(
+              constraints: .loose(Size(900, 600)),
+              child: ClipRRect(
+                borderRadius: BorderRadiusGeometry.circular(12),
+                child: settingsContent,
+              ),
+            );
+    },
   );
 }
