@@ -46,64 +46,6 @@ class SettingsPage extends ConsumerWidget {
           ),
         ]),
       ),
-      .new(
-        title: "Appearance",
-        icon: Icons.brush,
-        settings: .new([
-          .new(
-            title: "Dark Mode",
-            description:
-                "Toggle between Light Mode, Dark Mode, and System themes.",
-            widget: DialogListTile<ThemeMode>(
-              icon: Icon(Icons.palette),
-              title: "Dark Mode",
-              initialValue: ThemeMode.system,
-              options: ThemeMode.values,
-              getName: (option) => toBeginningOfSentenceCase(option.name),
-              onChanged: (value) {},
-            ),
-          ),
-          .new(
-            title: "Use Client Side Decorations",
-            description:
-                "On desktop, toggle between client-side or server-side decorations",
-            widget: SwitchListTile(
-              title: Text("Client Side Decorations"),
-              value: true,
-              onChanged: (value) {},
-            ),
-          ),
-        ]),
-      ),
-      .new(
-        title: "Appearance",
-        icon: Icons.brush,
-        settings: .new([
-          .new(
-            title: "Dark Mode",
-            description:
-                "Toggle between Light Mode, Dark Mode, and System themes.",
-            widget: DialogListTile<ThemeMode>(
-              icon: Icon(Icons.palette),
-              title: "Dark Mode",
-              initialValue: ThemeMode.system,
-              options: ThemeMode.values,
-              getName: (option) => toBeginningOfSentenceCase(option.name),
-              onChanged: (value) {},
-            ),
-          ),
-          .new(
-            title: "Use Client Side Decorations",
-            description:
-                "On desktop, toggle between client-side or server-side decorations",
-            widget: SwitchListTile(
-              title: Text("Client Side Decorations"),
-              value: true,
-              onChanged: (value) {},
-            ),
-          ),
-        ]),
-      ),
     ]),
   });
 
@@ -115,22 +57,18 @@ class SettingsPage extends ConsumerWidget {
 
         final selected = useState(0);
 
+        final searchBar = SearchAnchor.bar(
+          barHintText: "Search...",
+          suggestionsBuilder: (context, controller) {
+            // TODO
+            return [];
+          },
+        );
+
         final settingsContent = Scaffold(
           appBar: AppBar(
             title: Text("Settings"),
             actionsPadding: .symmetric(horizontal: 12),
-            actions: [
-              SearchAnchor(
-                builder: (_, controller) => IconButton(
-                  icon: const Icon(Icons.search),
-                  onPressed: controller.openView,
-                ),
-                suggestionsBuilder: (context, controller) {
-                  // TODO
-                  return [];
-                },
-              ),
-            ],
           ),
           body: categoriesArePages
               ? CustomScrollView(
@@ -139,9 +77,15 @@ class SettingsPage extends ConsumerWidget {
                         (categoryGroup, categories) => [
                           SliverToBoxAdapter(
                             child: Padding(
+                              padding: EdgeInsets.all(12).copyWith(bottom: 4),
+                              child: searchBar,
+                            ),
+                          ),
+                          SliverToBoxAdapter(
+                            child: Padding(
                               padding: EdgeInsets.symmetric(
                                 horizontal: 16,
-                              ).copyWith(top: 8, bottom: 4),
+                              ).copyWith(bottom: 4),
                               child: DividerText(categoryGroup),
                             ),
                           ),
@@ -175,6 +119,8 @@ class SettingsPage extends ConsumerWidget {
                   children: [
                     NavigationRailM3E(
                       type: .alwaysExpand,
+                      trailing: searchBar,
+                      scrollable: true,
                       sections: settingsCategoryGroups
                           .mapTo(
                             (categoryGroup, categories) =>
