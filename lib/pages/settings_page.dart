@@ -1,6 +1,8 @@
 import "package:flutter/material.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
+import "package:m3e_card_list/m3e_card_list.dart";
 import "package:navigation_rail_m3e/navigation_rail_m3e.dart";
+import "package:nexus/widgets/divider_text.dart";
 import "package:super_sliver_list/super_sliver_list.dart";
 
 class SettingsPage extends ConsumerWidget {
@@ -29,43 +31,105 @@ class SettingsPage extends ConsumerWidget {
         ),
         body: Padding(
           padding: .symmetric(vertical: 12),
-          child: Row(
-            children: [
-              Padding(
-                padding: .symmetric(vertical: 8),
-                child: NavigationRailM3E(
-                  type: .alwaysExpand,
-                  sections: [
-                    .new(
-                      destinations: [
-                        .new(icon: Icon(Icons.abc), label: "Account"),
-                        .new(icon: Icon(Icons.abc), label: "Account"),
-                        .new(icon: Icon(Icons.abc), label: "Account"),
-                        .new(icon: Icon(Icons.abc), label: "Account"),
-                        .new(icon: Icon(Icons.abc), label: "Account"),
-                        .new(icon: Icon(Icons.abc), label: "Account"),
-                        .new(icon: Icon(Icons.abc), label: "Account"),
-                      ],
+          child: categoriesArePages
+              ? CustomScrollView(
+                  slivers: [
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: .symmetric(horizontal: 16),
+                        child: DividerText("Account Settings"),
+                      ),
+                    ),
+                    SliverM3ECardList(
+                      padding: .symmetric(horizontal: 4, vertical: 8),
+                      margin: .all(12),
+                      color: Theme.of(context).colorScheme.primaryContainer,
+                      itemCount: 3,
+                      itemBuilder: (context, index) => ListTile(
+                        leading: Icon(Icons.abc),
+                        title: Text("Account"),
+                      ),
+                    ),
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: .symmetric(horizontal: 16),
+                        child: DividerText("Some Other Settings"),
+                      ),
+                    ),
+                    SliverM3ECardList(
+                      padding: .symmetric(horizontal: 4, vertical: 8),
+                      margin: .symmetric(horizontal: 12),
+                      color: Theme.of(context).colorScheme.primaryContainer,
+                      itemCount: 4,
+                      itemBuilder: (context, index) => ListTile(
+                        leading: Icon(Icons.abc),
+                        title: Text("Account"),
+                      ),
                     ),
                   ],
-                  selectedIndex: 0,
-                  onDestinationSelected: (value) {},
-                ),
-              ),
-              VerticalDivider(),
-              Expanded(
-                child: SuperListView(
+                )
+              : Row(
                   children: [
-                    SwitchListTile(
-                      title: Text("Settings Title"),
-                      value: false,
-                      onChanged: (value) {},
+                    Padding(
+                      padding: .symmetric(vertical: 8),
+                      child: NavigationRailM3E(
+                        type: .alwaysExpand,
+                        sections: [
+                          .new(
+                            header: DividerText("Account Settings"),
+                            destinations: [
+                              .new(icon: Icon(Icons.abc), label: "Account"),
+                              .new(icon: Icon(Icons.abc), label: "Account"),
+                              .new(icon: Icon(Icons.abc), label: "Account"),
+                            ],
+                          ),
+                          .new(
+                            header: DividerText("Some Other Settings"),
+                            destinations: [
+                              .new(icon: Icon(Icons.abc), label: "Account"),
+                              .new(icon: Icon(Icons.abc), label: "Account"),
+                              .new(icon: Icon(Icons.abc), label: "Account"),
+                            ],
+                          ),
+                        ],
+                        selectedIndex: 0,
+                        onDestinationSelected: (value) {},
+                      ),
+                    ),
+                    VerticalDivider(),
+                    Expanded(
+                      child: SuperListView(
+                        children: [
+                          SwitchListTile(
+                            title: Text("Settings Title"),
+                            value: false,
+                            onChanged: (value) {},
+                          ),
+                          SwitchListTile(
+                            title: Text("Settings Title"),
+                            value: false,
+                            onChanged: (value) {},
+                          ),
+                          SwitchListTile(
+                            title: Text("Settings Title"),
+                            value: false,
+                            onChanged: (value) {},
+                          ),
+                          SwitchListTile(
+                            title: Text("Settings Title"),
+                            value: false,
+                            onChanged: (value) {},
+                          ),
+                          SwitchListTile(
+                            title: Text("Settings Title"),
+                            value: false,
+                            onChanged: (value) {},
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
-              ),
-            ],
-          ),
         ),
       );
 
