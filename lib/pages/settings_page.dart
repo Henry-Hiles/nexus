@@ -72,48 +72,50 @@ class SettingsPage extends ConsumerWidget {
           ),
           body: categoriesArePages
               ? CustomScrollView(
-                  slivers: settingsCategoryGroups
-                      .mapTo(
-                        (categoryGroup, categories) => [
-                          SliverToBoxAdapter(
-                            child: Padding(
-                              padding: EdgeInsets.all(12).copyWith(bottom: 4),
-                              child: searchBar,
-                            ),
-                          ),
-                          SliverToBoxAdapter(
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 16,
-                              ).copyWith(bottom: 4),
-                              child: DividerText(categoryGroup),
-                            ),
-                          ),
-                          SliverM3ECardList(
-                            padding: .symmetric(horizontal: 4, vertical: 8),
-                            margin: .symmetric(horizontal: 12),
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.primaryContainer,
-                            itemCount: categories.length,
-                            onTap: (index) => Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => Scaffold(
-                                  appBar: AppBar(
-                                    title: Text(categories[index].title),
-                                  ),
-                                  body: ListView(),
-                                ),
+                  slivers: [
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: EdgeInsets.all(12).copyWith(bottom: 4),
+                        child: searchBar,
+                      ),
+                    ),
+                    ...settingsCategoryGroups
+                        .mapTo(
+                          (categoryGroup, categories) => [
+                            SliverToBoxAdapter(
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                ).copyWith(bottom: 4),
+                                child: DividerText(categoryGroup),
                               ),
                             ),
-                            itemBuilder: (context, index) => ListTile(
-                              leading: Icon(categories[index].icon),
-                              title: Text(categories[index].title),
+                            SliverM3ECardList(
+                              padding: .symmetric(horizontal: 4, vertical: 8),
+                              margin: .symmetric(horizontal: 12),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.primaryContainer,
+                              itemCount: categories.length,
+                              onTap: (index) => Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => Scaffold(
+                                    appBar: AppBar(
+                                      title: Text(categories[index].title),
+                                    ),
+                                    body: ListView(),
+                                  ),
+                                ),
+                              ),
+                              itemBuilder: (context, index) => ListTile(
+                                leading: Icon(categories[index].icon),
+                                title: Text(categories[index].title),
+                              ),
                             ),
-                          ),
-                        ],
-                      )
-                      .flattenedToList,
+                          ],
+                        )
+                        .flattened,
+                  ],
                 )
               : Row(
                   children: [
