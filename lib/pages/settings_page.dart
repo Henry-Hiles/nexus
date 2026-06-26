@@ -139,13 +139,15 @@ class SettingsPage extends ConsumerWidget {
                         (categoryGroup, categories) => [
                           SliverToBoxAdapter(
                             child: Padding(
-                              padding: .symmetric(horizontal: 16),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 16,
+                              ).copyWith(top: 8, bottom: 4),
                               child: DividerText(categoryGroup),
                             ),
                           ),
                           SliverM3ECardList(
                             padding: .symmetric(horizontal: 4, vertical: 8),
-                            margin: .all(12),
+                            margin: .symmetric(horizontal: 12),
                             color: Theme.of(
                               context,
                             ).colorScheme.primaryContainer,
