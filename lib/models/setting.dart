@@ -1,12 +1,23 @@
 import "package:flutter/material.dart";
-import "package:freezed_annotation/freezed_annotation.dart";
-part "setting.freezed.dart";
 
-@freezed
-abstract class Setting with _$Setting {
-  const factory Setting({
-    required String title,
-    required String description,
-    required Widget widget,
-  }) = _Setting;
+class Setting<T> {
+  final String id;
+  final String title;
+  final T initialValue;
+  final String description;
+  final Widget Function(
+    String title,
+    String description,
+    ValueChanged<T> onChanged,
+    T currentValue,
+  )
+  builder;
+
+  Setting({
+    required this.id,
+    required this.title,
+    required this.initialValue,
+    required this.description,
+    required this.builder,
+  });
 }

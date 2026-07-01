@@ -6,6 +6,7 @@ import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:intl/intl.dart";
 import "package:m3e_card_list/m3e_card_list.dart";
 import "package:navigation_rail_m3e/navigation_rail_m3e.dart";
+import "package:nexus/models/setting.dart";
 import "package:nexus/models/settings_category.dart";
 import "package:nexus/widgets/divider_text.dart";
 import "package:nexus/widgets/settings/dialog_list_tile.dart";
@@ -14,45 +15,70 @@ import "package:super_sliver_list/super_sliver_list.dart";
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
 
-  static final IMap<String, IList<SettingsCategory>>
-  settingsCategoryGroups = .new({
-    "General": .new([
-      .new(
-        title: "Appearance",
-        icon: Icons.brush,
-        settings: .new([
-          .new(
-            title: "Dark Mode",
-            description:
-                "Toggle between Light Mode, Dark Mode, and System themes.",
-            widget: DialogListTile<ThemeMode>(
-              icon: Icon(Icons.palette),
-              title: "Dark Mode",
-              initialValue: ThemeMode.system,
-              options: ThemeMode.values,
-              getName: (option) => toBeginningOfSentenceCase(option.name),
-              onChanged: (value) {},
-            ),
-          ),
-          .new(
-            title: "Use Client Side Decorations",
-            description:
-                "On desktop, toggle between client-side or server-side decorations",
-            widget: SwitchListTile(
-              title: Text("Client Side Decorations"),
-              value: true,
-              onChanged: (value) {},
-            ),
-          ),
-        ]),
-      ),
-    ]),
-  });
-
   @override
   Widget build(BuildContext context, WidgetRef ref) => LayoutBuilder(
     builder: (_, constraints) => HookBuilder(
       builder: (context) {
+        final IMap<String, IList<SettingsCategory>>
+        settingsCategoryGroups = .new({
+          "General": .new([
+            .new(
+              title: "Appearance",
+              icon: Icons.brush,
+              settings: .new([
+                Setting<ThemeMode>(
+                  id: "dark_mode",
+                  title: "Dark Mode",
+                  initialValue: ThemeMode.system,
+                  description:
+                      "Toggle between Light Mode, Dark Mode, and System themes.",
+                  builder: (title, description, onChanged, currentValue) =>
+                      DialogListTile<ThemeMode>(
+                        icon: Icon(Icons.palette),
+                        title: title,
+                        subtitle: Text(description),
+                        initialValue: currentValue,
+                        options: ThemeMode.values,
+                        getName: (option) =>
+                            toBeginningOfSentenceCase(option.name),
+                        onChanged: onChanged,
+                      ),
+                ),
+                Setting<bool>(
+                  id: "use_csd",
+                  initialValue: true,
+                  title: "Use Client Side Decorations",
+                  description:
+                      "On desktop, toggle between client-side or server-side decorations",
+                  builder: (title, description, onChanged, currentValue) =>
+                      SwitchListTile(
+                        title: Text(title),
+                        secondary: Icon(Icons.border_top),
+                        subtitle: Text(description),
+                        value: currentValue,
+                        onChanged: onChanged,
+                      ),
+                ),
+                Setting<bool>(
+                  id: "use_system_font",
+                  title: "Use System Font",
+                  initialValue: true,
+                  description:
+                      "Use the system's sans and emoji fonts, instead of Flutter's bundled fonts. Turn this off if you are having issues rendering emoji.",
+                  builder: (title, description, onChanged, currentValue) =>
+                      SwitchListTile(
+                        title: Text(title),
+                        subtitle: Text(description),
+                        secondary: Icon(Icons.abc),
+                        value: currentValue,
+                        onChanged: onChanged,
+                      ),
+                ),
+              ]),
+            ),
+          ]),
+        });
+
         final categoriesArePages = constraints.maxWidth < 550;
 
         final selected = useState(0);
@@ -75,7 +101,7 @@ class SettingsPage extends ConsumerWidget {
                   slivers: [
                     SliverToBoxAdapter(
                       child: Padding(
-                        padding: EdgeInsets.all(12).copyWith(bottom: 4),
+                        padding: EdgeInsets.all(12).copyWith(bottom: 8),
                         child: searchBar,
                       ),
                     ),
@@ -146,33 +172,23 @@ class SettingsPage extends ConsumerWidget {
                     VerticalDivider(),
                     Expanded(
                       child: SuperListView(
-                        children: [
-                          SwitchListTile(
-                            title: Text("Settings Title"),
-                            value: false,
-                            onChanged: (value) {},
-                          ),
-                          SwitchListTile(
-                            title: Text("Settings Title"),
-                            value: false,
-                            onChanged: (value) {},
-                          ),
-                          SwitchListTile(
-                            title: Text("Settings Title"),
-                            value: false,
-                            onChanged: (value) {},
-                          ),
-                          SwitchListTile(
-                            title: Text("Settings Title"),
-                            value: false,
-                            onChanged: (value) {},
-                          ),
-                          SwitchListTile(
-                            title: Text("Settings Title"),
-                            value: false,
-                            onChanged: (value) {},
-                          ),
-                        ],
+                        padding: .symmetric(vertical: 12),
+                        children: settingsCategoryGroups
+                            .values
+                            .flattenedToList[selected.value]
+                            .settings
+                            .map(
+                              (setting) => Padding(
+                                padding: .only(bottom: 4),
+                                child: setting.builder(
+                                  setting.title,
+                                  setting.description,
+                                  (value) {},
+                                  setting.initialValue,
+                                ),
+                              ),
+                            )
+                            .toList(),
                       ),
                     ),
                   ],

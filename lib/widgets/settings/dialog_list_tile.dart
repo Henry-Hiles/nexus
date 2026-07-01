@@ -5,7 +5,7 @@ import "package:nexus/widgets/settings/radio_dialog.dart";
 class DialogListTile<T> extends ConsumerWidget {
   final T? initialValue;
   final String title;
-  final String? description;
+  final Widget? subtitle;
   final List<T> options;
   final bool required;
   final Icon icon;
@@ -19,7 +19,7 @@ class DialogListTile<T> extends ConsumerWidget {
     required this.options,
     required this.onChanged,
     required this.getName,
-    this.description,
+    this.subtitle,
     this.required = true,
   });
 
@@ -51,7 +51,7 @@ class DialogListTile<T> extends ConsumerWidget {
           ),
         ),
         title: Text(title),
-        subtitle: description == null ? null : Text(description!),
+        subtitle: subtitle,
         leading: icon,
         trailing: Chip(
           label: Text(
