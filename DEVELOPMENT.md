@@ -63,7 +63,7 @@ When possible, we prefer not to create global variables or methods. You can usua
 
 ## LLM/AI Assisted Contributions
 
-Largely LLM generated code is NOT allowed. All contributions should be written by humans, with minimal to no LLM assistance. Please disclose any usage of LLMs.
+LLM generated code is NOT allowed. All contributions should be written by humans. Using LLMs for interacting with others, e.g. for Comments, PRs, etc, is also not allowed.
 
 ## Code of Conduct
 
