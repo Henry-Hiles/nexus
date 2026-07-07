@@ -1,6 +1,7 @@
 import "dart:io";
 import "package:hooks/hooks.dart";
 import "package:code_assets/code_assets.dart";
+import "package:nexus/helpers/extensions/get_xcode_sdk.dart";
 
 Future<void> main(List<String> args) => build(args, (input, output) async {
   if (!input.config.buildCodeAssets) return;
@@ -16,6 +17,7 @@ Future<void> main(List<String> args) => build(args, (input, output) async {
       break;
     case OS.macOS:
       libFileName = "libgomuks.dylib";
+      env = {"SDKROOT": await getXCodeSDK()};
       break;
     case OS.windows:
       libFileName = "libgomuks.dll";

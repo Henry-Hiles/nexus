@@ -1,6 +1,7 @@
 import "dart:io";
 import "package:ffigen/ffigen.dart";
 import "package:path/path.dart";
+import "package:nexus/helpers/extensions/get_xcode_sdk.dart";
 
 void main(List<String> args) async {
   final repoDir = Directory.fromUri(Platform.script.resolve("../gomuks"));
@@ -14,7 +15,10 @@ void main(List<String> args) async {
     ),
     headers: Headers(
       entryPoints: [File(join(repoDir.path, "pkg", "ffi", "gomuksffi.h")).uri],
-      compilerOptions: ["--no-warnings"],
+      compilerOptions: [
+        "--no-warnings",
+        if (Platform.isMacOS) "${await getXCodeSDK()}/usr/include",
+      ],
     ),
     functions: Functions.includeAll,
   ).generate(
