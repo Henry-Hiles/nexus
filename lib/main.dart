@@ -62,7 +62,10 @@ void main() async {
   if (Platform.isLinux || Platform.isMacOS || Platform.isWindows) {
     await windowManager.ensureInitialized();
     await windowManager.waitUntilReadyToShow(
-      WindowOptions(titleBarStyle: TitleBarStyle.hidden),
+      WindowOptions(
+        titleBarStyle: TitleBarStyle.hidden,
+        windowButtonVisibility: false,
+      ),
     );
     await windowManager.setMinimumSize(Size.square(500));
   }
