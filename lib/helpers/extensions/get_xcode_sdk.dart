@@ -7,5 +7,5 @@ Future<String> getXCodeSDK() async {
     throw Exception("Failed to get XCode SDK\n${result.stderr}");
   }
 
-  return result.stdout;
+  return result.stdout.trim();
 }
