@@ -17,7 +17,7 @@ void main(List<String> args) async {
       entryPoints: [File(join(repoDir.path, "pkg", "ffi", "gomuksffi.h")).uri],
       compilerOptions: [
         "--no-warnings",
-        if (Platform.isMacOS) "${await getXCodeSDK()}/usr/include",
+        if (Platform.isMacOS) "-I${await getXCodeSDK()}/usr/include",
       ],
     ),
     functions: Functions.includeAll,
