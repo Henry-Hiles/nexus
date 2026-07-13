@@ -1,7 +1,9 @@
 import "dart:io";
+import "package:collection/collection.dart";
 import "package:hooks/hooks.dart";
 import "package:code_assets/code_assets.dart";
 import "package:nexus/helpers/extensions/get_xcode_sdk.dart";
+import "package:path/path.dart";
 
 Future<void> main(List<String> args) => build(args, (input, output) async {
   if (!input.config.buildCodeAssets) return;
@@ -10,14 +12,24 @@ Future<void> main(List<String> args) => build(args, (input, output) async {
   final targetArch = codeConfig.targetArchitecture;
 
   String libFileName;
-  Map<String, String> env = {};
+  Map<String, String> extraEnv = {};
   switch (targetOS) {
     case OS.linux:
       libFileName = "libgomuks.so";
       break;
     case OS.macOS:
       libFileName = "libgomuks.dylib";
-      env = {"SDKROOT": await getXCodeSDK()};
+      extraEnv = {
+        "SDKROOT": await getXCodeSDK(),
+        "CGO_ENABLED": "1",
+        "GOARCH": switch (targetArch) {
+          Architecture.arm64 => "arm64",
+          Architecture.x64 => "amd64",
+          _ => throw UnsupportedError(
+            "Unsupported macOS architecture: $targetArch",
+          ),
+        },
+      };
       break;
     case OS.windows:
       libFileName = "libgomuks.dll";
@@ -27,23 +39,48 @@ Future<void> main(List<String> args) => build(args, (input, output) async {
 
       final targetNdkApi = codeConfig.android.targetNdkApi;
 
+      Future<String?> findNdkFromSdk() async {
+        final androidHome =
+            Platform.environment["ANDROID_HOME"] ??
+            Platform.environment["ANDROID_SDK_ROOT"];
+        if (androidHome == null) return null;
+
+        final ndkDir = Directory(join(androidHome, "ndk"));
+        if (!await ndkDir.exists()) return null;
+
+        final versions = await ndkDir.list().toList();
+        return versions.sortedBy((file) => file.path).lastOrNull?.path;
+      }
+
       final ndkHome =
           Platform.environment["ANDROID_NDK_HOME"] ??
           Platform.environment["ANDROID_NDK_ROOT"] ??
           Platform.environment["NDK_HOME"] ??
-          await _findNdkFromSdk();
+          await findNdkFromSdk();
+
       if (ndkHome == null) {
         throw Exception(
           "Could not find Android NDK. Set ANDROID_NDK_HOME or install via sdkmanager.",
         );
       }
 
-      final hostTag = _ndkHostTag();
-      final (goArch, ccTriple) = _androidArch(targetArch);
+      // TODO: Someone please give me a way to detect host architecture so I can change this
+      final hostTag =
+          Platform.environment["ANDROID_HOST_TAG"] ??
+          "${Platform.operatingSystem}-x86_64";
+      final ccTriple = switch (targetArch) {
+        Architecture.arm64 => "aarch64-linux-android",
+        Architecture.arm => "armv7a-linux-androideabi",
+        Architecture.x64 => "x86_64-linux-android",
+        Architecture.ia32 => "i686-linux-android",
+        _ => throw UnsupportedError(
+          "Unsupported Android architecture: $targetArch",
+        ),
+      };
       final cc =
           "$ndkHome/toolchains/llvm/prebuilt/$hostTag/bin/$ccTriple$targetNdkApi-clang";
 
-      env = {"CGO_ENABLED": "1", "GOOS": "android", "GOARCH": goArch, "CC": cc};
+      extraEnv = {"GOOS": "android", "CC": cc};
       break;
     default:
       throw UnsupportedError("Unsupported OS: $targetOS");
@@ -56,10 +93,10 @@ Future<void> main(List<String> args) => build(args, (input, output) async {
     final buildDir = input.packageRoot.resolve("build/");
     libFile = buildDir.resolve("${targetArch.name}/$libFileName");
 
-    // goheif/dav1d supported on Android would need to fix upstream
     final tags = [
       "sqlite_fts5",
       "goolm",
+      // goheif/dav1d is not supported on Android, would need to be fixed upstream
       if (targetOS == OS.android) "noheic",
     ].join(",");
     print(
@@ -69,7 +106,17 @@ Future<void> main(List<String> args) => build(args, (input, output) async {
       "go",
       ["build", "-tags", tags, "-o", libFile.path, "-buildmode=c-shared"],
       workingDirectory: gomuksBuildDir.resolve("pkg/ffi/").toFilePath(),
-      environment: env.isNotEmpty ? env : null,
+      environment: {
+        "CGO_ENABLED": "1",
+        "GOARCH": switch (targetArch) {
+          Architecture.arm64 => "arm64",
+          Architecture.arm => "arm",
+          Architecture.x64 => "amd64",
+          Architecture.ia32 => "386",
+          _ => throw UnsupportedError("Unsupported architecture: $targetArch"),
+        },
+        ...extraEnv,
+      },
     );
 
     if (result.exitCode != 0) {
@@ -94,43 +141,3 @@ Future<void> main(List<String> args) => build(args, (input, output) async {
     ..dependencies.add(gomuksBuildDir);
   print("Done!");
 });
-
-Future<String?> _findNdkFromSdk() async {
-  // pretty sure this wont be needed with nix, i'll get this removed
-  final androidHome =
-      Platform.environment["ANDROID_HOME"] ??
-      Platform.environment["ANDROID_SDK_ROOT"];
-  if (androidHome == null) return null;
-  final ndkDir = Directory("$androidHome/ndk");
-  if (!await ndkDir.exists()) return null;
-  final versions = await ndkDir.list().toList();
-  if (versions.isEmpty) return null;
-  versions.sort((a, b) => a.path.compareTo(b.path));
-  return versions.last.path;
-}
-
-String _ndkHostTag() {
-  if (Platform.isMacOS) {
-    return "darwin-x86_64";
-  } else if (Platform.isLinux) {
-    return "linux-x86_64";
-  } else if (Platform.isWindows) {
-    return "windows-x86_64";
-  }
-  throw UnsupportedError("Unsupported host platform for Android NDK");
-}
-
-(String goArch, String ccTriple) _androidArch(Architecture arch) {
-  switch (arch) {
-    case Architecture.arm64:
-      return ("arm64", "aarch64-linux-android");
-    case Architecture.arm:
-      return ("arm", "armv7a-linux-androideabi");
-    case Architecture.x64:
-      return ("amd64", "x86_64-linux-android");
-    case Architecture.ia32:
-      return ("386", "i686-linux-android");
-    default:
-      throw UnsupportedError("Unsupported Android architecture: $arch");
-  }
-}
