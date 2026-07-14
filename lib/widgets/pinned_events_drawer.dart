@@ -57,10 +57,11 @@ class PinnedEventsDrawer extends HookConsumerWidget {
           ),
           AsyncData(:final value) ||
           AsyncLoading(:final value?) => ListView.builder(
-            padding: .symmetric(horizontal: 8),
+            padding: .all(8),
+            reverse: true,
             itemCount: value.length,
             itemBuilder: (context, index) {
-              final event = value[index];
+              final event = value.reversed[index];
 
               return InkWell(
                 borderRadius: .circular(12),
