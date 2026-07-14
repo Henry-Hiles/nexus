@@ -205,15 +205,11 @@ class RoomChatController extends AsyncNotifier<IList<Event>?> {
       .new(
         roomId: roomId,
         type: EventType.reaction.type,
-        content: {
-          "m.relates_to": {
-            "event_id": event.eventId,
-            "rel_type": "m.annotation",
-            "key": reaction,
-          },
-        },
+        content: ReactionContent(key: reaction),
         synchronous: true,
         disableEncryption: true,
+        relatesTo: event.eventId,
+        relationType: "m.annotation",
       ),
     );
   }

@@ -276,14 +276,23 @@ class MessageRenderer extends ConsumerWidget {
                             ],
                           ],
                         ),
-                        MessageContent(:final body) => Row(
-                          spacing: 8,
-                          mainAxisSize: .min,
-                          children: [
-                            Text("Unknown message type:", style: errorStyle),
-                            Text(body),
-                          ],
-                        ),
+                        MessageContent(:final body) =>
+                          body == null
+                              ? Text(
+                                  "This message is redacted",
+                                  style: errorStyle,
+                                )
+                              : Row(
+                                  spacing: 8,
+                                  mainAxisSize: .min,
+                                  children: [
+                                    Text(
+                                      "Unknown message type:",
+                                      style: errorStyle,
+                                    ),
+                                    Text(body),
+                                  ],
+                                ),
                         _ => throw Exception("This is impossible"),
                       },
                     ],

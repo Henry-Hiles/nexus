@@ -7,16 +7,17 @@ import "package:measure_size/measure_size.dart";
 import "package:nexus/controllers/account_data_controller.dart";
 import "package:nexus/controllers/client_controller.dart";
 import "package:nexus/controllers/client_state_controller.dart";
+import "package:nexus/controllers/pinned_ids_controller.dart";
 import "package:nexus/controllers/power_level_controller.dart";
 import "package:nexus/controllers/rooms_controller.dart";
 import "package:nexus/controllers/room_chat_controller.dart";
 import "package:nexus/controllers/via_controller.dart";
-import "package:nexus/models/configs/power_level_config.dart";
 import "package:nexus/models/content/message.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/models/relation_type.dart";
 import "package:nexus/widgets/composer/composer.dart";
 import "package:nexus/widgets/emoji_picker_button.dart";
+import "package:nexus/widgets/pinned_events_drawer.dart";
 import "package:nexus/widgets/renderers/event.dart";
 import "package:nexus/widgets/member_list.dart";
 import "package:nexus/widgets/room_appbar.dart";
@@ -61,8 +62,7 @@ class RoomChat extends HookConsumerWidget {
         appBar: RoomAppbar(
           roomId: this.roomId,
           isDesktop: isDesktop,
-          onOpenDrawer: (_) => Scaffold.of(context).openDrawer(),
-          onOpenMemberList: null,
+          onOpenDrawer: () => Scaffold.of(context).openDrawer(),
         ),
         body: nothing,
       );
@@ -80,6 +80,27 @@ class RoomChat extends HookConsumerWidget {
     final controllerData = ref.watch(controllerProvider);
 
     final topEventBeforeLoad = useState<String?>(null);
+
+    Future<void> jumpToId(String eventId) async {
+      final index = controllerData.value?.indexWhere(
+        (element) => element.eventId == eventId,
+      );
+      if (index == null) return;
+
+      listController.value.animateToItem(
+        index: index,
+        scrollController: scrollController,
+        alignment: 0.5,
+        duration: (_) => .new(milliseconds: 700),
+        curve: (_) => Curves.easeInOut,
+      );
+      highlightedEvent.value = eventId;
+      await Future.delayed(.new(seconds: 1), () {
+        if (highlightedEvent.value == eventId) {
+          highlightedEvent.value = null;
+        }
+      });
+    }
 
     Future<void> loadOlder() async {
       if (controllerData case AsyncData(:final value?)) {
@@ -177,6 +198,7 @@ class RoomChat extends HookConsumerWidget {
     IList<PopupMenuEntry> getEventOptions(Event event) {
       final danger = theme.colorScheme.error;
       final isSentByMe = event.sender == userId;
+
       return [
         if (ref.watch(
           PowerLevelController.provider(
@@ -229,7 +251,7 @@ class RoomChat extends HookConsumerWidget {
           ),
         if (ref.watch(
           PowerLevelController.provider(
-            PowerLevelConfig(eventType: .message, roomId: roomId),
+            .new(eventType: .message, roomId: roomId),
           ),
         ))
           PopupMenuItem(
@@ -249,6 +271,35 @@ class RoomChat extends HookConsumerWidget {
             },
             child: ListTile(leading: Icon(Icons.edit), title: Text("Edit")),
           ),
+        if (ref.watch(
+          PowerLevelController.provider(
+            .state(eventType: .pinnedEvents, roomId: roomId),
+          ),
+        ))
+          switch (ref
+              .watch(PinnedIdsController.provider(roomId))
+              .contains(event.eventId)) {
+            bool isPinned => PopupMenuItem(
+              onTap: () async {
+                try {
+                  final notifier = ref.read(
+                    PinnedIdsController.provider(roomId).notifier,
+                  );
+                  if (isPinned) {
+                    await notifier.removePin(event.eventId);
+                  } else {
+                    await notifier.addPin(event.eventId);
+                  }
+                } catch (error, stackTrace) {
+                  showError(error, stackTrace);
+                }
+              },
+              child: ListTile(
+                leading: Icon(Icons.push_pin),
+                title: Text(isPinned == true ? "Unpin Event" : "Pin Event"),
+              ),
+            ),
+          },
         PopupMenuItem(
           onTap: () async {
             final room = ref.watch(
@@ -384,131 +435,130 @@ class RoomChat extends HookConsumerWidget {
     }
 
     return Scaffold(
-      appBar: RoomAppbar(
-        roomId: roomId,
-        isDesktop: isDesktop,
-        onOpenDrawer: (_) => Scaffold.of(context).openDrawer(),
-        onOpenMemberList: (thisContext) {
-          memberListOpened.value = !memberListOpened.value;
-          Scaffold.of(thisContext).openEndDrawer();
-        },
+      endDrawer: PinnedEventsDrawer(
+        roomId,
+        getEventOptions: getEventOptions,
+        jumpToId: jumpToId,
       ),
-      body: Row(
-        children: [
-          Expanded(
-            child: Stack(
-              children: [
-                Positioned.fill(
-                  child: Padding(
-                    padding: .symmetric(horizontal: 4),
-                    child: switch (controllerData) {
-                      AsyncData(:final value?) ||
-                      AsyncLoading(:final value?) => CustomScrollView(
-                        controller: scrollController,
-                        slivers: [
-                          SliverToBoxAdapter(
-                            child: Padding(
-                              padding: .symmetric(vertical: 36),
-                              child: Center(
-                                child: ElevatedButton(
-                                  onPressed: controllerData is AsyncData
-                                      ? loadOlder
-                                      : null,
-                                  child: Text("Load More"),
+      body: Builder(
+        builder: (middleContext) => Scaffold(
+          endDrawer: showMembersByDefault ? null : MemberList(roomId),
+          appBar: RoomAppbar(
+            roomId: roomId,
+            isDesktop: isDesktop,
+            onOpenDrawer: Scaffold.of(context).openDrawer,
+            onOpenMemberList: (thisContext) {
+              memberListOpened.value = !memberListOpened.value;
+              Scaffold.of(thisContext).openEndDrawer();
+            },
+            onOpenPinnedMessagesList: () {
+              Scaffold.of(middleContext).openEndDrawer();
+            },
+          ),
+          body: Row(
+            children: [
+              Expanded(
+                child: Stack(
+                  children: [
+                    Positioned.fill(
+                      child: Padding(
+                        padding: .symmetric(horizontal: 4),
+                        child: switch (controllerData) {
+                          AsyncData(:final value?) ||
+                          AsyncLoading(:final value?) => CustomScrollView(
+                            controller: scrollController,
+                            slivers: [
+                              SliverToBoxAdapter(
+                                child: Padding(
+                                  padding: .symmetric(vertical: 36),
+                                  child: Center(
+                                    child: ElevatedButton(
+                                      onPressed: controllerData is AsyncData
+                                          ? loadOlder
+                                          : null,
+                                      child: Text("Load More"),
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
-                          ),
 
-                          SuperSliverList.builder(
-                            listController: listController.value,
-                            itemCount: value.length,
-                            itemBuilder: (_, index) {
-                              final event = value[index];
-                              final previousEvent = value.getOrNull(index - 1);
-                              return HighlightWrapper(
-                                EventRenderer(
-                                  event,
-                                  onTapReply: () async {
-                                    final replyId = event.replyTo;
-                                    listController.value.animateToItem(
-                                      index: value.indexWhere(
-                                        (element) => element.eventId == replyId,
-                                      ),
-                                      scrollController: scrollController,
-                                      alignment: 0.5,
-                                      duration: (_) => .new(milliseconds: 700),
-                                      curve: (_) => Curves.easeInOut,
-                                    );
-                                    highlightedEvent.value = replyId;
-                                    await Future.delayed(.new(seconds: 1), () {
-                                      if (highlightedEvent.value == replyId) {
-                                        highlightedEvent.value = null;
-                                      }
-                                    });
-                                  },
-                                  getEventOptions: getEventOptions,
-                                  isGrouped:
-                                      previousEvent?.content
-                                          is MessageContent &&
-                                      previousEvent?.redactedBy == null &&
-                                      previousEvent?.relationType !=
-                                          "m.replace" &&
-                                      "${event.sender}${event.pmp?.id}" ==
-                                          "${previousEvent?.sender}${previousEvent?.pmp?.id}",
-                                ),
-                                isHighlighted:
-                                    highlightedEvent.value == event.eventId,
-                              );
-                            },
-                          ),
+                              SuperSliverList.builder(
+                                listController: listController.value,
+                                itemCount: value.length,
+                                itemBuilder: (_, index) {
+                                  final event = value[index];
+                                  final previousEvent = value.getOrNull(
+                                    index - 1,
+                                  );
+                                  return HighlightWrapper(
+                                    EventRenderer(
+                                      event,
+                                      onTapReply: () =>
+                                          jumpToId(event.replyTo!),
+                                      getEventOptions: getEventOptions,
+                                      isGrouped:
+                                          previousEvent?.content
+                                              is MessageContent &&
+                                          previousEvent?.redactedBy == null &&
+                                          previousEvent?.relationType !=
+                                              "m.replace" &&
+                                          "${event.sender}${event.pmp?.id}" ==
+                                              "${previousEvent?.sender}${previousEvent?.pmp?.id}",
+                                    ),
+                                    isHighlighted:
+                                        highlightedEvent.value == event.eventId,
+                                  );
+                                },
+                              ),
 
-                          SliverPadding(
-                            padding: .only(bottom: composerSize.value),
+                              SliverPadding(
+                                padding: .only(bottom: composerSize.value),
+                              ),
+                            ],
                           ),
-                        ],
+                          AsyncData() => nothing,
+                          AsyncLoading() => Loading(),
+                          AsyncError(:final error, :final stackTrace) =>
+                            ErrorDialog(error, stackTrace),
+                        },
                       ),
-                      AsyncData() => nothing,
-                      AsyncLoading() => Loading(),
-                      AsyncError(:final error, :final stackTrace) =>
-                        ErrorDialog(error, stackTrace),
-                    },
-                  ),
-                ),
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: MeasureSize(
-                    onChange: (size) => composerSize.value = size.height,
-                    child: Composer(
-                      roomId,
-                      node: composerNode,
-                      onSend: (text, {required shouldMention, required tags}) =>
-                          notifier
-                              .send(
-                                text,
-                                tags: tags,
-                                relationType: relationType.value,
-                                shouldMention: shouldMention,
-                                relation: relatedEvent.value,
-                              )
-                              .onError(showError),
-                      relationType: relationType.value,
-                      relatedEvent: relatedEvent.value,
-                      onDismiss: () => relatedEvent.value = null,
                     ),
-                  ),
+                    Positioned(
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      child: MeasureSize(
+                        onChange: (size) => composerSize.value = size.height,
+                        child: Composer(
+                          roomId,
+                          node: composerNode,
+                          onSend:
+                              (text, {required shouldMention, required tags}) =>
+                                  notifier
+                                      .send(
+                                        text,
+                                        tags: tags,
+                                        relationType: relationType.value,
+                                        shouldMention: shouldMention,
+                                        relation: relatedEvent.value,
+                                      )
+                                      .onError(showError),
+                          relationType: relationType.value,
+                          relatedEvent: relatedEvent.value,
+                          onDismiss: () => relatedEvent.value = null,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
+              ),
 
-          if (memberListOpened.value == true && showMembersByDefault)
-            MemberList(roomId),
-        ],
+              if (memberListOpened.value == true && showMembersByDefault)
+                MemberList(roomId),
+            ],
+          ),
+        ),
       ),
-      endDrawer: showMembersByDefault ? null : MemberList(roomId),
     );
   }
 }

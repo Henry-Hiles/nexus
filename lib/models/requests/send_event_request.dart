@@ -1,4 +1,5 @@
 import "package:freezed_annotation/freezed_annotation.dart";
+import "package:nexus/models/content/content.dart";
 part "send_event_request.freezed.dart";
 part "send_event_request.g.dart";
 
@@ -7,7 +8,9 @@ abstract class SendEventRequest with _$SendEventRequest {
   const factory SendEventRequest({
     required String roomId,
     required String type,
-    required Map<String, dynamic> content,
+    required Content content,
+    String? relatesTo,
+    String? relationType,
     @Default(false) bool synchronous,
     @Default(false) bool disableEncryption,
   }) = _SendEventRequest;

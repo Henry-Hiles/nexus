@@ -7,8 +7,9 @@ part "pinned_events.g.dart";
 @freezed
 abstract class PinnedEventsContent extends Content with _$PinnedEventsContent {
   PinnedEventsContent._();
-  factory PinnedEventsContent({@Default(IList.empty()) IList<String> pinned}) =
-      _PinnedEventsContent;
+  factory PinnedEventsContent({
+    @Default(IList.empty()) @JsonKey(name: "pinned") IList<String> pinnedEvents,
+  }) = _PinnedEventsContent;
 
   factory PinnedEventsContent.fromJson(Map<String, Object?> json) =>
       _$PinnedEventsContentFromJson(json);

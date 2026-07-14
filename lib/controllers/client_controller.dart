@@ -28,6 +28,7 @@ import "package:nexus/models/requests/report_request.dart";
 import "package:nexus/models/requests/send_event_request.dart";
 import "package:nexus/models/requests/send_message_request.dart";
 import "package:nexus/models/requests/set_membership_request.dart";
+import "package:nexus/models/requests/set_state_request.dart";
 import "package:nexus/models/room.dart";
 import "package:nexus/models/sync_data.dart";
 import "package:nexus/src/third_party/gomuks.g.dart";
@@ -159,7 +160,10 @@ class ClientController extends AsyncNotifier<int> {
     calloc.free(bufferPointer);
 
     final json = response.buf.toJson();
-    if (json is String) throw json;
+    if (response.command.cast<Utf8>().toDartString() == "error") {
+      throw json;
+    }
+
     return json;
   }
 
@@ -169,8 +173,27 @@ class ClientController extends AsyncNotifier<int> {
   Future<Event> sendMessage(SendMessageRequest request) async =>
       Event.fromJson(await _sendCommand("send_message", request.toJson()));
 
-  Future<Event> sendEvent(SendEventRequest request) async =>
-      Event.fromJson(await _sendCommand("send_event", request.toJson()));
+  Future<Event> sendEvent(SendEventRequest request) async {
+    final json = request.toJson();
+    final content = request.content.toJson();
+
+    return Event.fromJson(
+      await _sendCommand("send_event", {
+        ...json,
+        "content": {
+          ...content,
+          "m.relates_to": {
+            ...((content["m.relates_to"] as Map<String, dynamic>?) ?? {}),
+            "event_id": request.relatesTo,
+            "rel_type": request.relationType,
+          },
+        },
+      }),
+    );
+  }
+
+  Future<String?> setState(SetStateRequest request) async =>
+      await _sendCommand("set_state", request.toJson());
 
   Future<String?> verify(String recoveryKey) async {
     try {

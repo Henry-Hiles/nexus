@@ -12,13 +12,15 @@ import "package:nexus/widgets/room_menu.dart";
 class RoomAppbar extends ConsumerWidget implements PreferredSizeWidget {
   final bool isDesktop;
   final void Function(BuildContext context)? onOpenMemberList;
-  final void Function(BuildContext context) onOpenDrawer;
+  final void Function()? onOpenPinnedMessagesList;
+  final void Function() onOpenDrawer;
   final String? roomId;
   const RoomAppbar({
     required this.roomId,
     required this.isDesktop,
     required this.onOpenDrawer,
     this.onOpenMemberList,
+    this.onOpenPinnedMessagesList,
     super.key,
   });
 
@@ -101,7 +103,7 @@ class RoomAppbar extends ConsumerWidget implements PreferredSizeWidget {
                     height: 24,
                     fallback: Icon(Icons.numbers),
                   )
-          : DrawerButton(onPressed: () => onOpenDrawer(context)),
+          : DrawerButton(onPressed: onOpenDrawer),
       scrolledUnderElevation: 0,
       title: room == null
           ? null
@@ -128,7 +130,7 @@ class RoomAppbar extends ConsumerWidget implements PreferredSizeWidget {
           ? .new()
           : .new([
               IconButton(
-                onPressed: null,
+                onPressed: onOpenPinnedMessagesList?.call,
                 icon: Icon(Icons.push_pin),
                 tooltip: "Open pinned messages",
               ),

@@ -10,7 +10,7 @@ part "message.g.dart";
 @Freezed(unionKey: "msgtype", fallbackUnion: "default")
 abstract class MessageContent extends Content with _$MessageContent {
   MessageContent._();
-  factory MessageContent({required String body}) = UnknownMessageContent;
+  factory MessageContent({String? body}) = UnknownMessageContent;
 
   @FreezedUnionValue("m.text")
   factory MessageContent.text({
