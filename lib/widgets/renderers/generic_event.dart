@@ -7,7 +7,7 @@ class GenericEventRenderer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: .only(bottom: 8),
+    padding: .symmetric(vertical: 4),
     child: Row(
       spacing: 8,
       children: [
