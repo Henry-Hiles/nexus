@@ -66,7 +66,7 @@ class PinnedEventsDrawer extends HookConsumerWidget {
               return InkWell(
                 borderRadius: .circular(12),
                 onTap: () {
-                  Navigator.pop(context);
+                  Navigator.of(context).pop();
                   jumpToId(event.eventId);
                 },
                 child: Padding(
