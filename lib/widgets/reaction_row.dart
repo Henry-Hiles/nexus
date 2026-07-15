@@ -21,93 +21,98 @@ class ReactionRow extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final clientState = ref.watch(ClientStateController.provider);
 
-    return switch (ref.watch(
-      ReactionsController.provider(
-        .new(roomId: event.roomId, eventRowId: event.rowId),
-      ),
-    )) {
-      AsyncData(value: final IMap<String, IList<String>>? reactors) ||
-      AsyncLoading(value: final reactors) => Wrap(
-        spacing: 4,
-        runSpacing: 4,
-        children: event.reactions
-            .where((_, value) => value != 0)
-            .mapTo(
-              (reaction, count) => HookBuilder(
-                builder: (context) {
-                  final enabled = useState(true);
+    return Padding(
+      padding: .only(top: 4),
+      child: switch (ref.watch(
+        ReactionsController.provider(
+          .new(roomId: event.roomId, eventRowId: event.rowId),
+        ),
+      )) {
+        AsyncData(value: final IMap<String, IList<String>>? reactors) ||
+        AsyncLoading(value: final reactors) => Wrap(
+          spacing: 4,
+          runSpacing: 4,
+          children: event.reactions
+              .where((_, value) => value != 0)
+              .mapTo(
+                (reaction, count) => HookBuilder(
+                  builder: (context) {
+                    final enabled = useState(true);
 
-                  final selected =
-                      reactors?[reaction]?.contains(clientState!.userId) ??
-                      false;
-                  return Tooltip(
-                    message: reactors?[reaction]?.join(", ") ?? "",
-                    child: ChoiceChip(
-                      showCheckmark: false,
-                      selected: selected,
-                      label: Row(
-                        mainAxisSize: .min,
-                        spacing: 8,
-                        children: [
-                          Flexible(
-                            child: reaction.startsWith("mxc://")
-                                ? Image(
-                                    height: 20,
-                                    image: CachedNetworkImage(
-                                      headers: ref.headers,
-                                      Uri.parse(reaction)
-                                          .mxcToHttps(
-                                            clientState!.homeserverUrl!,
-                                          )
-                                          .toString(),
-                                      ref.watch(CrossCacheController.provider),
-                                    ),
-                                  )
-                                : Text(reaction, overflow: .ellipsis),
-                          ),
-                          Text(count.toString(), overflow: .ellipsis),
-                        ],
-                      ),
-                      onSelected: enabled.value
-                          ? (value) async {
-                              enabled.value = false;
-                              try {
-                                final controller = ref.watch(
-                                  RoomChatController.provider(
-                                    event.roomId,
-                                  ).notifier,
-                                );
+                    final selected =
+                        reactors?[reaction]?.contains(clientState!.userId) ??
+                        false;
+                    return Tooltip(
+                      message: reactors?[reaction]?.join(", ") ?? "",
+                      child: ChoiceChip(
+                        showCheckmark: false,
+                        selected: selected,
+                        label: Row(
+                          mainAxisSize: .min,
+                          spacing: 8,
+                          children: [
+                            Flexible(
+                              child: reaction.startsWith("mxc://")
+                                  ? Image(
+                                      height: 20,
+                                      image: CachedNetworkImage(
+                                        headers: ref.headers,
+                                        Uri.parse(reaction)
+                                            .mxcToHttps(
+                                              clientState!.homeserverUrl!,
+                                            )
+                                            .toString(),
+                                        ref.watch(
+                                          CrossCacheController.provider,
+                                        ),
+                                      ),
+                                    )
+                                  : Text(reaction, overflow: .ellipsis),
+                            ),
+                            Text(count.toString(), overflow: .ellipsis),
+                          ],
+                        ),
+                        onSelected: enabled.value
+                            ? (value) async {
+                                enabled.value = false;
+                                try {
+                                  final controller = ref.watch(
+                                    RoomChatController.provider(
+                                      event.roomId,
+                                    ).notifier,
+                                  );
 
-                                if (selected) {
-                                  await controller
-                                      .removeReaction(
-                                        reaction,
-                                        event,
-                                        clientState!.userId!,
-                                      )
-                                      .onError(showError);
-                                } else {
-                                  await controller
-                                      .sendReaction(reaction, event)
-                                      .onError(showError);
+                                  if (selected) {
+                                    await controller
+                                        .removeReaction(
+                                          reaction,
+                                          event,
+                                          clientState!.userId!,
+                                        )
+                                        .onError(showError);
+                                  } else {
+                                    await controller
+                                        .sendReaction(reaction, event)
+                                        .onError(showError);
+                                  }
+                                } finally {
+                                  enabled.value = true;
                                 }
-                              } finally {
-                                enabled.value = true;
                               }
-                            }
-                          : null,
-                    ),
-                  );
-                },
-              ),
-            )
-            .toList(),
-      ),
+                            : null,
+                      ),
+                    );
+                  },
+                ),
+              )
+              .toList(),
+        ),
 
-      AsyncError(:final error, :final stackTrace) => ErrorDialog(
-        error,
-        stackTrace,
-      ),
-    };
+        AsyncError(:final error, :final stackTrace) => ErrorDialog(
+          error,
+          stackTrace,
+        ),
+      },
+    );
   }
 }

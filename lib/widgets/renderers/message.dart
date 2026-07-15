@@ -271,7 +271,6 @@ class MessageRenderer extends ConsumerWidget {
                                   case final UrlElement link?)
                                 UrlPreview(link.url),
 
-                              SizedBox(height: 4),
                               ReactionRow(event),
                             ],
                           ],
