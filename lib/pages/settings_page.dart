@@ -30,6 +30,7 @@ class SettingsPage extends ConsumerWidget {
 
         final searchBar = SearchAnchor.bar(
           barHintText: "Search...",
+          isFullScreen: categoriesArePages,
           suggestionsBuilder: (suggestionsContext, controller) async {
             final categories = await ref.watch(
               SettingsSectionsController.provider.future,
