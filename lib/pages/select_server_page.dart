@@ -63,6 +63,7 @@ class SelectServerPage extends HookConsumerWidget {
         child: ConstrainedBox(
           constraints: .new(maxWidth: 600),
           child: ListView(
+            padding: .symmetric(vertical: 8, horizontal: 12),
             children: [
               Row(
                 children: [
