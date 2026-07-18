@@ -12,7 +12,7 @@ extension SchemeToTheme on ColorScheme {
       backgroundColor: surfaceContainerLow,
     ),
     textTheme: ThemeData(
-      fontFamilyFallback: ["sans", "emoji"],
+      fontFamilyFallback: ["sans", "emoji", "fallback-sans", "fallback-emoji"],
       brightness: brightness,
     ).textTheme,
     inputDecorationTheme: const InputDecorationTheme(

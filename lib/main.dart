@@ -8,9 +8,11 @@ import "package:nexus/controllers/client_controller.dart";
 import "package:nexus/controllers/client_state_controller.dart";
 import "package:nexus/controllers/header_controller.dart";
 import "package:nexus/controllers/multi_provider_controller.dart";
+import "package:nexus/controllers/settings_controller.dart";
 import "package:nexus/controllers/shared_prefs_controller.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
 import "package:nexus/helpers/extensions/scheme_to_theme.dart";
+import "package:nexus/helpers/font_licenses.dart";
 import "package:nexus/pages/chat_page.dart";
 import "package:nexus/pages/select_server_page.dart";
 import "package:nexus/pages/verify_page.dart";
@@ -70,6 +72,8 @@ void main() async {
     await windowManager.setMinimumSize(Size.square(500));
   }
 
+  LicenseRegistry.addLicense(() => Stream.fromIterable(fontLicenses));
+
   FlutterError.onError = (FlutterErrorDetails details) =>
       showError(details.exception.toString(), details.stack);
 
@@ -90,20 +94,43 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => DynamicColorBuilder(
-    builder: (lightDynamic, darkDynamic) => MaterialApp(
-      navigatorKey: navigatorKey,
-      debugShowCheckedModeBanner: false,
-      // Use indigo to work around bugs in theme generation
-      theme: (lightDynamic ?? ColorScheme.fromSeed(seedColor: Colors.indigo))
-          .theme,
-      darkTheme:
-          (darkDynamic ??
-                  ColorScheme.fromSeed(
-                    seedColor: Colors.indigo,
-                    brightness: Brightness.dark,
-                  ))
-              .theme,
-      home: Scaffold(
+    builder: (lightDynamic, darkDynamic) => Consumer(
+      builder: (context, ref, child) => MaterialApp(
+        navigatorKey: navigatorKey,
+        debugShowCheckedModeBanner: false,
+        // Use indigo to work around bugs in theme generation
+        theme:
+            (ref
+                        .watch(SettingsController.provider)
+                        .maybeWhen(
+                          orElse: () => lightDynamic,
+                          data: (settings) =>
+                              settings.useDynamicTheming ? lightDynamic : null,
+                        ) ??
+                    ColorScheme.fromSeed(seedColor: Colors.indigo))
+                .theme,
+        darkTheme:
+            (ref
+                        .watch(SettingsController.provider)
+                        .maybeWhen(
+                          orElse: () => darkDynamic,
+                          data: (settings) =>
+                              settings.useDynamicTheming ? darkDynamic : null,
+                        ) ??
+                    ColorScheme.fromSeed(
+                      seedColor: Colors.indigo,
+                      brightness: Brightness.dark,
+                    ))
+                .theme,
+        themeMode: ref
+            .watch(SettingsController.provider)
+            .maybeWhen(
+              data: (settings) => settings.theme,
+              orElse: () => ThemeMode.system,
+            ),
+        home: child,
+      ),
+      child: Scaffold(
         body: Consumer(
           builder: (_, ref, _) => ref
               .watch(

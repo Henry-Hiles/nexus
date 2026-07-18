@@ -1,9 +1,11 @@
 import "dart:io";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/material.dart";
+import "package:hooks_riverpod/hooks_riverpod.dart";
+import "package:nexus/controllers/settings_controller.dart";
 import "package:window_manager/window_manager.dart";
 
-class Appbar extends StatelessWidget implements PreferredSizeWidget {
+class Appbar extends ConsumerWidget implements PreferredSizeWidget {
   final Widget? leading;
   final Widget? title;
   final Color? backgroundColor;
@@ -25,7 +27,7 @@ class Appbar extends StatelessWidget implements PreferredSizeWidget {
   Size get preferredSize => const .fromHeight(kToolbarHeight);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     Future<void> maximize() async {
       final isMaximized = await windowManager.isMaximized();
 
@@ -37,7 +39,13 @@ class Appbar extends StatelessWidget implements PreferredSizeWidget {
     }
 
     return GestureDetector(
-      onPanStart: (_) => windowManager.startDragging(),
+      onPanStart: ref
+          .watch(SettingsController.provider)
+          .whenOrNull(
+            data: (settings) => settings.linuxMobileMode
+                ? null
+                : (_) => windowManager.startDragging(),
+          ),
       child: AppBar(
         leading: InkWell(onTap: onTap, child: leading),
         backgroundColor: backgroundColor,
