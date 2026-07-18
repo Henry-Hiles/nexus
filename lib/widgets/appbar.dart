@@ -2,7 +2,7 @@ import "dart:io";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/material.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
-import "package:nexus/controllers/settings_controller.dart";
+import "package:nexus/controllers/settings.dart";
 import "package:window_manager/window_manager.dart";
 
 class Appbar extends ConsumerWidget implements PreferredSizeWidget {

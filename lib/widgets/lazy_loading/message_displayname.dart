@@ -1,6 +1,6 @@
 import "package:flutter/material.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
-import "package:nexus/controllers/author_controller.dart";
+import "package:nexus/controllers/author.dart";
 import "package:nexus/helpers/extensions/get_localpart.dart";
 import "package:nexus/helpers/extensions/show_user_popover.dart";
 import "package:nexus/helpers/extensions/string_to_color.dart";

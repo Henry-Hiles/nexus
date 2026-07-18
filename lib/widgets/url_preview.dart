@@ -1,8 +1,8 @@
 import "package:cross_cache/cross_cache.dart";
 import "package:flutter/material.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
-import "package:nexus/controllers/cross_cache_controller.dart";
-import "package:nexus/controllers/url_preview_controller.dart";
+import "package:nexus/controllers/cross_cache.dart";
+import "package:nexus/controllers/url_preview.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
 import "package:nexus/helpers/extensions/get_headers.dart";
 import "package:nexus/helpers/launch_helper.dart";

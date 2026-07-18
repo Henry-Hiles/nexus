@@ -1,7 +1,7 @@
 import "package:emoji_text_field/emoji_text_field.dart";
 import "package:flutter/material.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
-import "package:nexus/controllers/emoji_controller.dart";
+import "package:nexus/controllers/emoji.dart";
 
 class EmojiPickerButton extends HookConsumerWidget {
   final TextEditingController? controller;

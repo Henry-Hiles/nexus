@@ -1,11 +1,11 @@
 import "package:flutter/material.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
-import "package:nexus/controllers/rooms_controller.dart";
+import "package:nexus/controllers/rooms.dart";
 import "package:nexus/helpers/extensions/mxc_to_https.dart";
 import "package:nexus/widgets/appbar.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/widgets/expandable_image.dart";
-import "package:nexus/controllers/client_state_controller.dart";
+import "package:nexus/controllers/client_state.dart";
 import "package:nexus/widgets/linkified_text.dart";
 import "package:nexus/widgets/room_menu.dart";
 

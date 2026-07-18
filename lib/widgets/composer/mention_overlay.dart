@@ -1,8 +1,8 @@
 import "package:flutter/material.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
-import "package:nexus/controllers/members_by_status_controller.dart";
-import "package:nexus/controllers/rooms_controller.dart";
-import "package:nexus/controllers/via_controller.dart";
+import "package:nexus/controllers/members_by_status.dart";
+import "package:nexus/controllers/rooms.dart";
+import "package:nexus/controllers/via.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
 import "package:nexus/helpers/extensions/get_localpart.dart";
 import "package:nexus/models/content/membership.dart";

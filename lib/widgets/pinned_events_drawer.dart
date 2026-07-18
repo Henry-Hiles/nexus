@@ -1,7 +1,7 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/material.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
-import "package:nexus/controllers/pinned_events_controller.dart";
+import "package:nexus/controllers/pinned_events.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/widgets/error_dialog.dart";
 import "package:nexus/widgets/loading.dart";

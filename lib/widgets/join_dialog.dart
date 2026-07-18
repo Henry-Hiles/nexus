@@ -2,9 +2,9 @@ import "package:collection/collection.dart";
 import "package:flutter/material.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
-import "package:nexus/controllers/client_controller.dart";
-import "package:nexus/controllers/key_controller.dart";
-import "package:nexus/controllers/spaces_controller.dart";
+import "package:nexus/controllers/client.dart";
+import "package:nexus/controllers/key.dart";
+import "package:nexus/controllers/spaces.dart";
 import "package:nexus/helpers/extensions/link_to_mention.dart";
 
 class JoinDialog extends HookWidget {

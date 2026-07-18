@@ -1,0 +1,301 @@
+import "dart:ffi";
+import "dart:io";
+import "dart:isolate";
+import "dart:math";
+import "package:fast_immutable_collections/fast_immutable_collections.dart";
+import "package:ffi/ffi.dart";
+import "package:flutter/foundation.dart";
+import "package:nexus/controllers/account_data.dart";
+import "package:nexus/controllers/client_state.dart";
+import "package:nexus/controllers/init_complete.dart";
+import "package:nexus/controllers/rooms.dart";
+import "package:nexus/controllers/space_edges.dart";
+import "package:nexus/controllers/sync_status.dart";
+import "package:nexus/controllers/top_level_spaces.dart";
+import "package:nexus/helpers/extensions/gomuks_buffer.dart";
+import "package:nexus/main.dart";
+import "package:nexus/models/event.dart";
+import "package:nexus/models/paginate.dart";
+import "package:nexus/models/requests/get_event.dart";
+import "package:nexus/models/requests/get_related_events.dart";
+import "package:nexus/models/requests/get_room_state.dart";
+import "package:nexus/models/requests/join_room.dart";
+import "package:nexus/models/requests/login.dart";
+import "package:nexus/models/profile.dart";
+import "package:nexus/models/requests/paginate.dart";
+import "package:nexus/models/requests/redact_event.dart";
+import "package:nexus/models/requests/report.dart";
+import "package:nexus/models/requests/send_event.dart";
+import "package:nexus/models/requests/send_message.dart";
+import "package:nexus/models/requests/set_membership.dart";
+import "package:nexus/models/requests/set_state.dart";
+import "package:nexus/models/room.dart";
+import "package:nexus/models/sync_data.dart";
+import "package:nexus/src/third_party/gomuks.g.dart";
+import "package:flutter_riverpod/flutter_riverpod.dart";
+import "package:path_provider/path_provider.dart";
+
+class ClientController extends AsyncNotifier<int> {
+  @override
+  Future<int> build() async {
+    final Pointer<Char> root;
+    if (Platform.isAndroid) {
+      final dir = await getApplicationSupportDirectory();
+      root = "${dir.path}/gomuks".toNativeUtf8().cast();
+    } else {
+      root = nullptr.cast();
+    }
+
+    final handle = GomuksInit(root);
+
+    final callable =
+        NativeCallable<
+          Void Function(Pointer<Char>, Int64, GomuksOwnedBuffer)
+        >.listener((
+          Pointer<Char> command,
+          int requestId,
+          GomuksOwnedBuffer data,
+        ) {
+          try {
+            final muksEventType = command.cast<Utf8>().toDartString();
+            debugPrint("Handling $muksEventType...");
+            final decodedMuksEvent = data.toJson();
+
+            switch (muksEventType) {
+              case "client_state":
+                ref
+                    .watch(ClientStateController.provider.notifier)
+                    .set(.fromJson(decodedMuksEvent));
+                break;
+              case "sync_status":
+                ref
+                    .watch(SyncStatusController.provider.notifier)
+                    .set(.fromJson(decodedMuksEvent));
+                break;
+              case "init_complete":
+                ref.watch(InitCompleteController.provider.notifier).complete();
+                break;
+              case "send_complete":
+                final event = Event.fromJson(decodedMuksEvent["event"]);
+                ref
+                    .watch(RoomsController.provider.notifier)
+                    .update(
+                      .new({
+                        event.roomId: .new(events: .new({event.rowId: event})),
+                      }),
+                      .new(),
+                    );
+
+                break;
+              case "sync_complete":
+                final syncData = SyncData.fromJson(decodedMuksEvent);
+                final roomProvider = RoomsController.provider;
+                final accountDataProvider = AccountDataController.provider;
+
+                if (syncData.clearState) {
+                  ref.invalidate(roomProvider);
+                  ref.invalidate(accountDataProvider);
+                }
+
+                ref
+                    .watch(roomProvider.notifier)
+                    .update(syncData.rooms, syncData.leftRooms);
+                ref
+                    .watch(accountDataProvider.notifier)
+                    .update(syncData.accountData);
+
+                if (syncData.topLevelSpaces != null) {
+                  ref
+                      .watch(TopLevelSpacesController.provider.notifier)
+                      .set(syncData.topLevelSpaces!);
+                }
+
+                if (syncData.spaceEdges != null) {
+                  ref
+                      .watch(SpaceEdgesController.provider.notifier)
+                      .set(syncData.spaceEdges!);
+                }
+
+                // ref
+                //     .watch(SyncStatusController.provider.notifier)
+                //     .set(SyncStatus.fromJson(decodedMuksEvent));
+                break;
+              default:
+                debugPrint("Unhandled event: $muksEventType");
+            }
+            debugPrint("Finished handling $muksEventType...");
+          } catch (error, stackTrace) {
+            if (kDebugMode) {
+              debugPrintStack(stackTrace: stackTrace, label: error.toString());
+              rethrow;
+            } else {
+              showError(error, stackTrace);
+            }
+          }
+        });
+
+    ref.onDispose(() => GomuksDestroy(handle));
+    ref.onDispose(callable.close);
+
+    final errorCode = GomuksStart(handle, callable.nativeFunction);
+
+    if (errorCode == 0) return handle;
+    throw Exception("GomuksStart returned error code $errorCode");
+  }
+
+  Future<dynamic> _sendCommand(
+    String command, [
+    Map<String, dynamic> data = const {},
+  ]) async {
+    final bufferPointer = data.toGomuksBufferPtr();
+    final handle = await future;
+    final response = await Isolate.run(
+      () => GomuksSubmitCommand(
+        handle,
+        command.toNativeUtf8().cast<Char>(),
+        bufferPointer.ref,
+      ),
+    );
+
+    calloc.free(bufferPointer);
+
+    final json = response.buf.toJson();
+    if (response.command.cast<Utf8>().toDartString() == "error") {
+      throw json;
+    }
+
+    return json;
+  }
+
+  Future<void> redactEvent(RedactEventRequest report) =>
+      _sendCommand("redact_event", report.toJson());
+
+  Future<Event> sendMessage(SendMessageRequest request) async =>
+      Event.fromJson(await _sendCommand("send_message", request.toJson()));
+
+  Future<Event> sendEvent(SendEventRequest request) async {
+    final json = request.toJson();
+    final content = request.content.toJson();
+
+    return Event.fromJson(
+      await _sendCommand("send_event", {
+        ...json,
+        "content": {
+          ...content,
+          "m.relates_to": {
+            ...((content["m.relates_to"] as Map<String, dynamic>?) ?? {}),
+            "event_id": request.relatesTo,
+            "rel_type": request.relationType,
+          },
+        },
+      }),
+    );
+  }
+
+  Future<String?> setState(SetStateRequest request) async =>
+      await _sendCommand("set_state", request.toJson());
+
+  Future<String?> verify(String recoveryKey) async {
+    try {
+      await _sendCommand("verify", {"recovery_key": recoveryKey});
+      return null;
+    } catch (error) {
+      return error.toString();
+    }
+  }
+
+  Future<String> joinRoom(JoinRoomRequest request) async {
+    final response = await _sendCommand("join_room", request.toJson());
+    return response["room_id"];
+  }
+
+  Future<String?> getAccessToken() async {
+    final response = await _sendCommand("get_account_info", {});
+    return response?["access_token"];
+  }
+
+  Future<void> leaveRoom(Room room) async {
+    if (room.metadata == null) return;
+    await _sendCommand("leave_room", {"room_id": room.metadata!.id});
+  }
+
+  // (await _sendCommand("get_event_context", {
+  //   "room_id": request.roomId,
+  //   "event_id": r"$OqZT4NuTj0J1-771IOEEWRI4XdumRNu6ighlvO3K3gc",
+  // }));
+
+  Future<IList<Event>> getRoomState(GetRoomStateRequest request) async {
+    Future<List?> getState(GetRoomStateRequest request) async =>
+        (await _sendCommand("get_room_state", request.toJson())) as List?;
+    final response = await getState(request);
+
+    return .new(
+      (response ?? await getState(request.copyWith(refetch: true)) ?? []).map(
+        (event) => .fromJson(event),
+      ),
+    );
+  }
+
+  Future<IList<Event>?> getRelatedEvents(
+    GetRelatedEventsRequest request,
+  ) async {
+    final response =
+        (await _sendCommand("get_related_events", request.toJson())) as List?;
+    return .new(response?.map((event) => .fromJson(event)));
+  }
+
+  Future<Event?> getEvent(GetEventRequest request) async {
+    final json = await _sendCommand("get_event", request.toJson());
+    return json == null ? null : .fromJson(json);
+  }
+
+  Future<Paginate> paginate(PaginateRequest request) async =>
+      .fromJson(await _sendCommand("paginate", request.toJson()));
+
+  Future<Profile> getProfile(String userId) async {
+    final json = await _sendCommand("get_profile", {"user_id": userId});
+    return .fromJsonWithCatch({...json, "id": userId});
+  }
+
+  Future<void> reportEvent(ReportRequest request) =>
+      _sendCommand("report_event", request.toJson());
+
+  Future<void> setMembership(SetMembershipRequest request) =>
+      _sendCommand("set_membership", request.toJson());
+
+  Future<void> markRead(Room room) async {
+    final eventRowId = room.timeline[room.timeline.keys.reduce(max)];
+    final event = eventRowId == null ? null : room.events[eventRowId];
+    if (event == null || room.metadata == null) return;
+
+    await _sendCommand("mark_read", {
+      "room_id": room.metadata!.id,
+      "receipt_type": "m.read",
+      "event_id": event.eventId,
+    });
+  }
+
+  Future<String?> login(LoginRequest login) async {
+    try {
+      await _sendCommand("login", login.toJson());
+      return null;
+    } catch (error) {
+      return error.toString();
+    }
+  }
+
+  Future<Uri?> discoverHomeserver(Uri homeserver) async {
+    try {
+      final response = await _sendCommand("discover_homeserver", {
+        "user_id": "@fake-user:${homeserver.host}",
+      });
+      return Uri.parse(response["m.homeserver"]?["base_url"]);
+    } catch (error) {
+      return null;
+    }
+  }
+
+  static final provider = AsyncNotifierProvider<ClientController, int>(
+    ClientController.new,
+  );
+}

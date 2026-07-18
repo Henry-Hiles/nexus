@@ -1,6 +1,6 @@
 import "package:flutter/material.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
-import "package:nexus/controllers/user_controller.dart";
+import "package:nexus/controllers/user.dart";
 import "package:nexus/helpers/extensions/link_to_mention.dart";
 import "package:nexus/helpers/extensions/show_user_popover.dart";
 
