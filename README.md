@@ -113,29 +113,7 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
 - [ ] Notifications using UnifiedPush ([#35](https://git.federated.nexus/Nexus/nexus/issues/35))
 - [ ] Group calls using [MSC4195](https://github.com/matrix-org/matrix-spec-proposals/pull/4195)
 - [ ] Invites
-- [ ] Settings ([#37](https://git.federated.nexus/Nexus/nexus/issues/37))
-    - [ ] Matrix: URIs vs Matrix.to links
-    - [ ] Light/Dark mode
-    - [ ] Remote Gomuks instance
-    - [ ] SSD or CSD
-    - [ ] Align your message bubbles to left or right
-    - [ ] Show media by default
-    - [ ] Dynamic Theming
-    - [ ] Personas
-        - [ ] Setting per-message profiles for users (MSC4461)
-        - [ ] Explain how to send messages using a certain PMP
-    - [ ] Devices
-        - [ ] Viewing devices
-        - [ ] Verifying devices
-    - [ ] URL preview: Server / Sending Client (Beeper spec) / None
-    - [ ] Account changes
-        - [ ] Display name
-        - [ ] Profile picture
-        - [ ] Timezone
-        - [ ] Pronouns
-        - [ ] Password
-    - [ ] About
-    - [x] Log Out
+- [x] Settings
 
 ## Try it out
 
