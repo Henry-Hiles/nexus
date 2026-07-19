@@ -20,30 +20,32 @@ class ChatPage extends ConsumerWidget {
       final roomId = ref.watch(KeyController.provider(KeyController.roomKey));
       ref.read(EmojiController.provider);
 
-      return Scaffold(
-        appBar: initComplete ? null : Appbar(),
-        body: initComplete
-            ? Row(
-                children: [
-                  if (isDesktop) Sidebar(isDesktop: isDesktop),
-                  Expanded(
-                    child: RoomChat(
-                      roomId: roomId,
-                      isDesktop: isDesktop,
-                      showMembersByDefault: showMembersByDefault,
+      return SafeArea(
+        child: Scaffold(
+          appBar: initComplete ? null : Appbar(),
+          body: initComplete
+              ? Row(
+                  children: [
+                    if (isDesktop) Sidebar(isDesktop: isDesktop),
+                    Expanded(
+                      child: RoomChat(
+                        roomId: roomId,
+                        isDesktop: isDesktop,
+                        showMembersByDefault: showMembersByDefault,
+                      ),
                     ),
+                  ],
+                )
+              : Center(
+                  child: Column(
+                    mainAxisSize: .min,
+                    children: [Loading(), Text("Syncing...")],
                   ),
-                ],
-              )
-            : Center(
-                child: Column(
-                  mainAxisSize: .min,
-                  children: [Loading(), Text("Syncing...")],
                 ),
-              ),
-        drawer: isDesktop || !initComplete
-            ? null
-            : Sidebar(isDesktop: isDesktop),
+          drawer: isDesktop || !initComplete
+              ? null
+              : Sidebar(isDesktop: isDesktop),
+        ),
       );
     },
   );
