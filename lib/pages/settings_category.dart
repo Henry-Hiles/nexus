@@ -51,25 +51,27 @@ class SettingsCategoryPage extends HookConsumerWidget {
             appBar: AppBar(
               title: Text(sections.values.flattenedToList[index].title),
             ),
-            body: SuperListView(
-              controller: scrollController,
-              listController: listController.value,
-              padding: .symmetric(vertical: 12, horizontal: 8),
-              children: sections.values.flattenedToList[index].settings
-                  .mapIndexed(
-                    (index, setting) => Padding(
-                      padding: .only(bottom: 4),
-                      child: HighlightWrapper(
-                        setting.builder(
-                          setting.title,
-                          setting.description,
-                          setting.icon,
+            body: SafeArea(
+              child: SuperListView(
+                controller: scrollController,
+                listController: listController.value,
+                padding: .symmetric(vertical: 12, horizontal: 8),
+                children: sections.values.flattenedToList[index].settings
+                    .mapIndexed(
+                      (index, setting) => Padding(
+                        padding: .only(bottom: 4),
+                        child: HighlightWrapper(
+                          setting.builder(
+                            setting.title,
+                            setting.description,
+                            setting.icon,
+                          ),
+                          isHighlighted: highlight.value == index,
                         ),
-                        isHighlighted: highlight.value == index,
                       ),
-                    ),
-                  )
-                  .toList(),
+                    )
+                    .toList(),
+              ),
             ),
           ),
         );
