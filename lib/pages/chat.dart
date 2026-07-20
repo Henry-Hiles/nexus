@@ -18,6 +18,7 @@ class ChatPage extends ConsumerWidget {
       final showMembersByDefault = constraints.maxWidth > 1000;
       final initComplete = ref.watch(InitCompleteController.provider);
       final roomId = ref.watch(KeyController.provider(KeyController.roomKey));
+
       ref.read(EmojiController.provider);
 
       return SafeArea(

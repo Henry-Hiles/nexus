@@ -30,7 +30,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace = "nexus.federated.Nexus"
+    namespace = "nexus.federated.nexus"
     ndkVersion = flutter.ndkVersion
     compileSdk = 34
 
@@ -45,7 +45,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "nexus.federated.Nexus"
+        applicationId = "nexus.federated.nexus"
         minSdk = 29
         targetSdkVersion flutter.targetSdkVersion
         versionCode = flutterVersionCode.toInteger()

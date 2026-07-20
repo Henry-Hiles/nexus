@@ -120,14 +120,10 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
 If you want to try out Nexus, grab one of the following artifacts from CI:
 
 - [Android APK](https://nightly.link/Henry-Hiles/nexus/workflows/android/main/APK.zip)
-- Windows
-    - [Portable Build](https://nightly.link/Henry-Hiles/nexus/workflows/windows/main/windows-portable.zip)
-    - [Installer](https://nightly.link/Henry-Hiles/nexus/workflows/windows/main/windows-installer.zip)
+- [Windows EXE](https://nightly.link/Henry-Hiles/nexus/workflows/windows/main/windows-installer.zip)
 - Flatpak
     - [AArch64/Arm64](https://nightly.link/Henry-Hiles/nexus/workflows/flatpak/main/flatpak-aarch64.zip)
     - [x86_64/AMD64](https://nightly.link/Henry-Hiles/nexus/workflows/flatpak/main/flatpak-x86_64.zip)
-
-Or, try the Nix package: `nix run git+https://git.federated.nexus/Nexus/nexus`
 
 ## Build it yourself
 

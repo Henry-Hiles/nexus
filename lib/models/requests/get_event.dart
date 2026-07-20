@@ -2,9 +2,8 @@ import "package:freezed_annotation/freezed_annotation.dart";
 part "get_event.freezed.dart";
 part "get_event.g.dart";
 
-@Freezed()
+@freezed
 abstract class GetEventRequest with _$GetEventRequest {
-  const GetEventRequest._();
   const factory GetEventRequest({
     required String roomId,
     required String eventId,

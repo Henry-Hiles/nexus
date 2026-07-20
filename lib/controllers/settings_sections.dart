@@ -3,6 +3,8 @@ import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/material.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:intl/intl.dart";
+import "package:m3e_buttons/m3e_buttons.dart";
+import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/settings.dart";
 import "package:nexus/models/settings_category.dart";
 import "package:nexus/main.dart";
@@ -87,11 +89,46 @@ class SettingsSectionsController
           ]),
         ),
       ]),
+      "Account": .new([
+        .new(title: "Profile", icon: Icons.person, settings: .new([])),
+        .new(
+          title: "Other",
+          icon: Icons.key,
+          settings: .new([
+            .new(
+              title: "Log Out",
+              description:
+                  "Log out of your account, returning you to the login page.",
+              builder: (title, description, icon) => Builder(
+                builder: (context) {
+                  final colorScheme = Theme.of(context).colorScheme;
+                  return M3EButton.icon(
+                    onPressed: () async {
+                      await ref
+                          .watch(ClientController.provider.notifier)
+                          .logout();
+                      if (context.mounted) Navigator.of(context).pop();
+                    },
+                    label: Text(title),
+                    icon: Icon(icon),
+                    tooltip: description,
+                    decoration: .styleFrom(
+                      backgroundColor: colorScheme.errorContainer,
+                      foregroundColor: colorScheme.onErrorContainer,
+                    ),
+                  );
+                },
+              ),
+              icon: Icons.logout,
+            ),
+          ]),
+        ),
+      ]),
     });
   }
 
   static final provider =
-      AsyncNotifierProvider<
+      AsyncNotifierProvider.autoDispose<
         SettingsSectionsController,
         IMap<String, IList<SettingsCategory>>
       >(SettingsSectionsController.new);

@@ -1,11 +1,14 @@
+import "package:app_links/app_links.dart";
 import "package:flutter/material.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:flutter_svg/flutter_svg.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
+import "package:nexus/controllers/auth_url.dart";
 import "package:nexus/controllers/client.dart";
+import "package:nexus/controllers/client_id.dart";
 import "package:nexus/helpers/launch_helper.dart";
+import "package:nexus/main.dart";
 import "package:nexus/models/homeserver.dart";
-import "package:nexus/pages/login.dart";
 import "package:nexus/widgets/appbar.dart";
 import "package:nexus/widgets/divider_text.dart";
 
@@ -32,7 +35,7 @@ class SelectServerPage extends HookConsumerWidget {
         final newUrl = newHomeserver == null
             ? null
             : await ref
-                  .watch(ClientController.provider.notifier)
+                  .read(ClientController.provider.notifier)
                   .discoverHomeserver(newHomeserver);
 
         if (context.mounted) {
@@ -47,11 +50,42 @@ class SelectServerPage extends HookConsumerWidget {
               ),
             );
           } else {
-            await Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => LoginPage(homeserver: newUrl)),
+            final codeResponse = await ref.watch(
+              AuthUrlController.provider(newUrl).future,
             );
+
+            await ref.watch(LaunchHelper.provider).launchUrl(codeResponse.url);
+
+            AppLinks().uriLinkStream.listen((encodedUri) async {
+              final code = encodedUri.queryParameters["code"];
+
+              if (code != null) {
+                await ref
+                    .watch(ClientController.provider.notifier)
+                    .exchangeToken(
+                      .new(
+                        homeserverUrl: newUrl,
+                        codeVerifier: codeResponse.codeVerifier,
+                        redirectUri: .new(
+                          scheme: "nexus.federated.nexus",
+                          path: "/",
+                        ),
+                        code: code,
+                        clientId: await ref.watch(
+                          ClientIdController.provider(newUrl).future,
+                        ),
+                      ),
+                    )
+                    .onError(showError);
+              }
+            });
+            // await Navigator.of(context).push(
+            //   MaterialPageRoute(builder: (_) => LoginPage(homeserver: newUrl)),
+            // );
           }
         }
+      } catch (error, stackTrace) {
+        showError(error, stackTrace);
       } finally {
         isLoading.value = false;
       }

@@ -2,8 +2,9 @@
 Name=Nexus
 GenericName=Matrix Client
 Comment=A simple and user-friendly Matrix client
-Exec=nexus
+Exec=nexus %u
 Icon=nexus
 Terminal=false
 Type=Application
 Categories=Chat;Network;InstantMessaging;
+MimeType=x-scheme-handler/nexus.federated.nexus;

@@ -15,3 +15,7 @@ Source: "..\build\windows\x64\runner\Release\*"; DestDir: "{app}"; Flags: recurs
 [Icons]
 Name: "{group}\Nexus"; Filename: "{app}\nexus.exe"
 Name: "{commondesktop}\Nexus"; Filename: "{app}\nexus.exe"
+
+[Registry]
+Root: HKCU; Subkey: "Software\Classes\nexus.federated.nexus"; ValueType: string; ValueName: "URL Protocol"; ValueData: ""
+Root: HKCU; Subkey: "Software\Classes\nexus.federated.nexus\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\nexus.exe"" ""%1"""

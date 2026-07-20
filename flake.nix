@@ -52,7 +52,7 @@
               flatpak = inputs.nix2flatpak.lib.${system}.mkFlatpak {
                 appName = "Nexus";
                 developer = "QuadRadical";
-                appId = "nexus.federated.Nexus";
+                appId = "nexus.federated.nexus";
                 package = default;
                 runtime = "org.gnome.Platform/49";
                 permissions = {

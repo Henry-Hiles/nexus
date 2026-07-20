@@ -79,6 +79,7 @@ void main() async {
 
   runApp(
     ProviderScope(
+      retry: null,
       observers: [
         // Change false to true if you want debug information on provider reloads
         // ignore: dead_code

@@ -15,13 +15,16 @@ import "package:nexus/controllers/top_level_spaces.dart";
 import "package:nexus/helpers/extensions/gomuks_buffer.dart";
 import "package:nexus/main.dart";
 import "package:nexus/models/event.dart";
+import "package:nexus/models/oauth_auth_code_response.dart";
 import "package:nexus/models/paginate.dart";
 import "package:nexus/models/requests/get_event.dart";
 import "package:nexus/models/requests/get_related_events.dart";
 import "package:nexus/models/requests/get_room_state.dart";
 import "package:nexus/models/requests/join_room.dart";
-import "package:nexus/models/requests/login.dart";
 import "package:nexus/models/profile.dart";
+import "package:nexus/models/requests/oauth/exchange_token.dart";
+import "package:nexus/models/requests/oauth/get_auth_url.dart";
+import "package:nexus/models/requests/oauth/register_client.dart";
 import "package:nexus/models/requests/paginate.dart";
 import "package:nexus/models/requests/redact_event.dart";
 import "package:nexus/models/requests/report.dart";
@@ -263,6 +266,8 @@ class ClientController extends AsyncNotifier<int> {
   Future<void> setMembership(SetMembershipRequest request) =>
       _sendCommand("set_membership", request.toJson());
 
+  Future<void> logout() => _sendCommand("logout");
+
   Future<void> markRead(Room room) async {
     final eventRowId = room.timeline[room.timeline.keys.reduce(max)];
     final event = eventRowId == null ? null : room.events[eventRowId];
@@ -275,14 +280,19 @@ class ClientController extends AsyncNotifier<int> {
     });
   }
 
-  Future<String?> login(LoginRequest login) async {
-    try {
-      await _sendCommand("login", login.toJson());
-      return null;
-    } catch (error) {
-      return error.toString();
-    }
-  }
+  Future<String> registerClient(OAuthRegisterClientRequest request) async =>
+      (await _sendCommand(
+        "oauth_register_client",
+        request.toJson(),
+      ))["client_id"];
+
+  Future<OAuthAuthCodeResponse> getAuthUrl(OAuthGetAuthUrl request) async =>
+      .fromJson(
+        await _sendCommand("oauth_get_authorization_url", request.toJson()),
+      );
+
+  Future<void> exchangeToken(OAuthExchangeTokenRequest request) async =>
+      await _sendCommand("oauth_exchange_token", request.toJson());
 
   Future<Uri?> discoverHomeserver(Uri homeserver) async {
     try {

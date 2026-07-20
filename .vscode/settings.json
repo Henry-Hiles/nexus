@@ -10,6 +10,7 @@
         "msgtype",
         "muks",
         "prefs",
-        "unban"
+        "unban",
+        "unredact"
     ]
 }

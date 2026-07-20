@@ -19,7 +19,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: 3.41.9
+          flutter-version: 3.44.4
 
       - name: Set up Go
         uses: actions/setup-go@v6
@@ -51,12 +51,6 @@ jobs:
           cp /mingw64/bin/libgcc_s_seh-1.dll build/windows/x64/runner/Release/
           cp /mingw64/bin/libwinpthread-1.dll build/windows/x64/runner/Release/
           cp /mingw64/bin/libstdc++-6.dll build/windows/x64/runner/Release/
-
-      - name: Upload exe zip
-        uses: actions/upload-artifact@v6
-        with:
-          name: windows-portable
-          path: build/windows/x64/runner/Release/
 
       - name: Install Inno Setup
         run: choco install innosetup -y
