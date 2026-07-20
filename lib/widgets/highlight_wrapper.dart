@@ -14,7 +14,7 @@ class HighlightWrapper extends StatelessWidget {
           ? Theme.of(context).colorScheme.onSurface.withAlpha(50)
           : Colors.transparent,
       duration: .new(milliseconds: 250),
-      child: child,
+      child: Material(color: Colors.transparent, child: child),
     ),
   );
 }
