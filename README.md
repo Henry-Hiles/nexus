@@ -22,10 +22,7 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
     - [ ] MacOS ([#50](https://git.federated.nexus/Nexus/nexus/issues/50))
     - [ ] iOS
     - [ ] Web (may not be possible)
-- [x] Login
-    - [x] Username / password auth
-    - [ ] OAuth / OIDC
-    - [x] Improve initial sync experience
+- [x] Login (via OAuth)
 - [x] Rooms / Spaces
     - [x] Displaying and choosing
     - [x] Reading, showing unread
