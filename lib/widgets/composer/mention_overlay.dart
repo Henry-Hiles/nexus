@@ -73,20 +73,23 @@ class MentionOverlay extends ConsumerWidget {
                                     :final displayName,
                                     :final avatarUrl,
                                   ) =>
-                                    ListTile(
-                                      leading: AvatarOrHash(
-                                        avatarUrl,
-                                        displayName ??
-                                            member.stateKey!.localpart,
-                                      ),
-                                      title: Text(
-                                        displayName ??
-                                            member.stateKey!.localpart,
-                                      ),
-                                      subtitle: Text(member.stateKey!),
-                                      onTap: () => addTag(
-                                        id: "[@$displayName](matrix:u/${member.stateKey!.substring(1)})",
-                                        name: member.stateKey!.localpart,
+                                    Material(
+                                      color: Colors.transparent,
+                                      child: ListTile(
+                                        leading: AvatarOrHash(
+                                          avatarUrl,
+                                          displayName ??
+                                              member.stateKey!.localpart,
+                                        ),
+                                        title: Text(
+                                          displayName ??
+                                              member.stateKey!.localpart,
+                                        ),
+                                        subtitle: Text(member.stateKey!),
+                                        onTap: () => addTag(
+                                          id: "[@$displayName](matrix:u/${member.stateKey!.substring(1)})",
+                                          name: member.stateKey!.localpart,
+                                        ),
                                       ),
                                     ),
                                   _ => SizedBox.shrink(),
@@ -113,31 +116,34 @@ class MentionOverlay extends ConsumerWidget {
                             room.metadata?.canonicalAlias ??
                             room.metadata?.id ??
                             "Unknown Room";
-                        return ListTile(
-                          leading: AvatarOrHash(
-                            room.metadata?.avatar,
-                            name,
-                            fallback: Icon(Icons.numbers),
+                        return Material(
+                          color: Colors.transparent,
+                          child: ListTile(
+                            leading: AvatarOrHash(
+                              room.metadata?.avatar,
+                              name,
+                              fallback: Icon(Icons.numbers),
+                            ),
+                            title: Text(name),
+                            subtitle: room.metadata?.topic == null
+                                ? null
+                                : Text(room.metadata!.topic!, maxLines: 1),
+                            onTap: () {
+                              final vias = ref.watch(
+                                ViaController.provider(room),
+                              );
+                              addTag(
+                                id: "[#$name](matrix:roomid/${room.metadata?.id.substring(1)}$vias)",
+                                name:
+                                    (room.metadata?.canonicalAlias ??
+                                            room.metadata?.id)
+                                        ?.substring(1)
+                                        .split(":")
+                                        .first ??
+                                    "",
+                              );
+                            },
                           ),
-                          title: Text(name),
-                          subtitle: room.metadata?.topic == null
-                              ? null
-                              : Text(room.metadata!.topic!, maxLines: 1),
-                          onTap: () {
-                            final vias = ref.watch(
-                              ViaController.provider(room),
-                            );
-                            addTag(
-                              id: "[#$name](matrix:roomid/${room.metadata?.id.substring(1)}$vias)",
-                              name:
-                                  (room.metadata?.canonicalAlias ??
-                                          room.metadata?.id)
-                                      ?.substring(1)
-                                      .split(":")
-                                      .first ??
-                                  "",
-                            );
-                          },
                         );
                       })
                       .toList(),
