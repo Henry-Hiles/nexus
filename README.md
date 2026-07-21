@@ -93,7 +93,7 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
 - [x] Reactions
 - [x] Pins
     - [x] Displaying
-    - [x] Creating
+    - [x] Pinning/Unpinning
 - [ ] Threads
 - [x] Profile popouts
     - [x] Working actions
