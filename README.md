@@ -86,8 +86,6 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
                 - [ ] Clickable
         - [x] Custom emojis/stickers
         - [x] History loading
-            - [x] Backwards
-            - [ ] Forwards
     - [x] Editing
     - [x] Deleting
 - [x] Reactions
