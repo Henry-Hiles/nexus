@@ -37,8 +37,9 @@ class SettingsPage extends ConsumerWidget {
             );
             final query = controller.text.toLowerCase();
 
-            final matches = categories.values
-                .expand((categoryList) => categoryList.asMap().entries)
+            final matches = categories.values.flattenedToList
+                .asMap()
+                .entries
                 .expand(
                   (categoryEntry) => categoryEntry.value.settings
                       .asMap()
