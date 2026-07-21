@@ -19,7 +19,7 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
     - [x] Linux
     - [x] Windows
     - [x] Android
-    - [ ] MacOS
+    - [ ] MacOS ([#50](https://git.federated.nexus/Nexus/nexus/issues/50))
     - [ ] iOS
     - [ ] Web (may not be possible)
 - [x] Login
