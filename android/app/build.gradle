@@ -40,7 +40,6 @@ android {
     }
 
     kotlinOptions {
-        // do we want to update.. eventually?
         jvmTarget = "17"
     }
 
