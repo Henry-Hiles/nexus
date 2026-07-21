@@ -9,6 +9,7 @@ import "package:nexus/controllers/client_id.dart";
 import "package:nexus/helpers/launch_helper.dart";
 import "package:nexus/main.dart";
 import "package:nexus/models/homeserver.dart";
+import "package:nexus/pages/settings.dart";
 import "package:nexus/widgets/appbar.dart";
 import "package:nexus/widgets/divider_text.dart";
 
@@ -92,7 +93,15 @@ class SelectServerPage extends HookConsumerWidget {
     }
 
     return Scaffold(
-      appBar: Appbar(),
+      appBar: Appbar(
+        actions: .new([
+          IconButton(
+            onPressed: () =>
+                showDialog(context: context, builder: (_) => SettingsPage()),
+            icon: Icon(Icons.settings),
+          ),
+        ]),
+      ),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
