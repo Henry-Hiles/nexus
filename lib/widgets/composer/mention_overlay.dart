@@ -101,15 +101,18 @@ class MentionOverlay extends ConsumerWidget {
                           ? rooms.values
                           : rooms.values.where(
                               (room) =>
-                                  (room.metadata?.name ?? room.metadata!.id)
+                                  (room.metadata?.name ??
+                                          room.metadata?.id ??
+                                          "")
                                       .toLowerCase()
                                       .contains(query.toLowerCase()),
                             ))
                       .map((room) {
                         final name =
                             room.metadata?.name ??
-                            room.metadata!.canonicalAlias ??
-                            room.metadata!.id;
+                            room.metadata?.canonicalAlias ??
+                            room.metadata?.id ??
+                            "Unknown Room";
                         return ListTile(
                           leading: AvatarOrHash(
                             room.metadata?.avatar,
