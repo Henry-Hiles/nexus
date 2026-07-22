@@ -14,6 +14,7 @@ import "package:nexus/controllers/sync_status.dart";
 import "package:nexus/controllers/top_level_spaces.dart";
 import "package:nexus/helpers/extensions/gomuks_buffer.dart";
 import "package:nexus/main.dart";
+import "package:nexus/models/content/message.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/models/oauth_auth_code_response.dart";
 import "package:nexus/models/paginate.dart";
@@ -32,6 +33,7 @@ import "package:nexus/models/requests/send_event.dart";
 import "package:nexus/models/requests/send_message.dart";
 import "package:nexus/models/requests/set_membership.dart";
 import "package:nexus/models/requests/set_state.dart";
+import "package:nexus/models/requests/upload_media.dart";
 import "package:nexus/models/room.dart";
 import "package:nexus/models/sync_data.dart";
 import "package:nexus/src/third_party/gomuks.g.dart";
@@ -265,6 +267,9 @@ class ClientController extends AsyncNotifier<int> {
 
   Future<void> setMembership(SetMembershipRequest request) =>
       _sendCommand("set_membership", request.toJson());
+
+  Future<MessageContent> uploadMedia(UploadMediaRequest request) async =>
+      .fromJson(await _sendCommand("upload_media", request.toJson()));
 
   Future<void> logout() => _sendCommand("logout");
 

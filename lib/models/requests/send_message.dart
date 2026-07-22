@@ -1,5 +1,6 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:freezed_annotation/freezed_annotation.dart";
+import "package:nexus/models/content/content.dart";
 import "package:nexus/models/relation_type.dart";
 part "send_message.freezed.dart";
 part "send_message.g.dart";
@@ -9,6 +10,7 @@ abstract class SendMessageRequest with _$SendMessageRequest {
   const factory SendMessageRequest({
     required String roomId,
     required String text,
+    Content? baseContent,
     @Default(Mentions()) @JsonKey(name: "mentions") Mentions mentions,
     @JsonKey(name: "relates_to") Relation? relation,
   }) = _SendMessageRequest;

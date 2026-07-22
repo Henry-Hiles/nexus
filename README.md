@@ -48,7 +48,7 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
         - [x] Replies
             - [x] Choose ping on/off
         - [x] Per message profiles
-        - [ ] Attachments
+        - [x] Attachments
         - [ ] Commands with [MSC4391](https://github.com/matrix-org/matrix-spec-proposals/pull/4391)
         - [x] Mentions
             - [x] Users

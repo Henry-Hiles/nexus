@@ -1,9 +1,13 @@
+import "dart:io";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
+import "package:file_selector/file_selector.dart";
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:fluttertagger/fluttertagger.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
+import "package:nexus/controllers/attachment.dart";
+import "package:nexus/controllers/image_picker.dart";
 import "package:nexus/controllers/power_level.dart";
 import "package:nexus/models/content/message.dart";
 import "package:nexus/models/event.dart";
@@ -11,6 +15,7 @@ import "package:nexus/models/relation_type.dart";
 import "package:nexus/widgets/composer/mention_overlay.dart";
 import "package:nexus/widgets/composer/relation_preview.dart";
 import "package:nexus/widgets/emoji_picker_button.dart";
+import "package:nexus/main.dart";
 
 class Composer extends HookConsumerWidget {
   final String roomId;
@@ -68,131 +73,190 @@ class Composer extends HookConsumerWidget {
       fontWeight: .bold,
     );
 
+    final attachment = ref.watch(AttachmentController.provider(roomId));
+
     return Padding(
       padding: .all(12),
-      child: ClipRRect(
-        borderRadius: .all(.circular(12)),
-        child: Column(
-          children: [
-            RelationPreview(
-              relatedEvent,
-              shouldMention: shouldMention.value,
-              toggleShouldMention: () =>
-                  shouldMention.value = !shouldMention.value,
-              relationType: relationType,
-              onDismiss: onDismiss,
+      child: Column(
+        children: [
+          if (attachment != null)
+            Card(
+              margin: .only(bottom: 8),
+              child: ListTile(
+                leading: attachment.$2 == null
+                    ? SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(),
+                      )
+                    : Icon(Icons.file_copy),
+                title: Text(attachment.$1),
+                trailing: IconButton(
+                  onPressed: () =>
+                      ref.invalidate(AttachmentController.provider(roomId)),
+                  icon: Icon(Icons.close),
+                ),
+              ),
             ),
-            Container(
-              color: theme.colorScheme.surfaceContainerHighest,
-              padding: .symmetric(horizontal: 8),
-              child: Row(
-                spacing: 8,
-                mainAxisAlignment: .center,
-                children:
-                    ref.watch(
-                      PowerLevelController.provider(
-                        .new(eventType: .message, roomId: roomId),
-                      ),
-                    )
-                    ? [
-                        EmojiPickerButton(
-                          context: context,
-                          onSelection: (_) => node?.requestFocus(),
-                          controller: controller.value,
-                        ),
-                        PopupMenuButton(
-                          tooltip: "Add media",
-                          itemBuilder: (context) => [
-                            PopupMenuItem(
-                              child: ListTile(
-                                title: Text("Camera"),
-                                leading: Icon(Icons.add_a_photo),
+          ClipRRect(
+            borderRadius: .all(.circular(12)),
+            child: Column(
+              children: [
+                RelationPreview(
+                  relatedEvent,
+                  shouldMention: shouldMention.value,
+                  toggleShouldMention: () =>
+                      shouldMention.value = !shouldMention.value,
+                  relationType: relationType,
+                  onDismiss: onDismiss,
+                ),
+                Container(
+                  color: theme.colorScheme.surfaceContainerHighest,
+                  padding: .symmetric(horizontal: 8),
+                  child: Row(
+                    spacing: 8,
+                    mainAxisAlignment: .center,
+                    children:
+                        ref.watch(
+                          PowerLevelController.provider(
+                            .new(eventType: .message, roomId: roomId),
+                          ),
+                        )
+                        ? [
+                            EmojiPickerButton(
+                              context: context,
+                              onSelection: (_) => node?.requestFocus(),
+                              controller: controller.value,
+                            ),
+                            PopupMenuButton(
+                              tooltip: "Add media",
+                              enabled: attachment == null,
+                              itemBuilder: (context) => [
+                                if (Platform.isAndroid || Platform.isIOS)
+                                  PopupMenuItem(
+                                    child: ListTile(
+                                      title: Text("Camera"),
+                                      leading: Icon(Icons.add_a_photo),
+                                    ),
+                                  ),
+                                PopupMenuItem(
+                                  child: ListTile(
+                                    title: Text("Gallery"),
+                                    leading: Icon(Icons.add_photo_alternate),
+                                  ),
+                                  onTap: () async => ref
+                                      .watch(
+                                        AttachmentController.provider(
+                                          roomId,
+                                        ).notifier,
+                                      )
+                                      .add(
+                                        (await ref
+                                            .watch(
+                                              ImagePickerController.provider,
+                                            )
+                                            .pickImage(source: .gallery))!,
+                                      )
+                                      .onError(showError),
+                                ),
+                                PopupMenuItem(
+                                  onTap: () async => ref
+                                      .watch(
+                                        AttachmentController.provider(
+                                          roomId,
+                                        ).notifier,
+                                      )
+                                      .add((await openFile())!)
+                                      .onError(showError),
+                                  child: ListTile(
+                                    title: Text("Files"),
+                                    leading: Icon(Icons.attachment),
+                                  ),
+                                ),
+                              ],
+                              icon: Icon(Icons.add),
+                            ),
+                            Expanded(
+                              child: FlutterTagger(
+                                triggerStrategy: .eager,
+                                overlay: MentionOverlay(
+                                  roomId,
+                                  query: query.value,
+                                  triggerCharacter: triggerCharacter.value,
+                                  addTag: ({required id, required name}) {
+                                    controller.value.addTag(id: id, name: name);
+                                    node?.requestFocus();
+                                  },
+                                ),
+                                controller: controller.value,
+                                onSearch: (newQuery, newTriggerCharacter) {
+                                  triggerCharacter.value = newTriggerCharacter;
+                                  query.value = newQuery;
+                                },
+                                triggerCharacterAndStyles: {
+                                  "@": style,
+                                  "#": style,
+                                },
+                                builder: (context, key) => Focus(
+                                  onKeyEvent: (_, event) {
+                                    if (event is KeyDownEvent &&
+                                        event.logicalKey ==
+                                            LogicalKeyboardKey.enter) {
+                                      final shiftPressed = HardwareKeyboard
+                                          .instance
+                                          .isShiftPressed;
+
+                                      if (!shiftPressed) {
+                                        send();
+                                        return KeyEventResult.handled;
+                                      }
+                                    }
+
+                                    return KeyEventResult.ignored;
+                                  },
+                                  child: TextField(
+                                    maxLines: 12,
+                                    minLines: 1,
+                                    autofocus: true,
+                                    decoration: .new(
+                                      hintText: "Your message here...",
+                                      border: .none,
+                                    ),
+                                    controller: controller.value,
+                                    key: key,
+                                    focusNode: node,
+                                  ),
+                                ),
                               ),
                             ),
-                            PopupMenuItem(
-                              child: ListTile(
-                                title: Text("Gallery"),
-                                leading: Icon(Icons.add_photo_alternate),
-                              ),
+                            IconButton(
+                              onPressed:
+                                  attachment != null && attachment.$2 == null
+                                  ? null
+                                  : send,
+                              icon: Icon(Icons.send),
+                              tooltip: "Send message",
                             ),
-                            PopupMenuItem(
-                              child: ListTile(
-                                title: Text("Files"),
-                                leading: Icon(Icons.attachment),
+                          ]
+                        : [
+                            Expanded(
+                              child: Padding(
+                                padding: .symmetric(
+                                  horizontal: 8,
+                                  vertical: 12,
+                                ),
+                                child: Text(
+                                  "You don't have permission to send messages in this room...",
+                                ),
                               ),
                             ),
                           ],
-                          icon: Icon(Icons.add),
-                        ),
-                        Expanded(
-                          child: FlutterTagger(
-                            triggerStrategy: .eager,
-                            overlay: MentionOverlay(
-                              roomId,
-                              query: query.value,
-                              triggerCharacter: triggerCharacter.value,
-                              addTag: ({required id, required name}) {
-                                controller.value.addTag(id: id, name: name);
-                                node?.requestFocus();
-                              },
-                            ),
-                            controller: controller.value,
-                            onSearch: (newQuery, newTriggerCharacter) {
-                              triggerCharacter.value = newTriggerCharacter;
-                              query.value = newQuery;
-                            },
-                            triggerCharacterAndStyles: {"@": style, "#": style},
-                            builder: (context, key) => Focus(
-                              onKeyEvent: (_, event) {
-                                if (event is KeyDownEvent &&
-                                    event.logicalKey ==
-                                        LogicalKeyboardKey.enter) {
-                                  final shiftPressed =
-                                      HardwareKeyboard.instance.isShiftPressed;
-
-                                  if (!shiftPressed) {
-                                    send();
-                                    return KeyEventResult.handled;
-                                  }
-                                }
-
-                                return KeyEventResult.ignored;
-                              },
-                              child: TextField(
-                                maxLines: 12,
-                                minLines: 1,
-                                autofocus: true,
-                                decoration: .new(
-                                  hintText: "Your message here...",
-                                  border: .none,
-                                ),
-                                controller: controller.value,
-                                key: key,
-                                focusNode: node,
-                              ),
-                            ),
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: send,
-                          icon: Icon(Icons.send),
-                          tooltip: "Send message",
-                        ),
-                      ]
-                    : [
-                        Expanded(
-                          child: Padding(
-                            padding: .symmetric(horizontal: 8, vertical: 12),
-                            child: Text(
-                              "You don't have permission to send messages in this room...",
-                            ),
-                          ),
-                        ),
-                      ],
-              ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

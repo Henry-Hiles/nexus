@@ -4,6 +4,7 @@ import "package:collection/collection.dart";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:fluttertagger/fluttertagger.dart";
+import "package:nexus/controllers/attachment.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/models/content/content.dart";
@@ -120,6 +121,10 @@ class RoomChatController extends AsyncNotifier<IList<Event>?> {
     required RelationType relationType,
     Event? relation,
   }) async {
+    final attachment = ref.watch(AttachmentController.provider(roomId));
+
+    if (attachment != null && attachment.$2 == null) return;
+
     var taggedMessage = text;
 
     for (final tag in tags) {
@@ -136,6 +141,7 @@ class RoomChatController extends AsyncNotifier<IList<Event>?> {
     final event = await client.sendMessage(
       SendMessageRequest(
         roomId: roomId,
+        baseContent: attachment?.$2,
         mentions: Mentions(
           userIds: [
             if (shouldMention == true &&
@@ -151,6 +157,8 @@ class RoomChatController extends AsyncNotifier<IList<Event>?> {
             : .new(eventId: relation.eventId, relationType: relationType),
       ),
     );
+
+    ref.invalidate(AttachmentController.provider(roomId));
 
     ref
         .watch(RoomsController.provider.notifier)
