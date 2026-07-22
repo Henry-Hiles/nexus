@@ -56,8 +56,10 @@ class Composer extends HookConsumerWidget {
           };
     }
 
+    final attachment = ref.watch(AttachmentController.provider(roomId));
+
     void send() {
-      if (controller.value.text.isEmpty) return;
+      if (controller.value.text.isEmpty && attachment == null) return;
       onSend(
         controller.value.formattedText,
         shouldMention: shouldMention.value,
@@ -72,8 +74,6 @@ class Composer extends HookConsumerWidget {
       color: theme.colorScheme.primary,
       fontWeight: .bold,
     );
-
-    final attachment = ref.watch(AttachmentController.provider(roomId));
 
     return Padding(
       padding: .all(12),
