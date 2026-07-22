@@ -17,7 +17,10 @@ extension SchemeToTheme on ColorScheme {
         backgroundColor: surfaceContainerLow,
       ),
       tooltipTheme: .new(
-        textStyle: textTheme.labelLarge?.copyWith(fontSize: 16),
+        textStyle: textTheme.labelLarge?.copyWith(
+          fontSize: 16,
+          fontWeight: .w600,
+        ),
         padding: .all(8),
         decoration: BoxDecoration(
           color: surfaceContainerHighest,
