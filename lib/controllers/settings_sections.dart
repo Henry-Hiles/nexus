@@ -106,10 +106,15 @@ class SettingsSectionsController
                     final colorScheme = Theme.of(context).colorScheme;
                     return M3EButton.icon(
                       onPressed: () async {
+                        Navigator.of(
+                          context,
+                        ).popUntil((route) => route.isFirst);
+
+                        await WidgetsBinding.instance.endOfFrame;
+
                         await ref
                             .watch(ClientController.provider.notifier)
                             .logout();
-                        if (context.mounted) Navigator.of(context).pop();
                       },
                       label: Text(title),
                       icon: Icon(icon),
