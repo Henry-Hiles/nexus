@@ -138,6 +138,20 @@ class Composer extends HookConsumerWidget {
                                       title: Text("Camera"),
                                       leading: Icon(Icons.add_a_photo),
                                     ),
+                                    onTap: () async => ref
+                                        .watch(
+                                          AttachmentController.provider(
+                                            roomId,
+                                          ).notifier,
+                                        )
+                                        .add(
+                                          (await ref
+                                              .watch(
+                                                ImagePickerController.provider,
+                                              )
+                                              .pickImage(source: .camera))!,
+                                        )
+                                        .onError(showError),
                                   ),
                                 PopupMenuItem(
                                   child: ListTile(
