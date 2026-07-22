@@ -127,13 +127,13 @@ class SettingsPage extends ConsumerWidget {
                           ),
                           ...sections
                               .mapTo(
-                                (categoryGroup, categories) => [
+                                (section, categories) => [
                                   SliverToBoxAdapter(
                                     child: Padding(
                                       padding: EdgeInsets.symmetric(
                                         horizontal: 16,
                                       ).copyWith(bottom: 4),
-                                      child: DividerText(categoryGroup),
+                                      child: DividerText(section),
                                     ),
                                   ),
                                   SliverM3ECardList(
@@ -150,7 +150,14 @@ class SettingsPage extends ConsumerWidget {
                                         Navigator.of(context).push(
                                           MaterialPageRoute(
                                             builder: (context) =>
-                                                SettingsCategoryPage(index),
+                                                SettingsCategoryPage(
+                                                  sections
+                                                      .values
+                                                      .flattenedToList
+                                                      .indexOf(
+                                                        categories[index],
+                                                      ),
+                                                ),
                                           ),
                                         ),
                                     itemBuilder: (context, index) => ListTile(
