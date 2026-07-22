@@ -6,7 +6,7 @@ part "upload_media.g.dart";
 abstract class UploadMediaRequest with _$UploadMediaRequest {
   const factory UploadMediaRequest({
     required String path,
-    required bool encrypted,
+    required bool encrypt,
     String? filename,
     @Default(false) @JsonKey(name: "voice_message") bool isVoiceMessage,
     @Default(false) bool forceFile,

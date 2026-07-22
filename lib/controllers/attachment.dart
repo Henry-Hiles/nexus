@@ -26,8 +26,7 @@ class AttachmentController extends Notifier<(String, MessageContent?)?> {
         .uploadMedia(
           .new(
             path: file.path,
-            encrypted:
-                room?.state[EventType.encryption.name]?.isNotEmpty == true,
+            encrypt: room?.state[EventType.encryption.type]?.isNotEmpty == true,
           ),
         );
 

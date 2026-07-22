@@ -7,6 +7,8 @@ import "package:nexus/models/info/video.dart";
 part "message.freezed.dart";
 part "message.g.dart";
 
+typedef EncryptedFile = Map<String, dynamic>;
+
 @Freezed(unionKey: "msgtype", fallbackUnion: "default")
 abstract class MessageContent extends Content with _$MessageContent {
   MessageContent._();
@@ -38,7 +40,7 @@ abstract class MessageContent extends Content with _$MessageContent {
     required String body,
     MessageFormat? format,
     String? formattedBody,
-    // EncryptedFile? file
+    EncryptedFile? file,
     String? filename,
     ImageInfo? info,
     Uri? url,
@@ -49,7 +51,7 @@ abstract class MessageContent extends Content with _$MessageContent {
     required String body,
     MessageFormat? format,
     String? formattedBody,
-    // EncryptedFile? file
+    EncryptedFile? file,
     String? filename,
     FileInfo? info,
     Uri? url,
@@ -60,7 +62,7 @@ abstract class MessageContent extends Content with _$MessageContent {
     required String body,
     MessageFormat? format,
     String? formattedBody,
-    // EncryptedFile? file
+    EncryptedFile? file,
     String? filename,
     AudioInfo? info,
     Uri? url,
@@ -71,7 +73,7 @@ abstract class MessageContent extends Content with _$MessageContent {
     required String body,
     MessageFormat? format,
     String? formattedBody,
-    // EncryptedFile? file
+    EncryptedFile? file,
     String? filename,
     VideoInfo? info,
     Uri? url,
