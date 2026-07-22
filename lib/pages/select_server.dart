@@ -80,9 +80,6 @@ class SelectServerPage extends HookConsumerWidget {
                     .onError(showError);
               }
             });
-            // await Navigator.of(context).push(
-            //   MaterialPageRoute(builder: (_) => LoginPage(homeserver: newUrl)),
-            // );
           }
         }
       } catch (error, stackTrace) {
