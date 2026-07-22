@@ -38,6 +38,11 @@ New Value: ${newValue is AsyncData ? newValue.value : newValue}
 }
 
 void showError(Object error, [StackTrace? stackTrace]) {
+  if (error.toString().contains(
+    "setState() or markNeedsBuild() called during build.",
+  )) {
+    return;
+  }
   if (error.toString().contains("DioException")) return;
   if (error.toString().contains("Invalid source")) return;
   if (error.toString().contains("UTF-16")) return;
