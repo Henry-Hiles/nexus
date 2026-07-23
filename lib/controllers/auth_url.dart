@@ -23,10 +23,8 @@ class AuthUrlController extends AsyncNotifier<OAuthAuthCodeResponse> {
         ),
       );
 
-  static final provider =
-      AsyncNotifierProvider.family<
-        AuthUrlController,
-        OAuthAuthCodeResponse,
-        Uri
-      >(AuthUrlController.new);
+  static final provider = AsyncNotifierProvider.family
+      .autoDispose<AuthUrlController, OAuthAuthCodeResponse, Uri>(
+        AuthUrlController.new,
+      );
 }

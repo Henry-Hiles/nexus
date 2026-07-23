@@ -2,6 +2,7 @@ import "package:flutter/material.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/client.dart";
+import "package:nexus/pages/settings.dart";
 import "package:nexus/widgets/appbar.dart";
 import "package:nexus/helpers/required_validator_helper.dart";
 
@@ -32,7 +33,15 @@ class VerifyPage extends HookConsumerWidget {
     }
 
     return Scaffold(
-      appBar: Appbar(),
+      appBar: Appbar(
+        actions: .new([
+          IconButton(
+            onPressed: () =>
+                showDialog(context: context, builder: (_) => SettingsPage()),
+            icon: Icon(Icons.settings),
+          ),
+        ]),
+      ),
       body: AlertDialog(
         title: Text("Verify"),
         content: Form(

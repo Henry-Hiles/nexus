@@ -58,6 +58,9 @@ class SelectServerPage extends HookConsumerWidget {
             await ref.watch(LaunchHelper.provider).launchUrl(codeResponse.url);
 
             AppLinks().uriLinkStream.listen((encodedUri) async {
+              final state = encodedUri.queryParameters["state"];
+              if (state != codeResponse.state) return;
+
               final code = encodedUri.queryParameters["code"];
 
               if (code != null) {
