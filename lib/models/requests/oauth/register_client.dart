@@ -16,6 +16,9 @@ abstract class OAuthRegisterClientRequest with _$OAuthRegisterClientRequest {
     IList<GrantType>? grantTypes,
     IList<Uri>? redirectUris,
     IList<ResponseType>? responseTypes,
+
+    @Default(AuthMethod.none)
+    @JsonKey(name: "token_endpoint_auth_method")
     AuthMethod? authMethod,
   }) = _OAuthRegisterClientRequest;
 
