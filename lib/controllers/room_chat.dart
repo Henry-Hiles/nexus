@@ -121,9 +121,16 @@ class RoomChatController extends AsyncNotifier<IList<Event>?> {
     required RelationType relationType,
     Event? relation,
   }) async {
-    final attachment = ref.watch(AttachmentController.provider(roomId));
+    Content? baseContent;
+    if (relationType == .edit) {
+      baseContent = relation?.content;
+    } else {
+      final attachment = ref.watch(AttachmentController.provider(roomId));
+      if (attachment != null && attachment.$2 == null) return;
 
-    if (attachment != null && attachment.$2 == null) return;
+      baseContent = attachment?.$2;
+      ref.invalidate(AttachmentController.provider(roomId));
+    }
 
     var taggedMessage = text;
 
@@ -141,7 +148,7 @@ class RoomChatController extends AsyncNotifier<IList<Event>?> {
     final event = await client.sendMessage(
       SendMessageRequest(
         roomId: roomId,
-        baseContent: attachment?.$2,
+        baseContent: baseContent,
         mentions: Mentions(
           userIds: [
             if (shouldMention == true &&
@@ -157,8 +164,6 @@ class RoomChatController extends AsyncNotifier<IList<Event>?> {
             : .new(eventId: relation.eventId, relationType: relationType),
       ),
     );
-
-    ref.invalidate(AttachmentController.provider(roomId));
 
     ref
         .watch(RoomsController.provider.notifier)
