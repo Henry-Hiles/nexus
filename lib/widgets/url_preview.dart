@@ -6,7 +6,7 @@ import "package:nexus/helpers/launch_helper.dart";
 import "package:nexus/helpers/mxc_image.dart";
 
 class UrlPreview extends ConsumerWidget {
-  final String link;
+  final Uri link;
   const UrlPreview(this.link, {super.key});
 
   @override
@@ -18,8 +18,7 @@ class UrlPreview extends ConsumerWidget {
           data: (preview) => preview == null
               ? SizedBox.shrink()
               : InkWell(
-                  onTap: () =>
-                      ref.watch(LaunchHelper.provider).launchUrl(.parse(link)),
+                  onTap: () => ref.watch(LaunchHelper.provider).launchUrl(link),
                   child: Card(
                     margin: .symmetric(vertical: 4),
                     color: Theme.of(

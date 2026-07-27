@@ -17,6 +17,7 @@ import "package:nexus/main.dart";
 import "package:nexus/models/content/message.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/models/oauth_auth_code_response.dart";
+import "package:nexus/models/open_graph_data.dart";
 import "package:nexus/models/paginate.dart";
 import "package:nexus/models/requests/download_media.dart";
 import "package:nexus/models/requests/get_event.dart";
@@ -215,11 +216,6 @@ class ClientController extends AsyncNotifier<int> {
     return response["room_id"];
   }
 
-  Future<String?> getAccessToken() async {
-    final response = await _sendCommand("get_account_info", {});
-    return response?["access_token"];
-  }
-
   Future<void> leaveRoom(Room room) async {
     if (room.metadata == null) return;
     await _sendCommand("leave_room", {"room_id": room.metadata!.id});
@@ -254,6 +250,9 @@ class ClientController extends AsyncNotifier<int> {
     final json = await _sendCommand("get_event", request.toJson());
     return json == null ? null : .fromJson(json);
   }
+
+  Future<OpenGraphData> getUrlPreview(Uri url) async =>
+      .fromJson(await _sendCommand("get_url_preview", {"url": url.toString()}));
 
   Future<Paginate> paginate(PaginateRequest request) async =>
       .fromJson(await _sendCommand("paginate", request.toJson()));

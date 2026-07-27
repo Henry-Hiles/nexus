@@ -273,7 +273,8 @@ class MessageRenderer extends ConsumerWidget {
                                     (element) => element is UrlElement,
                                   )
                                   case final UrlElement link?)
-                                UrlPreview(link.url),
+                                if (Uri.tryParse(link.url) case final Uri url?)
+                                  UrlPreview(url),
 
                               ReactionRow(event),
                             ],

@@ -6,7 +6,6 @@ import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:media_kit/media_kit.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/client_state.dart";
-import "package:nexus/controllers/header.dart";
 import "package:nexus/controllers/multi_provider.dart";
 import "package:nexus/controllers/settings.dart";
 import "package:nexus/controllers/shared_prefs.dart";
@@ -144,7 +143,6 @@ class App extends StatelessWidget {
                   IListConst([
                     SharedPrefsController.provider,
                     ClientController.provider,
-                    HeaderController.provider,
                   ]),
                 ),
               )
