@@ -1,17 +1,17 @@
 import "dart:async";
-
 import "package:flutter/material.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:media_kit/media_kit.dart";
-import "package:nexus/helpers/extensions/get_headers.dart";
+import "package:nexus/controllers/client.dart";
 import "package:nexus/models/info/audio.dart";
 
 class AudioPlayer extends HookConsumerWidget {
-  final Uri url;
+  final Uri uri;
   final AudioInfo? info;
+  final bool encrypted;
 
-  const AudioPlayer(this.url, this.info, {super.key});
+  const AudioPlayer(this.uri, this.info, {this.encrypted = false, super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -24,11 +24,12 @@ class AudioPlayer extends HookConsumerWidget {
     final duration = useState(Duration.zero);
 
     useEffect(() {
+      player.platform?.state = player.platform!.state.copyWith(buffering: true);
       scheduleMicrotask(() async {
-        await player.open(
-          Media(url.toString(), httpHeaders: ref.headers),
-          play: false,
-        );
+        final video = await ref
+            .watch(ClientController.provider.notifier)
+            .downloadMedia(.new(mxc: uri, encrypted: encrypted));
+        await player.open(Media(video.path), play: false);
 
         player.stream.playing.listen((value) {
           playing.value = value;
@@ -67,12 +68,18 @@ class AudioPlayer extends HookConsumerWidget {
           padding: .only(left: 8, right: 16),
           child: Row(
             children: [
-              IconButton(
-                onPressed: player.playOrPause,
-                icon: Icon(
-                  playing.value ? Icons.pause_circle : Icons.play_circle,
+              if (player.state.buffering)
+                SizedBox.square(
+                  dimension: 24,
+                  child: CircularProgressIndicator(padding: .all(4)),
+                )
+              else
+                IconButton(
+                  onPressed: player.playOrPause,
+                  icon: Icon(
+                    playing.value ? Icons.pause_circle : Icons.play_circle,
+                  ),
                 ),
-              ),
               SizedBox(width: 8),
               Text(
                 format(position.value),

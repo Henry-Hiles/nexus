@@ -226,10 +226,25 @@ class MessageRenderer extends ConsumerWidget {
                                 ConstrainedBox(
                                   constraints: .loose(.square(500)),
                                   child: switch (event.content) {
-                                    VideoMessageContent(:final info) =>
-                                      VideoPlayer(url, info),
-                                    AudioMessageContent(:final info) =>
-                                      AudioPlayer(url, info),
+                                    VideoMessageContent(
+                                      :final info,
+                                      :final file,
+                                    ) =>
+                                      VideoPlayer(
+                                        url,
+                                        info,
+                                        encrypted: file != null,
+                                      ),
+                                    AudioMessageContent(
+                                      :final info,
+                                      :final file,
+                                    ) =>
+                                      AudioPlayer(
+                                        url,
+                                        info,
+
+                                        encrypted: file != null,
+                                      ),
                                     FileMessageContent(
                                       :final info,
                                       :final filename,
