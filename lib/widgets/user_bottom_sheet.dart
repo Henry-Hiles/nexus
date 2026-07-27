@@ -10,7 +10,6 @@ import "package:nexus/controllers/power_level.dart";
 import "package:nexus/controllers/profile.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
 import "package:nexus/helpers/extensions/get_localpart.dart";
-import "package:nexus/helpers/extensions/mxc_to_https.dart";
 import "package:nexus/models/content/membership.dart";
 import "package:nexus/models/membership_action.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
@@ -97,15 +96,7 @@ class UserBottomSheet extends ConsumerWidget {
           SizedBox(height: 18),
 
           ExpandableImage(
-            member.avatarUrl
-                ?.mxcToHttps(
-                  ref.watch(
-                    ClientStateController.provider.select(
-                      (value) => value!.homeserverUrl!,
-                    ),
-                  ),
-                )
-                .toString(),
+            member.avatarUrl == null ? null : .new(mxc: member.avatarUrl!),
             child: AvatarOrHash(
               member.avatarUrl,
               member.displayName ?? userId.localpart,

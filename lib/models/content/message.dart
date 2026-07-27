@@ -12,6 +12,9 @@ typedef EncryptedFile = Map<String, dynamic>;
 @Freezed(unionKey: "msgtype", fallbackUnion: "default")
 abstract class MessageContent extends Content with _$MessageContent {
   MessageContent._();
+  static String? mediaUrlFromJson(Map<dynamic, dynamic> json, String key) =>
+      json[key] ?? json["file"]?[key];
+
   factory MessageContent({String? body}) = UnknownMessageContent;
 
   @FreezedUnionValue("m.text")
@@ -43,7 +46,7 @@ abstract class MessageContent extends Content with _$MessageContent {
     EncryptedFile? file,
     String? filename,
     ImageInfo? info,
-    Uri? url,
+    @JsonKey(readValue: MessageContent.mediaUrlFromJson) required Uri url,
   }) = ImageMessageContent;
 
   @FreezedUnionValue("m.file")
@@ -54,7 +57,7 @@ abstract class MessageContent extends Content with _$MessageContent {
     EncryptedFile? file,
     String? filename,
     FileInfo? info,
-    Uri? url,
+    @JsonKey(readValue: MessageContent.mediaUrlFromJson) required Uri url,
   }) = FileMessageContent;
 
   @FreezedUnionValue("m.audio")
@@ -65,7 +68,7 @@ abstract class MessageContent extends Content with _$MessageContent {
     EncryptedFile? file,
     String? filename,
     AudioInfo? info,
-    Uri? url,
+    @JsonKey(readValue: MessageContent.mediaUrlFromJson) required Uri url,
   }) = AudioMessageContent;
 
   @FreezedUnionValue("m.video")
@@ -76,7 +79,7 @@ abstract class MessageContent extends Content with _$MessageContent {
     EncryptedFile? file,
     String? filename,
     VideoInfo? info,
-    Uri? url,
+    @JsonKey(readValue: MessageContent.mediaUrlFromJson) required Uri url,
   }) = VideoMessageContent;
 
   @FreezedUnionValue("m.location")

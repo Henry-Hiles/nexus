@@ -1,11 +1,7 @@
 import "package:color_hash/color_hash.dart";
-import "package:cross_cache/cross_cache.dart";
 import "package:flutter/material.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
-import "package:nexus/controllers/client_state.dart";
-import "package:nexus/controllers/cross_cache.dart";
-import "package:nexus/helpers/extensions/get_headers.dart";
-import "package:nexus/helpers/extensions/mxc_to_https.dart";
+import "package:nexus/helpers/mxc_image.dart";
 
 class AvatarOrHash extends ConsumerWidget {
   final Uri? avatar;
@@ -27,15 +23,6 @@ class AvatarOrHash extends ConsumerWidget {
       child: Center(child: Icon(Icons.person, size: height / 2)),
     );
 
-    final parsedAvatar = avatar?.mxcToHttps(
-      ref.watch(
-            ClientStateController.provider.select(
-              (value) => value?.homeserverUrl,
-            ),
-          ) ??
-          "",
-    );
-
     return SizedBox(
       width: height,
       height: height,
@@ -45,14 +32,10 @@ class AvatarOrHash extends ConsumerWidget {
           child: SizedBox(
             width: height,
             height: height,
-            child: parsedAvatar == null
+            child: avatar == null
                 ? fallback ?? box
                 : Image(
-                    image: CachedNetworkImage(
-                      parsedAvatar.toString(),
-                      ref.watch(CrossCacheController.provider),
-                      headers: ref.headers,
-                    ),
+                    image: MxcImage(ref, .new(mxc: avatar!, isAvatar: true)),
                     fit: .cover,
                     loadingBuilder: (_, child, loadingProgress) =>
                         loadingProgress == null ? child : fallback ?? box,

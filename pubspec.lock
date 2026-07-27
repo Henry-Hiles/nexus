@@ -249,14 +249,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.15.1"
-  cross_cache:
-    dependency: "direct main"
-    description:
-      name: cross_cache
-      sha256: "4983a16603cc99b0a14de6a772fa8ee4533411f46f3c423f1386fea7566049c5"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.0"
   cross_file:
     dependency: transitive
     description:
@@ -297,22 +289,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.14"
-  dio:
-    dependency: transitive
-    description:
-      name: dio
-      sha256: ea2bad3c89a27635ce2d85cce4d6b199da49a5a48ec77b03e45b65a3b90922b0
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.10.0"
-  dio_web_adapter:
-    dependency: transitive
-    description:
-      name: dio_web_adapter
-      sha256: dd58dc3861eb36edb13b217efc006a1c21e5bbc341de8c229b85634fa5e362e4
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.2.0"
   dynamic_color:
     dependency: "direct main"
     description:
@@ -686,14 +662,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.2.1"
-  idb_shim:
-    dependency: transitive
-    description:
-      name: idb_shim
-      sha256: "3448298f244bc76a14aca71461eeab6add2b8a877930521c42c2e8b71b644590"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.9.6+2"
   image:
     dependency: transitive
     description:
@@ -1248,14 +1216,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.2.2"
-  sembast:
-    dependency: transitive
-    description:
-      name: sembast
-      sha256: a58b26925e23071cf0f4754d8449aabe829e9a9930a872fb18e6ae4c2c88e025
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.8.9+1"
   shared_preferences:
     dependency: "direct main"
     description:

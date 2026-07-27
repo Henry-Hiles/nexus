@@ -4,7 +4,6 @@ import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:linkify/linkify.dart";
 import "package:nexus/controllers/client_state.dart";
 import "package:nexus/controllers/event.dart";
-import "package:nexus/helpers/extensions/mxc_to_https.dart";
 import "package:nexus/models/content/encrypted.dart";
 import "package:nexus/models/content/message.dart";
 import "package:nexus/models/content/sticker.dart";
@@ -146,14 +145,9 @@ class MessageRenderer extends ConsumerWidget {
                               : ConstrainedBox(
                                   constraints: .loose(.square(200)),
                                   child: MessageImage(
-                                    url.mxcToHttps(
-                                      ref.watch(
-                                        ClientStateController.provider.select(
-                                          (value) => value!.homeserverUrl!,
-                                        ),
-                                      ),
-                                    ),
+                                    url,
                                     info: info,
+                                    encrypted: false,
                                   ),
                                 ),
                         // TODO: Handle locations
@@ -229,35 +223,30 @@ class MessageRenderer extends ConsumerWidget {
                                       FileMessageContent(:final url) ||
                                       VideoMessageContent(:final url) ||
                                       AudioMessageContent(:final url))
-                                switch (url?.mxcToHttps(
-                                  ref.watch(
-                                    ClientStateController.provider.select(
-                                      (value) => value!.homeserverUrl!,
-                                    ),
-                                  ),
-                                )) {
-                                  final url? => ConstrainedBox(
-                                    constraints: .loose(.square(500)),
-                                    child: switch (event.content) {
-                                      VideoMessageContent(:final info) =>
-                                        VideoPlayer(url, info),
-                                      AudioMessageContent(:final info) =>
-                                        AudioPlayer(url, info),
-                                      FileMessageContent(
-                                        :final info,
-                                        :final filename,
-                                      ) =>
-                                        FileCard(url, info, filename: filename),
-                                      ImageMessageContent(:final info) =>
-                                        MessageImage(url, info: info),
-                                      _ => SizedBox.shrink(),
-                                    },
-                                  ),
-                                  _ => Text(
-                                    "Nexus currently cannot handle encrypted media",
-                                    style: errorStyle,
-                                  ),
-                                },
+                                ConstrainedBox(
+                                  constraints: .loose(.square(500)),
+                                  child: switch (event.content) {
+                                    VideoMessageContent(:final info) =>
+                                      VideoPlayer(url, info),
+                                    AudioMessageContent(:final info) =>
+                                      AudioPlayer(url, info),
+                                    FileMessageContent(
+                                      :final info,
+                                      :final filename,
+                                    ) =>
+                                      FileCard(url, info, filename: filename),
+                                    ImageMessageContent(
+                                      :final info,
+                                      :final file,
+                                    ) =>
+                                      MessageImage(
+                                        url,
+                                        info: info,
+                                        encrypted: file != null,
+                                      ),
+                                    _ => SizedBox.shrink(),
+                                  },
+                                ),
 
                               if (event.lastEditRowId != 0)
                                 Text(

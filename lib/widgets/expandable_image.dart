@@ -1,19 +1,18 @@
-import "package:cross_cache/cross_cache.dart";
 import "package:flutter/material.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:m3e_buttons/m3e_buttons.dart";
-import "package:nexus/controllers/cross_cache.dart";
-import "package:nexus/helpers/extensions/get_headers.dart";
+import "package:nexus/helpers/mxc_image.dart";
+import "package:nexus/models/requests/download_media.dart";
 import "package:nexus/widgets/error_dialog.dart";
 
 class ExpandableImage extends ConsumerWidget {
   final Widget child;
-  final String? source;
-  const ExpandableImage(this.source, {required this.child, super.key});
+  final DownloadMediaRequest? request;
+  const ExpandableImage(this.request, {required this.child, super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => InkWell(
-    onTap: source == null
+    onTap: request == null
         ? null
         : () => showDialog(
             context: context,
@@ -27,14 +26,10 @@ class ExpandableImage extends ConsumerWidget {
                         maxScale: 10,
                         child: Image(
                           errorBuilder: (_, error, stackTrace) => ErrorDialog(
-                            "Loading failed for $source\nError: $error",
+                            "Loading failed for ${request?.mxc}\nError: $error",
                             stackTrace,
                           ),
-                          image: CachedNetworkImage(
-                            source!,
-                            ref.watch(CrossCacheController.provider),
-                            headers: ref.headers,
-                          ),
+                          image: MxcImage(ref, request!),
                         ),
                       ),
                     ),

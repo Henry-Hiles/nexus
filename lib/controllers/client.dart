@@ -18,6 +18,7 @@ import "package:nexus/models/content/message.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/models/oauth_auth_code_response.dart";
 import "package:nexus/models/paginate.dart";
+import "package:nexus/models/requests/download_media.dart";
 import "package:nexus/models/requests/get_event.dart";
 import "package:nexus/models/requests/get_related_events.dart";
 import "package:nexus/models/requests/get_room_state.dart";
@@ -270,6 +271,9 @@ class ClientController extends AsyncNotifier<int> {
 
   Future<MessageContent> uploadMedia(UploadMediaRequest request) async =>
       .fromJson(await _sendCommand("upload_media", request.toJson()));
+
+  Future<File> downloadMedia(DownloadMediaRequest request) async =>
+      .new((await _sendCommand("download_media", request.toJson()))["path"]);
 
   Future<void> logout() => _sendCommand("logout");
 

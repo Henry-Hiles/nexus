@@ -1,13 +1,10 @@
-import "package:cross_cache/cross_cache.dart";
 import "package:flutter/material.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client_state.dart";
-import "package:nexus/controllers/cross_cache.dart";
 import "package:nexus/controllers/reactions.dart";
 import "package:nexus/controllers/room_chat.dart";
-import "package:nexus/helpers/extensions/get_headers.dart";
-import "package:nexus/helpers/extensions/mxc_to_https.dart";
+import "package:nexus/helpers/mxc_image.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/widgets/error_dialog.dart";
 import "package:nexus/main.dart";
@@ -55,16 +52,9 @@ class ReactionRow extends ConsumerWidget {
                               child: reaction.startsWith("mxc://")
                                   ? Image(
                                       height: 20,
-                                      image: CachedNetworkImage(
-                                        headers: ref.headers,
-                                        Uri.parse(reaction)
-                                            .mxcToHttps(
-                                              clientState!.homeserverUrl!,
-                                            )
-                                            .toString(),
-                                        ref.watch(
-                                          CrossCacheController.provider,
-                                        ),
+                                      image: MxcImage(
+                                        ref,
+                                        .new(mxc: Uri.parse(reaction)),
                                       ),
                                     )
                                   : Text(reaction, overflow: .ellipsis),

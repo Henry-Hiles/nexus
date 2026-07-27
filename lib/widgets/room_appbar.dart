@@ -1,11 +1,9 @@
 import "package:flutter/material.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/rooms.dart";
-import "package:nexus/helpers/extensions/mxc_to_https.dart";
 import "package:nexus/widgets/appbar.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/widgets/expandable_image.dart";
-import "package:nexus/controllers/client_state.dart";
 import "package:nexus/widgets/linkified_text.dart";
 import "package:nexus/widgets/room_menu.dart";
 
@@ -53,15 +51,9 @@ class RoomAppbar extends ConsumerWidget implements PreferredSizeWidget {
                         children: [
                           if (room.metadata?.avatar != null)
                             ExpandableImage(
-                              room.metadata!.avatar!
-                                  .mxcToHttps(
-                                    ref.watch(
-                                      ClientStateController.provider.select(
-                                        (value) => value!.homeserverUrl!,
-                                      ),
-                                    ),
-                                  )
-                                  .toString(),
+                              room.metadata?.avatar == null
+                                  ? null
+                                  : .new(mxc: room.metadata!.avatar!),
                               child: AvatarOrHash(
                                 room.metadata?.avatar,
                                 room.metadata?.name ?? "Unnamed Room",

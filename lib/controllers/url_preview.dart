@@ -3,7 +3,6 @@ import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:http/http.dart";
 import "package:nexus/controllers/client_state.dart";
 import "package:nexus/controllers/header.dart";
-import "package:nexus/helpers/extensions/mxc_to_https.dart";
 import "package:nexus/models/open_graph_data.dart";
 
 class UrlPreviewController extends AsyncNotifier<OpenGraphData?> {
@@ -30,12 +29,9 @@ class UrlPreviewController extends AsyncNotifier<OpenGraphData?> {
             final decodedValue = json.decode(response.body);
             if (decodedValue is! Map<String, dynamic>) return null;
 
-            final mxc = decodedValue["og:image"];
-            final image = mxc == null
-                ? null
-                : Uri.tryParse(mxc)?.mxcToHttps(homeserver);
-
-            return .fromJson(decodedValue).copyWith(imageUrl: image);
+            return .fromJson(
+              decodedValue,
+            ).copyWith(imageUrl: decodedValue["og:image"]);
           }
         }
       }

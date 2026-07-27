@@ -1,14 +1,10 @@
-import "package:cross_cache/cross_cache.dart";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/material.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart";
-import "package:nexus/controllers/client_state.dart";
-import "package:nexus/controllers/cross_cache.dart";
-import "package:nexus/helpers/extensions/get_headers.dart";
 import "package:nexus/helpers/extensions/link_to_mention.dart";
-import "package:nexus/helpers/extensions/mxc_to_https.dart";
 import "package:nexus/helpers/launch_helper.dart";
+import "package:nexus/helpers/mxc_image.dart";
 import "package:nexus/widgets/expandable_image.dart";
 import "package:nexus/widgets/html/mention_chip.dart";
 import "package:nexus/widgets/html/spoiler_text.dart";
@@ -40,16 +36,7 @@ class Html extends ConsumerWidget {
           (element.attributes.keys.contains("data-mx-emoticon") ? 32 : null) ??
           300;
       final width = int.tryParse(element.attributes["width"] ?? "");
-      final src = Uri.tryParse(element.attributes["src"] ?? "")
-          ?.mxcToHttps(
-            ref.watch(
-                  ClientStateController.provider.select(
-                    (value) => value?.homeserverUrl,
-                  ),
-                ) ??
-                "",
-          )
-          .toString();
+      final src = Uri.tryParse(element.attributes["src"] ?? "");
 
       return switch (element.localName) {
         "code" =>
@@ -77,13 +64,9 @@ class Html extends ConsumerWidget {
               : InlineCustomWidget(
                   alignment: PlaceholderAlignment.middle,
                   child: ExpandableImage(
-                    src,
+                    .new(mxc: src),
                     child: Image(
-                      image: CachedNetworkImage(
-                        src,
-                        ref.watch(CrossCacheController.provider),
-                        headers: ref.headers,
-                      ),
+                      image: MxcImage(ref, .new(mxc: src)),
                       errorBuilder: (_, error, _) => Text(
                         "Image Failed to Load",
                         style: .new(color: Theme.of(context).colorScheme.error),
