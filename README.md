@@ -69,7 +69,7 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
         - [x] Edits
         - [x] Attachments
             - [x] Unencrypted
-            - [ ] Encrypted
+            - [x] Encrypted
             - [x] Blurhashing
             - [ ] Downloading attachments
             - [x] Opening attachments in their own view
