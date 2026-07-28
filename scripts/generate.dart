@@ -24,7 +24,18 @@ void main(List<String> args) async {
   ).generate(
     libclangDylib: libclangPath == null
         ? null
-        : Uri.file(join(libclangPath, "libclang.so")),
+        : Uri.file(
+            join(
+              libclangPath,
+              "libclang.${(Platform.isLinux || Platform.isAndroid)
+                  ? "so"
+                  : Platform.isMacOS
+                  ? "dylib"
+                  : Platform.isWindows
+                  ? "dll"
+                  : throw UnsupportedError("Unsupported Platform")}",
+            ),
+          ),
   );
   print("Done!");
 }
