@@ -1,31 +1,38 @@
 {
   src,
+  stdenv,
   buildGoModule,
 }:
 
-buildGoModule (finalAttrs: {
-  pname = "gomuks-ffi";
-  version = "submodule";
+buildGoModule (
+  finalAttrs:
+  let
+    filename = "libgomuks${stdenv.hostPlatform.extensions.sharedLibrary}";
+  in
+  {
+    pname = "gomuks-ffi";
+    version = "submodule";
 
-  doCheck = false;
+    doCheck = false;
 
-  src = "${src}/gomuks";
+    src = "${src}/gomuks";
 
-  vendorHash = "sha256-4QU51WGiNKYm7z/ajnas2qQaMK5BgyHwPfmNpQvW0qg=";
+    vendorHash = "sha256-4QU51WGiNKYm7z/ajnas2qQaMK5BgyHwPfmNpQvW0qg=";
 
-  buildPhase = ''
-    runHook preBuild
+    buildPhase = ''
+      runHook preBuild
 
-    go build -buildmode=c-shared -o libgomuks.so -tags goolm,noheic,sqlite_fts5 ./pkg/ffi 
+      go build -buildmode=c-shared -o ${filename} -tags goolm,noheic,sqlite_fts5 ./pkg/ffi 
 
-    runHook postBuild
-  '';
+      runHook postBuild
+    '';
 
-  installPhase = ''
-    runHook preInstall
+    installPhase = ''
+      runHook preInstall
 
-    install -Dm0644 libgomuks.so -t $out/lib
+      install -Dm0644 ${filename} -t $out/lib
 
-    runHook postInstall
-  '';
-})
+      runHook postInstall
+    '';
+  }
+)
