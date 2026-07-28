@@ -44,7 +44,7 @@ flutter.buildFlutterApplication {
   meta = {
     description = "A simple and user-friendly Matrix client";
     mainProgram = "nexus";
-    platforms = lib.platforms.linux;
+    platforms = lib.platforms.unix;
     maintainers = with lib.maintainers; [ quadradical ];
   };
 }

@@ -13,8 +13,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
-        with:
-          submodules: recursive
 
       - name: Lix GHA Installer Action
         uses: samueldr/lix-gha-installer-action@v2026-02-22
@@ -22,10 +20,10 @@ jobs:
           extra_nix_config: experimental-features = nix-command flakes flake-self-attrs
 
       - name: Build app
-        run: nix develop --command bash -c "flutter pub get && dart scripts/generate.dart && flutter pub run build_runner build && flutter build macos --release"
+        run: nix build .#default
 
       - name: Upload installer artifact
         uses: actions/upload-artifact@v6
         with:
-          name: App
-          path: build/macos/Build/Products/Release/Nexus.app
+          name: flatpak-${{ matrix.arch }}
+          path: result/Nexus.app
