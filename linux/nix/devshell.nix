@@ -18,20 +18,22 @@ let
   };
 in
 pkgs.mkShell {
-  packages = with pkgs; [
-    go
-    git
-    jdk17
-    libGL
-    wayland
-    (flutter.override {
-      extraPkgConfigPackages = [
-        mpv-unwrapped
-        libass
-      ];
-    })
-    android.platform-tools
-  ];
+  packages =
+    with pkgs;
+    [
+      go
+      git
+      jdk17
+      libGL
+      (flutter.override {
+        extraPkgConfigPackages = [
+          mpv-unwrapped
+          libass
+        ];
+      })
+      android.platform-tools
+    ]
+    ++ lib.optional pkgs.stdenv.isLinux wayland;
 
   env = rec {
     LIBCLANG_PATH = lib.makeLibraryPath [ pkgs.libclang ];
