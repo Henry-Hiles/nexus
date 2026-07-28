@@ -35,8 +35,6 @@ pkgs.mkShell {
 
   env = rec {
     LIBCLANG_PATH = lib.makeLibraryPath [ pkgs.libclang ];
-    LD_LIBRARY_PATH = "./build/native_assets/linux:${lib.makeLibraryPath [ pkgs.zlib ]}";
-    CPATH = lib.makeSearchPath "include" [ pkgs.glibc.dev ];
 
     ANDROID_HOME = "${android.androidsdk}/libexec/android-sdk";
     ANDROID_SDK_ROOT = ANDROID_HOME;
@@ -44,5 +42,9 @@ pkgs.mkShell {
 
     TOOLS = "${ANDROID_HOME}/build-tools/${"36.0.0"}";
     GRADLE_OPTS = "-Dorg.gradle.project.android.aapt2FromMavenOverride=${TOOLS}/aapt2";
+  }
+  // lib.optionalAttrs pkgs.stdenv.isLinux {
+    CPATH = lib.makeSearchPath "include" [ pkgs.glibc.dev ];
+    LD_LIBRARY_PATH = "./build/native_assets/linux:${lib.makeLibraryPath [ pkgs.zlib ]}";
   };
 }
