@@ -17,7 +17,7 @@ class AttachmentController extends Notifier<(String, MessageContent?)?> {
     final filename = basename(file.path);
     state = (filename, null);
 
-    final room = ref.watch(
+    final room = ref.read(
       RoomsController.provider.select((value) => value[roomId]),
     );
 
