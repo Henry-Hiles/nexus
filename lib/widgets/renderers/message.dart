@@ -286,9 +286,8 @@ class MessageRenderer extends ConsumerWidget {
                                   "This message is redacted",
                                   style: errorStyle,
                                 )
-                              : Row(
+                              : Wrap(
                                   spacing: 8,
-                                  mainAxisSize: .min,
                                   children: [
                                     Text(
                                       "Unknown message type:",
