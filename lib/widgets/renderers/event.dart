@@ -216,10 +216,13 @@ class EventRenderer extends HookConsumerWidget {
               if (event.content is! MessageContent) ReactionRow(event),
 
               if (event.sendError != null && event.sendError != "not sent")
-                Text(
-                  event.sendError!,
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: theme.colorScheme.error,
+                Padding(
+                  padding: .only(bottom: 4),
+                  child: Text(
+                    event.sendError!,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: theme.colorScheme.error,
+                    ),
                   ),
                 ),
             ].map((child) => Padding(padding: .only(left: 4), child: child)),
