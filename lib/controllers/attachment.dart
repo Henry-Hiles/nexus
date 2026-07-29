@@ -17,18 +17,16 @@ class AttachmentController extends Notifier<(String, MessageContent?)?> {
     final filename = basename(file.path);
     state = (filename, null);
 
-    final room = ref.read(
-      RoomsController.provider.select((value) => value[roomId]),
+    final isEncrypted = ref.read(
+      RoomsController.provider.select(
+        (value) =>
+            value[roomId]?.state[EventType.encryption.type]?.isNotEmpty == true,
+      ),
     );
 
     final content = await ref
         .watch(ClientController.provider.notifier)
-        .uploadMedia(
-          .new(
-            path: file.path,
-            encrypt: room?.state[EventType.encryption.type]?.isNotEmpty == true,
-          ),
-        );
+        .uploadMedia(.new(path: file.path, encrypt: isEncrypted));
 
     state = (filename, content);
   }
