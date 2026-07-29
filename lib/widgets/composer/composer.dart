@@ -59,7 +59,10 @@ class Composer extends HookConsumerWidget {
     final attachment = ref.watch(AttachmentController.provider(roomId));
 
     void send() {
-      if (controller.value.text.isEmpty && attachment == null) return;
+      if (controller.value.text.isEmpty && attachment == null ||
+          attachment != null && attachment.$2 == null) {
+        return;
+      }
       onSend(
         controller.value.formattedText,
         shouldMention: shouldMention.value,

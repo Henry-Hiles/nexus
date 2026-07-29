@@ -125,11 +125,9 @@ class RoomChatController extends AsyncNotifier<IList<Event>?> {
     if (relationType == .edit) {
       baseContent = relation?.content;
     } else {
-      final attachment = ref.watch(AttachmentController.provider(roomId));
-      if (attachment != null && attachment.$2 == null) return;
-
-      baseContent = attachment?.$2;
-      ref.invalidate(AttachmentController.provider(roomId));
+      final provider = AttachmentController.provider(roomId);
+      baseContent = ref.watch(provider)?.$2;
+      ref.invalidate(provider);
     }
 
     var taggedMessage = text;
