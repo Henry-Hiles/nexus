@@ -127,15 +127,16 @@ If you want to try out Nexus, grab one of the following artifacts from CI:
 #### Linux
 
 - With Nix: Either use direnv and `direnv allow`, or `nix flake develop`
-- Without Nix: Install Flutter, Go, Git, Libclang, and Glibc. Do not use any Snap packages, they cause various compilation issues.
+- Without Nix: Install Flutter, Go, Git, Libclang, Libass, MPV, and Glibc. Do not use any Snap packages, they cause various compilation issues.
 
 #### Windows
 
 You will need:
 
 - Flutter
-- Android SDK + NDK
 - Git
+- Libass
+- MPV
 - Go
 - Visual Studio 2022 (Desktop development with C++)
 - [MSYS2/MinGW-w64 GCC](https://www.msys2.org/) (for CGO)
