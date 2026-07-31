@@ -7,6 +7,7 @@ import "package:measure_size/measure_size.dart";
 import "package:nexus/controllers/account_data.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/client_state.dart";
+import "package:nexus/controllers/member_list_opened.dart";
 import "package:nexus/controllers/pinned_ids.dart";
 import "package:nexus/controllers/power_level.dart";
 import "package:nexus/controllers/rooms.dart";
@@ -46,9 +47,8 @@ class RoomChat extends HookConsumerWidget {
 
     final composerSize = useState<double>(64);
 
-    final memberListOpened = useState<bool>(showMembersByDefault);
-
     final userId = ref.watch(ClientStateController.provider)?.userId;
+    final memberListOpened = ref.watch(MemberListOpenedController.provider);
     final theme = Theme.of(context);
 
     final nothing = Center(
@@ -448,7 +448,9 @@ class RoomChat extends HookConsumerWidget {
             isDesktop: isDesktop,
             onOpenDrawer: Scaffold.of(context).openDrawer,
             onOpenMemberList: (thisContext) {
-              memberListOpened.value = !memberListOpened.value;
+              ref
+                  .watch(MemberListOpenedController.provider.notifier)
+                  .set(!memberListOpened);
               Scaffold.of(thisContext).openEndDrawer();
             },
             onOpenPinnedMessagesList: () {
@@ -553,7 +555,7 @@ class RoomChat extends HookConsumerWidget {
                 ),
               ),
 
-              if (memberListOpened.value == true && showMembersByDefault)
+              if (memberListOpened == true && showMembersByDefault)
                 MemberList(roomId),
             ],
           ),
