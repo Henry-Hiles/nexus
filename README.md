@@ -203,7 +203,7 @@ Development instructions can be found in [DEVELOPMENT.md](./DEVELOPMENT.md).
 
 ## Community
 
-Join the [Nexus Client Matrix Room](https://matrix.to/#/#nexus:federated.nexus) for questions or help with developing or using Nexus Client.
+Join the [Nexus Client Matrix room](https://matrix.to/#/#nexus:federated.nexus) for questions or help with developing or using Nexus Client.
 
 # Credits
 
