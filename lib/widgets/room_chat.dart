@@ -214,11 +214,9 @@ class RoomChat extends HookConsumerWidget {
                   ...{
                         ...ref.watch(
                           AccountDataController.provider.select(
-                            (value) => IList(
-                              value["m.recent_emoji"]
-                                      ?.content["recent_emoji"] ??
-                                  [],
-                            ).map((entry) => entry["emoji"]).toIList(),
+                            (value) => value.recentEmoji
+                                .map((entry) => entry.emoji)
+                                .toIList(),
                           ),
                         ),
                         "👍",

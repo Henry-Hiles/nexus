@@ -84,9 +84,7 @@ class SpacesController extends Notifier<IList<Space>> {
       ],
     }.nonNulls.toISet();
 
-    final directMessages = IMap(
-      accountData["m.direct"]?.content ?? {},
-    ).values.expand((e) => e).toISet();
+    final directMessages = accountData.directMessages.values.flattened;
 
     final otherRooms = rooms.entries
         .where(

@@ -33,10 +33,12 @@ import "package:nexus/models/requests/redact_event.dart";
 import "package:nexus/models/requests/report.dart";
 import "package:nexus/models/requests/send_event.dart";
 import "package:nexus/models/requests/send_message.dart";
+import "package:nexus/models/requests/set_account_data.dart";
 import "package:nexus/models/requests/set_membership.dart";
 import "package:nexus/models/requests/set_state.dart";
 import "package:nexus/models/requests/upload_media.dart";
 import "package:nexus/models/room.dart";
+import "package:nexus/models/spec_versions_response.dart";
 import "package:nexus/models/sync_data.dart";
 import "package:nexus/src/third_party/gomuks.g.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
@@ -268,6 +270,9 @@ class ClientController extends AsyncNotifier<int> {
   Future<void> setMembership(SetMembershipRequest request) =>
       _sendCommand("set_membership", request.toJson());
 
+  Future<void> setAccountData(SetAccountDataRequest request) =>
+      _sendCommand("set_account_data", request.toJson());
+
   Future<MessageContent> uploadMedia(UploadMediaRequest request) async =>
       .fromJson(await _sendCommand("upload_media", request.toJson()));
 
@@ -301,6 +306,9 @@ class ClientController extends AsyncNotifier<int> {
 
   Future<void> exchangeToken(OAuthExchangeTokenRequest request) async =>
       await _sendCommand("oauth_exchange_token", request.toJson());
+
+  Future<SpecVersionsResponse> getSpecVersions() async =>
+      .fromJson(await _sendCommand("get_versions"));
 
   Future<Uri?> discoverHomeserver(Uri homeserver) async {
     try {

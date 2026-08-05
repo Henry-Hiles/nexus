@@ -4,9 +4,11 @@ import "package:flutter/material.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:intl/intl.dart";
 import "package:m3e_buttons/m3e_buttons.dart";
+import "package:nexus/controllers/account_data.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/client_state.dart";
 import "package:nexus/controllers/settings.dart";
+import "package:nexus/models/account_data.dart";
 import "package:nexus/models/settings_category.dart";
 import "package:nexus/main.dart";
 import "package:nexus/widgets/settings/dialog_list_tile.dart";
@@ -16,6 +18,9 @@ class SettingsSectionsController
   @override
   Future<IMap<String, IList<SettingsCategory>>> build() async {
     final settings = await ref.watch(SettingsController.provider.future);
+    final specVersionsResponse = await ref
+        .watch(ClientController.provider.notifier)
+        .getSpecVersions();
 
     return .new({
       "General": .new([
@@ -93,6 +98,51 @@ class SettingsSectionsController
       if (ref.watch(ClientStateController.provider)?.isLoggedIn == true)
         "Account": .new([
           .new(title: "Profile", icon: Icons.person, settings: .new([])),
+          .new(
+            title: "Safety",
+            icon: Icons.gpp_good,
+            settings: .new([
+              .new(
+                title: "Invite Blocking",
+                description:
+                    "Block invites, either completely, or block only invites from users without shared private rooms (depends on server support).",
+                builder: (title, description, icon) => Consumer(
+                  builder: (context, ref, _) =>
+                      DialogListTile<DefaultInviteAction>(
+                        icon: Icon(icon),
+                        title: title,
+                        subtitle: Text(description),
+                        initialValue: ref
+                            .watch(AccountDataController.provider)
+                            .invitePermissionConfig
+                            .defaultAction,
+                        options: specVersionsResponse.unstableFeatures.msc4494
+                            ? DefaultInviteAction.values
+                            : IList(
+                                DefaultInviteAction.values,
+                              ).remove(.denyPublic).toList(),
+                        getName: (option) => switch (option) {
+                          .allow => "Allow",
+                          .deny => "Deny",
+                          .denyPublic => "Deny public",
+                        },
+                        onChanged: (value) => ref
+                            .watch(ClientController.provider.notifier)
+                            .setAccountData(
+                              .new(
+                                type: InvitePermissionConfig.key,
+                                content: InvitePermissionConfig(
+                                  defaultAction: value,
+                                ),
+                              ),
+                            )
+                            .onError(showError),
+                      ),
+                ),
+                icon: Icons.person_off,
+              ),
+            ]),
+          ),
           .new(
             title: "Other",
             icon: Icons.key,
