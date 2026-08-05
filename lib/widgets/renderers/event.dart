@@ -213,7 +213,10 @@ class EventRenderer extends HookConsumerWidget {
             ),
 
             ...[
-              if (event.content is! MessageContent) ReactionRow(event),
+              if (event.content is! MessageContent &&
+                  event.content is! StickerContent &&
+                  event.content is! EncryptedContent)
+                ReactionRow(event),
 
               if (event.sendError != null && event.sendError != "not sent")
                 Padding(

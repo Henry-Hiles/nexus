@@ -275,8 +275,6 @@ class MessageRenderer extends ConsumerWidget {
                                   case final UrlElement link?)
                                 if (Uri.tryParse(link.url) case final Uri url?)
                                   UrlPreview(url),
-
-                              ReactionRow(event),
                             ],
                           ],
                         ),
@@ -298,6 +296,7 @@ class MessageRenderer extends ConsumerWidget {
                                 ),
                         _ => throw Exception("This is impossible"),
                       },
+                      if (!textOnly) ReactionRow(event),
                     ],
                   ),
                 ),
