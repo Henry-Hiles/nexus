@@ -2,7 +2,7 @@ import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:freezed_annotation/freezed_annotation.dart";
 import "package:nexus/models/content/content.dart";
 import "package:nexus/models/epoch_date_time_converter.dart";
-import "package:nexus/models/profile.dart";
+import "package:nexus/models/profile_response.dart";
 part "event.freezed.dart";
 part "event.g.dart";
 

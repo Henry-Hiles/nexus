@@ -123,9 +123,10 @@ class UserBottomSheet extends ConsumerWidget {
               .watch(ProfileController.provider(userId))
               .betterWhen(
                 loading: () => Text(""),
-                data: (profile) => Column(
+                data: (profileResponse) => Column(
                   children: [
-                    if (profile.timezone == null && profile.pronouns.isEmpty)
+                    if (profileResponse.profile.timezone == null &&
+                        profileResponse.profile.pronouns.isEmpty)
                       Text(""),
                     Wrap(
                       crossAxisAlignment: .center,
@@ -133,7 +134,7 @@ class UserBottomSheet extends ConsumerWidget {
                       spacing: 4,
                       runSpacing: 4,
                       children: [
-                        ...profile.pronouns
+                        ...profileResponse.profile.pronouns
                             .where(
                               // TODO: Check system language (l10n)
                               (pronoun) => pronoun.language == "en",
@@ -157,8 +158,8 @@ class UserBottomSheet extends ConsumerWidget {
                             )
                             .flattened,
 
-                        if (profile.timezone != null) ...[
-                          if (profile.pronouns.isNotEmpty)
+                        if (profileResponse.profile.timezone != null) ...[
+                          if (profileResponse.profile.pronouns.isNotEmpty)
                             SizedBox(
                               height: 16,
                               child: VerticalDivider(
@@ -168,7 +169,7 @@ class UserBottomSheet extends ConsumerWidget {
                               ),
                             ),
                           Text(
-                            profile.timezone!,
+                            profileResponse.profile.timezone!,
                             textAlign: .center,
                             style: textTheme.titleSmall?.copyWith(
                               color: theme.colorScheme.onSurfaceVariant,

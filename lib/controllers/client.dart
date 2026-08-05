@@ -24,7 +24,7 @@ import "package:nexus/models/requests/get_event.dart";
 import "package:nexus/models/requests/get_related_events.dart";
 import "package:nexus/models/requests/get_room_state.dart";
 import "package:nexus/models/requests/join_room.dart";
-import "package:nexus/models/profile.dart";
+import "package:nexus/models/profile_response.dart";
 import "package:nexus/models/requests/oauth/exchange_token.dart";
 import "package:nexus/models/requests/oauth/get_auth_url.dart";
 import "package:nexus/models/requests/oauth/register_client.dart";
@@ -259,10 +259,8 @@ class ClientController extends AsyncNotifier<int> {
   Future<Paginate> paginate(PaginateRequest request) async =>
       .fromJson(await _sendCommand("paginate", request.toJson()));
 
-  Future<Profile> getProfile(String userId) async {
-    final json = await _sendCommand("get_profile", {"user_id": userId});
-    return .fromJsonWithCatch({...json, "id": userId});
-  }
+  Future<ProfileResponse> getProfile(String userId) async =>
+      .fromJson(await _sendCommand("get_profile", {"user_id": userId}));
 
   Future<void> reportEvent(ReportRequest request) =>
       _sendCommand("report_event", request.toJson());

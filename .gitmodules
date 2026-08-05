@@ -1,4 +1,4 @@
 [submodule "gomuks"]
 	path = gomuks
 	url = https://github.com/gomuks/gomuks
-	branch = timedoutuk/versions-rpc
+	branch = main

@@ -27,14 +27,15 @@ class UserController extends AsyncNotifier<MembershipContent> {
       return content;
     }
 
-    final profile = await ref.watch(
+    final profileResponse = await ref.watch(
       ProfileController.provider(config.userId).future,
     );
 
     return .new(
       status: .leave,
-      avatarUrl: profile.avatarUrl,
-      displayName: profile.displayName ?? config.userId.localpart,
+      avatarUrl: profileResponse.profile.avatarUrl,
+      displayName:
+          profileResponse.profile.displayName ?? config.userId.localpart,
     );
   }
 
