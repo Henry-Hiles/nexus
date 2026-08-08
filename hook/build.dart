@@ -48,8 +48,6 @@ Future<void> main(List<String> args) => build(args, (input, output) async {
       break;
     case OS.macOS:
       libFileName = "libgomuks.dylib";
-
-      extraEnv = {"CC": await getXCodeTool(findTool: "clang")};
       break;
     case OS.windows:
       libFileName = "libgomuks.dll";
