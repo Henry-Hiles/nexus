@@ -112,7 +112,7 @@ class App extends StatelessWidget {
                           data: (settings) =>
                               settings.useDynamicTheming ? lightDynamic : null,
                         ) ??
-                    ColorScheme.fromSeed(seedColor: Colors.indigo))
+                    ThemeData.light().colorScheme)
                 .theme,
         darkTheme:
             (ref
@@ -122,10 +122,7 @@ class App extends StatelessWidget {
                           data: (settings) =>
                               settings.useDynamicTheming ? darkDynamic : null,
                         ) ??
-                    ColorScheme.fromSeed(
-                      seedColor: Colors.indigo,
-                      brightness: Brightness.dark,
-                    ))
+                    ThemeData.dark().colorScheme)
                 .theme,
         themeMode: ref
             .watch(SettingsController.provider)
