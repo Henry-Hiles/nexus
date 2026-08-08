@@ -1,40 +1,42 @@
 name: "Build MacOS App"
 
 on:
-  push:
-    branches: ["main"]
-    tags: ["*"]
-  workflow_dispatch:
+    push:
+        branches: ["main"]
+        tags: ["*"]
+    workflow_dispatch:
 
 jobs:
-  build-app:
-    runs-on: macos-latest
+    build-app:
+        runs-on: macos-latest
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-        with:
-          submodules: recursive
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v6
+              with:
+                  submodules: recursive
 
-      - name: Lix GHA Installer Action
-        uses: samueldr/lix-gha-installer-action@v2026-02-22
-        with:
-          extra_nix_config: experimental-features = nix-command flakes flake-self-attrs
+            - name: Lix GHA Installer Action
+              uses: samueldr/lix-gha-installer-action@v2026-02-22
+              with:
+                  extra_nix_config: experimental-features = nix-command flakes flake-self-attrs
 
-      - run: |
-          nix develop --command bash -c '
-            set -e
-            flutter pub get
-            dart scripts/generate.dart
-            flutter pub run build_runner build
-            # Nix-provided Flutter'"'"'s bundled frameworks are read-only, which
-            # breaks lipo when Flutter thins them into build/ (NixOS/nixpkgs#405066).
-            find "$(dirname "$(dirname "$(readlink -f "$(command -v flutter)")")")" -type d -iname "*.framework" -exec chmod -R u+w {} + 2>/dev/null || true
-            flutter build macos --release
-          '
+            - name: Build app
+              run: |
+                  nix develop --command bash -c '
+                    set -e
+                    flutter pub get
+                    dart scripts/generate.dart
+                    flutter pub run build_runner build
 
-      - name: Upload installer artifact
-        uses: actions/upload-artifact@v6
-        with:
-          name: App
-          path: build/macos/Build/Products/Release/Nexus.app
+                    FLUTTER_ROOT="$(dirname "$(dirname "$(readlink -f "$(command -v flutter)")")")"
+                    sudo find -L "$FLUTTER_ROOT" -type d -iname "*.framework" -exec chmod -R u+w {} +
+
+                    flutter build macos --release
+                  '
+
+            - name: Upload installer artifact
+              uses: actions/upload-artifact@v6
+              with:
+                  name: App
+                  path: build/macos/Build/Products/Release/Nexus.app
