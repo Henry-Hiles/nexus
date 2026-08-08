@@ -48,7 +48,7 @@ class ClientController extends AsyncNotifier<int> {
   @override
   Future<int> build() async {
     final Pointer<Char> root;
-    if (Platform.isAndroid) {
+    if (Platform.isAndroid || Platform.isIOS) {
       final dir = await getApplicationSupportDirectory();
       root = "${dir.path}/gomuks".toNativeUtf8().cast();
     } else {

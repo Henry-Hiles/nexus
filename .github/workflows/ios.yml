@@ -1,0 +1,39 @@
+name: "Build iOS App"
+
+on:
+  push:
+    branches: ["main"]
+    tags: ["*"]
+  workflow_dispatch:
+
+jobs:
+  build-app:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: Lix GHA Installer Action
+        uses: samueldr/lix-gha-installer-action@v2026-02-22
+        with:
+          extra_nix_config: experimental-features = nix-command flakes flake-self-attrs
+
+      - name: Build app
+        run: nix develop --command bash -c "flutter pub get && dart scripts/generate.dart && flutter pub run build_runner build && flutter build ios --release --no-codesign"
+
+      # Unsigned IPA: SideStore/AltStore re-sign this on-device with the
+      # user's own Apple ID at install time, so no certificate is needed here.
+      - name: Package unsigned IPA
+        run: |
+          mkdir Payload
+          cp -r build/ios/iphoneos/Runner.app Payload/
+          zip -r Nexus.ipa Payload
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: Nexus.ipa
+          path: Nexus.ipa

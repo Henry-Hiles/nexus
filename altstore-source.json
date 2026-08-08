@@ -1,0 +1,22 @@
+{
+  "name": "Nexus",
+  "identifier": "nexus.federated.nexus.source",
+  "subtitle": "Nexus for iOS",
+  "description": "Nexus iOS builds for AltStore and SideStore.",
+  "iconURL": "https://git.federated.nexus/Nexus/nexus/raw/branch/main/assets/icon.png",
+  "website": "https://git.federated.nexus/Nexus/nexus",
+  "apps": [
+    {
+      "name": "Nexus",
+      "bundleIdentifier": "nexus.federated.nexus",
+      "developerName": "Nexus",
+      "subtitle": "A Matrix client",
+      "localizedDescription": "Nexus for iOS. Unsigned builds, resigned at install by AltStore/SideStore.",
+      "iconURL": "https://git.federated.nexus/Nexus/nexus/raw/branch/main/assets/icon.png",
+      "category": "social",
+      "screenshots": [],
+      "versions": []
+    }
+  ],
+  "news": []
+}

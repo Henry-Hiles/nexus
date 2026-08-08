@@ -1,11 +1,14 @@
 import "dart:io";
 
-Future<String> getXCodeSDK() async {
-  final result = await Process.run("xcrun", ["--show-sdk-path"]);
+Future<String> getXCodeTool({String? sdkType, String? findTool}) async {
+  final result = await Process.run("xcrun", [
+    if (sdkType != null) ...["--sdk", sdkType],
+    if (findTool != null) ...["-f", findTool] else "--show-sdk-path",
+  ]);
 
   if (result.exitCode != 0) {
-    throw Exception("Failed to get XCode SDK\n${result.stderr}");
+    throw Exception("Failed to get ${sdkType ?? "XCode"} ${findTool ?? "SDK"}");
   }
 
-  return result.stdout.trim();
+  return result.stdout.toString().trim();
 }
