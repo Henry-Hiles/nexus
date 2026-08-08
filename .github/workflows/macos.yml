@@ -16,27 +16,19 @@ jobs:
               with:
                   submodules: recursive
 
-            - name: Lix GHA Installer Action
-              uses: samueldr/lix-gha-installer-action@v2026-02-22
+            - name: Set up Flutter
+              uses: subosito/flutter-action@v2
               with:
-                  extra_nix_config: experimental-features = nix-command flakes flake-self-attrs
+                  flutter-version: 3.44.4
+
+            - name: Set up Go
+              uses: actions/setup-go@v6
+              with:
+                  go-version-file: gomuks/go.mod
 
             - name: Build app
               run: |
-                  nix develop --command bash -c '
-                    set -e
-                    flutter pub get
-                    dart scripts/generate.dart
-                    flutter pub run build_runner build
-
-                    FLUTTER_ROOT="$(dirname "$(dirname "$(readlink -f "$(command -v flutter)")")")"
-                    sudo find -L "$FLUTTER_ROOT" -type d -iname "*.framework" -exec chmod -R u+w {} +
-
-                    flutter build macos --release
-                  '
-
-            - name: Upload installer artifact
-              uses: actions/upload-artifact@v6
-              with:
-                  name: App
-                  path: build/macos/Build/Products/Release/Nexus.app
+                  flutter pub get
+                  dart scripts/generate.dart
+                  flutter pub run build_runner build
+                  flutter build macos --release
