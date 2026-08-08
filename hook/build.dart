@@ -19,17 +19,7 @@ Future<void> main(List<String> args) => build(args, (input, output) async {
       break;
     case OS.macOS:
       libFileName = "libgomuks.dylib";
-      extraEnv = {
-        "SDKROOT": await getXCodeSDK(),
-        "CGO_ENABLED": "1",
-        "GOARCH": switch (targetArch) {
-          Architecture.arm64 => "arm64",
-          Architecture.x64 => "amd64",
-          _ => throw UnsupportedError(
-            "Unsupported macOS architecture: $targetArch",
-          ),
-        },
-      };
+      extraEnv = {"SDKROOT": await getXCodeSDK()};
       break;
     case OS.windows:
       libFileName = "libgomuks.dll";
