@@ -40,48 +40,52 @@ class RoomAppbar extends ConsumerWidget implements PreferredSizeWidget {
                 constraints: .loose(.fromWidth(400)),
                 child: Padding(
                   padding: .all(24),
-                  child: Column(
-                    mainAxisSize: .min,
-                    crossAxisAlignment: .start,
-                    spacing: 8,
-                    children: [
-                      Row(
-                        spacing: 12,
-                        mainAxisSize: .min,
-                        children: [
-                          if (room.metadata?.avatar != null)
-                            ExpandableImage(
-                              room.metadata?.avatar == null
-                                  ? null
-                                  : .new(mxc: room.metadata!.avatar!),
-                              child: AvatarOrHash(
-                                room.metadata?.avatar,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: .min,
+                      crossAxisAlignment: .start,
+                      spacing: 8,
+                      children: [
+                        Row(
+                          spacing: 12,
+                          mainAxisSize: .min,
+                          children: [
+                            if (room.metadata?.avatar != null)
+                              ExpandableImage(
+                                room.metadata?.avatar == null
+                                    ? null
+                                    : .new(mxc: room.metadata!.avatar!),
+                                child: AvatarOrHash(
+                                  room.metadata?.avatar,
+                                  room.metadata?.name ?? "Unnamed Room",
+                                  height: 64,
+                                  fallback: Icon(Icons.numbers),
+                                ),
+                              ),
+                            Expanded(
+                              child: Text(
                                 room.metadata?.name ?? "Unnamed Room",
-                                height: 64,
-                                fallback: Icon(Icons.numbers),
-                              ),
-                            ),
-                          Expanded(
-                            child: Text(
-                              room.metadata?.name ?? "Unnamed Room",
-                              overflow: .ellipsis,
-                              maxLines: 3,
-                              style: Theme.of(context).textTheme.headlineSmall,
-                            ),
-                          ),
-                        ],
-                      ),
-                      if (room.metadata?.topic?.isNotEmpty == true)
-                        LinkifiedText(
-                          room.metadata!.topic!,
-                          style: Theme.of(context).textTheme.bodyLarge
-                              ?.copyWith(
-                                color: Theme.of(
+                                overflow: .ellipsis,
+                                maxLines: 3,
+                                style: Theme.of(
                                   context,
-                                ).colorScheme.onSurfaceVariant,
+                                ).textTheme.headlineSmall,
                               ),
+                            ),
+                          ],
                         ),
-                    ],
+                        if (room.metadata?.topic?.isNotEmpty == true)
+                          LinkifiedText(
+                            room.metadata!.topic!,
+                            style: Theme.of(context).textTheme.bodyLarge
+                                ?.copyWith(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
+                                ),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
               ),
