@@ -17,6 +17,14 @@ abstract class Event with _$Event {
     return content["m.new_content"] ?? content;
   }
 
+  static String? replyToFromJson(Map<dynamic, dynamic> json) {
+    try {
+      return json["m.relates_to"]?["m.in_reply_to"]?["event_id"];
+    } catch (_) {
+      return null;
+    }
+  }
+
   const factory Event({
     @JsonKey(name: "rowid") required int rowId,
     @JsonKey(name: "timeline_rowid") required int timelineRowId,
@@ -45,9 +53,7 @@ abstract class Event with _$Event {
 
   factory Event.fromJson(Map<String, dynamic> json) =>
       _$EventFromJson(json).copyWith(
-        replyTo: getContentFromJson(
-          json,
-        )["m.relates_to"]?["m.in_reply_to"]?["event_id"],
+        replyTo: replyToFromJson(getContentFromJson(json)),
         pmp: json["content"]?["com.beeper.per_message_profile"] == null
             ? null
             : Profile.fromJsonWithCatch(
