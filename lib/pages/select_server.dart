@@ -60,27 +60,32 @@ class SelectServerPage extends HookConsumerWidget {
             AppLinks().uriLinkStream.listen((encodedUri) async {
               final state = encodedUri.queryParameters["state"];
               if (state != codeResponse.state) return;
+              isLoading.value = true;
 
-              final code = encodedUri.queryParameters["code"];
+              try {
+                final code = encodedUri.queryParameters["code"];
 
-              if (code != null) {
-                await ref
-                    .watch(ClientController.provider.notifier)
-                    .exchangeToken(
-                      .new(
-                        homeserverUrl: newUrl,
-                        codeVerifier: codeResponse.codeVerifier,
-                        redirectUri: .new(
-                          scheme: "nexus.federated.nexus",
-                          path: "/",
+                if (code != null) {
+                  await ref
+                      .watch(ClientController.provider.notifier)
+                      .exchangeToken(
+                        .new(
+                          homeserverUrl: newUrl,
+                          codeVerifier: codeResponse.codeVerifier,
+                          redirectUri: .new(
+                            scheme: "nexus.federated.nexus",
+                            path: "/",
+                          ),
+                          code: code,
+                          clientId: await ref.watch(
+                            ClientIdController.provider(newUrl).future,
+                          ),
                         ),
-                        code: code,
-                        clientId: await ref.watch(
-                          ClientIdController.provider(newUrl).future,
-                        ),
-                      ),
-                    )
-                    .onError(showError);
+                      )
+                      .onError(showError);
+                }
+              } finally {
+                isLoading.value = false;
               }
             });
           }
