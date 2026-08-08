@@ -130,7 +130,7 @@ class SettingsSectionsController
                             .watch(ClientController.provider.notifier)
                             .setAccountData(
                               .new(
-                                type: InvitePermissionConfig.key,
+                                type: AccountData.invitePermissionConfigKey,
                                 content: InvitePermissionConfig(
                                   defaultAction: value,
                                 ),

@@ -15,17 +15,21 @@ abstract class AccountData with _$AccountData {
     IList<RecentEmoji> recentEmoji,
   ) => {"recent_emoji": recentEmoji.map((emoji) => emoji.toJson()).toList()};
 
+  static const invitePermissionConfigKey = "m.invite_permission_config";
+  static const directKey = "m.direct";
+  static const recentEmojiKey = "m.recent_emoji";
+
   const factory AccountData({
-    @JsonKey(name: InvitePermissionConfig.key)
+    @JsonKey(name: AccountData.invitePermissionConfigKey)
     @Default(InvitePermissionConfig())
     InvitePermissionConfig invitePermissionConfig,
 
-    @JsonKey(name: "m.direct")
+    @JsonKey(name: AccountData.directKey)
     @Default(IMap.empty())
     IMap<String, IList<String>> directMessages,
 
     @JsonKey(
-      name: "m.recent_emoji",
+      name: AccountData.recentEmojiKey,
       readValue: AccountData.readRecentEmojiValue,
       toJson: AccountData.recentEmojiToJson,
     )
@@ -39,8 +43,6 @@ abstract class AccountData with _$AccountData {
 
 @freezed
 abstract class InvitePermissionConfig with _$InvitePermissionConfig {
-  static const key = "m.invite_permission_config";
-
   const factory InvitePermissionConfig({
     @JsonKey(unknownEnumValue: DefaultInviteAction.allow)
     @Default(DefaultInviteAction.allow)
