@@ -36,5 +36,5 @@ jobs:
             - name: Upload installer artifact
               uses: actions/upload-artifact@v6
               with:
-                  name: App
+                  name: Nexus.App
                   path: build/macos/Build/Products/Release/Nexus.app
