@@ -48,6 +48,9 @@ Future<void> main(List<String> args) => build(args, (input, output) async {
       break;
     case OS.macOS:
       libFileName = "libgomuks.dylib";
+
+      extraEnv = {"SDKROOT": await getXCodeTool()};
+
       break;
     case OS.windows:
       libFileName = "libgomuks.dll";

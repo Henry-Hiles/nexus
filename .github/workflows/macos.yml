@@ -26,24 +26,6 @@ jobs:
               with:
                   go-version-file: gomuks/go.mod
 
-            - name: Debug macOS compiler
-              run: |
-                  echo "CC:"
-                  go env CC
-
-                  echo "SDKROOT:"
-                  echo "$SDKROOT"
-
-                  echo "xcrun SDK:"
-                  xcrun --sdk macosx --show-sdk-path
-
-                  echo "clang:"
-                  xcrun --sdk macosx --find clang
-
-                  echo "clang search paths:"
-                  echo '#include <stdlib.h>' | \
-                  xcrun --sdk macosx clang -v -E -x c - >/dev/null
-
             - name: Build app
               run: |
                   flutter pub get
