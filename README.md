@@ -15,12 +15,12 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
 
 ## Progress
 
-- [ ] Platform Support
+- [x] Platform Support
     - [x] Linux
-    - [x] Windows
+    - [x] Windows - Currently has some bugs, due to us not having any developers on Windows. If you want to fix these, get in contact with us though the [Nexus Client Matrix room](https://matrix.to/#/#nexus:federated.nexus).
     - [x] Android
-    - [ ] MacOS ([#50](https://git.federated.nexus/Nexus/nexus/issues/50))
-    - [ ] iOS
+    - [x] MacOS - Unsigned only, at the moment
+    - [x] iOS - Unsigned only, at the moment
     - [ ] Web (may not be possible)
 - [x] Login (via OAuth)
 - [x] Rooms / Spaces
@@ -116,6 +116,9 @@ If you want to try out Nexus, grab one of the following artifacts from CI:
 
 - [Android APK](https://nightly.link/Henry-Hiles/nexus/workflows/android/main/APK.zip)
 - [Windows EXE](https://nightly.link/Henry-Hiles/nexus/workflows/windows/main/windows-installer.zip)
+- [Unsigned iOS IPA](https://nightly.link/Henry-Hiles/nexus/workflows/ios/main/Nexus.ipa.zip)
+- [Unsigned MacOS App](https://nightly.link/Henry-Hiles/nexus/workflows/macos/main/Nexus.App.zip)
+- [Windows EXE](https://nightly.link/Henry-Hiles/nexus/workflows/windows/main/windows-installer.zip)
 - Flatpak
     - [AArch64/Arm64](https://nightly.link/Henry-Hiles/nexus/workflows/flatpak/main/flatpak-aarch64.zip)
     - [x86_64/AMD64](https://nightly.link/Henry-Hiles/nexus/workflows/flatpak/main/flatpak-x86_64.zip)
@@ -126,8 +129,8 @@ If you want to try out Nexus, grab one of the following artifacts from CI:
 
 #### Linux
 
-- With Nix: Either use direnv and `direnv allow`, or `nix flake develop`
-- Without Nix: Install Flutter, Go, Git, Libclang, Libass, MPV, and Glibc. Do not use any Snap packages, they cause various compilation issues.
+- On NixOS: Either use direnv and `direnv allow`, or `nix flake develop`
+- On other distros: Install Flutter, Go, Git, Libclang, Libass, MPV, and Glibc. Do not use any Snap packages, they cause various compilation issues.
 
 #### Windows
 
