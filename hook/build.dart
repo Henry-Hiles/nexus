@@ -29,6 +29,7 @@ Future<void> main(List<String> args) => build(args, (input, output) async {
       iosSdk = iosConfig.targetSdk;
       final minVersion = iosConfig.targetVersion;
       iosSdkPath = await getXCodeTool(sdkType: iosSdk.type);
+
       final archTriple = switch (targetArch) {
         Architecture.arm64 => "arm64",
         Architecture.x64 => "x86_64",
@@ -36,6 +37,7 @@ Future<void> main(List<String> args) => build(args, (input, output) async {
           "Unsupported iOS architecture: $targetArch",
         ),
       };
+
       iosTargetTriple = iosSdk == IOSSdk.iPhoneSimulator
           ? "$archTriple-apple-ios$minVersion.0-simulator"
           : "$archTriple-apple-ios$minVersion.0";
@@ -48,9 +50,7 @@ Future<void> main(List<String> args) => build(args, (input, output) async {
       break;
     case OS.macOS:
       libFileName = "libgomuks.dylib";
-
       extraEnv = {"SDKROOT": await getXCodeTool()};
-
       break;
     case OS.windows:
       libFileName = "libgomuks.dll";
