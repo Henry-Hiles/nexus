@@ -26,14 +26,14 @@ jobs:
               with:
                   go-version-file: gomuks/go.mod
 
-            - name: Build app
+            - name: Build App
               run: |
                   flutter pub get
                   dart scripts/generate.dart
                   flutter pub run build_runner build
                   flutter build macos --release
 
-            - name: Upload installer artifact
+            - name: Upload App
               uses: actions/upload-artifact@v6
               with:
                   name: Nexus.App
@@ -45,7 +45,7 @@ jobs:
                   dmg_name: nexus.dmg
                   src_dir: Nexus.app
 
-            - name: Upload installer artifact
+            - name: Upload DMG
               uses: actions/upload-artifact@v6
               with:
                   name: ${{ steps.create-dmg.inputs.path }}
