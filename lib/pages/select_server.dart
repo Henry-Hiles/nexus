@@ -26,6 +26,17 @@ class SelectServerPage extends HookConsumerWidget {
     final homeserverUrl = useTextEditingController();
 
     Future<void> setHomeserver(Uri? newHomeserver) async {
+      if (newHomeserver == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              "Failed to parse homeserver URL. Are you sure you typed it correctly?",
+              style: .new(color: theme.colorScheme.onErrorContainer),
+            ),
+            backgroundColor: theme.colorScheme.errorContainer,
+          ),
+        );
+      }
       isLoading.value = true;
 
       try {
@@ -33,26 +44,14 @@ class SelectServerPage extends HookConsumerWidget {
           newHomeserver = Uri.https(newHomeserver!.path);
         }
 
-        final newUrl = newHomeserver == null
-            ? null
-            : await ref
-                  .read(ClientController.provider.notifier)
-                  .discoverHomeserver(newHomeserver);
+        final newUrl = await ref
+            .read(ClientController.provider.notifier)
+            .discoverHomeserver(newHomeserver!);
 
         if (context.mounted) {
-          if (newUrl == null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  "Homeserver verification failed. Is your homeserver down?",
-                  style: .new(color: theme.colorScheme.onErrorContainer),
-                ),
-                backgroundColor: theme.colorScheme.errorContainer,
-              ),
-            );
-          } else {
+          Future<void> tryLogin(Uri url) async {
             final codeResponse = await ref.watch(
-              AuthUrlController.provider(newUrl).future,
+              AuthUrlController.provider(url).future,
             );
 
             await ref.watch(LaunchHelper.provider).launchUrl(codeResponse.url);
@@ -70,7 +69,7 @@ class SelectServerPage extends HookConsumerWidget {
                       .watch(ClientController.provider.notifier)
                       .exchangeToken(
                         .new(
-                          homeserverUrl: newUrl,
+                          homeserverUrl: url,
                           codeVerifier: codeResponse.codeVerifier,
                           redirectUri: .new(
                             scheme: "nexus.federated.nexus",
@@ -78,7 +77,7 @@ class SelectServerPage extends HookConsumerWidget {
                           ),
                           code: code,
                           clientId: await ref.watch(
-                            ClientIdController.provider(newUrl).future,
+                            ClientIdController.provider(url).future,
                           ),
                         ),
                       )
@@ -88,6 +87,25 @@ class SelectServerPage extends HookConsumerWidget {
                 isLoading.value = false;
               }
             });
+          }
+
+          if (newUrl == null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  "Homeserver verification failed.",
+                  style: .new(color: theme.colorScheme.onErrorContainer),
+                ),
+                action: SnackBarAction(
+                  onPressed: () => tryLogin(newHomeserver!),
+                  label: "Attempt log in anyways",
+                  textColor: theme.colorScheme.onErrorContainer,
+                ),
+                backgroundColor: theme.colorScheme.errorContainer,
+              ),
+            );
+          } else {
+            tryLogin(newUrl);
           }
         }
       } catch (error, stackTrace) {

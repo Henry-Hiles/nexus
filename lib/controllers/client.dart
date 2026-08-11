@@ -311,7 +311,7 @@ class ClientController extends AsyncNotifier<int> {
   Future<Uri?> discoverHomeserver(Uri homeserver) async {
     try {
       final response = await _sendCommand("discover_homeserver", {
-        "user_id": "@fake-user:${homeserver.host}",
+        "user_id": "@fake-user:${homeserver.authority}",
       });
       return Uri.parse(response["m.homeserver"]?["base_url"]);
     } catch (error) {
