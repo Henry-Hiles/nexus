@@ -117,7 +117,7 @@ If you want to try out Nexus, grab one of the following artifacts from CI:
 - [Android APK](https://nightly.link/Henry-Hiles/nexus/workflows/android/main/APK.zip)
 - [Windows EXE](https://nightly.link/Henry-Hiles/nexus/workflows/windows/main/windows-installer.zip)
 - [Unsigned iOS IPA](https://nightly.link/Henry-Hiles/nexus/workflows/ios/main/Nexus.ipa.zip)
-- [Unsigned MacOS App](https://nightly.link/Henry-Hiles/nexus/workflows/macos/main/Nexus.App.zip)
+- [Unsigned MacOS DMG](https://nightly.link/Henry-Hiles/nexus/workflows/macos/main/nexus.dmg.zip)
 - [Windows EXE](https://nightly.link/Henry-Hiles/nexus/workflows/windows/main/windows-installer.zip)
 - Flatpak
     - [AArch64/Arm64](https://nightly.link/Henry-Hiles/nexus/workflows/flatpak/main/flatpak-aarch64.zip)
