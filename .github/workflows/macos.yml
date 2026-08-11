@@ -41,7 +41,7 @@ jobs:
 
             - name: Create DMG
               id: create-dmg
-              uses: L-Super/create-dmg-actions@v1
+              uses: L-Super/create-dmg-actions@28511e988b13ca34096d439159a66d468b8e724f
               with:
                   dmg_name: nexus
                   src_dir: build/macos/Build/Products/Release/Nexus.app
@@ -50,4 +50,4 @@ jobs:
               uses: actions/upload-artifact@v6
               with:
                   name: nexus.dmg
-                  path: "${{ steps.create-dmg.outputs.dmg_path }}"
+                  path: ${{ steps.create-dmg.outputs.dmg_path }}
