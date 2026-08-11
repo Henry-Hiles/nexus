@@ -75,12 +75,13 @@ class RoomChatController extends AsyncNotifier<IList<Event>?> {
       );
 
   Future<bool> loadOlder() async {
+    state = AsyncLoading();
     final timelineKeys = ref
         .read(RoomsController.provider.select((value) => value[roomId]))
         ?.timeline
         .keys;
     final response = await ref
-        .watch(ClientController.provider.notifier)
+        .read(ClientController.provider.notifier)
         .paginate(
           .new(
             roomId: roomId,
@@ -90,26 +91,30 @@ class RoomChatController extends AsyncNotifier<IList<Event>?> {
           ),
         );
 
-    ref
-        .watch(RoomsController.provider.notifier)
-        .update(
-          IMap({
-            roomId: Room(
-              events: IMap.fromIterable(
-                response.events.addAll(response.relatedEvents),
-                keyMapper: (event) => event.rowId,
-                valueMapper: (event) => event,
+    if (response.events.isEmpty) {
+      state = .data(state.value);
+    } else {
+      ref
+          .read(RoomsController.provider.notifier)
+          .update(
+            IMap({
+              roomId: Room(
+                events: IMap.fromIterable(
+                  response.events.addAll(response.relatedEvents),
+                  keyMapper: (event) => event.rowId,
+                  valueMapper: (event) => event,
+                ),
+                hasMore: response.hasMore,
+                timeline: IMap.fromIterable(
+                  response.events,
+                  keyMapper: (event) => event.timelineRowId,
+                  valueMapper: (event) => event.rowId,
+                ),
               ),
-              hasMore: response.hasMore,
-              timeline: IMap.fromIterable(
-                response.events,
-                keyMapper: (event) => event.timelineRowId,
-                valueMapper: (event) => event.rowId,
-              ),
-            ),
-          }),
-          .new(),
-        );
+            }),
+            .new(),
+          );
+    }
 
     return response.hasMore;
   }

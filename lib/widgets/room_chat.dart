@@ -80,6 +80,7 @@ class RoomChat extends HookConsumerWidget {
     final controllerData = ref.watch(controllerProvider);
 
     final topEventBeforeLoad = useState<String?>(null);
+    final hasMore = useState<bool>(true);
 
     Future<void> jumpToId(String eventId) async {
       final index = controllerData.value?.indexWhere(
@@ -105,7 +106,7 @@ class RoomChat extends HookConsumerWidget {
     Future<void> loadOlder() async {
       if (controllerData case AsyncData(:final value?)) {
         topEventBeforeLoad.value = value.firstOrNull?.eventId;
-        await notifier.loadOlder();
+        hasMore.value = await notifier.loadOlder();
       }
     }
 
@@ -470,19 +471,20 @@ class RoomChat extends HookConsumerWidget {
                                 ScrollViewKeyboardDismissBehavior.onDrag,
                             controller: scrollController,
                             slivers: [
-                              SliverToBoxAdapter(
-                                child: Padding(
-                                  padding: .symmetric(vertical: 36),
-                                  child: Center(
-                                    child: ElevatedButton(
-                                      onPressed: controllerData is AsyncData
-                                          ? loadOlder
-                                          : null,
-                                      child: Text("Load More"),
+                              if (hasMore.value)
+                                SliverToBoxAdapter(
+                                  child: Padding(
+                                    padding: .symmetric(vertical: 36),
+                                    child: Center(
+                                      child: ElevatedButton(
+                                        onPressed: controllerData is AsyncData
+                                            ? loadOlder
+                                            : null,
+                                        child: Text("Load More"),
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
 
                               SuperSliverList.builder(
                                 listController: listController.value,
