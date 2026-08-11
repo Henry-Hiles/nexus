@@ -87,13 +87,13 @@ dev_dependencies:
     json_serializable: 6.14.1
 
 flutter_launcher_icons:
-    ios: true
-    android: true
     image_path: assets/icon.png
+    ios: true
+    image_path_ios: assets/mobile.png
+    android: true
     adaptive_icon_background: assets/background.png
     adaptive_icon_foreground: assets/foreground.png
     adaptive_icon_monochrome: assets/monochrome.png
-    remove_alpha_ios: true
     windows:
         generate: true
     macos:
