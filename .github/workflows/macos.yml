@@ -33,12 +33,6 @@ jobs:
                   flutter pub run build_runner build
                   flutter build macos --release
 
-            - name: Upload App
-              uses: actions/upload-artifact@v6
-              with:
-                  name: Nexus.app
-                  path: build/macos/Build/Products/Release/Nexus.app
-
             - name: Create DMG
               id: create-dmg
               uses: L-Super/create-dmg-actions@28511e988b13ca34096d439159a66d468b8e724f

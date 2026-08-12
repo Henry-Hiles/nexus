@@ -19,7 +19,7 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
     - [x] Linux
     - [x] Windows - Currently has some bugs, due to us not having any developers on Windows. If you want to fix these, get in contact with us though the [Nexus Client Matrix room](https://matrix.to/#/#nexus:federated.nexus).
     - [x] Android
-    - [x] MacOS - Unsigned .dmg/.App only
+    - [x] MacOS - Unsigned .dmg only
     - [x] iOS - Unsigned .ipa only
     - [ ] Web (may not be possible)
 - [x] Login (via OAuth)
