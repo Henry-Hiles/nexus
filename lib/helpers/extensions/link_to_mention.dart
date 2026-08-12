@@ -9,6 +9,7 @@ extension LinkToMention on String {
   ///
   /// Returns the decoded identifier (e.g. "#room:matrix.org")
   /// or null if this is not a Matrix link.
+  /// TODO: Needs to be reworked to handle event links. Might be worth just rewriting, I don't like this code.
   String? get mention {
     final trimmed = trim();
 
