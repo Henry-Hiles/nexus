@@ -7,7 +7,7 @@ part "join_room.g.dart";
 abstract class JoinRoomRequest with _$JoinRoomRequest {
   const factory JoinRoomRequest({
     required String roomIdOrAlias,
-    required IList<String> via,
+    @Default(IList.empty()) IList<String> via,
   }) = _JoinRoomRequest;
 
   factory JoinRoomRequest.fromJson(Map<String, Object?> json) =>

@@ -1,8 +1,11 @@
 import "package:flutter/material.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
+import "package:nexus/controllers/room_summary.dart";
 import "package:nexus/controllers/user.dart";
 import "package:nexus/helpers/extensions/link_to_mention.dart";
 import "package:nexus/helpers/extensions/show_user_popover.dart";
+import "package:nexus/models/content/membership.dart";
+import "package:nexus/models/room_summary.dart";
 
 class MentionChip extends ConsumerWidget {
   final String? roomId;
@@ -12,29 +15,48 @@ class MentionChip extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final mention = content.mention;
-    final membership = mention?.startsWith("@") == true
-        ? ref
-              .watch(
-                UserController.provider(.new(roomId: roomId, userId: mention!)),
-              )
-              .whenOrNull(data: (data) => data)
-        : null;
+    final data = switch (mention?.characters.firstOrNull) {
+      "@" =>
+        ref
+            .watch(
+              UserController.provider(.new(roomId: roomId, userId: mention!)),
+            )
+            .whenOrNull(data: (data) => data),
+
+      "#" || "!" =>
+        ref
+            .watch(
+              RoomSummaryController.provider(.new(roomIdOrAlias: mention!)),
+            )
+            .whenOrNull(data: (data) => data),
+
+      _ => null,
+    };
 
     return mention == null
         ? SizedBox.shrink()
         : InkWell(
             onTap: () {
-              if (membership != null) {
+              if (data case MembershipContent membership) {
                 context.showUserPopover(membership, mention, roomId: roomId);
+              } else if (data case RoomSummary summary) {
+                // TODO: Handle summary
               }
             },
             child: IgnorePointer(
               child: Chip(
                 label: Text(
-                  (membership?.displayName == null
-                          ? null
-                          : "@${membership!.displayName}") ??
-                      mention,
+                  switch (data) {
+                    RoomSummary summary =>
+                      (summary.name == null ? null : "#${summary.name}") ??
+                          summary.canonicalAlias ??
+                          summary.roomId,
+                    MembershipContent membership =>
+                      membership.displayName == null
+                          ? mention
+                          : "@${membership.displayName}",
+                    _ => mention,
+                  },
                   style: .new(
                     fontWeight: .bold,
                     color: Theme.of(context).colorScheme.onPrimary,

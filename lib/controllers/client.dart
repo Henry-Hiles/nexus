@@ -38,6 +38,7 @@ import "package:nexus/models/requests/set_membership.dart";
 import "package:nexus/models/requests/set_state.dart";
 import "package:nexus/models/requests/upload_media.dart";
 import "package:nexus/models/room.dart";
+import "package:nexus/models/room_summary.dart";
 import "package:nexus/models/spec_versions_response.dart";
 import "package:nexus/models/sync_data.dart";
 import "package:nexus/src/third_party/gomuks.g.dart";
@@ -213,10 +214,11 @@ class ClientController extends AsyncNotifier<int> {
     }
   }
 
-  Future<String> joinRoom(JoinRoomRequest request) async {
-    final response = await _sendCommand("join_room", request.toJson());
-    return response["room_id"];
-  }
+  Future<String> joinRoom(JoinRoomRequest request) async =>
+      (await _sendCommand("join_room", request.toJson()))["room_id"];
+
+  Future<RoomSummary> getRoomSummary(JoinRoomRequest request) async =>
+      .fromJson(await _sendCommand("get_room_summary", request.toJson()));
 
   Future<void> leaveRoom(Room room) async {
     if (room.metadata == null) return;

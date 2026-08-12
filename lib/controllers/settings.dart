@@ -9,14 +9,14 @@ class SettingsController extends AsyncNotifier<Settings> {
     final file = await ref.watch(SettingsFileController.provider.future);
 
     try {
-      return Settings.fromJson(json.decode(await file.readAsString()));
+      return .fromJson(json.decode(await file.readAsString()));
     } catch (_) {
-      return Settings();
+      return .new();
     }
   }
 
   Future<void> set(Settings settings) async {
-    state = AsyncData(settings);
+    state = .data(settings);
     final file = await ref.watch(SettingsFileController.provider.future);
     await file.writeAsString(json.encode(settings.toJson()));
   }

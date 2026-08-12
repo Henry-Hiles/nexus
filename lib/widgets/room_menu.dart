@@ -35,8 +35,7 @@ class RoomMenu extends ConsumerWidget {
 
               await Clipboard.setData(
                 .new(
-                  text:
-                      "matrix:roomid/${room!.metadata?.id.substring(1)}$vias)",
+                  text: "matrix:roomid/${room!.metadata?.id.substring(1)}$vias",
                 ),
               );
             },

@@ -311,7 +311,7 @@ class RoomChat extends HookConsumerWidget {
             await Clipboard.setData(
               ClipboardData(
                 text:
-                    "matrix:roomid/${room.metadata?.id.substring(1)}/e/${event.eventId}$vias)",
+                    "matrix:roomid/${room.metadata?.id.substring(1)}/e/${event.eventId}$vias",
               ),
             );
           },
