@@ -35,7 +35,7 @@ flutter.buildFlutterApplication {
   };
 
   postInstall = ''
-    install -D assets/icon.svg $out/share/icons/hicolor/scalable/apps/nexus.svg
+    install -D assets/bundled/icon.svg $out/share/icons/hicolor/scalable/apps/nexus.svg
     install -Dm755 linux/nexus.federated.nexus.desktop -t $out/share/applications
     wrapProgram $out/bin/nexus \
       --suffix LD_LIBRARY_PATH : $out/app/nexus/lib
