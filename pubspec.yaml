@@ -13,6 +13,7 @@ flutter:
               - asset: assets/fonts/Roboto.ttf
     assets:
         - assets/
+    uses-material-design: true
 
 environment:
     sdk: 3.13.0
