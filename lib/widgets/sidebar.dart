@@ -12,6 +12,9 @@ import "package:nexus/widgets/divider_widget.dart";
 import "package:nexus/widgets/join_dialog.dart";
 import "package:nexus/widgets/room_menu.dart";
 
+// Needed for navigation_rail_m3e (#65).
+import "package:flutter/material.dart" as old_mat;
+
 class const Sidebar({required final bool isDesktop, super.key})
     extends HookConsumerWidget {
   @override
@@ -72,126 +75,137 @@ class const Sidebar({required final bool isDesktop, super.key})
       shape: Border(),
       child: Row(
         children: [
-          Theme(
-            data: Theme.of(context).copyWith(
-              extensions: [
-                NavigationRailM3ETheme(
-                  itemCollapsedHeight: 48,
-                  itemVerticalGap: 0,
+          MaterialUiCompatibilityBridge(
+            child: Builder(
+              builder: (context) => old_mat.Theme(
+                data: old_mat.Theme.of(context).copyWith(
+                  extensions: [
+                    NavigationRailM3ETheme(
+                      itemCollapsedHeight: 48,
+                      itemVerticalGap: 0,
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            child: Container(
-              color: NavigationRailTokensAdapter(context).containerColor,
-              padding: EdgeInsets.only(top: 16),
-              child: NavigationRailM3E(
-                type: .alwaysCollapse,
-                labelBehavior: .alwaysHide,
-                scrollable: true,
-                onDestinationSelected: (value) {
-                  selectedSpaceIdNotifier.set(spaces[value].id);
-                  selectedRoomIdNotifier.set(
-                    spaces[value].children.firstOrNull?.metadata?.id,
-                  );
-                },
-                sections: [
-                  .new(
-                    destinations: spaces
-                        .map(
-                          (space) => NavigationRailM3EDestination(
-                            badgeCount: switch (space.children
-                                .addAll(
-                                  space.subSpaces
-                                      .map((element) => element.children)
-                                      .flattened,
-                                )
-                                .fold(
-                                  0,
-                                  (previousValue, room) =>
-                                      previousValue +
-                                      (room.metadata?.unreadNotifications ?? 0),
-                                )) {
-                              0 =>
-                                space.children
-                                        .addAll(
-                                          space.subSpaces
-                                              .map(
-                                                (element) => element.children,
-                                              )
-                                              .flattened,
-                                        )
-                                        .any(
-                                          (room) =>
-                                              room.metadata?.unreadMessages !=
-                                              0,
-                                        )
-                                    ? 0
-                                    : null,
-                              int badgeCount => badgeCount,
-                            },
-                            short: true,
-                            icon: AvatarOrHash(
-                              height: 28,
-                              space.room?.metadata?.avatar,
-                              fallback: space.icon == null
-                                  ? null
-                                  : Icon(space.icon),
-                              space.title,
-                            ),
-                            label: space.title,
-                          ),
-                        )
-                        .toList(),
-                  ),
-                ],
-                selectedIndex: selectedIndex,
-                trailingAtBottom: true,
-                trailing: Padding(
-                  padding: .symmetric(vertical: 16),
-                  child: Column(
-                    spacing: 8,
-                    children: [
-                      PopupMenuButton(
-                        itemBuilder: (_) => [
-                          PopupMenuItem(
-                            onTap: () => showDialog(
-                              context: context,
-                              builder: (_) => JoinDialog(ref),
-                            ),
-                            child: ListTile(
-                              title: Text("Join an existing room (or space)"),
-                              leading: Icon(Icons.numbers),
-                            ),
-                          ),
-                          PopupMenuItem(
-                            onTap: null,
-                            child: ListTile(
-                              title: Text("Create a new room"),
-                              leading: Icon(Icons.add),
-                            ),
-                          ),
-                        ],
-                        icon: Icon(Icons.add),
-                      ),
-                      IconButton(
-                        tooltip: "Explore other rooms",
-                        onPressed: null,
-                        icon: Icon(Icons.explore),
-                      ),
-                      IconButton(
-                        tooltip: "Open settings",
-                        onPressed: () => showDialog(
-                          context: context,
-                          builder: (_) => SettingsPage(),
-                        ),
-                        icon: Icon(Icons.settings),
+                child: Container(
+                  color: NavigationRailTokensAdapter(context).containerColor,
+                  padding: EdgeInsets.only(top: 16),
+                  child: NavigationRailM3E(
+                    type: .alwaysCollapse,
+                    labelBehavior: .alwaysHide,
+                    scrollable: true,
+                    onDestinationSelected: (value) {
+                      selectedSpaceIdNotifier.set(spaces[value].id);
+                      selectedRoomIdNotifier.set(
+                        spaces[value].children.firstOrNull?.metadata?.id,
+                      );
+                    },
+                    sections: [
+                      .new(
+                        destinations: spaces
+                            .map(
+                              (space) => NavigationRailM3EDestination(
+                                badgeCount: switch (space.children
+                                    .addAll(
+                                      space.subSpaces
+                                          .map((element) => element.children)
+                                          .flattened,
+                                    )
+                                    .fold(
+                                      0,
+                                      (previousValue, room) =>
+                                          previousValue +
+                                          (room.metadata?.unreadNotifications ??
+                                              0),
+                                    )) {
+                                  0 =>
+                                    space.children
+                                            .addAll(
+                                              space.subSpaces
+                                                  .map(
+                                                    (element) =>
+                                                        element.children,
+                                                  )
+                                                  .flattened,
+                                            )
+                                            .any(
+                                              (room) =>
+                                                  room
+                                                      .metadata
+                                                      ?.unreadMessages !=
+                                                  0,
+                                            )
+                                        ? 0
+                                        : null,
+                                  int badgeCount => badgeCount,
+                                },
+                                short: true,
+                                icon: AvatarOrHash(
+                                  height: 28,
+                                  space.room?.metadata?.avatar,
+                                  fallback: space.icon == null
+                                      ? null
+                                      : Icon(space.icon),
+                                  space.title,
+                                ),
+                                label: space.title,
+                              ),
+                            )
+                            .toList(),
                       ),
                     ],
+                    selectedIndex: selectedIndex,
+                    trailingAtBottom: true,
+                    trailing: Padding(
+                      padding: .symmetric(vertical: 16),
+                      child: Column(
+                        spacing: 8,
+                        children: [
+                          PopupMenuButton(
+                            itemBuilder: (_) => [
+                              PopupMenuItem(
+                                onTap: () => showDialog(
+                                  context: context,
+                                  builder: (_) => JoinDialog(ref),
+                                ),
+                                child: ListTile(
+                                  title: Text(
+                                    "Join an existing room (or space)",
+                                  ),
+                                  leading: Icon(Icons.numbers),
+                                ),
+                              ),
+                              PopupMenuItem(
+                                onTap: null,
+                                child: ListTile(
+                                  title: Text("Create a new room"),
+                                  leading: Icon(Icons.add),
+                                ),
+                              ),
+                            ],
+                            icon: Icon(Icons.add),
+                          ),
+                          IconButton(
+                            tooltip: "Explore other rooms",
+                            onPressed: null,
+                            icon: Icon(Icons.explore),
+                          ),
+                          IconButton(
+                            tooltip: "Open settings",
+                            onPressed: () => showDialog(
+                              context: context,
+                              builder: (_) => SettingsPage(),
+                            ),
+                            icon: Icon(Icons.settings),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ),
             ),
           ),
+
           Expanded(
             child: Scaffold(
               backgroundColor: Colors.transparent,
@@ -217,67 +231,75 @@ class const Sidebar({required final bool isDesktop, super.key})
                   ),
                 ],
               ),
-              body: Theme(
-                data: Theme.of(context).copyWith(
-                  extensions: [
-                    NavigationRailM3ETheme(
-                      itemExpandedHeight: 48,
-                      iconLabelGap: 16,
+              body: MaterialUiCompatibilityBridge(
+                child: Builder(
+                  builder: (context) => old_mat.Theme(
+                    data: old_mat.Theme.of(context).copyWith(
+                      extensions: [
+                        NavigationRailM3ETheme(
+                          itemExpandedHeight: 48,
+                          iconLabelGap: 16,
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                child: NavigationRailM3E(
-                  expandedWidth: double.infinity,
-                  scrollable: true,
-                  background: Colors.transparent,
-                  type: .alwaysExpand,
-                  selectedIndex: selectedRoomIndex ?? 0,
-                  sections: [
-                    .new(
-                      header: selectedSpace.room == null
-                          ? null
-                          : DividerWidget(Text("Rooms")),
-                      destinations: roomsToDestinations(selectedSpace.children),
-                    ),
-                    for (final subSpace in selectedSpace.subSpaces)
-                      .new(
-                        header: DividerWidget(
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            spacing: 8,
-                            children: [
-                              if (subSpace.room.metadata?.avatar != null)
-                                AvatarOrHash(
-                                  subSpace.room.metadata?.avatar,
-                                  subSpace.room.metadata?.name ??
-                                      "Unnamed Room",
-                                  height: 16,
-                                ),
-                              Flexible(
-                                child: Text(
-                                  subSpace.room.metadata?.name ??
-                                      "Unnamed Space",
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
+                    child: NavigationRailM3E(
+                      expandedWidth: double.infinity,
+                      scrollable: true,
+                      background: Colors.transparent,
+                      type: .alwaysExpand,
+                      selectedIndex: selectedRoomIndex ?? 0,
+                      sections: [
+                        .new(
+                          header: selectedSpace.room == null
+                              ? null
+                              : DividerWidget(Text("Rooms")),
+                          destinations: roomsToDestinations(
+                            selectedSpace.children,
                           ),
                         ),
-                        destinations: roomsToDestinations(subSpace.children),
-                      ),
-                  ],
-                  onDestinationSelected: (value) {
-                    final children = selectedSpace.children.addAll(
-                      selectedSpace.subSpaces
-                          .map((element) => element.children)
-                          .flattened,
-                    );
-                    selectedRoomIdNotifier.set(
-                      children[value].metadata?.id, //
-                    );
-                    if (!isDesktop) Navigator.of(context).pop();
-                  },
+                        for (final subSpace in selectedSpace.subSpaces)
+                          .new(
+                            header: DividerWidget(
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                spacing: 8,
+                                children: [
+                                  if (subSpace.room.metadata?.avatar != null)
+                                    AvatarOrHash(
+                                      subSpace.room.metadata?.avatar,
+                                      subSpace.room.metadata?.name ??
+                                          "Unnamed Room",
+                                      height: 16,
+                                    ),
+                                  Flexible(
+                                    child: Text(
+                                      subSpace.room.metadata?.name ??
+                                          "Unnamed Space",
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            destinations: roomsToDestinations(
+                              subSpace.children,
+                            ),
+                          ),
+                      ],
+                      onDestinationSelected: (value) {
+                        final children = selectedSpace.children.addAll(
+                          selectedSpace.subSpaces
+                              .map((element) => element.children)
+                              .flattened,
+                        );
+                        selectedRoomIdNotifier.set(
+                          children[value].metadata?.id, //
+                        );
+                        if (!isDesktop) Navigator.of(context).pop();
+                      },
+                    ),
+                  ),
                 ),
               ),
             ),

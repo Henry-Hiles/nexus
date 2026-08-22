@@ -1004,7 +1004,7 @@ packages:
     description:
       path: "packages/navigation_rail_m3e"
       ref: HEAD
-      resolved-ref: c9edb0be7251e1a31e2336444f00557eb93ca09d
+      resolved-ref: da860a413d5cf78b9c9c967215250bcdbfe5191d
       url: "https://github.com/Henry-Hiles/material_3_expressive"
     source: git
     version: "0.3.5"
