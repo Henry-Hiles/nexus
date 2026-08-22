@@ -1,9 +1,6 @@
-import "package:flutter/material.dart";
+import "package:material_ui/material_ui.dart";
 
-class Loading extends StatelessWidget {
-  final double? height;
-  const Loading({this.height, super.key});
-
+class const Loading({super.key, final double? height}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Center(
     child: Padding(

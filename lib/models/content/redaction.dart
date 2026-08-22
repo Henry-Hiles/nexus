@@ -4,7 +4,7 @@ part "redaction.freezed.dart";
 part "redaction.g.dart";
 
 @freezed
-abstract class RedactionContent extends Content with _$RedactionContent {
+sealed class RedactionContent extends Content with _$RedactionContent {
   RedactionContent._();
   factory RedactionContent({String? reason, String? redacts}) =
       _RedactionContent;

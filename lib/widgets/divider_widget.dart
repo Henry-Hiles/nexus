@@ -1,9 +1,7 @@
-import "package:flutter/material.dart";
+import "package:material_ui/material_ui.dart";
 
-class DividerWidget extends StatelessWidget {
-  final Widget widget;
-  const DividerWidget(this.widget, {super.key});
-
+final class const DividerWidget(final Widget widget, {super.key})
+    extends StatelessWidget {
   @override
   Widget build(BuildContext context) => LayoutBuilder(
     builder: (_, constraints) => Row(

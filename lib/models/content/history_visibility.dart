@@ -4,7 +4,7 @@ part "history_visibility.freezed.dart";
 part "history_visibility.g.dart";
 
 @freezed
-abstract class HistoryVisibilityContent extends Content
+sealed class HistoryVisibilityContent extends Content
     with _$HistoryVisibilityContent {
   HistoryVisibilityContent._();
   factory HistoryVisibilityContent({

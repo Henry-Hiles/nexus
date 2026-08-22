@@ -1,25 +1,17 @@
-import "package:flutter/material.dart";
+import "package:material_ui/material_ui.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/models/relation_type.dart";
 import "package:nexus/widgets/event_preview.dart";
 
-class RelationPreview extends ConsumerWidget {
-  final Event? relatedEvent;
-  final RelationType relationType;
-  final VoidCallback onDismiss;
-  final bool shouldMention;
-  final VoidCallback toggleShouldMention;
-
-  const RelationPreview(
-    this.relatedEvent, {
-    required this.relationType,
-    required this.onDismiss,
-    required this.shouldMention,
-    required this.toggleShouldMention,
-    super.key,
-  });
-
+class const RelationPreview(
+  final Event? relatedEvent, {
+  required final RelationType relationType,
+  required final VoidCallback onDismiss,
+  required final bool shouldMention,
+  required final VoidCallback toggleShouldMention,
+  super.key,
+}) extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (relatedEvent == null) return SizedBox.shrink();

@@ -1,14 +1,11 @@
-import "package:flutter/material.dart";
+import "package:material_ui/material_ui.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/url_preview.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
 import "package:nexus/helpers/launch_helper.dart";
 import "package:nexus/helpers/mxc_image.dart";
 
-class UrlPreview extends ConsumerWidget {
-  final Uri link;
-  const UrlPreview(this.link, {super.key});
-
+class const UrlPreview(final Uri link, {super.key}) extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => ConstrainedBox(
     constraints: .loose(.fromWidth(400)),
@@ -21,9 +18,9 @@ class UrlPreview extends ConsumerWidget {
                   onTap: () => ref.watch(LaunchHelper.provider).launchUrl(link),
                   child: Card(
                     margin: .symmetric(vertical: 4),
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.surfaceContainerHighest,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .surfaceContainerHighest,
                     child: Padding(
                       padding: .all(16),
                       child: Column(

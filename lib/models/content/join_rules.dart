@@ -6,7 +6,7 @@ part "join_rules.freezed.dart";
 part "join_rules.g.dart";
 
 @freezed
-abstract class JoinRulesContent extends Content with _$JoinRulesContent {
+sealed class JoinRulesContent extends Content with _$JoinRulesContent {
   JoinRulesContent._();
   factory JoinRulesContent({
     required JoinRule joinRule,
@@ -17,12 +17,13 @@ abstract class JoinRulesContent extends Content with _$JoinRulesContent {
       _$JoinRulesContentFromJson(json);
 }
 
-@freezed
-abstract class AllowCondition with _$AllowCondition {
-  const factory AllowCondition({
-    String? roomId,
-    required AllowConditionType type,
-  }) = _AllowCondition;
+@Freezed(toJson: false, fromJson: false)
+@JsonSerializable()
+class const AllowCondition({
+  final String? roomId,
+  required final AllowConditionType type,
+}) with _$AllowCondition {
+  Map<String, Object?> toJson() => _$AllowConditionToJson(this);
 
   factory AllowCondition.fromJson(Map<String, Object?> json) =>
       _$AllowConditionFromJson(json);

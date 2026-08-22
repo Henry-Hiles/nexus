@@ -1,4 +1,4 @@
-import "package:flutter/material.dart";
+import "package:material_ui/material_ui.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/author.dart";
 import "package:nexus/helpers/extensions/get_localpart.dart";
@@ -6,11 +6,11 @@ import "package:nexus/helpers/extensions/show_user_popover.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 
-class MessageAvatar extends ConsumerWidget {
-  final Event event;
-  final double height;
-  const MessageAvatar(this.event, {this.height = 24, super.key});
-
+class const MessageAvatar(
+  final Event event, {
+  final double height = 24,
+  super.key,
+}) extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => switch (ref.watch(
     AuthorController.provider(event),

@@ -5,7 +5,7 @@ part "canonical_alias.freezed.dart";
 part "canonical_alias.g.dart";
 
 @freezed
-abstract class CanonicalAliasContent extends Content
+sealed class CanonicalAliasContent extends Content
     with _$CanonicalAliasContent {
   CanonicalAliasContent._();
   factory CanonicalAliasContent({

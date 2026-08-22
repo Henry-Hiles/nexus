@@ -1,26 +1,27 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:freezed_annotation/freezed_annotation.dart";
+
 part "register_client.freezed.dart";
 part "register_client.g.dart";
 
-@freezed
-abstract class OAuthRegisterClientRequest with _$OAuthRegisterClientRequest {
-  const factory OAuthRegisterClientRequest({
-    required Uri homeserverUrl,
-    @Default(ApplicationType.web) ApplicationType applicationType,
-    String? clientName,
-    required Uri clientUri,
-    Uri? logoUri,
-    Uri? policyUri,
-    Uri? tosUri,
-    IList<GrantType>? grantTypes,
-    IList<Uri>? redirectUris,
-    IList<ResponseType>? responseTypes,
+@Freezed(toJson: false, fromJson: false)
+@JsonSerializable()
+class const OAuthRegisterClientRequest({
+  required final Uri homeserverUrl,
+  final ApplicationType applicationType = ApplicationType.web,
+  final String? clientName,
+  required final Uri clientUri,
+  final Uri? logoUri,
+  final Uri? policyUri,
+  final Uri? tosUri,
+  final IList<GrantType>? grantTypes,
+  final IList<Uri>? redirectUris,
+  final IList<ResponseType>? responseTypes,
 
-    @Default(AuthMethod.none)
-    @JsonKey(name: "token_endpoint_auth_method")
-    AuthMethod? authMethod,
-  }) = _OAuthRegisterClientRequest;
+  @JsonKey(name: "token_endpoint_auth_method")
+  final AuthMethod? authMethod = AuthMethod.none,
+}) with _$OAuthRegisterClientRequest {
+  Map<String, Object?> toJson() => _$OAuthRegisterClientRequestToJson(this);
 
   factory OAuthRegisterClientRequest.fromJson(Map<String, Object?> json) =>
       _$OAuthRegisterClientRequestFromJson(json);

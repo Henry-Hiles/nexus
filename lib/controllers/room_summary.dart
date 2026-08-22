@@ -3,10 +3,8 @@ import "package:nexus/controllers/client.dart";
 import "package:nexus/models/requests/join_room.dart";
 import "package:nexus/models/room_summary.dart";
 
-class RoomSummaryController extends AsyncNotifier<RoomSummary> {
-  final JoinRoomRequest request;
-  RoomSummaryController(this.request);
-
+class RoomSummaryController(final JoinRoomRequest request)
+    extends AsyncNotifier<RoomSummary> {
   @override
   Future<RoomSummary> build() =>
       ref.watch(ClientController.provider.notifier).getRoomSummary(request);

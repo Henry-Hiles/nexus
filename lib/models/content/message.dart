@@ -10,7 +10,7 @@ part "message.g.dart";
 typedef EncryptedFile = Map<String, dynamic>;
 
 @Freezed(unionKey: "msgtype", fallbackUnion: "default")
-abstract class MessageContent extends Content with _$MessageContent {
+sealed class MessageContent extends Content with _$MessageContent {
   MessageContent._();
   static String? mediaUrlFromJson(Map<dynamic, dynamic> json, String key) =>
       json[key] ?? json["file"]?[key];

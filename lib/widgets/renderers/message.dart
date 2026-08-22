@@ -1,5 +1,5 @@
 import "package:collection/collection.dart";
-import "package:flutter/material.dart";
+import "package:material_ui/material_ui.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:linkify/linkify.dart";
 import "package:nexus/controllers/client_state.dart";
@@ -21,21 +21,14 @@ import "package:nexus/widgets/event_preview.dart";
 import "package:nexus/widgets/players/video.dart";
 import "package:nexus/widgets/players/audio.dart";
 
-class MessageRenderer extends ConsumerWidget {
-  final Event event;
-  final bool textOnly;
-  final bool isGrouped;
-  final int? maxLines;
-  final VoidCallback? onTapReply;
-  const MessageRenderer(
-    this.event, {
-    this.onTapReply,
-    this.textOnly = false,
-    this.isGrouped = false,
-    this.maxLines,
-    super.key,
-  });
-
+class const MessageRenderer(
+  final Event event, {
+  final VoidCallback? onTapReply,
+  final bool textOnly = false,
+  final bool isGrouped = false,
+  final int? maxLines,
+  super.key,
+}) extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);

@@ -1,4 +1,4 @@
-import "package:flutter/material.dart";
+import "package:material_ui/material_ui.dart";
 import "package:nexus/models/content/membership.dart";
 import "package:nexus/widgets/user_bottom_sheet.dart";
 

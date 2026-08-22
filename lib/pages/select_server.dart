@@ -1,5 +1,5 @@
 import "package:app_links/app_links.dart";
-import "package:flutter/material.dart";
+import "package:material_ui/material_ui.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:flutter_svg/flutter_svg.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
@@ -13,9 +13,7 @@ import "package:nexus/pages/settings.dart";
 import "package:nexus/widgets/appbar.dart";
 import "package:nexus/widgets/divider_text.dart";
 
-class SelectServerPage extends HookConsumerWidget {
-  const SelectServerPage({super.key});
-
+class const SelectServerPage({super.key}) extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
@@ -181,23 +179,20 @@ class SelectServerPage extends HookConsumerWidget {
                 ...(<Homeserver>[
                   .new(
                     name: "Matrix.org",
-                    description:
-                        "The Matrix.org Foundation offers the matrix.org homeserver as an easy entry point for anyone wanting to try out Matrix.",
+                    description: "The Matrix.org Foundation offers the matrix.org homeserver as an easy entry point for anyone wanting to try out Matrix.",
                     url: .https("matrix.org"),
                     iconUrl:
                         "https://raw.githubusercontent.com/element-hq/logos/refs/heads/master/matrix/matrix-favicon${Theme.brightnessOf(context) == Brightness.dark ? "-white" : ""}.png",
                   ),
                   .new(
                     name: "Federated Nexus",
-                    description:
-                        "Federated Nexus is a community resource hosting multiple FOSS (especially federated) services, including Matrix and Forgejo. By the same developers who made Nexus client.",
+                    description: "Federated Nexus is a community resource hosting multiple FOSS (especially federated) services, including Matrix and Forgejo. By the same developers who made Nexus client.",
                     url: .https("federated.nexus"),
                     iconUrl: "https://federated.nexus/images/icon.png",
                   ),
                   .new(
                     name: "Unredacted",
-                    description:
-                        "Unredacted is a 501(c)(3) non-profit organization that builds Internet infrastructure and services to help people evade censorship and protect their right to privacy.",
+                    description: "Unredacted is a 501(c)(3) non-profit organization that builds Internet infrastructure and services to help people evade censorship and protect their right to privacy.",
                     url: .https("unredacted.org", "services/si/matrix"),
                     iconUrl: "https://unredacted.org/favicon.ico",
                   ),

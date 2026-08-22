@@ -1,5 +1,5 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
-import "package:flutter/material.dart";
+import "package:material_ui/material_ui.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart";
 import "package:nexus/helpers/extensions/link_to_mention.dart";
@@ -11,12 +11,12 @@ import "package:nexus/widgets/html/spoiler_text.dart";
 import "package:nexus/widgets/html/code_block.dart";
 import "package:nexus/widgets/html/quoted.dart";
 
-class Html extends ConsumerWidget {
-  final String html;
-  final String? roomId;
-  final TextStyle? textStyle;
-  const Html(this.html, {this.roomId, this.textStyle, super.key});
-
+class const Html(
+  final String html, {
+  final String? roomId,
+  final TextStyle? textStyle,
+  super.key,
+}) extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => HtmlWidget(
     html,
@@ -28,7 +28,7 @@ class Html extends ConsumerWidget {
       }
 
       if (element.attributes.keys.contains("data-mx-spoiler")) {
-        return InlineCustomWidget(child: SpoilerText(text: element.text));
+        return InlineCustomWidget(child: SpoilerText(element.text));
       }
 
       final height =

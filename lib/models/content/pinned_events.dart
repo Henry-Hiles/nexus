@@ -5,7 +5,7 @@ part "pinned_events.freezed.dart";
 part "pinned_events.g.dart";
 
 @freezed
-abstract class PinnedEventsContent extends Content with _$PinnedEventsContent {
+sealed class PinnedEventsContent extends Content with _$PinnedEventsContent {
   PinnedEventsContent._();
   factory PinnedEventsContent({
     @Default(IList.empty()) @JsonKey(name: "pinned") IList<String> pinnedEvents,

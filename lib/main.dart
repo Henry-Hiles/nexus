@@ -1,4 +1,5 @@
 import "dart:io";
+
 import "package:dynamic_color/dynamic_color.dart";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/foundation.dart";
@@ -18,7 +19,7 @@ import "package:nexus/pages/verify.dart";
 import "package:nexus/widgets/error_dialog.dart";
 import "package:nexus/widgets/loading.dart";
 import "package:window_manager/window_manager.dart";
-import "package:flutter/material.dart";
+import "package:material_ui/material_ui.dart";
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -94,16 +95,13 @@ void main() async {
   );
 }
 
-class App extends StatelessWidget {
-  const App({super.key});
-
+class const App({super.key}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) => DynamicColorBuilder(
     builder: (lightDynamic, darkDynamic) => Consumer(
       builder: (context, ref, child) => MaterialApp(
         navigatorKey: navigatorKey,
         debugShowCheckedModeBanner: false,
-        // Use indigo to work around bugs in theme generation
         theme:
             (ref
                         .watch(SettingsController.provider)

@@ -1,13 +1,15 @@
 import "package:freezed_annotation/freezed_annotation.dart";
+
 part "reactions.freezed.dart";
 part "reactions.g.dart";
 
-@freezed
-abstract class ReactionsConfig with _$ReactionsConfig {
-  const factory ReactionsConfig({
-    required String roomId,
-    required int eventRowId,
-  }) = _ReactionsConfig;
+@Freezed(toJson: false, fromJson: false)
+@JsonSerializable()
+class const ReactionsConfig({
+  required final String roomId,
+  required final int eventRowId,
+}) with _$ReactionsConfig {
+  Map<String, Object?> toJson() => _$ReactionsConfigToJson(this);
 
   factory ReactionsConfig.fromJson(Map<String, Object?> json) =>
       _$ReactionsConfigFromJson(json);

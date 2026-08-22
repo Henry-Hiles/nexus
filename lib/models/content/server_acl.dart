@@ -5,7 +5,7 @@ part "server_acl.freezed.dart";
 part "server_acl.g.dart";
 
 @freezed
-abstract class ServerACLContent extends Content with _$ServerACLContent {
+sealed class ServerACLContent extends Content with _$ServerACLContent {
   ServerACLContent._();
   factory ServerACLContent({
     @Default(IList.empty()) IList<String> allow,

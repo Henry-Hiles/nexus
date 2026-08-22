@@ -1,28 +1,20 @@
 import "dart:io";
+
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
-import "package:flutter/material.dart";
+import "package:material_ui/material_ui.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/settings.dart";
 import "package:window_manager/window_manager.dart";
 
-class Appbar extends ConsumerWidget implements PreferredSizeWidget {
-  final Widget? leading;
-  final Widget? title;
-  final Color? backgroundColor;
-  final double? scrolledUnderElevation;
-  final IList<Widget> actions;
-  final VoidCallback? onTap;
-
-  const Appbar({
-    super.key,
-    this.title,
-    this.onTap,
-    this.backgroundColor,
-    this.scrolledUnderElevation,
-    this.leading,
-    this.actions = const .empty(),
-  });
-
+final class const Appbar({
+  final Widget? leading,
+  final Widget? title,
+  final Color? backgroundColor,
+  final double? scrolledUnderElevation,
+  final IList<Widget> actions = const .empty(),
+  final VoidCallback? onTap,
+  super.key,
+}) extends ConsumerWidget implements PreferredSizeWidget {
   @override
   Size get preferredSize => const .fromHeight(kToolbarHeight);
 

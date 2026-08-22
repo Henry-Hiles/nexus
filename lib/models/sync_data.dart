@@ -2,20 +2,21 @@ import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:freezed_annotation/freezed_annotation.dart";
 import "package:nexus/models/room.dart";
 import "package:nexus/models/space_edge.dart";
+
 part "sync_data.freezed.dart";
 part "sync_data.g.dart";
 
-@freezed
-abstract class SyncData with _$SyncData {
-  const factory SyncData({
-    @Default(false) bool clearState,
-    @Default(IMap.empty()) IMap<String, IMap<String, dynamic>> accountData,
-    @Default(IMap.empty()) IMap<String, Room> rooms,
-    @Default(ISet.empty()) ISet<String> leftRooms,
-    // required IList<InvitedRoom> invitedRooms,
-    IMap<String, IList<SpaceEdge>>? spaceEdges,
-    IList<String>? topLevelSpaces,
-  }) = _SyncData;
+@Freezed(toJson: false, fromJson: false)
+@JsonSerializable()
+class const SyncData({
+  final bool clearState = false,
+  final IMap<String, IMap<String, dynamic>> accountData = const IMap.empty(),
+  final IMap<String, Room> rooms = const IMap.empty(),
+  final ISet<String> leftRooms = const ISet.empty(),
+  final IMap<String, IList<SpaceEdge>>? spaceEdges,
+  final IList<String>? topLevelSpaces,
+}) with _$SyncData {
+  Map<String, Object?> toJson() => _$SyncDataToJson(this);
 
   factory SyncData.fromJson(Map<String, Object?> json) =>
       _$SyncDataFromJson(json);

@@ -1,5 +1,5 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
-import "package:flutter/material.dart";
+import "package:material_ui/material_ui.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:m3e_buttons/m3e_buttons.dart";
@@ -16,10 +16,8 @@ import "package:nexus/widgets/error_dialog.dart";
 import "package:nexus/widgets/loading.dart";
 import "package:nexus/widgets/user_bottom_sheet.dart";
 
-class MemberList extends HookConsumerWidget {
-  final String roomId;
-  const MemberList(this.roomId, {super.key});
-
+class const MemberList(final String roomId, {super.key})
+    extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final statusIndex = useState(0);
@@ -96,9 +94,9 @@ class MemberList extends HookConsumerWidget {
                               ),
                               SliverM3ECardList(
                                 padding: .all(4),
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.surfaceContainerHigh,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .surfaceContainerHigh,
                                 margin: .symmetric(horizontal: 12, vertical: 4),
                                 itemCount: members.length,
                                 itemBuilder: (context, index) =>

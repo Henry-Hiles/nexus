@@ -1,10 +1,10 @@
-import "package:flutter/material.dart";
+import "package:material_ui/material_ui.dart";
 
-class HighlightWrapper extends StatelessWidget {
-  final Widget child;
-  final bool isHighlighted;
-  const HighlightWrapper(this.child, {this.isHighlighted = false, super.key});
-
+final class const HighlightWrapper(
+  final Widget child, {
+  final bool isHighlighted = false,
+  super.key,
+}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) => ClipRRect(
     borderRadius: .all(.circular(12)),

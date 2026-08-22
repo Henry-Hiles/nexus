@@ -1,4 +1,4 @@
-import "package:flutter/material.dart";
+import "package:material_ui/material_ui.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/client.dart";
@@ -6,9 +6,7 @@ import "package:nexus/pages/settings.dart";
 import "package:nexus/widgets/appbar.dart";
 import "package:nexus/helpers/required_validator_helper.dart";
 
-class VerifyPage extends HookConsumerWidget {
-  const VerifyPage({super.key});
-
+class const VerifyPage({super.key}) extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final passphraseController = useTextEditingController();

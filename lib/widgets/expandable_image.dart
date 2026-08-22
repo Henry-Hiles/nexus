@@ -1,15 +1,15 @@
-import "package:flutter/material.dart";
+import "package:material_ui/material_ui.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:m3e_buttons/m3e_buttons.dart";
 import "package:nexus/helpers/mxc_image.dart";
 import "package:nexus/models/requests/download_media.dart";
 import "package:nexus/widgets/error_dialog.dart";
 
-class ExpandableImage extends ConsumerWidget {
-  final Widget child;
-  final DownloadMediaRequest? request;
-  const ExpandableImage(this.request, {required this.child, super.key});
-
+final class const ExpandableImage(
+  final DownloadMediaRequest? request, {
+  required final Widget child,
+  super.key,
+}) extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => InkWell(
     onTap: request == null

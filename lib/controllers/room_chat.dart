@@ -1,5 +1,6 @@
 import "dart:async";
 import "dart:math";
+
 import "package:collection/collection.dart";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
@@ -15,10 +16,8 @@ import "package:nexus/models/relation_type.dart";
 import "package:nexus/models/requests/send_message.dart";
 import "package:nexus/models/room.dart";
 
-class RoomChatController extends AsyncNotifier<IList<Event>?> {
-  final String roomId;
-  RoomChatController(this.roomId);
-
+class RoomChatController(final String roomId)
+    extends AsyncNotifier<IList<Event>?> {
   @override
   Future<IList<Event>?> build() async {
     final client = ref.watch(ClientController.provider.notifier);

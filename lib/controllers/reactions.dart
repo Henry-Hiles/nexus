@@ -5,10 +5,8 @@ import "package:nexus/controllers/rooms.dart";
 import "package:nexus/models/configs/reactions.dart";
 import "package:nexus/models/content/reaction.dart";
 
-class ReactionsController extends AsyncNotifier<IMap<String, IList<String>>> {
-  final ReactionsConfig config;
-  ReactionsController(this.config);
-
+class ReactionsController(final ReactionsConfig config)
+    extends AsyncNotifier<IMap<String, IList<String>>> {
   @override
   Future<IMap<String, IList<String>>> build() async {
     final eventInfo = ref.watch(

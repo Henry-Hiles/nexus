@@ -1,10 +1,7 @@
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client.dart";
 
-class ClientIdController extends AsyncNotifier<String> {
-  final Uri homeserver;
-  ClientIdController(this.homeserver);
-
+class ClientIdController(final Uri homeserver) extends AsyncNotifier<String> {
   @override
   Future<String> build() => ref
       .watch(ClientController.provider.notifier)

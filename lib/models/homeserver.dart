@@ -1,12 +1,11 @@
 import "package:freezed_annotation/freezed_annotation.dart";
+
 part "homeserver.freezed.dart";
 
 @freezed
-abstract class Homeserver with _$Homeserver {
-  const factory Homeserver({
-    required String name,
-    required String description,
-    required Uri url,
-    required String iconUrl,
-  }) = _Homeserver;
-}
+class const Homeserver({
+  @override required final String name,
+  @override required final String description,
+  @override required final Uri url,
+  @override required final String iconUrl,
+}) with _$Homeserver;

@@ -1,12 +1,12 @@
 import "dart:math";
 
-import "package:flutter/material.dart";
+import "package:material_ui/material_ui.dart";
 
-class CodeBlock extends StatelessWidget {
-  final String code;
-  final String lang;
-  const CodeBlock(this.code, {required this.lang, super.key});
-
+class const CodeBlock(
+  final String code, {
+  required final String lang,
+  super.key,
+}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);

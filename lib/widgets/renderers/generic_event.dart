@@ -1,10 +1,10 @@
-import "package:flutter/material.dart";
+import "package:material_ui/material_ui.dart";
 
-class GenericEventRenderer extends StatelessWidget {
-  final IconData icon;
-  final List<Widget> children;
-  const GenericEventRenderer(this.icon, this.children, {super.key});
-
+class const GenericEventRenderer(
+  final IconData icon,
+  final List<Widget> children, {
+  super.key,
+}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Padding(
     padding: .symmetric(vertical: 4),

@@ -6,10 +6,8 @@ import "package:nexus/models/content/content.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/models/requests/get_room_state.dart";
 
-class MembersController extends AsyncNotifier<ISet<Event>> {
-  final String roomId;
-  MembersController(this.roomId);
-
+class MembersController(final String roomId)
+    extends AsyncNotifier<ISet<Event>> {
   @override
   Future<ISet<Event>> build() async {
     final room = ref.watch(

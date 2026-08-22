@@ -5,10 +5,8 @@ import "package:nexus/models/configs/members_by_status.dart";
 import "package:nexus/models/content/membership.dart";
 import "package:nexus/models/event.dart";
 
-class MembersByStatusController extends AsyncNotifier<ISet<Event>> {
-  final MembersByStatusConfig config;
-  MembersByStatusController(this.config);
-
+class MembersByStatusController(final MembersByStatusConfig config)
+    extends AsyncNotifier<ISet<Event>> {
   @override
   Future<ISet<Event>> build() => ref.watch(
     MembersController.provider(config.roomId).selectAsync(

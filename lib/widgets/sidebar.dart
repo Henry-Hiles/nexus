@@ -1,6 +1,6 @@
 import "package:collection/collection.dart";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
-import "package:flutter/material.dart";
+import "package:material_ui/material_ui.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:navigation_rail_m3e/navigation_rail_m3e.dart";
 import "package:nexus/controllers/key.dart";
@@ -12,10 +12,8 @@ import "package:nexus/widgets/divider_widget.dart";
 import "package:nexus/widgets/join_dialog.dart";
 import "package:nexus/widgets/room_menu.dart";
 
-class Sidebar extends HookConsumerWidget {
-  final bool isDesktop;
-  const Sidebar({required this.isDesktop, super.key});
-
+class const Sidebar({required final bool isDesktop, super.key})
+    extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedSpaceProvider = KeyController.provider(

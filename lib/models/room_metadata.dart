@@ -1,29 +1,31 @@
 import "package:freezed_annotation/freezed_annotation.dart";
 import "package:nexus/models/epoch_date_time_converter.dart";
 import "package:nexus/models/lazy_load_summary.dart";
+
 part "room_metadata.freezed.dart";
 part "room_metadata.g.dart";
 
-@freezed
-abstract class RoomMetadata with _$RoomMetadata {
-  const factory RoomMetadata({
-    @JsonKey(name: "room_id") required String id,
+@Freezed(toJson: false, fromJson: false)
+@JsonSerializable()
+class const RoomMetadata({
+  @JsonKey(name: "room_id") required final String id,
 
-    // required CreateEventContent creationContent,
-    // required TombstoneEventContent tombstoneEventContent,
-    String? name,
-    Uri? avatar,
-    String? dmUserId,
-    String? topic,
-    String? canonicalAlias,
-    LazyLoadSummary? lazyLoadSummary,
-    required bool hasMemberList,
-    @JsonKey(name: "preview_event_rowid") required int previewEventRowID,
-    @EpochDateTimeConverter() required DateTime sortingTimestamp,
-    required int unreadHighlights,
-    required int unreadNotifications,
-    required int unreadMessages,
-  }) = _RoomMetadata;
+  // CreateEventContent creationContent,
+  // TombstoneEventContent tombstoneEventContent,
+  final String? name,
+  final Uri? avatar,
+  final String? dmUserId,
+  final String? topic,
+  final String? canonicalAlias,
+  final LazyLoadSummary? lazyLoadSummary,
+  required final bool hasMemberList,
+  @JsonKey(name: "preview_event_rowid") required final int previewEventRowID,
+  @EpochDateTimeConverter() required final DateTime sortingTimestamp,
+  required final int unreadHighlights,
+  required final int unreadNotifications,
+  required final int unreadMessages,
+}) with _$RoomMetadata {
+  Map<String, Object?> toJson() => _$RoomMetadataToJson(this);
 
   factory RoomMetadata.fromJson(Map<String, Object?> json) =>
       _$RoomMetadataFromJson(json);

@@ -1,18 +1,18 @@
 import "dart:async";
-import "package:flutter/material.dart";
+
+import "package:material_ui/material_ui.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:media_kit/media_kit.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/models/info/audio.dart";
 
-class AudioPlayer extends HookConsumerWidget {
-  final Uri uri;
-  final AudioInfo? info;
-  final bool encrypted;
-
-  const AudioPlayer(this.uri, this.info, {this.encrypted = false, super.key});
-
+class const AudioPlayer(
+  final Uri uri,
+  final AudioInfo? info, {
+  final bool encrypted = false,
+  super.key,
+}) extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final player = useMemoized(

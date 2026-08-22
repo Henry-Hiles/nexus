@@ -1,21 +1,15 @@
 import "package:emoji_text_field/emoji_text_field.dart";
-import "package:flutter/material.dart";
+import "package:material_ui/material_ui.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/emoji.dart";
 
-class EmojiPickerButton extends HookConsumerWidget {
-  final TextEditingController? controller;
-  final void Function(String emoji)? onSelection;
-  final VoidCallback? onPressed;
-  final BuildContext context;
-  const EmojiPickerButton({
-    this.controller,
-    this.onPressed,
-    this.onSelection,
-    required this.context,
-    super.key,
-  });
-
+final class const EmojiPickerButton({
+  required final BuildContext context,
+  final TextEditingController? controller,
+  final void Function(String emoji)? onSelection,
+  final VoidCallback? onPressed,
+  super.key,
+}) extends HookConsumerWidget {
   @override
   Widget build(_, WidgetRef ref) => IconButton(
     onPressed: () async {

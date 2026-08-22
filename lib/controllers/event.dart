@@ -5,10 +5,8 @@ import "package:nexus/controllers/rooms.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/models/requests/get_event.dart";
 
-class EventController extends AsyncNotifier<Event?> {
-  final GetEventRequest request;
-  EventController(this.request);
-
+class EventController(final GetEventRequest request)
+    extends AsyncNotifier<Event?> {
   @override
   Future<Event?> build() async {
     final room = ref.watch(

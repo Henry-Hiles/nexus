@@ -1,14 +1,16 @@
 import "package:freezed_annotation/freezed_annotation.dart";
+
 part "sync_status.freezed.dart";
 part "sync_status.g.dart";
 
-@freezed
-abstract class SyncStatus with _$SyncStatus {
-  const factory SyncStatus({
-    required SyncStatusType type,
-    String? error,
-    required int errorCount,
-  }) = _SyncStatus;
+@Freezed(toJson: false, fromJson: false)
+@JsonSerializable()
+class const SyncStatus({
+  required final SyncStatusType type,
+  required final String? error,
+  required final int errorCount,
+}) with _$SyncStatus {
+  Map<String, Object?> toJson() => _$SyncStatusToJson(this);
 
   factory SyncStatus.fromJson(Map<String, Object?> json) =>
       _$SyncStatusFromJson(json);

@@ -5,10 +5,7 @@ import "package:nexus/controllers/rooms.dart";
 import "package:nexus/models/content/content.dart";
 import "package:nexus/models/content/pinned_events.dart";
 
-class PinnedIdsController extends Notifier<IList<String>> {
-  final String roomId;
-  PinnedIdsController(this.roomId);
-
+class PinnedIdsController(final String roomId) extends Notifier<IList<String>> {
   @override
   IList<String> build() {
     final room = ref.watch(

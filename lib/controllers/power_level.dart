@@ -6,10 +6,8 @@ import "package:nexus/models/configs/power_level.dart";
 import "package:nexus/models/content/content.dart";
 import "package:nexus/models/content/power_levels.dart";
 
-class PowerLevelController extends Notifier<bool> {
-  final PowerLevelConfig config;
-  PowerLevelController(this.config);
-
+class PowerLevelController(final PowerLevelConfig config)
+    extends Notifier<bool> {
   @override
   bool build() {
     if (config case EventPowerLevelConfig(:final eventType)) {

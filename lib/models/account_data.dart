@@ -1,11 +1,26 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:freezed_annotation/freezed_annotation.dart";
+
 part "account_data.freezed.dart";
 part "account_data.g.dart";
 
-@freezed
-abstract class AccountData with _$AccountData {
-  const AccountData._();
+@Freezed(toJson: false, fromJson: false)
+@JsonSerializable()
+class const AccountData({
+  @JsonKey(name: AccountData.invitePermissionConfigKey)
+  final InvitePermissionConfig invitePermissionConfig =
+      const InvitePermissionConfig(),
+
+  @JsonKey(name: AccountData.directKey)
+  final IMap<String, IList<String>> directMessages = const IMap.empty(),
+
+  @JsonKey(
+    name: AccountData.recentEmojiKey,
+    readValue: AccountData.readRecentEmojiValue,
+    toJson: AccountData.recentEmojiToJson,
+  )
+  final IList<RecentEmoji> recentEmoji = const IList.empty(),
+}) with _$AccountData {
   static List<dynamic>? readRecentEmojiValue(
     Map<dynamic, dynamic> json,
     String key,
@@ -19,44 +34,29 @@ abstract class AccountData with _$AccountData {
   static const directKey = "m.direct";
   static const recentEmojiKey = "m.recent_emoji";
 
-  const factory AccountData({
-    @JsonKey(name: AccountData.invitePermissionConfigKey)
-    @Default(InvitePermissionConfig())
-    InvitePermissionConfig invitePermissionConfig,
-
-    @JsonKey(name: AccountData.directKey)
-    @Default(IMap.empty())
-    IMap<String, IList<String>> directMessages,
-
-    @JsonKey(
-      name: AccountData.recentEmojiKey,
-      readValue: AccountData.readRecentEmojiValue,
-      toJson: AccountData.recentEmojiToJson,
-    )
-    @Default(IList.empty())
-    IList<RecentEmoji> recentEmoji,
-  }) = _AccountData;
+  Map<String, Object?> toJson() => _$AccountDataToJson(this);
 
   factory AccountData.fromJson(Map<String, Object?> json) =>
       _$AccountDataFromJson(json);
 }
 
-@freezed
-abstract class InvitePermissionConfig with _$InvitePermissionConfig {
-  const factory InvitePermissionConfig({
-    @JsonKey(unknownEnumValue: DefaultInviteAction.allow)
-    @Default(DefaultInviteAction.allow)
-    DefaultInviteAction defaultAction,
-  }) = _InvitePermissionConfig;
+@Freezed(toJson: false, fromJson: false)
+@JsonSerializable()
+class const InvitePermissionConfig({
+  @JsonKey(unknownEnumValue: DefaultInviteAction.allow)
+  final DefaultInviteAction defaultAction = DefaultInviteAction.allow,
+}) with _$InvitePermissionConfig {
+  Map<String, Object?> toJson() => _$InvitePermissionConfigToJson(this);
 
   factory InvitePermissionConfig.fromJson(Map<String, Object?> json) =>
       _$InvitePermissionConfigFromJson(json);
 }
 
-@freezed
-abstract class RecentEmoji with _$RecentEmoji {
-  const factory RecentEmoji({required String emoji, required int total}) =
-      _RecentEmoji;
+@Freezed(toJson: false, fromJson: false)
+@JsonSerializable()
+class const RecentEmoji({required final String emoji, required final int total})
+    with _$RecentEmoji {
+  Map<String, Object?> toJson() => _$RecentEmojiToJson(this);
 
   factory RecentEmoji.fromJson(Map<String, Object?> json) =>
       _$RecentEmojiFromJson(json);

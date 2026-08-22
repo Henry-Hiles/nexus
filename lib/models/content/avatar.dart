@@ -5,7 +5,7 @@ part "avatar.freezed.dart";
 part "avatar.g.dart";
 
 @freezed
-abstract class AvatarContent extends Content with _$AvatarContent {
+sealed class AvatarContent extends Content with _$AvatarContent {
   AvatarContent._();
   factory AvatarContent({ImageInfo? info, Uri? url}) = _AvatarContent;
 

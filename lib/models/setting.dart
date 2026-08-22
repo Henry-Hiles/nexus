@@ -1,16 +1,13 @@
-import "package:flutter/material.dart";
+import "package:material_ui/material_ui.dart";
 
-class Setting {
-  final String title;
-  final String description;
-  final IconData icon;
-  final Widget Function(String title, String description, IconData icon)
-  builder;
-
-  Setting({
-    required this.title,
-    required this.description,
-    required this.builder,
-    required this.icon,
-  });
-}
+class Setting({
+  required final String title,
+  required final String description,
+  required final IconData icon,
+  required final Widget Function(
+    String title,
+    String description,
+    IconData icon,
+  )
+  builder,
+});

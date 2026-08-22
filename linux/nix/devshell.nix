@@ -2,7 +2,7 @@
 let
   android = pkgs.androidenv.composeAndroidPackages {
     toolsVersion = "26.1.1";
-    platformToolsVersion = "36.0.1";
+    platformToolsVersion = "37.0.1";
     buildToolsVersions = [
       "35.0.0"
       "36.0.0"
@@ -42,8 +42,7 @@ pkgs.mkShell {
     ANDROID_SDK_ROOT = ANDROID_HOME;
     JAVA_HOME = pkgs.jdk17;
 
-    TOOLS = "${ANDROID_HOME}/build-tools/${"36.0.0"}";
-    GRADLE_OPTS = "-Dorg.gradle.project.android.aapt2FromMavenOverride=${TOOLS}/aapt2";
+    GRADLE_OPTS = "-Dorg.gradle.project.android.aapt2FromMavenOverride=${ANDROID_HOME}/build-tools/36.0.0/aapt2";
   }
   // lib.optionalAttrs pkgs.stdenv.isLinux {
     CPATH = lib.makeSearchPath "include" [ pkgs.glibc.dev ];

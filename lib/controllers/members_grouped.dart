@@ -8,11 +8,8 @@ import "package:nexus/models/content/content.dart";
 import "package:nexus/models/content/power_levels.dart";
 import "package:nexus/models/event.dart";
 
-class MembersGroupedController
+class MembersGroupedController(final MembersByStatusConfig config)
     extends AsyncNotifier<IList<MapEntry<int?, ISet<Event>>>> {
-  final MembersByStatusConfig config;
-  MembersGroupedController(this.config);
-
   @override
   Future<IList<MapEntry<int?, ISet<Event>>>> build() async {
     final room = ref.watch(

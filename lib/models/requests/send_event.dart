@@ -1,19 +1,21 @@
 import "package:freezed_annotation/freezed_annotation.dart";
 import "package:nexus/models/content/content.dart";
+
 part "send_event.freezed.dart";
 part "send_event.g.dart";
 
-@freezed
-abstract class SendEventRequest with _$SendEventRequest {
-  const factory SendEventRequest({
-    required String roomId,
-    required String type,
-    required Content content,
-    String? relatesTo,
-    String? relationType,
-    @Default(false) bool synchronous,
-    @Default(false) bool disableEncryption,
-  }) = _SendEventRequest;
+@Freezed(toJson: false, fromJson: false)
+@JsonSerializable()
+class const SendEventRequest({
+  required final String roomId,
+  required final String type,
+  required final Content content,
+  final String? relatesTo,
+  final String? relationType,
+  final bool synchronous = false,
+  final bool disableEncryption = false,
+}) with _$SendEventRequest {
+  Map<String, Object?> toJson() => _$SendEventRequestToJson(this);
 
   factory SendEventRequest.fromJson(Map<String, Object?> json) =>
       _$SendEventRequestFromJson(json);

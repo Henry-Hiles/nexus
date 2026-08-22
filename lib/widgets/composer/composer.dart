@@ -1,7 +1,8 @@
 import "dart:io";
+
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:file_selector/file_selector.dart";
-import "package:flutter/material.dart";
+import "package:material_ui/material_ui.dart";
 import "package:flutter/services.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:fluttertagger/fluttertagger.dart";
@@ -17,28 +18,20 @@ import "package:nexus/widgets/composer/relation_preview.dart";
 import "package:nexus/widgets/emoji_picker_button.dart";
 import "package:nexus/main.dart";
 
-class Composer extends HookConsumerWidget {
-  final String roomId;
-  final Event? relatedEvent;
-  final RelationType relationType;
-  final VoidCallback onDismiss;
-  final FocusNode? node;
-  final Future<void> Function(
+class const Composer(
+  final String roomId, {
+  required final Event? relatedEvent,
+  required final RelationType relationType,
+  required final VoidCallback onDismiss,
+  required final Future<void> Function(
     String text, {
     required bool shouldMention,
     required IList<Tag> tags,
   })
-  onSend;
-  const Composer(
-    this.roomId, {
-    required this.relatedEvent,
-    required this.relationType,
-    required this.onDismiss,
-    required this.onSend,
-    this.node,
-    super.key,
-  });
-
+  onSend,
+  final FocusNode? node,
+  super.key,
+}) extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
@@ -143,9 +136,8 @@ class Composer extends HookConsumerWidget {
                                     ),
                                     onTap: () async => ref
                                         .watch(
-                                          AttachmentController.provider(
-                                            roomId,
-                                          ).notifier,
+                                          AttachmentController.provider(roomId)
+                                              .notifier,
                                         )
                                         .add(
                                           (await ref
@@ -163,9 +155,8 @@ class Composer extends HookConsumerWidget {
                                   ),
                                   onTap: () async => ref
                                       .watch(
-                                        AttachmentController.provider(
-                                          roomId,
-                                        ).notifier,
+                                        AttachmentController.provider(roomId)
+                                            .notifier,
                                       )
                                       .add(
                                         (await ref
@@ -179,9 +170,8 @@ class Composer extends HookConsumerWidget {
                                 PopupMenuItem(
                                   onTap: () async => ref
                                       .watch(
-                                        AttachmentController.provider(
-                                          roomId,
-                                        ).notifier,
+                                        AttachmentController.provider(roomId)
+                                            .notifier,
                                       )
                                       .add((await openFile())!)
                                       .onError(showError),

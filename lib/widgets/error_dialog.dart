@@ -1,13 +1,13 @@
-import "package:flutter/material.dart";
+import "package:material_ui/material_ui.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:flutter_riverpod/misc.dart";
 
-class ErrorDialog extends ConsumerWidget {
-  final Object error;
-  final StackTrace? stackTrace;
-  final ProviderOrFamily? provider;
-  const ErrorDialog(this.error, this.stackTrace, {this.provider, super.key});
-
+final class const ErrorDialog(
+  final Object error,
+  final StackTrace? stackTrace, {
+  final ProviderOrFamily? provider,
+  super.key,
+}) extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return AlertDialog(

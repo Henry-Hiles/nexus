@@ -5,7 +5,7 @@ part "sticker.freezed.dart";
 part "sticker.g.dart";
 
 @freezed
-abstract class StickerContent extends Content with _$StickerContent {
+sealed class StickerContent extends Content with _$StickerContent {
   StickerContent._();
   factory StickerContent({
     required String body,

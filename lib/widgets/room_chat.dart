@@ -1,5 +1,5 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
-import "package:flutter/material.dart";
+import "package:material_ui/material_ui.dart";
 import "package:flutter/services.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
@@ -28,17 +28,12 @@ import "package:nexus/main.dart";
 import "package:nexus/widgets/loading.dart";
 import "package:super_sliver_list/super_sliver_list.dart";
 
-class RoomChat extends HookConsumerWidget {
-  final bool isDesktop;
-  final bool showMembersByDefault;
-  final String? roomId;
-  const RoomChat({
-    required this.roomId,
-    required this.isDesktop,
-    required this.showMembersByDefault,
-    super.key,
-  });
-
+final class const RoomChat({
+  required final String? roomId,
+  required final bool isDesktop,
+  required final bool showMembersByDefault,
+  super.key,
+}) extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final relatedEvent = useState<Event?>(null);
@@ -127,9 +122,8 @@ class RoomChat extends HookConsumerWidget {
     }, [scrollController.hasClients]);
 
     useEffect(() {
-      if (controllerData case AsyncData(
-        :final value?,
-      ) when scrollController.hasClients) {
+      if (controllerData case AsyncData(:final value?)
+          when scrollController.hasClients) {
         if (topEventBeforeLoad.value != null) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (scrollController.hasClients) {

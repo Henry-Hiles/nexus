@@ -1,14 +1,16 @@
 import "package:freezed_annotation/freezed_annotation.dart";
+
 part "get_event.freezed.dart";
 part "get_event.g.dart";
 
-@freezed
-abstract class GetEventRequest with _$GetEventRequest {
-  const factory GetEventRequest({
-    required String roomId,
-    required String eventId,
-    @Default(false) bool unredact,
-  }) = _GetEventRequest;
+@Freezed(toJson: false, fromJson: false)
+@JsonSerializable()
+class const GetEventRequest({
+  required final String roomId,
+  required final String eventId,
+  final bool unredact = false,
+}) with _$GetEventRequest {
+  Map<String, Object?> toJson() => _$GetEventRequestToJson(this);
 
   factory GetEventRequest.fromJson(Map<String, Object?> json) =>
       _$GetEventRequestFromJson(json);

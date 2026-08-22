@@ -1,4 +1,4 @@
-import "package:flutter/material.dart";
+import "package:material_ui/material_ui.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/widgets/appbar.dart";
@@ -7,21 +7,14 @@ import "package:nexus/widgets/expandable_image.dart";
 import "package:nexus/widgets/linkified_text.dart";
 import "package:nexus/widgets/room_menu.dart";
 
-class RoomAppbar extends ConsumerWidget implements PreferredSizeWidget {
-  final bool isDesktop;
-  final void Function(BuildContext context)? onOpenMemberList;
-  final void Function()? onOpenPinnedMessagesList;
-  final void Function() onOpenDrawer;
-  final String? roomId;
-  const RoomAppbar({
-    required this.roomId,
-    required this.isDesktop,
-    required this.onOpenDrawer,
-    this.onOpenMemberList,
-    this.onOpenPinnedMessagesList,
-    super.key,
-  });
-
+final class const RoomAppbar({
+  required final String? roomId,
+  required final bool isDesktop,
+  required final void Function() onOpenDrawer,
+  final void Function(BuildContext context)? onOpenMemberList,
+  final void Function()? onOpenPinnedMessagesList,
+  super.key,
+}) extends ConsumerWidget implements PreferredSizeWidget {
   @override
   Size get preferredSize => AppBar().preferredSize;
 
@@ -67,9 +60,9 @@ class RoomAppbar extends ConsumerWidget implements PreferredSizeWidget {
                                 room.metadata?.name ?? "Unnamed Room",
                                 overflow: .ellipsis,
                                 maxLines: 3,
-                                style: Theme.of(
-                                  context,
-                                ).textTheme.headlineSmall,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headlineSmall,
                               ),
                             ),
                           ],
@@ -79,9 +72,9 @@ class RoomAppbar extends ConsumerWidget implements PreferredSizeWidget {
                             room.metadata!.topic!,
                             style: Theme.of(context).textTheme.bodyLarge
                                 ?.copyWith(
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.onSurfaceVariant,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant,
                                 ),
                           ),
                       ],

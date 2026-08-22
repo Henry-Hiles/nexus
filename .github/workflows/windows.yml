@@ -1,65 +1,65 @@
 name: "Build EXE"
 
 on:
-  push:
-    branches: ["main"]
-    tags: ["*"]
-  workflow_dispatch:
+    push:
+        branches: ["main"]
+        tags: ["*"]
+    workflow_dispatch:
 
 jobs:
-  build-exe:
-    runs-on: windows-latest
+    build-exe:
+        runs-on: windows-latest
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-        with:
-          submodules: recursive
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v6
+              with:
+                  submodules: recursive
 
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: 3.44.4
+            - name: Set up Flutter
+              uses: subosito/flutter-action@v2
+              with:
+                  flutter-version: 3.47.0
 
-      - name: Set up Go
-        uses: actions/setup-go@v6
-        with:
-          go-version-file: gomuks/go.mod
+            - name: Set up Go
+              uses: actions/setup-go@v6
+              with:
+                  go-version-file: gomuks/go.mod
 
-      - name: Setup MSYS2
-        uses: msys2/setup-msys2@v2
-        with:
-          msystem: MINGW64
-          install: >-
-            mingw-w64-x86_64-gcc
+            - name: Setup MSYS2
+              uses: msys2/setup-msys2@v2
+              with:
+                  msystem: MINGW64
+                  install: >-
+                      mingw-w64-x86_64-gcc
 
-      - name: Go build
-        run: |
-          cd gomuks/pkg/ffi
-          go build -tags goolm,sqlite_fts5 -o ../../../libgomuks.dll -buildmode=c-shared
+            - name: Go build
+              run: |
+                  cd gomuks/pkg/ffi
+                  go build -tags goolm,sqlite_fts5 -o ../../../libgomuks.dll -buildmode=c-shared
 
-      - name: Build with Flutter
-        run: |
-          flutter pub get
-          dart scripts/generate.dart
-          flutter pub run build_runner build
-          flutter build windows --release
+            - name: Build with Flutter
+              run: |
+                  flutter pub get
+                  dart scripts/generate.dart
+                  flutter pub run build_runner build
+                  flutter build windows --release
 
-      - name: Copy MinGW runtime DLLs
-        shell: msys2 {0}
-        run: |
-          cp /mingw64/bin/libgcc_s_seh-1.dll build/windows/x64/runner/Release/
-          cp /mingw64/bin/libwinpthread-1.dll build/windows/x64/runner/Release/
-          cp /mingw64/bin/libstdc++-6.dll build/windows/x64/runner/Release/
+            - name: Copy MinGW runtime DLLs
+              shell: msys2 {0}
+              run: |
+                  cp /mingw64/bin/libgcc_s_seh-1.dll build/windows/x64/runner/Release/
+                  cp /mingw64/bin/libwinpthread-1.dll build/windows/x64/runner/Release/
+                  cp /mingw64/bin/libstdc++-6.dll build/windows/x64/runner/Release/
 
-      - name: Install Inno Setup
-        run: choco install innosetup -y
+            - name: Install Inno Setup
+              run: choco install innosetup -y
 
-      - name: Build Inno Setup installer
-        run: iscc windows/installer.iss
+            - name: Build Inno Setup installer
+              run: iscc windows/installer.iss
 
-      - name: Upload installer artifact
-        uses: actions/upload-artifact@v6
-        with:
-          name: windows-installer
-          path: windows/dist/Nexus-Setup.exe
+            - name: Upload installer artifact
+              uses: actions/upload-artifact@v6
+              with:
+                  name: windows-installer
+                  path: windows/dist/Nexus-Setup.exe

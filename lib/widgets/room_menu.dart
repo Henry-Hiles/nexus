@@ -1,16 +1,16 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
-import "package:flutter/material.dart";
+import "package:material_ui/material_ui.dart";
 import "package:flutter/services.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/via.dart";
 import "package:nexus/models/room.dart";
 
-class RoomMenu extends ConsumerWidget {
-  final Room? room;
-  final IList<Room> children;
-  const RoomMenu(this.room, {this.children = const IList.empty(), super.key});
-
+final class const RoomMenu(
+  final Room? room, {
+  final IList<Room> children = const IList.empty(),
+  super.key,
+}) extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final danger = Theme.of(context).colorScheme.error;

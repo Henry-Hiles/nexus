@@ -6,10 +6,8 @@ import "package:nexus/models/content/content.dart";
 import "package:nexus/models/content/message.dart";
 import "package:path/path.dart";
 
-class AttachmentController extends Notifier<(String, MessageContent?)?> {
-  final String roomId;
-  AttachmentController(this.roomId);
-
+class AttachmentController(final String roomId)
+    extends Notifier<(String, MessageContent?)?> {
   @override
   Null build() => null;
 

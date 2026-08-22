@@ -4,10 +4,7 @@ import "package:nexus/models/content/content.dart";
 import "package:nexus/models/content/create.dart";
 import "package:nexus/models/room.dart";
 
-class RoomCreatorsController extends Notifier<IList<String>> {
-  final Room room;
-  RoomCreatorsController(this.room);
-
+class RoomCreatorsController(final Room room) extends Notifier<IList<String>> {
   @override
   IList<String> build() {
     final createRowId = room.state[EventType.create.type]?[""];

@@ -3,11 +3,38 @@ import "package:freezed_annotation/freezed_annotation.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/models/read_receipt.dart";
 import "package:nexus/models/room_metadata.dart";
+
 part "room.freezed.dart";
 part "room.g.dart";
 
-@freezed
-abstract class Room with _$Room {
+@Freezed(toJson: false, fromJson: false)
+@JsonSerializable()
+class const Room({
+  @JsonKey(name: "meta") final RoomMetadata? metadata,
+
+  @JsonKey(fromJson: Room.timelineTupleJsonToIMap)
+  final IMap<int, int?> timeline = const IMap.empty(),
+
+  final ISet<int> sticky = const ISet.empty(),
+
+  @JsonKey(fromJson: Room.eventsJsonToIMap)
+  final IMap<int, Event> events = const IMap.empty(),
+
+  final bool reset = false,
+  final bool hasFetchedState = false,
+  final bool hasFetchedMembers = false,
+  final IMap<String, IMap<String, int>> state = const IMap.empty(),
+
+  final IMap<String, IList<ReadReceipt>> receipts = const IMap.empty(),
+  final bool dismissNotifications = false,
+  final bool hasMore = true,
+
+  // IMap<String, AccountData> accountData,
+  // IList<Notification> notifications,
+}) with _$Room {
+  /// [timeline] is an IMap of timelineRowId to eventRowId
+  /// [events] is an IMap of eventRowId to event
+  /// [sticky] is an ISet of eventRowId
   static IMap<int, int?> timelineTupleJsonToIMap(List<dynamic> json) =>
       IMap.fromEntries(
         json.map(
@@ -26,32 +53,7 @@ abstract class Room with _$Room {
         }),
       );
 
-  /// [timeline] is an IMap of timelineRowId to eventRowId
-  /// [events] is an IMap of eventRowId to event
-  /// [sticky] is an ISet of eventRowId
-  const factory Room({
-    @JsonKey(name: "meta") RoomMetadata? metadata,
-    @Default(IMap.empty())
-    @JsonKey(fromJson: Room.timelineTupleJsonToIMap)
-    IMap<int, int?> timeline,
-    @Default(ISet.empty()) ISet<int> sticky,
-
-    @Default(IMap.empty())
-    @JsonKey(fromJson: Room.eventsJsonToIMap)
-    IMap<int, Event> events,
-
-    @Default(false) bool reset,
-    @Default(false) bool hasFetchedState,
-    @Default(false) bool hasFetchedMembers,
-    @Default(IMap.empty()) IMap<String, IMap<String, int>> state,
-
-    @Default(IMap.empty()) IMap<String, IList<ReadReceipt>> receipts,
-    @Default(false) bool dismissNotifications,
-    @Default(true) bool hasMore,
-
-    // required IMap<String, AccountData> accountData,
-    // required IList<Notification> notifications,
-  }) = _Room;
+  Map<String, Object?> toJson() => _$RoomToJson(this);
 
   factory Room.fromJson(Map<String, Object?> json) => _$RoomFromJson(json);
 }

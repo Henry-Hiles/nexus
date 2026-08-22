@@ -5,7 +5,7 @@ part "create.freezed.dart";
 part "create.g.dart";
 
 @freezed
-abstract class CreateContent extends Content with _$CreateContent {
+sealed class CreateContent extends Content with _$CreateContent {
   CreateContent._();
   factory CreateContent({
     @JsonKey(name: "additional_creators")
@@ -30,9 +30,10 @@ enum RoomType {
   space,
 }
 
-@freezed
-abstract class PreviousRoom with _$PreviousRoom {
-  const factory PreviousRoom({required String roomId}) = _PreviousRoom;
+@Freezed(toJson: false, fromJson: false)
+@JsonSerializable()
+class const PreviousRoom({required final String roomId}) with _$PreviousRoom {
+  Map<String, Object?> toJson() => _$PreviousRoomToJson(this);
 
   factory PreviousRoom.fromJson(Map<String, Object?> json) =>
       _$PreviousRoomFromJson(json);

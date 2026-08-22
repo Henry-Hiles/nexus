@@ -1,4 +1,4 @@
-import "package:flutter/material.dart";
+import "package:material_ui/material_ui.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client_state.dart";
@@ -10,10 +10,7 @@ import "package:nexus/widgets/error_dialog.dart";
 import "package:nexus/main.dart";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 
-class ReactionRow extends ConsumerWidget {
-  final Event event;
-  const ReactionRow(this.event, {super.key});
-
+class const ReactionRow(final Event event, {super.key}) extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final clientState = ref.watch(ClientStateController.provider);
@@ -67,9 +64,8 @@ class ReactionRow extends ConsumerWidget {
                                 enabled.value = false;
                                 try {
                                   final controller = ref.watch(
-                                    RoomChatController.provider(
-                                      event.roomId,
-                                    ).notifier,
+                                    RoomChatController.provider(event.roomId)
+                                        .notifier,
                                   );
 
                                   if (selected) {

@@ -4,7 +4,7 @@ part "reaction.freezed.dart";
 part "reaction.g.dart";
 
 @Freezed(toJson: false)
-abstract class ReactionContent extends Content with _$ReactionContent {
+sealed class ReactionContent extends Content with _$ReactionContent {
   ReactionContent._();
   static String? keyJsonFromJson(Map<dynamic, dynamic> json, String key) =>
       json["m.relates_to"]?["key"];

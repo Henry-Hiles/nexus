@@ -5,7 +5,7 @@ part "membership.freezed.dart";
 part "membership.g.dart";
 
 @freezed
-abstract class MembershipContent extends Content with _$MembershipContent {
+sealed class MembershipContent extends Content with _$MembershipContent {
   MembershipContent._();
 
   static String? displaynameFromJson(String? displayName) =>

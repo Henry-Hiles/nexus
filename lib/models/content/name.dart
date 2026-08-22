@@ -4,7 +4,7 @@ part "name.freezed.dart";
 part "name.g.dart";
 
 @freezed
-abstract class NameContent extends Content with _$NameContent {
+sealed class NameContent extends Content with _$NameContent {
   NameContent._();
   factory NameContent({required String name}) = _NameContent;
 

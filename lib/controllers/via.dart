@@ -7,10 +7,7 @@ import "package:nexus/models/content/membership.dart";
 import "package:nexus/models/content/power_levels.dart";
 import "package:nexus/models/room.dart";
 
-class ViaController extends Notifier<String> {
-  final Room room;
-  ViaController(this.room);
-
+class ViaController(final Room room) extends Notifier<String> {
   @override
   String build() {
     final servers = <String>{};

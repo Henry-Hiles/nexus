@@ -1,16 +1,18 @@
 import "package:freezed_annotation/freezed_annotation.dart";
+
 part "exchange_token.freezed.dart";
 part "exchange_token.g.dart";
 
-@freezed
-abstract class OAuthExchangeTokenRequest with _$OAuthExchangeTokenRequest {
-  const factory OAuthExchangeTokenRequest({
-    required Uri homeserverUrl,
-    required String codeVerifier,
-    required Uri redirectUri,
-    required String code,
-    required String clientId,
-  }) = _OAuthExchangeTokenRequest;
+@Freezed(toJson: false, fromJson: false)
+@JsonSerializable()
+class const OAuthExchangeTokenRequest({
+  required final Uri homeserverUrl,
+  required final String codeVerifier,
+  required final Uri redirectUri,
+  required final String code,
+  required final String clientId,
+}) with _$OAuthExchangeTokenRequest {
+  Map<String, Object?> toJson() => _$OAuthExchangeTokenRequestToJson(this);
 
   factory OAuthExchangeTokenRequest.fromJson(Map<String, Object?> json) =>
       _$OAuthExchangeTokenRequestFromJson(json);

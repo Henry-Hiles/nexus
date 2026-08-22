@@ -4,7 +4,7 @@ part "encrypted.freezed.dart";
 part "encrypted.g.dart";
 
 @freezed
-abstract class EncryptedContent extends Content with _$EncryptedContent {
+sealed class EncryptedContent extends Content with _$EncryptedContent {
   EncryptedContent._();
   factory EncryptedContent() = _EncryptedContent;
 

@@ -1,21 +1,14 @@
-import "package:flutter/material.dart";
+import "package:material_ui/material_ui.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 
-class RadioDialog<T> extends HookWidget {
-  final T? value;
-  final String title;
-  final List<T> options;
-  final void Function(T value)? onChanged;
-  final String Function(T option) getName;
-  const RadioDialog({
-    super.key,
-    required this.title,
-    required this.value,
-    required this.options,
-    required this.onChanged,
-    required this.getName,
-  });
-
+final class const RadioDialog<T>({
+  required final T? value,
+  required final String title,
+  required final List<T> options,
+  required final void Function(T value)? onChanged,
+  required final String Function(T option) getName,
+  super.key,
+}) extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final mutValue = useState<T?>(null);

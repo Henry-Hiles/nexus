@@ -1,5 +1,6 @@
 import "dart:async";
-import "package:flutter/material.dart";
+
+import "package:material_ui/material_ui.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/models/info/video.dart";
@@ -7,12 +8,12 @@ import "package:flutter_hooks/flutter_hooks.dart";
 import "package:media_kit/media_kit.dart";
 import "package:media_kit_video/media_kit_video.dart";
 
-class VideoPlayer extends HookConsumerWidget {
-  final VideoInfo? info;
-  final Uri uri;
-  final bool encrypted;
-  const VideoPlayer(this.uri, this.info, {this.encrypted = false, super.key});
-
+class const VideoPlayer(
+  final Uri uri,
+  final VideoInfo? info, {
+  final bool encrypted = false,
+  super.key,
+}) extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final player = useMemoized(

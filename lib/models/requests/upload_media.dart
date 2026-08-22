@@ -1,23 +1,26 @@
 import "package:freezed_annotation/freezed_annotation.dart";
+
 part "upload_media.freezed.dart";
 part "upload_media.g.dart";
 
-@freezed
-abstract class UploadMediaRequest with _$UploadMediaRequest {
-  const factory UploadMediaRequest({
-    required String path,
-    required bool encrypt,
-    String? filename,
-    @Default(false) @JsonKey(name: "voice_message") bool isVoiceMessage,
-    @Default(false) bool forceFile,
-
-    // Below params only work if encodeTo is set
-    String? encodeTo,
-    int? resizeWidth,
-    int? resizeHeight,
-    int? resizePercent,
-    @Default(80) int quality,
-  }) = _UploadMediaRequest;
+@Freezed(toJson: false, fromJson: false)
+@JsonSerializable()
+class const UploadMediaRequest({
+  required final String path,
+  required final bool encrypt,
+  final String? filename,
+  @JsonKey(name: "voice_message") final bool isVoiceMessage = false,
+  final bool forceFile = false,
+  final
+  // Below params only work if encodeTo is set
+  String?
+  encodeTo,
+  final int? resizeWidth,
+  final int? resizeHeight,
+  final int? resizePercent,
+  final int quality = 80,
+}) with _$UploadMediaRequest {
+  Map<String, Object?> toJson() => _$UploadMediaRequestToJson(this);
 
   factory UploadMediaRequest.fromJson(Map<String, Object?> json) =>
       _$UploadMediaRequestFromJson(json);

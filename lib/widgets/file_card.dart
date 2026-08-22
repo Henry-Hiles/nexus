@@ -1,13 +1,13 @@
-import "package:flutter/material.dart";
+import "package:material_ui/material_ui.dart";
 import "package:nexus/helpers/extensions/size_to_string.dart";
 import "package:nexus/models/info/file.dart";
 
-class FileCard extends StatelessWidget {
-  final Uri uri;
-  final FileInfo? info;
-  final String? filename;
-  const FileCard(this.uri, this.info, {this.filename, super.key});
-
+final class const FileCard(
+  final Uri uri,
+  final FileInfo? info, {
+  final String? filename,
+  super.key,
+}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) => SizedBox(
     width: 320,

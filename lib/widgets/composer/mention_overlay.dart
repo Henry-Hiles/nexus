@@ -1,4 +1,4 @@
-import "package:flutter/material.dart";
+import "package:material_ui/material_ui.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/members_by_status.dart";
 import "package:nexus/controllers/rooms.dart";
@@ -9,19 +9,14 @@ import "package:nexus/models/content/membership.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/widgets/loading.dart";
 
-class MentionOverlay extends ConsumerWidget {
-  final String? triggerCharacter;
-  final String query;
-  final String roomId;
-  final void Function({required String id, required String name}) addTag;
-  const MentionOverlay(
-    this.roomId, {
-    required this.query,
-    required this.addTag,
-    required this.triggerCharacter,
-    super.key,
-  });
-
+class const MentionOverlay(
+  final String roomId, {
+  required final String query,
+  required final void Function({required String id, required String name})
+  addTag,
+  required final String? triggerCharacter,
+  super.key,
+}) extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final rooms = ref.watch(RoomsController.provider);

@@ -19,9 +19,11 @@ import "package:nexus/models/content/history_visibility.dart";
 
 class Content {
   final Error? parseError;
-  Content({this.parseError});
 
-  factory Content.fromJson(Map<String, dynamic> json) => Content();
+  const Content({this.parseError});
+
+  factory Content.fromJson(Map<String, dynamic> json) => const Content();
+
   Map<String, dynamic> toJson() => {};
 
   static Map<String, dynamic> readValue(Map<dynamic, dynamic> json, _) =>
@@ -34,13 +36,16 @@ class Content {
               ?.contentFromJson ??
           Content.fromJson)(json);
     } catch (error) {
-      if (error is Error) return .new(parseError: error);
+      if (error is Error) return Content(parseError: error);
       rethrow;
     }
   }
 }
 
-enum EventType {
+enum EventType(
+  final String type,
+  final Content Function(Map<String, dynamic> json) contentFromJson,
+) {
   encrypted("m.room.encrypted", EncryptedContent.fromJson),
   redaction("m.room.redaction", RedactionContent.fromJson),
   encryption("m.room.encryption", EncryptionContent.fromJson),
@@ -61,8 +66,4 @@ enum EventType {
   reaction("m.reaction", ReactionContent.fromJson),
   pinnedEvents("m.room.pinned_events", PinnedEventsContent.fromJson),
   message("m.room.message", MessageContent.fromJson);
-
-  final String type;
-  final Content Function(Map<String, dynamic> json) contentFromJson;
-  const EventType(this.type, this.contentFromJson);
 }

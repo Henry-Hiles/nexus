@@ -1,5 +1,5 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
-import "package:flutter/material.dart";
+import "package:material_ui/material_ui.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/pinned_events.dart";
 import "package:nexus/models/event.dart";
@@ -7,17 +7,12 @@ import "package:nexus/widgets/error_dialog.dart";
 import "package:nexus/widgets/loading.dart";
 import "package:nexus/widgets/renderers/event.dart";
 
-class PinnedEventsDrawer extends HookConsumerWidget {
-  final String roomId;
-  final IList<PopupMenuEntry> Function(Event event) getEventOptions;
-  final Future<void> Function(String eventId) jumpToId;
-  const PinnedEventsDrawer(
-    this.roomId, {
-    required this.getEventOptions,
-    required this.jumpToId,
-    super.key,
-  });
-
+final class const PinnedEventsDrawer(
+  final String roomId, {
+  required final IList<PopupMenuEntry> Function(Event event) getEventOptions,
+  required final Future<void> Function(String eventId) jumpToId,
+  super.key,
+}) extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final pinsProvider = ref.watch(PinnedEventsController.provider(roomId));

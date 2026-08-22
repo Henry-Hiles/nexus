@@ -1,28 +1,18 @@
-import "package:flutter/material.dart";
+import "package:material_ui/material_ui.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/widgets/settings/radio_dialog.dart";
 
-class DialogListTile<T> extends ConsumerWidget {
-  final T? initialValue;
-  final String title;
-  final Widget? subtitle;
-  final List<T> options;
-  final bool required;
-  final Icon icon;
-  final void Function(T value)? onChanged;
-  final String Function(T option) getName;
-  const DialogListTile({
-    super.key,
-    required this.icon,
-    required this.title,
-    required this.initialValue,
-    required this.options,
-    required this.onChanged,
-    required this.getName,
-    this.subtitle,
-    this.required = true,
-  });
-
+final class const DialogListTile<T>({
+  required final T? initialValue,
+  required final Icon icon,
+  required final String title,
+  required final List<T> options,
+  required final void Function(T value)? onChanged,
+  required final String Function(T option) getName,
+  final Widget? subtitle,
+  final bool required = true,
+  super.key,
+}) extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => FormField(
     validator: (value) =>

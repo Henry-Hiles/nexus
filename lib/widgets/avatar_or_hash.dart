@@ -1,21 +1,15 @@
 import "package:color_hash/color_hash.dart";
-import "package:flutter/material.dart";
+import "package:material_ui/material_ui.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/helpers/mxc_image.dart";
 
-class AvatarOrHash extends ConsumerWidget {
-  final Uri? avatar;
-  final String title;
-  final Widget? fallback;
-  final double height;
-  const AvatarOrHash(
-    this.avatar,
-    this.title, {
-    this.fallback,
-    this.height = 24,
-    super.key,
-  });
-
+final class const AvatarOrHash(
+  final Uri? avatar,
+  final String title, {
+  final Widget? fallback,
+  final double height = 24,
+  super.key,
+}) extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final box = ColoredBox(

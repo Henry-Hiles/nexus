@@ -1,17 +1,18 @@
 import "package:freezed_annotation/freezed_annotation.dart";
+
 part "image.freezed.dart";
 part "image.g.dart";
 
-@freezed
-abstract class ImageInfo with _$ImageInfo {
-  /// Information for images, [size] is in bytes.
-  const factory ImageInfo({
-    @JsonKey(name: "h") double? height,
-    @JsonKey(name: "w") double? width,
-    @JsonKey(name: "mimetype") String? mimeType,
-    @JsonKey(name: "xyz.amorgan.blurhash") String? blurHash,
-    int? size,
-  }) = _ImageInfo;
+@Freezed(toJson: false, fromJson: false)
+@JsonSerializable()
+class const ImageInfo({
+  @JsonKey(name: "h") final double? height,
+  @JsonKey(name: "w") final double? width,
+  @JsonKey(name: "mimetype") final String? mimeType,
+  @JsonKey(name: "xyz.amorgan.blurhash") final String? blurHash,
+  final int? size,
+}) with _$ImageInfo {
+  Map<String, Object?> toJson() => _$ImageInfoToJson(this);
 
   factory ImageInfo.fromJson(Map<String, Object?> json) =>
       _$ImageInfoFromJson(json);

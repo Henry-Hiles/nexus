@@ -1,4 +1,4 @@
-import "package:flutter/material.dart";
+import "package:material_ui/material_ui.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/author.dart";
 import "package:nexus/helpers/extensions/get_localpart.dart";
@@ -6,17 +6,12 @@ import "package:nexus/helpers/extensions/show_user_popover.dart";
 import "package:nexus/helpers/extensions/string_to_color.dart";
 import "package:nexus/models/event.dart";
 
-class MessageDisplayname extends ConsumerWidget {
-  final Event event;
-  final TextStyle? style;
-  final bool clickable;
-  const MessageDisplayname(
-    this.event, {
-    this.clickable = true,
-    this.style,
-    super.key,
-  });
-
+class const MessageDisplayname(
+  final Event event, {
+  final TextStyle? style,
+  final bool clickable = true,
+  super.key,
+}) extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => switch (ref.watch(
     AuthorController.provider(event),
@@ -40,14 +35,11 @@ class MessageDisplayname extends ConsumerWidget {
             maxLines: 1,
             overflow: .ellipsis,
           ),
-
           if (event.pmp != null)
             Text(
               "(via ${event.sender})",
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: event.sender.colorHash,
-                fontWeight: .bold,
-              ),
+              style: Theme.of(context).textTheme.labelSmall
+                  ?.copyWith(color: event.sender.colorHash, fontWeight: .bold),
               maxLines: 1,
               overflow: .ellipsis,
             ),

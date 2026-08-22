@@ -1,6 +1,7 @@
 import "package:freezed_annotation/freezed_annotation.dart";
 import "package:nexus/models/content/content.dart";
 import "package:nexus/models/membership_action.dart";
+
 part "power_level.freezed.dart";
 
 @freezed

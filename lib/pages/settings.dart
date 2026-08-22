@@ -1,6 +1,6 @@
 import "package:collection/collection.dart";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
-import "package:flutter/material.dart";
+import "package:material_ui/material_ui.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:m3e_card_list/m3e_card_list.dart";
@@ -13,9 +13,7 @@ import "package:nexus/widgets/divider_text.dart";
 import "package:nexus/widgets/highlight_wrapper.dart";
 import "package:super_sliver_list/super_sliver_list.dart";
 
-class SettingsPage extends ConsumerWidget {
-  const SettingsPage({super.key});
-
+class const SettingsPage({super.key}) extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => LayoutBuilder(
     builder: (_, constraints) => HookBuilder(
@@ -142,12 +140,12 @@ class SettingsPage extends ConsumerWidget {
                                       vertical: 8,
                                     ),
                                     margin: .symmetric(horizontal: 12),
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.primaryContainer,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .primaryContainer,
                                     itemCount: categories.length,
-                                    onTap: (index) =>
-                                        Navigator.of(context).push(
+                                    onTap: (index) => Navigator.of(context)
+                                        .push(
                                           MaterialPageRoute(
                                             builder: (context) =>
                                                 SettingsCategoryPage(

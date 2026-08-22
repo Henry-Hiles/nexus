@@ -1,4 +1,4 @@
-import "package:flutter/material.dart";
+import "package:material_ui/material_ui.dart";
 import "package:flutter_blurhash/flutter_blurhash.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/helpers/mxc_image.dart";
@@ -7,12 +7,12 @@ import "package:nexus/models/requests/download_media.dart";
 import "package:nexus/widgets/expandable_image.dart";
 import "package:nexus/widgets/loading.dart";
 
-class MessageImage extends ConsumerWidget {
-  final Uri url;
-  final i.ImageInfo? info;
-  final bool encrypted;
-  const MessageImage(this.url, {this.info, required this.encrypted, super.key});
-
+final class const MessageImage(
+  final Uri url, {
+  final i.ImageInfo? info,
+  required final bool encrypted,
+  super.key,
+}) extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final request = DownloadMediaRequest(mxc: url, encrypted: encrypted);

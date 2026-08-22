@@ -1,11 +1,7 @@
-import "package:flutter/material.dart";
+import "package:material_ui/material_ui.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 
-class SpoilerText extends HookWidget {
-  final String text;
-
-  const SpoilerText({super.key, required this.text});
-
+class const SpoilerText(final String text, {super.key}) extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final revealed = useState(false);

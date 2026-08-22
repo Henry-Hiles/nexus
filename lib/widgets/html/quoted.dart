@@ -1,9 +1,6 @@
-import "package:flutter/material.dart";
+import "package:material_ui/material_ui.dart";
 
-class Quoted extends StatelessWidget {
-  final Widget child;
-  const Quoted(this.child, {super.key});
-
+class const Quoted(final Widget child, {super.key}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
     decoration: BoxDecoration(

@@ -1,4 +1,4 @@
-import "package:flutter/material.dart";
+import "package:material_ui/material_ui.dart";
 import "package:nexus/helpers/extensions/get_localpart.dart";
 import "package:nexus/helpers/extensions/show_user_popover.dart";
 import "package:nexus/helpers/extensions/string_to_color.dart";
@@ -7,10 +7,8 @@ import "package:nexus/models/event.dart";
 import "package:nexus/widgets/lazy_loading/message_displayname.dart";
 import "package:nexus/widgets/renderers/generic_event.dart";
 
-class MembershipRenderer extends StatelessWidget {
-  final Event event;
-  const MembershipRenderer(this.event, {super.key});
-
+class const MembershipRenderer(final Event event, {super.key})
+    extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     assert(

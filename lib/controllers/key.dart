@@ -1,10 +1,7 @@
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/shared_prefs.dart";
 
-class KeyController extends Notifier<String?> {
-  final String key;
-  KeyController(this.key);
-
+class KeyController(final String key) extends Notifier<String?> {
   static const String spaceKey = "space";
   static const String roomKey = "room";
 

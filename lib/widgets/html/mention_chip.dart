@@ -1,4 +1,4 @@
-import "package:flutter/material.dart";
+import "package:material_ui/material_ui.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/room_summary.dart";
 import "package:nexus/controllers/user.dart";
@@ -7,11 +7,8 @@ import "package:nexus/helpers/extensions/show_user_popover.dart";
 import "package:nexus/models/content/membership.dart";
 import "package:nexus/models/room_summary.dart";
 
-class MentionChip extends ConsumerWidget {
-  final String? roomId;
-  final String content;
-  const MentionChip(this.content, this.roomId, {super.key});
-
+class const MentionChip(final String content, final String? roomId, {super.key})
+    extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final mention = content.mention;

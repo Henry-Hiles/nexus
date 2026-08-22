@@ -3,11 +3,39 @@ import "package:freezed_annotation/freezed_annotation.dart";
 import "package:nexus/models/content/content.dart";
 import "package:nexus/models/epoch_date_time_converter.dart";
 import "package:nexus/models/profile_response.dart";
+
 part "event.freezed.dart";
 part "event.g.dart";
 
-@freezed
-abstract class Event with _$Event {
+@Freezed(toJson: false, fromJson: false)
+@JsonSerializable()
+class const Event({
+  @JsonKey(name: "rowid") required final int rowId,
+  @JsonKey(name: "timeline_rowid") required final int timelineRowId,
+  final String? stateKey,
+  required final String roomId,
+  required final String eventId,
+  required final String sender,
+  @JsonKey(readValue: Event.typeJsonFromJson) required final String type,
+  @EpochDateTimeConverter() @override required final DateTime timestamp,
+  final IMap<String, dynamic> unsigned = const IMap.empty(),
+  final LocalContent? localContent,
+  final String? transactionId,
+  final String? redactedBy,
+  final String? relatesTo,
+  final String? relationType,
+  final String? replyTo,
+  final String? decryptionError,
+  final String? sendError,
+  final IMap<String, int> reactions = const IMap.empty(),
+  @JsonKey(name: "last_edit_rowid") @override final int lastEditRowId = 0,
+  @UnreadTypeConverter() @override final UnreadType? unreadType,
+  final Profile? pmp,
+  required final Content content,
+  required final Content? previousContent,
+}) with _$Event {
+  Map<String, Object?> toJson() => _$EventToJson(this);
+
   static String typeJsonFromJson(Map<dynamic, dynamic> json, _) =>
       json["decrypted_type"] ?? json["type"];
 
@@ -24,32 +52,6 @@ abstract class Event with _$Event {
       return null;
     }
   }
-
-  const factory Event({
-    @JsonKey(name: "rowid") required int rowId,
-    @JsonKey(name: "timeline_rowid") required int timelineRowId,
-    required String roomId,
-    required String eventId,
-    required String sender,
-    @JsonKey(readValue: Event.typeJsonFromJson) required String type,
-    String? stateKey,
-    @EpochDateTimeConverter() required DateTime timestamp,
-    @Default(IMap.empty()) IMap<String, dynamic> unsigned,
-    LocalContent? localContent,
-    String? transactionId,
-    String? redactedBy,
-    String? relatesTo,
-    String? relationType,
-    String? replyTo,
-    String? decryptionError,
-    String? sendError,
-    @Default(IMap.empty()) IMap<String, int> reactions,
-    @JsonKey(name: "last_edit_rowid") @Default(0) int lastEditRowId,
-    @UnreadTypeConverter() UnreadType? unreadType,
-    Profile? pmp,
-    required Content content,
-    required Content? previousContent,
-  }) = _Event;
 
   factory Event.fromJson(Map<String, dynamic> json) =>
       _$EventFromJson(json).copyWith(
@@ -72,17 +74,19 @@ abstract class Event with _$Event {
       );
 }
 
-@freezed
-abstract class LocalContent with _$LocalContent {
-  const factory LocalContent({
-    String? sanitizedHtml,
-    String? editSource,
-    bool? wasPlaintext,
-    bool? bigEmoji,
-    bool? hasMath,
-    bool? replyFallbackRemoved,
-  }) = _LocalContent;
+@Freezed(toJson: false, fromJson: false)
+@JsonSerializable()
+class const LocalContent({
+  final String? sanitizedHtml,
+  final String? editSource,
+  final bool? wasPlaintext,
+  final bool? bigEmoji,
+  final bool? hasMath,
+  final bool? replyFallbackRemoved,
+}) with _$LocalContent {
+  Map<String, Object?> toJson() => _$LocalContentToJson(this);
 
+  @override
   factory LocalContent.fromJson(Map<String, Object?> json) =>
       _$LocalContentFromJson(json);
 }

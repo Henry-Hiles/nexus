@@ -1,14 +1,12 @@
-import "package:flutter/material.dart";
+import "package:material_ui/material_ui.dart";
 import "package:nexus/models/content/message.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/widgets/lazy_loading/message_avatar.dart";
 import "package:nexus/widgets/lazy_loading/message_displayname.dart";
 import "package:nexus/widgets/renderers/event.dart";
 
-class EventPreview extends StatelessWidget {
-  final Event event;
-  const EventPreview(this.event, {super.key});
-
+class const EventPreview(final Event event, {super.key})
+    extends StatelessWidget {
   @override
   Widget build(BuildContext context) => IgnorePointer(
     child: Padding(

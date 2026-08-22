@@ -3,15 +3,16 @@ import "package:freezed_annotation/freezed_annotation.dart";
 part "emoji.freezed.dart";
 part "emoji.g.dart";
 
-@freezed
-abstract class Emoji with _$Emoji {
-  const factory Emoji({
-    required String emoji,
-    required String category,
-    required IList<String> aliases,
-    required String description,
-    required IList<String> tags,
-  }) = _Emoji;
+@Freezed(toJson: false, fromJson: false)
+@JsonSerializable()
+class Emoji({
+  required final String emoji,
+  required final String category,
+  required final IList<String> aliases,
+  required final String description,
+  required final IList<String> tags,
+}) with _$Emoji {
+  Map<String, Object?> toJson() => _$EmojiToJson(this);
 
   factory Emoji.fromJson(Map<String, Object?> json) => _$EmojiFromJson(json);
 }

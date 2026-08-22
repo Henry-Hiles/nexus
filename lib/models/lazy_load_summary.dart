@@ -1,15 +1,17 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:freezed_annotation/freezed_annotation.dart";
+
 part "lazy_load_summary.freezed.dart";
 part "lazy_load_summary.g.dart";
 
-@freezed
-abstract class LazyLoadSummary with _$LazyLoadSummary {
-  const factory LazyLoadSummary({
-    required IList<String>? heroes,
-    required int? joinedMemberCount,
-    required int? invitedMemberCount,
-  }) = _LazyLoadSummary;
+@Freezed(toJson: false, fromJson: false)
+@JsonSerializable()
+class const LazyLoadSummary({
+  required final IList<String>? heroes,
+  required final int? joinedMemberCount,
+  required final int? invitedMemberCount,
+}) with _$LazyLoadSummary {
+  Map<String, Object?> toJson() => _$LazyLoadSummaryToJson(this);
 
   factory LazyLoadSummary.fromJson(Map<String, Object?> json) =>
       _$LazyLoadSummaryFromJson(json);

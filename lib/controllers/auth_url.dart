@@ -4,10 +4,8 @@ import "package:nexus/controllers/client_id.dart";
 import "package:nexus/models/oauth_auth_code_response.dart";
 import "package:nexus/models/requests/oauth/get_auth_url.dart";
 
-class AuthUrlController extends AsyncNotifier<OAuthAuthCodeResponse> {
-  final Uri homeserver;
-  AuthUrlController(this.homeserver);
-
+class AuthUrlController(final Uri homeserver)
+    extends AsyncNotifier<OAuthAuthCodeResponse> {
   @override
   Future<OAuthAuthCodeResponse> build() async => ref
       .watch(ClientController.provider.notifier)

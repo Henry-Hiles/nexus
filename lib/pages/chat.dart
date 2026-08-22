@@ -1,4 +1,4 @@
-import "package:flutter/material.dart";
+import "package:material_ui/material_ui.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/emoji.dart";
 import "package:nexus/controllers/init_complete.dart";
@@ -8,9 +8,7 @@ import "package:nexus/widgets/sidebar.dart";
 import "package:nexus/widgets/room_chat.dart";
 import "package:nexus/widgets/loading.dart";
 
-class ChatPage extends ConsumerWidget {
-  const ChatPage({super.key});
-
+class const ChatPage({super.key}) extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => LayoutBuilder(
     builder: (context, constraints) {

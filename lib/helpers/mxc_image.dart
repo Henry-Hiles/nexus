@@ -1,14 +1,12 @@
 import "dart:ui";
+
 import "package:flutter/widgets.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/models/requests/download_media.dart";
 
-class MxcImage extends ImageProvider<MxcImage> {
-  final WidgetRef ref;
-  final DownloadMediaRequest request;
-  const MxcImage(this.ref, this.request);
-
+class MxcImage(final WidgetRef ref, final DownloadMediaRequest request)
+    extends ImageProvider<MxcImage> {
   @override
   Future<MxcImage> obtainKey(ImageConfiguration configuration) =>
       Future.value(this);

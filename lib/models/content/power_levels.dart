@@ -5,7 +5,7 @@ part "power_levels.freezed.dart";
 part "power_levels.g.dart";
 
 @freezed
-abstract class PowerLevelsContent extends Content with _$PowerLevelsContent {
+sealed class PowerLevelsContent extends Content with _$PowerLevelsContent {
   PowerLevelsContent._();
   factory PowerLevelsContent({
     @Default(IMap.empty()) IMap<String, int> events,
@@ -24,12 +24,13 @@ abstract class PowerLevelsContent extends Content with _$PowerLevelsContent {
       _$PowerLevelsContentFromJson(json);
 }
 
-@freezed
-abstract class Notifications with _$Notifications {
-  const factory Notifications({
-    @Default(50) int room,
-    @Default(IMapConst({})) IMap<String, int> other,
-  }) = _Notifications;
+@Freezed(toJson: false, fromJson: false)
+@JsonSerializable()
+class const Notifications({
+  final int room = 50,
+  final IMap<String, int> other = const IMap.empty(),
+}) with _$Notifications {
+  Map<String, Object?> toJson() => _$NotificationsToJson(this);
 
   factory Notifications.fromJson(Map<String, Object?> json) =>
       _$NotificationsFromJson(json);

@@ -1,5 +1,5 @@
 import "package:collection/collection.dart";
-import "package:flutter/material.dart";
+import "package:material_ui/material_ui.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/client.dart";
@@ -7,10 +7,7 @@ import "package:nexus/controllers/key.dart";
 import "package:nexus/controllers/spaces.dart";
 import "package:nexus/helpers/extensions/link_to_mention.dart";
 
-class JoinDialog extends HookWidget {
-  final WidgetRef ref;
-  const JoinDialog(this.ref, {super.key});
-
+class const JoinDialog(final WidgetRef ref, {super.key}) extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final roomAlias = useTextEditingController();
@@ -53,9 +50,8 @@ class JoinDialog extends HookWidget {
                       .new(
                         roomIdOrAlias: roomIdOrAlias,
                         via: .new(
-                          Uri.tryParse(
-                                roomAlias.text.replaceAll("/#", ""),
-                              )?.queryParametersAll["via"] ??
+                          Uri.tryParse(roomAlias.text.replaceAll("/#", ""))
+                                  ?.queryParametersAll["via"] ??
                               [],
                         ),
                       ),
@@ -76,9 +72,8 @@ class JoinDialog extends HookWidget {
 
                         await ref
                             .watch(
-                              KeyController.provider(
-                                KeyController.spaceKey,
-                              ).notifier,
+                              KeyController.provider(KeyController.spaceKey)
+                                  .notifier,
                             )
                             .set(
                               space?.id ??
@@ -100,9 +95,8 @@ class JoinDialog extends HookWidget {
                         if (space == null) {
                           await ref
                               .watch(
-                                KeyController.provider(
-                                  KeyController.roomKey,
-                                ).notifier,
+                                KeyController.provider(KeyController.roomKey)
+                                    .notifier,
                               )
                               .set(id);
                         }
@@ -115,9 +109,9 @@ class JoinDialog extends HookWidget {
                 if (context.mounted) {
                   scaffoldMessenger.showSnackBar(
                     .new(
-                      backgroundColor: Theme.of(
-                        context,
-                      ).colorScheme.errorContainer,
+                      backgroundColor: Theme.of(context)
+                          .colorScheme
+                          .errorContainer,
                       content: Text(
                         error.toString(),
                         style: .new(
