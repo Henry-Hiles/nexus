@@ -20,7 +20,7 @@ extension ShowContextMenu on BuildContext {
               Row(
                 spacing: 12,
                 children: [
-                  SvgPicture.asset("assets/icon.svg", width: 64),
+                  SvgPicture.asset("assets/bundled/icon.svg", width: 64),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: .start,

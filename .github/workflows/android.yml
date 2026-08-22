@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-apk:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
 
     steps:
       - name: Checkout repository
@@ -27,7 +27,7 @@ jobs:
           KEYSTORE_CONTENT: ${{ secrets.KEYSTORE_CONTENT }}
 
       - name: Build app
-        run: nix develop --command bash -c "flutter pub get && dart scripts/generate.dart && flutter pub run build_runner build && flutter build apk --release"
+        run: nix develop --command bash -c "flutter pub get && dart scripts/generate.dart && flutter pub run build_runner build && flutter build apk --target-platform android-arm64"
         env:
           KEYSTORE_PATH: ../../keystore.jks
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}

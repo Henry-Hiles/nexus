@@ -132,7 +132,7 @@ class const SelectServerPage({super.key}) extends HookConsumerWidget {
               children: [
                 Row(
                   children: [
-                    SvgPicture.asset("assets/icon.svg", width: 128),
+                    SvgPicture.asset("assets/bundled/icon.svg", width: 128),
                     SizedBox(width: 12),
                     Expanded(
                       child: Column(

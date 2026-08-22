@@ -12,7 +12,7 @@ flutter:
           fonts:
               - asset: assets/fonts/Roboto.ttf
     assets:
-        - assets/
+        - assets/bundled/
     uses-material-design: true
 
 environment:
