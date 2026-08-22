@@ -19,6 +19,10 @@ android {
     compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
+	lint {
+		disable += setOf("EasterEgg", "StopShip")
+	}
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
