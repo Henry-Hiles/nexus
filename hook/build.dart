@@ -1,4 +1,5 @@
 import "dart:io";
+
 import "package:collection/collection.dart";
 import "package:hooks/hooks.dart";
 import "package:code_assets/code_assets.dart";
@@ -134,6 +135,8 @@ Future<void> main(List<String> args) => build(args, (input, output) async {
       "go",
       [
         "build",
+        "-trimpath",
+        "-ldflags=-s -w",
         "-tags",
         tags,
         "-o",
