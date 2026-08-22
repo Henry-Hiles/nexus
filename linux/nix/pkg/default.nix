@@ -31,7 +31,7 @@ flutter.buildFlutterApplication {
   gitHashes = {
     emoji_text_field = "sha256-3TOys09EP2GRo6pUBGPXaqBlE39O2Cmwt42Hs1cTDKo=";
     linkify = "sha256-TpMD6+0zyY6i9l+6d8ErnVufmepCv362rCtnbOht/z4=";
-    navigation_rail_m3e = "sha256-+2awDTQnK58gGRY1nuHckG/jjxarsYSRu9ovR4i4TEc=";
+    navigation_rail_m3e = "sha256-LbReuEG/fYjehmXsyimZ2JSf4fyuhDpmaywsxsXzToI=";
   };
 
   postInstall = ''
