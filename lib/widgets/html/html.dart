@@ -19,6 +19,7 @@ class const Html(
 }) extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) =>
+      // needed until https://github.com/daohoangson/flutter_widget_from_html/issues/1618 is resolved
       MaterialUiCompatibilityBridge(
         child: HtmlWidget(
           html,
