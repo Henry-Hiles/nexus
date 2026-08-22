@@ -23,7 +23,7 @@ pkgs.mkShell {
     [
       go
       git
-      jdk17
+
       libGL
       (flutter.override {
         extraPkgConfigPackages = [
@@ -40,7 +40,7 @@ pkgs.mkShell {
 
     ANDROID_HOME = "${android.androidsdk}/libexec/android-sdk";
     ANDROID_SDK_ROOT = ANDROID_HOME;
-    JAVA_HOME = pkgs.jdk17;
+    JAVA_HOME = pkgs.jdk21;
 
     GRADLE_OPTS = "-Dorg.gradle.project.android.aapt2FromMavenOverride=${ANDROID_HOME}/build-tools/36.0.0/aapt2";
   }
