@@ -170,30 +170,34 @@ class const SettingsPage({super.key}) extends ConsumerWidget {
                       )
                     : Row(
                         children: [
-                          NavigationRailM3E(
-                            type: .alwaysExpand,
-                            trailing: searchBar,
-                            scrollable: true,
-                            sections: sections
-                                .mapTo(
-                                  (categoryGroup, categories) =>
-                                      NavigationRailM3ESection(
-                                        header: DividerText(categoryGroup),
-                                        destinations: categories
-                                            .map(
-                                              (category) =>
-                                                  NavigationRailM3EDestination(
-                                                    icon: Icon(category.icon),
-                                                    label: category.title,
-                                                  ),
-                                            )
-                                            .toList(),
-                                      ),
-                                )
-                                .toList(),
-                            selectedIndex: selected.value,
-                            onDestinationSelected: (value) =>
-                                selected.value = value,
+                          MaterialUiCompatibilityBridge(
+                            child: NavigationRailM3E(
+                              type: .alwaysExpand,
+                              trailing: searchBar,
+                              scrollable: true,
+                              sections: sections
+                                  .mapTo(
+                                    (
+                                      categoryGroup,
+                                      categories,
+                                    ) => NavigationRailM3ESection(
+                                      header: DividerText(categoryGroup),
+                                      destinations: categories
+                                          .map(
+                                            (category) =>
+                                                NavigationRailM3EDestination(
+                                                  icon: Icon(category.icon),
+                                                  label: category.title,
+                                                ),
+                                          )
+                                          .toList(),
+                                    ),
+                                  )
+                                  .toList(),
+                              selectedIndex: selected.value,
+                              onDestinationSelected: (value) =>
+                                  selected.value = value,
+                            ),
                           ),
                           VerticalDivider(),
                           Expanded(
