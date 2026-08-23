@@ -1,4 +1,5 @@
 import "dart:io";
+
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:material_ui/material_ui.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
@@ -8,6 +9,7 @@ import "package:nexus/controllers/account_data.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/client_state.dart";
 import "package:nexus/controllers/settings.dart";
+import "package:nexus/controllers/spec_versions.dart";
 import "package:nexus/models/account_data.dart";
 import "package:nexus/models/settings_category.dart";
 import "package:nexus/main.dart";
@@ -18,9 +20,6 @@ class SettingsSectionsController
   @override
   Future<IMap<String, IList<SettingsCategory>>> build() async {
     final settings = await ref.watch(SettingsController.provider.future);
-    final specVersionsResponse = await ref
-        .watch(ClientController.provider.notifier)
-        .getSpecVersions();
 
     return .new({
       "General": .new([
@@ -49,8 +48,7 @@ class SettingsSectionsController
             .new(
               title: "Use Dynamic Theme",
               icon: Icons.palette,
-              description:
-                  "Toggle on or off Dynamic Theme. Only available on Android, Linux, Windows, or MacOS.",
+              description: "Toggle on or off Dynamic Theme. Only available on Android, Linux, Windows, or MacOS.",
               builder: (title, description, icon) => SwitchListTile(
                 title: Text(title),
                 subtitle: Text(description),
@@ -76,8 +74,7 @@ class SettingsSectionsController
           settings: .new([
             .new(
               title: "Linux Mobile Mode",
-              description:
-                  "Enables some fixes for Linux mobile, e.g. disabling dragging appbar for moving window.",
+              description: "Enables some fixes for Linux mobile, e.g. disabling dragging appbar for moving window.",
               icon: Icons.construction,
               builder: (title, description, icon) => SwitchListTile(
                 title: Text(title),
@@ -104,40 +101,51 @@ class SettingsSectionsController
             settings: .new([
               .new(
                 title: "Invite Blocking",
-                description:
-                    "Block invites, either completely, or block only invites from users without shared private rooms (depends on server support).",
+                description: "Block invites, either completely, or block only invites from users without shared private rooms (depends on server support).",
                 builder: (title, description, icon) => Consumer(
-                  builder: (context, ref, _) =>
-                      DialogListTile<DefaultInviteAction>(
-                        icon: Icon(icon),
-                        title: title,
-                        subtitle: Text(description),
-                        initialValue: ref
-                            .watch(AccountDataController.provider)
-                            .invitePermissionConfig
-                            .defaultAction,
-                        options: specVersionsResponse.unstableFeatures.msc4494
-                            ? DefaultInviteAction.values
-                            : IList(
-                                DefaultInviteAction.values,
-                              ).remove(.denyPublic).toList(),
-                        getName: (option) => switch (option) {
-                          .allow => "Allow",
-                          .deny => "Deny",
-                          .denyPublic => "Deny public",
-                        },
-                        onChanged: (value) => ref
-                            .watch(ClientController.provider.notifier)
-                            .setAccountData(
-                              .new(
-                                type: AccountData.invitePermissionConfigKey,
-                                content: InvitePermissionConfig(
-                                  defaultAction: value,
-                                ),
-                              ),
-                            )
-                            .onError(showError),
+                  builder: (context, ref, _) {
+                    final specVersionsResponse = ref.watch(
+                      SpecVersionsController.provider,
+                    );
+                    return DialogListTile<DefaultInviteAction>(
+                      icon: Icon(icon),
+                      title: title,
+                      subtitle: Text(description),
+                      initialValue: ref
+                          .watch(AccountDataController.provider)
+                          .invitePermissionConfig
+                          .defaultAction,
+                      options:
+                          specVersionsResponse.maybeWhen(
+                            data: (data) => data.unstableFeatures.msc4494,
+                            orElse: () => true,
+                          )
+                          ? DefaultInviteAction.values
+                          : IList(DefaultInviteAction.values)
+                                .remove(.denyPublic)
+                                .toList(),
+                      getName: (option) => switch (option) {
+                        .allow => "Allow",
+                        .deny => "Deny",
+                        .denyPublic => "Deny public",
+                      },
+                      onChanged: specVersionsResponse.maybeWhen(
+                        data: (_) =>
+                            (value) => ref
+                                .watch(ClientController.provider.notifier)
+                                .setAccountData(
+                                  .new(
+                                    type: AccountData.invitePermissionConfigKey,
+                                    content: InvitePermissionConfig(
+                                      defaultAction: value,
+                                    ),
+                                  ),
+                                )
+                                .onError(showError),
+                        orElse: () => null,
                       ),
+                    );
+                  },
                 ),
                 icon: Icons.person_off,
               ),
@@ -156,9 +164,8 @@ class SettingsSectionsController
                     final colorScheme = Theme.of(context).colorScheme;
                     return M3EButton.icon(
                       onPressed: () async {
-                        Navigator.of(
-                          context,
-                        ).popUntil((route) => route.isFirst);
+                        Navigator.of(context)
+                            .popUntil((route) => route.isFirst);
 
                         await WidgetsBinding.instance.endOfFrame;
 
