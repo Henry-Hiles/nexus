@@ -2,6 +2,7 @@ import "dart:ffi";
 import "dart:io";
 import "dart:isolate";
 import "dart:math";
+
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:ffi/ffi.dart";
 import "package:flutter/foundation.dart";
@@ -261,8 +262,13 @@ class ClientController extends AsyncNotifier<int> {
   Future<Paginate> paginate(PaginateRequest request) async =>
       .fromJson(await _sendCommand("paginate", request.toJson()));
 
-  Future<ProfileResponse> getProfile(String userId) async =>
-      .fromJson(await _sendCommand("get_profile", {"user_id": userId}));
+  Future<ProfileResponse> getProfile(String userId) async {
+    try {
+      return .fromJson(await _sendCommand("get_profile", {"user_id": userId}));
+    } catch (_) {
+      return ProfileResponse(profile: .new(id: userId));
+    }
+  }
 
   Future<void> reportEvent(ReportRequest request) =>
       _sendCommand("report_event", request.toJson());

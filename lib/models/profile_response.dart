@@ -9,7 +9,7 @@ part "profile_response.g.dart";
 @JsonSerializable()
 class const ProfileResponse({
   @JsonKey(fromJson: Profile.fromJson) required final Profile profile,
-  required final Bio? bio,
+  final Bio? bio,
 }) with _$ProfileResponse {
   Map<String, Object?> toJson() => _$ProfileResponseToJson(this);
 
