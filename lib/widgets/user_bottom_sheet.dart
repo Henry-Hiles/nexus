@@ -200,36 +200,35 @@ final class const UserBottomSheet(
             ),
 
             if (ref.watch(
-                      PowerLevelController.provider(
-                        .membershipAction(
-                          action: .kick,
-                          roomId: roomId!,
-                          targetUser: userId,
-                        ),
-                      ),
-                    ) &&
-                    member.status == .join ||
-                member.status == .invite)
+              PowerLevelController.provider(
+                .membershipAction(
+                  action: .kick,
+                  roomId: roomId!,
+                  targetUser: userId,
+                ),
+              ),
+            ))
               Padding(
                 padding: .only(top: 4),
                 child: Row(
                   mainAxisSize: MainAxisSize.max,
                   spacing: 8,
                   children: [
-                    M3EButton.icon(
-                      onPressed: () => showMembershipDialog(.kick),
-                      shape: .square,
-                      icon: Icon(Icons.sports_martial_arts),
-                      label: Text("Kick"),
-                      decoration: .new(
-                        backgroundColor: WidgetStatePropertyAll(
-                          theme.colorScheme.error,
-                        ),
-                        foregroundColor: WidgetStatePropertyAll(
-                          theme.colorScheme.onError,
+                    if (member.status == .join || member.status == .invite)
+                      M3EButton.icon(
+                        onPressed: () => showMembershipDialog(.kick),
+                        shape: .square,
+                        icon: Icon(Icons.sports_martial_arts),
+                        label: Text("Kick"),
+                        decoration: .new(
+                          backgroundColor: WidgetStatePropertyAll(
+                            theme.colorScheme.error,
+                          ),
+                          foregroundColor: WidgetStatePropertyAll(
+                            theme.colorScheme.onError,
+                          ),
                         ),
                       ),
-                    ),
 
                     M3EButton.icon(
                       onPressed: () => showMembershipDialog(.ban),
