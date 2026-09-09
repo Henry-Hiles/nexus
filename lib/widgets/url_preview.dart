@@ -31,9 +31,15 @@ class const UrlPreview(final Uri link, {super.key}) extends ConsumerWidget {
                             Text(
                               preview.title!,
                               style: Theme.of(context).textTheme.titleLarge,
+                              maxLines: 3,
+                              overflow: .ellipsis,
                             ),
                           if (preview.description != null) ...[
-                            Text(preview.description!),
+                            Text(
+                              preview.description!,
+                              maxLines: 20,
+                              overflow: .ellipsis,
+                            ),
                             SizedBox(height: 4),
                           ],
                           if (preview.imageUrl != null)
