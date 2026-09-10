@@ -62,6 +62,13 @@
                     "fallback-x11"
                     "wayland"
                   ];
+
+                  talk-names = [ "org.unifiedpush.Distributor.*" ];
+                  own-names = [
+                    "nexus.federated.nexus"
+                    "nexus.federated.nexus.*"
+                  ];
+
                   devices = [ "dri" ];
                 };
               };
