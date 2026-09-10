@@ -1,5 +1,6 @@
 #include "my_application.h"
 
+#include <cstdlib>
 #include <flutter_linux/flutter_linux.h>
 #ifdef GDK_WINDOWING_X11
 #include <gdk/gdkx.h>
@@ -72,6 +73,7 @@ static void my_application_activate(GApplication* application) {
   gdk_rgba_parse(&background_color, "#000000");
   fl_view_set_background_color(view, &background_color);
   gtk_widget_show(GTK_WIDGET(view));
+  if (std::getenv("FLUTTER_HEADLESS")) gtk_widget_hide(GTK_WIDGET(window));
   gtk_container_add(GTK_CONTAINER(window), GTK_WIDGET(view));
 
   // Show the window when Flutter renders.

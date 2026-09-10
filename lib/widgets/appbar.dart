@@ -39,7 +39,7 @@ final class const Appbar({
                 : (_) => windowManager.startDragging(),
           ),
       child: AppBar(
-        leading: InkWell(onTap: onTap, child: leading),
+        leading: leading == null ? null : InkWell(onTap: onTap, child: leading),
         backgroundColor: backgroundColor,
         scrolledUnderElevation: scrolledUnderElevation,
         actionsPadding: const .symmetric(horizontal: 8),

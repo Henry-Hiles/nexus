@@ -1,3 +1,4 @@
+import "dart:async";
 import "dart:ffi";
 import "dart:io";
 import "dart:isolate";
@@ -15,11 +16,13 @@ import "package:nexus/controllers/sync_status.dart";
 import "package:nexus/controllers/top_level_spaces.dart";
 import "package:nexus/helpers/extensions/gomuks_buffer.dart";
 import "package:nexus/main.dart";
+import "package:nexus/models/capabilities.dart";
 import "package:nexus/models/content/message.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/models/oauth_auth_code_response.dart";
 import "package:nexus/models/open_graph_data.dart";
 import "package:nexus/models/paginate.dart";
+import "package:nexus/models/requests/deregister_pusher.dart";
 import "package:nexus/models/requests/download_media.dart";
 import "package:nexus/models/requests/get_event.dart";
 import "package:nexus/models/requests/get_related_events.dart";
@@ -31,6 +34,7 @@ import "package:nexus/models/requests/oauth/get_auth_url.dart";
 import "package:nexus/models/requests/oauth/register_client.dart";
 import "package:nexus/models/requests/paginate.dart";
 import "package:nexus/models/requests/redact_event.dart";
+import "package:nexus/models/requests/register_pusher.dart";
 import "package:nexus/models/requests/report.dart";
 import "package:nexus/models/requests/send_event.dart";
 import "package:nexus/models/requests/send_message.dart";
@@ -156,18 +160,15 @@ class ClientController extends AsyncNotifier<int> {
     throw Exception("GomuksStart returned error code $errorCode");
   }
 
-  Future<dynamic> _sendCommand(
-    String command, [
-    Map<String, dynamic> data = const {},
-  ]) async {
+  Future<dynamic> callGomuksMethod(
+    Map<String, dynamic> data,
+    FutureOr<GomuksResponse> Function(int handle, GomuksBorrowedBuffer data)
+    callback,
+  ) async {
     final bufferPointer = data.toGomuksBufferPtr();
     final handle = await future;
     final response = await Isolate.run(
-      () => GomuksSubmitCommand(
-        handle,
-        command.toNativeUtf8().cast<Char>(),
-        bufferPointer.ref,
-      ),
+      () => callback(handle, bufferPointer.ref),
     );
 
     calloc.free(bufferPointer);
@@ -179,6 +180,24 @@ class ClientController extends AsyncNotifier<int> {
 
     return json;
   }
+
+  Future<Event?> handlePush(Map<String, dynamic> data) async {
+    final response = await callGomuksMethod(
+      data,
+      (handle, data) async => GomuksHandlePush(handle, data),
+    );
+
+    return response == null ? null : .fromJson(response);
+  }
+
+  Future<dynamic> _sendCommand(
+    String command, [
+    Map<String, dynamic> data = const {},
+  ]) => callGomuksMethod(
+    data,
+    (handle, data) async =>
+        GomuksSubmitCommand(handle, command.toNativeUtf8().cast<Char>(), data),
+  );
 
   Future<void> redactEvent(RedactEventRequest report) =>
       _sendCommand("redact_event", report.toJson());
@@ -281,6 +300,15 @@ class ClientController extends AsyncNotifier<int> {
   Future<void> setAccountData(SetAccountDataRequest request) =>
       _sendCommand("set_account_data", request.toJson());
 
+  Future<void> registerPusher(RegisterPusherRequest request) =>
+      _sendCommand("register_homeserver_push", request.toJson());
+
+  Future<void> deregisterPusher(DeregisterPusherRequest request) =>
+      _sendCommand("register_homeserver_push", {
+        ...request.toJson(),
+        "kind": null,
+      });
+
   Future<MessageContent> uploadMedia(UploadMediaRequest request) async =>
       .fromJson(await _sendCommand("upload_media", request.toJson()));
 
@@ -317,6 +345,10 @@ class ClientController extends AsyncNotifier<int> {
 
   Future<SpecVersionsResponse> getSpecVersions() async =>
       .fromJson(await _sendCommand("get_versions"));
+
+  Future<Capabilities> getCapabilities() async => Capabilities.fromJson(
+    (await _sendCommand("get_capabilities"))["capabilities"],
+  );
 
   Future<Uri?> discoverHomeserver(Uri homeserver) async {
     try {

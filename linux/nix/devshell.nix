@@ -45,7 +45,6 @@ pkgs.mkShell {
     GRADLE_OPTS = "-Dorg.gradle.project.android.aapt2FromMavenOverride=${ANDROID_HOME}/build-tools/36.0.0/aapt2";
   }
   // lib.optionalAttrs pkgs.stdenv.isLinux {
-    CPATH = lib.makeSearchPath "include" [ pkgs.glibc.dev ];
     LD_LIBRARY_PATH = "./build/native_assets/linux:${lib.makeLibraryPath [ pkgs.zlib ]}";
   };
 }

@@ -20,16 +20,21 @@ android {
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
+		isCoreLibraryDesugaringEnabled = true
+		sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
 
     defaultConfig {
         applicationId = "nexus.federated.nexus"
-        minSdk = 29
+
+		minSdk = 29
         targetSdk = flutter.targetSdkVersion
+
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+
+		multiDexEnabled = true
     }
 
     signingConfigs {
@@ -61,6 +66,11 @@ android {
             applicationIdSuffix = ".debug"
         }
     }
+}
+
+dependencies {
+    implementation("org.unifiedpush.android:embedded-fcm-distributor:3.1.0")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 }
 
 kotlin {

@@ -8,8 +8,10 @@ import "package:media_kit/media_kit.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/client_state.dart";
 import "package:nexus/controllers/multi_provider.dart";
+import "package:nexus/controllers/notifications.dart";
 import "package:nexus/controllers/settings.dart";
 import "package:nexus/controllers/shared_prefs.dart";
+import "package:nexus/controllers/unified_push.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
 import "package:nexus/helpers/extensions/scheme_to_theme.dart";
 import "package:nexus/helpers/font_licenses.dart";
@@ -22,6 +24,7 @@ import "package:window_manager/window_manager.dart";
 import "package:material_ui/material_ui.dart";
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+late final bool isInBackground;
 
 final class Logger extends ProviderObserver {
   @override
@@ -45,6 +48,7 @@ void showError(Object error, [StackTrace? stackTrace]) {
       error.toString().contains("Invalid source") ||
       error.toString().contains("UTF-16") ||
       error.toString().contains("HTTP request failed") ||
+      error.toString().contains("'_nextFrame != null': is not true.") ||
       error.toString().contains("Invalid image data")) {
     return;
   }
@@ -62,7 +66,7 @@ void showError(Object error, [StackTrace? stackTrace]) {
   }
 }
 
-void main() async {
+void main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
   MediaKit.ensureInitialized();
 
@@ -77,25 +81,30 @@ void main() async {
     await windowManager.setMinimumSize(Size.square(500));
   }
 
+  isInBackground = args.contains("--unifiedpush-bg");
+
   LicenseRegistry.addLicense(() => Stream.fromIterable(fontLicenses));
 
   FlutterError.onError = (FlutterErrorDetails details) =>
       showError(details.exception.toString(), details.stack);
 
-  runApp(
-    ProviderScope(
-      retry: (_, _) => null,
-      observers: [
-        // Change false to true if you want debug information on provider reloads
-        // ignore: dead_code
-        if (false && kDebugMode) Logger(),
-      ],
-      child: const App(),
-    ),
-  );
+  if (!isInBackground) {
+    runApp(
+      ProviderScope(
+        retry: (_, _) => null,
+        observers: [
+          // Change false to true if you want debug information on provider reloads
+          // ignore: dead_code
+          if (false && kDebugMode) Logger(),
+        ],
+        child: App(isInBackground),
+      ),
+    );
+  }
 }
 
-class const App({super.key}) extends StatelessWidget {
+class const App(final bool isInBackground, {super.key})
+    extends StatelessWidget {
   @override
   Widget build(BuildContext context) => DynamicColorBuilder(
     builder: (lightDynamic, darkDynamic) => Consumer(
@@ -138,6 +147,8 @@ class const App({super.key}) extends StatelessWidget {
                   IListConst([
                     SharedPrefsController.provider,
                     ClientController.provider,
+                    NotificationsController.provider,
+                    UnifiedPushController.provider,
                   ]),
                 ),
               )

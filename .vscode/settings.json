@@ -11,6 +11,8 @@
         "muks",
         "prefs",
         "unban",
-        "unredact"
+        "unifiedpush",
+        "unredact",
+        "webpush"
     ]
 }

@@ -4,6 +4,7 @@ import "package:nexus/controllers/shared_prefs.dart";
 class KeyController(final String key) extends Notifier<String?> {
   static const String spaceKey = "space";
   static const String roomKey = "room";
+  static const String pushKeyKey = "pushKey";
 
   @override
   String? build() =>

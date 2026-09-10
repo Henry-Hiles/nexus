@@ -10,6 +10,7 @@ class const ClientState({
   required final bool isLoggedIn,
   required final bool isVerified,
   required final String? userId,
+  required final String? deviceId,
   required final String? homeserverUrl,
 }) with _$ClientState {
   Map<String, Object?> toJson() => _$ClientStateToJson(this);

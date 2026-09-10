@@ -1,15 +1,19 @@
 import "dart:io";
 
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
+import "package:flutter_hooks/flutter_hooks.dart";
+import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:material_ui/material_ui.dart";
-import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:intl/intl.dart";
 import "package:m3e_buttons/m3e_buttons.dart";
 import "package:nexus/controllers/account_data.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/client_state.dart";
+import "package:nexus/controllers/notifications.dart";
 import "package:nexus/controllers/settings.dart";
+import "package:nexus/controllers/unified_push.dart";
 import "package:nexus/controllers/spec_versions.dart";
+import "package:nexus/controllers/unified_push_allowed.dart";
 import "package:nexus/models/account_data.dart";
 import "package:nexus/models/settings_category.dart";
 import "package:nexus/main.dart";
@@ -96,6 +100,90 @@ class SettingsSectionsController
         "Account": .new([
           .new(title: "Profile", icon: Icons.person, settings: .new([])),
           .new(
+            title: "Notifications",
+            icon: Icons.notifications,
+            settings: .new([
+              .new(
+                title: "Push notifications",
+                description: "Enable push notifications using Web Push",
+                builder: (title, description, icon) => HookConsumer(
+                  builder: (context, ref, _) {
+                    final loading = useState(false);
+                    final pusherRegistered = ref.watch(
+                      UnifiedPushController.provider,
+                    );
+                    final unifiedPushAllowed = ref.watch(
+                      UnifiedPushAllowedController.provider,
+                    );
+
+                    return SwitchListTile(
+                      title: Text(title),
+                      subtitle: Text(
+                        unifiedPushAllowed.maybeWhen(
+                              data: (data) => data,
+                              orElse: () => null,
+                            ) ??
+                            description,
+                      ),
+                      secondary: Icon(icon),
+                      value: pusherRegistered.maybeWhen(
+                        data: (value) => value,
+                        orElse: () => false,
+                      ),
+                      onChanged: loading.value
+                          ? null
+                          : unifiedPushAllowed.maybeWhen(
+                              data: (data) => data == null,
+                              orElse: () => false,
+                            )
+                          ? pusherRegistered.maybeWhen(
+                              data: (_) => (value) async {
+                                try {
+                                  loading.value = true;
+                                  if (value) {
+                                    if (await ref
+                                        .watch(
+                                          NotificationsController
+                                              .provider
+                                              .notifier,
+                                        )
+                                        .requestPermissions()) {
+                                      await ref
+                                          .watch(
+                                            UnifiedPushController
+                                                .provider
+                                                .notifier,
+                                          )
+                                          .register();
+                                    } else {
+                                      // TODO: Handle not granted
+                                    }
+                                  } else {
+                                    await ref
+                                        .watch(
+                                          UnifiedPushController
+                                              .provider
+                                              .notifier,
+                                        )
+                                        .deregister();
+                                  }
+                                } catch (error, stackTrace) {
+                                  showError(error, stackTrace);
+                                } finally {
+                                  loading.value = false;
+                                }
+                              },
+                              orElse: () => null,
+                            )
+                          : null,
+                    );
+                  },
+                ),
+                icon: Icons.notification_add,
+              ),
+            ]),
+          ),
+          .new(
             title: "Safety",
             icon: Icons.gpp_good,
             settings: .new([
@@ -164,6 +252,8 @@ class SettingsSectionsController
                     final colorScheme = Theme.of(context).colorScheme;
                     return M3EButton.icon(
                       onPressed: () async {
+                        Navigator.of(context)
+                            .popUntil((route) => route.isFirst);
                         Navigator.of(context)
                             .popUntil((route) => route.isFirst);
 

@@ -190,6 +190,12 @@ dart scripts/generate.dart
 > export CPATH="$(clang -v 2>&1 | grep "Selected GCC installation" | rev | cut -d' ' -f1 | rev)/include"
 > ```
 
+Build webcrypto:
+
+```sh
+flutter pub run webcrypto:setup
+```
+
 Build generated files, and watch for new changes:
 
 ```sh
