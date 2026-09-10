@@ -11,12 +11,12 @@ void main(List<String> args) async {
 
   final libclangPath = Platform.environment["LIBCLANG_PATH"];
   FfiGenerator(
-    output: Output(
+    output: .new(
       dart: .new(
         path: Platform.script.resolve("../lib/src/third_party/gomuks.g.dart"),
       ),
     ),
-    visitors: [Visitor(func: (node) => node.isIncluded = true)],
+    visitors: [.new(func: (node) => node.isIncluded = true)],
     input: .new(
       entryPoints: [File(join(repoDir.path, "pkg", "ffi", "gomuksffi.h")).uri],
       compilerOptions: [
