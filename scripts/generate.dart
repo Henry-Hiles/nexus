@@ -16,6 +16,7 @@ void main(List<String> args) async {
         path: Platform.script.resolve("../lib/src/third_party/gomuks.g.dart"),
       ),
     ),
+    visitors: [Visitor(func: (node) => node.isIncluded = true)],
     input: .new(
       entryPoints: [File(join(repoDir.path, "pkg", "ffi", "gomuksffi.h")).uri],
       compilerOptions: [
