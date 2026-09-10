@@ -49,15 +49,17 @@ import "package:path_provider/path_provider.dart";
 class ClientController extends AsyncNotifier<int> {
   @override
   Future<int> build() async {
-    final Pointer<Char> root;
-    if (Platform.isAndroid || Platform.isIOS) {
-      final dir = await getApplicationSupportDirectory();
-      root = "${dir.path}/gomuks".toNativeUtf8().cast();
-    } else {
-      root = nullptr.cast();
-    }
+    final handle = await Isolate.run(() async {
+      final Pointer<Char> root;
+      if (Platform.isAndroid || Platform.isIOS) {
+        final dir = await getApplicationSupportDirectory();
+        root = "${dir.path}/gomuks".toNativeUtf8().cast();
+      } else {
+        root = nullptr.cast();
+      }
 
-    final handle = GomuksInit(root);
+      return GomuksInit(root);
+    });
 
     final callable =
         NativeCallable<
