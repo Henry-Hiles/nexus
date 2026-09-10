@@ -1,4 +1,5 @@
 import "dart:io";
+
 import "package:ffigen/ffigen.dart";
 import "package:path/path.dart";
 import "package:nexus/helpers/extensions/get_xcode_sdk.dart";
@@ -11,16 +12,17 @@ void main(List<String> args) async {
   final libclangPath = Platform.environment["LIBCLANG_PATH"];
   FfiGenerator(
     output: Output(
-      dartFile: Platform.script.resolve("../lib/src/third_party/gomuks.g.dart"),
+      dart: .new(
+        path: Platform.script.resolve("../lib/src/third_party/gomuks.g.dart"),
+      ),
     ),
-    headers: Headers(
+    input: .new(
       entryPoints: [File(join(repoDir.path, "pkg", "ffi", "gomuksffi.h")).uri],
       compilerOptions: [
         "--no-warnings",
         if (Platform.isMacOS) "-I${await getXCodeTool()}/usr/include",
       ],
     ),
-    functions: Functions.includeAll,
   ).generate(
     libclangDylib: libclangPath == null
         ? null
