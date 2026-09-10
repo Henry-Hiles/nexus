@@ -2,7 +2,6 @@ analyzer:
     errors:
         invalid_annotation_target: ignore
         avoid_print: ignore
-        annotate_overrides: ignore
     exclude:
         - "build/**"
         - "**/*.g.dart"
