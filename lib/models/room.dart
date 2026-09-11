@@ -15,7 +15,7 @@ class const Room({
   @JsonKey(fromJson: Room.timelineTupleJsonToIMap)
   final IMap<int, int?> timeline = const IMap.empty(),
 
-  final ISet<int> sticky = const ISet.empty(),
+  final ISet<int> clientSticky = const ISet.empty(),
 
   @JsonKey(fromJson: Room.eventsJsonToIMap)
   final IMap<int, Event> events = const IMap.empty(),
@@ -34,7 +34,7 @@ class const Room({
 }) with _$Room {
   /// [timeline] is an IMap of timelineRowId to eventRowId
   /// [events] is an IMap of eventRowId to event
-  /// [sticky] is an ISet of eventRowId
+  /// [clientSticky] is an ISet of eventRowId
   static IMap<int, int?> timelineTupleJsonToIMap(List<dynamic> json) =>
       IMap.fromEntries(
         json.map(

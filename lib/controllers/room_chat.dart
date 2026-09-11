@@ -43,7 +43,7 @@ class RoomChatController(final String roomId)
         .toEntryIList(compare: (a, b) => (a?.key ?? 0).compareTo(b?.key ?? 0))
         .map((element) => element.value)
         .toIList()
-        .addAll(room.sticky)
+        .addAll(room.clientSticky)
         .map((entry) {
           final foundEvent = entry == null ? null : room.events[entry];
 
@@ -173,7 +173,7 @@ class RoomChatController(final String roomId)
           .new({
             roomId: .new(
               events: .new({event.rowId: event}),
-              sticky: .new({event.rowId}),
+              clientSticky: .new({event.rowId}),
             ),
           }),
           .new(),

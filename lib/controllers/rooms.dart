@@ -1,4 +1,5 @@
 import "dart:isolate";
+
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/models/event.dart";
@@ -46,10 +47,10 @@ class RoomsController extends Notifier<IMap<String, Room>> {
         roomId,
         existing?.copyWith(
               hasMore: incoming.hasMore,
-              sticky:
-                  (incoming.sticky.isEmpty == true
-                          ? existing.sticky
-                          : existing.sticky.addAll(incoming.sticky))
+              clientSticky:
+                  (incoming.clientSticky.isEmpty == true
+                          ? existing.clientSticky
+                          : existing.clientSticky.addAll(incoming.clientSticky))
                       .removeWhere(
                         (rowId) => incoming.timeline.values.contains(rowId),
                       ),
