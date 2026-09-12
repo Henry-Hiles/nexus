@@ -111,7 +111,7 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
     - [x] Sort by power level
     - [ ] Colors based off of power level
 - [x] Notifications using UnifiedPush ([#35](https://git.federated.nexus/Nexus/nexus/issues/35))
-- [ ] Notifications page
+- [x] Notifications page
 - [ ] Group calls using [MSC4195](https://github.com/matrix-org/matrix-spec-proposals/pull/4195)
 - [ ] Invites
 - [x] Settings
