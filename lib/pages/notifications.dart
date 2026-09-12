@@ -88,7 +88,7 @@ class const NotificationsPage({
                                 child: HighlightWrapper(
                                   InkWell(
                                     onTap: () {
-                                      //TODO
+                                      // TODO: Jump to event
                                     },
                                     child: EventRenderer(event),
                                   ),
