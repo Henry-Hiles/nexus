@@ -33,7 +33,10 @@ class NotificationController
           if (navigatorKey.currentContext case final context?) {
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (_) => NotificationsPage(eventId: eventId),
+                builder: (_) => NotificationsPage(
+                  eventId: eventId,
+                  defaultToAllNotifications: true,
+                ),
               ),
             );
           }
