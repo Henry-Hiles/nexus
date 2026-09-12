@@ -108,16 +108,13 @@ class const NotificationsPage({
           ),
           Align(
             alignment: .topRight,
-            child: Card(
-              color: Theme.of(context).colorScheme.surfaceContainer,
-              child: Padding(
-                padding: .all(12),
-                child: M3EToggleButtonGroup(
-                  selectedIndex: unreadTypeIndex.value,
-                  onSelectedIndexChanged: (index) =>
-                      unreadTypeIndex.value = index ?? unreadTypeIndex.value,
-                  actions: options.keys.toList(),
-                ),
+            child: Padding(
+              padding: .all(16),
+              child: M3EToggleButtonGroup(
+                selectedIndex: unreadTypeIndex.value,
+                onSelectedIndexChanged: (index) =>
+                    unreadTypeIndex.value = index ?? unreadTypeIndex.value,
+                actions: options.keys.toList(),
               ),
             ),
           ),
