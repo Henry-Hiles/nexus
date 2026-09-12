@@ -34,7 +34,7 @@ class NotificationController
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (_) => NotificationsPage(
-                  eventId: eventId,
+                  highlightedEventId: eventId,
                   defaultToAllNotifications: true,
                 ),
               ),

@@ -1,3 +1,5 @@
+import "dart:async";
+
 import "package:m3e_buttons/m3e_buttons.dart";
 import "package:material_ui/material_ui.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
@@ -12,7 +14,7 @@ import "package:nexus/widgets/renderers/event.dart";
 import "package:super_sliver_list/super_sliver_list.dart";
 
 class const NotificationsPage({
-  final String? eventId,
+  final String? highlightedEventId,
   final bool defaultToAllNotifications = false,
   super.key,
 }) extends HookConsumerWidget {
@@ -30,6 +32,10 @@ class const NotificationsPage({
     };
     final unreadTypeIndex = useState(defaultToAllNotifications ? 1 : 0);
 
+    final highlightedId = useState(highlightedEventId);
+    final listController = useRef(ListController());
+    final scrollController = useScrollController();
+
     final provider = NotificationsController.provider((
       options.values.toList()[unreadTypeIndex.value],
       null,
@@ -37,7 +43,38 @@ class const NotificationsPage({
     final notifications = ref.watch(provider);
     final notifier = ref.watch(provider.notifier);
 
-    final scrollController = useScrollController();
+    useEffect(() {
+      if (highlightedId.value == null) return null;
+      Timer? timer;
+
+      void listener() =>
+          WidgetsBinding.instance.addPostFrameCallback((_) async {
+            if (!listController.value.isAttached) return;
+
+            final notifications = await ref.watch(provider.future);
+
+            final index = notifications.indexWhere(
+              (element) => element.eventId == highlightedId.value!,
+            );
+
+            if (index == -1) return;
+
+            listController.value.animateToItem(
+              index: index,
+              scrollController: scrollController,
+              alignment: 0.5,
+              duration: (_) => .new(milliseconds: 700),
+              curve: (_) => Curves.easeInOut,
+            );
+            timer = Timer(.new(seconds: 1), () {
+              highlightedId.value = null;
+            });
+            listController.value.removeListener(listener);
+          });
+
+      listController.value.addListener(listener);
+      return timer?.cancel;
+    }, []);
 
     useEffect(() {
       Future<void> listener() async {
@@ -72,6 +109,7 @@ class const NotificationsPage({
                             ),
                           )
                         : SuperListView.builder(
+                            listController: listController.value,
                             controller: scrollController,
                             itemCount: value.length,
                             padding: const EdgeInsets.symmetric(
@@ -81,7 +119,8 @@ class const NotificationsPage({
                             reverse: true,
                             itemBuilder: (context, index) {
                               final event = value[index];
-                              final isHighlighted = event.eventId == eventId;
+                              final isHighlighted =
+                                  event.eventId == highlightedId.value;
 
                               return Padding(
                                 padding: .only(top: 8),
