@@ -20,11 +20,11 @@ class const NotificationsPage({
   Widget build(BuildContext context, WidgetRef ref) {
     final options = <M3EToggleButtonGroupAction, UnreadType>{
       M3EToggleButtonGroupAction(
-        label: Text("Mentions"),
+        checkedLabel: Text("Mentions"),
         icon: Icon(Icons.alternate_email),
       ): .highlight,
       M3EToggleButtonGroupAction(
-        label: Text("All Notifications"),
+        checkedLabel: Text("All Notifications"),
         icon: Icon(Icons.notifications),
       ): .notify,
     };
