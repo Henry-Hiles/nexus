@@ -74,7 +74,7 @@ class RoomChatController(final String roomId)
       );
 
   Future<bool> loadOlder() async {
-    state = AsyncLoading();
+    state = .loading();
     final timelineKeys = ref
         .read(RoomsController.provider.select((value) => value[roomId]))
         ?.timeline

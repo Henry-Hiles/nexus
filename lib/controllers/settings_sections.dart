@@ -9,7 +9,7 @@ import "package:m3e_buttons/m3e_buttons.dart";
 import "package:nexus/controllers/account_data.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/client_state.dart";
-import "package:nexus/controllers/notifications.dart";
+import "package:nexus/controllers/notification.dart";
 import "package:nexus/controllers/settings.dart";
 import "package:nexus/controllers/unified_push.dart";
 import "package:nexus/controllers/spec_versions.dart";
@@ -143,7 +143,7 @@ class SettingsSectionsController
                                   if (value) {
                                     if (await ref
                                         .watch(
-                                          NotificationsController
+                                          NotificationController
                                               .provider
                                               .notifier,
                                         )

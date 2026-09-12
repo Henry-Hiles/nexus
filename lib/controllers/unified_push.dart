@@ -5,7 +5,7 @@ import "package:flutter/foundation.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:intl/intl.dart";
 import "package:nexus/controllers/key.dart";
-import "package:nexus/controllers/notifications.dart";
+import "package:nexus/controllers/notification.dart";
 import "package:nexus/controllers/push_key.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/main.dart";
@@ -61,7 +61,7 @@ class UnifiedPushController extends AsyncNotifier<bool> {
         );
 
         if (event == null ||
-            event.unreadType?.shouldNotify != true ||
+            event.unreadType?.shouldNotify() != true ||
             (!isInBackground &&
                 await windowManager.isFocused().onError((_, _) => false) &&
                 ref.watch(KeyController.provider(KeyController.roomKey)) ==
@@ -81,7 +81,7 @@ class UnifiedPushController extends AsyncNotifier<bool> {
                   .downloadMedia(.new(mxc: avatar, isAvatar: true));
 
         await ref
-            .read(NotificationsController.provider.notifier)
+            .read(NotificationController.provider.notifier)
             .send(
               id: event.eventId.hashCode & 0x7fffffff,
               title: room?.metadata?.name ?? "New Event",

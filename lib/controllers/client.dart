@@ -25,6 +25,7 @@ import "package:nexus/models/paginate.dart";
 import "package:nexus/models/requests/deregister_pusher.dart";
 import "package:nexus/models/requests/download_media.dart";
 import "package:nexus/models/requests/get_event.dart";
+import "package:nexus/models/requests/get_mentions.dart";
 import "package:nexus/models/requests/get_related_events.dart";
 import "package:nexus/models/requests/get_room_state.dart";
 import "package:nexus/models/requests/join_room.dart";
@@ -271,6 +272,12 @@ class ClientController extends AsyncNotifier<int> {
         (await _sendCommand("get_related_events", request.toJson())) as List?;
     return .new(response?.map((event) => .fromJson(event)));
   }
+
+  Future<IList<Event>> getMentions(GetMentionsRequest request) async => .new(
+    ((await _sendCommand("get_mentions", request.toJson())) as List).map(
+      (event) => .fromJson(event),
+    ),
+  );
 
   Future<Event?> getEvent(GetEventRequest request) async {
     final json = await _sendCommand("get_event", request.toJson());

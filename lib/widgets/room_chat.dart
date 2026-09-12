@@ -78,10 +78,12 @@ final class const RoomChat({
     final hasMore = useState<bool>(true);
 
     Future<void> jumpToId(String eventId) async {
-      final index = controllerData.value?.indexWhere(
-        (element) => element.eventId == eventId,
-      );
-      if (index == null) return;
+      final index =
+          controllerData.value?.indexWhere(
+            (element) => element.eventId == eventId,
+          ) ??
+          -1;
+      if (index == -1) return;
 
       listController.value.animateToItem(
         index: index,

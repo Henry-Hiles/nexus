@@ -1,120 +1,59 @@
-import "dart:io";
-
-import "package:material_ui/material_ui.dart";
-import "package:nexus/main.dart";
-import "package:flutter_local_notifications/flutter_local_notifications.dart";
-// ignore: implementation_imports
-import "package:flutter_local_notifications_linux/src/model/hint.dart";
+import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
-import "package:nexus/pages/notifications.dart";
+import "package:nexus/controllers/client.dart";
+import "package:nexus/models/event.dart";
 
-class NotificationsController
-    extends AsyncNotifier<FlutterLocalNotificationsPlugin> {
+typedef NotificationsRequest = (UnreadType? unreadType, String? roomId);
+
+class NotificationsController([final NotificationsRequest? request])
+    extends AsyncNotifier<IList<Event>> {
+  static const limit = 20;
+
   @override
-  Future<FlutterLocalNotificationsPlugin> build() async {
-    final notifications = FlutterLocalNotificationsPlugin();
+  Future<IList<Event>> build() async {
+    final client = ref.watch(ClientController.provider.notifier);
 
-    final darwin = DarwinInitializationSettings();
+    final (unreadType, roomId) = request ?? (null, null);
 
-    await notifications.initialize(
-      settings: .new(
-        windows: .new(
-          appName: "Nexus",
-          appUserModelId: "nexus.federated.nexus",
-          guid: "dde78daf-130f-4e46-a80a-e31deeab45d7",
+    final mentions = await client.getMentions(
+      .new(
+        maxTimestamp: .now(),
+        unreadType: unreadType ?? .highlight,
+        limit: limit,
+        roomId: roomId,
+      ),
+    );
+
+    return mentions;
+  }
+
+  Future<void> loadOlder() async {
+    final currentNotifications = await future;
+    state = .loading();
+    state = await .guard(() async {
+      final lastTs = currentNotifications.lastOrNull?.timestamp;
+      if (lastTs == null) return const .empty();
+
+      final client = ref.watch(ClientController.provider.notifier);
+      final (unreadType, roomId) = request ?? (null, null);
+
+      final newNotifications = await client.getMentions(
+        .new(
+          maxTimestamp: lastTs,
+          unreadType: unreadType ?? .highlight,
+          limit: limit,
+          roomId: roomId,
         ),
-        android: .new("ic_launcher_foreground"),
-        iOS: darwin,
-        macOS: darwin,
-        linux: .new(defaultActionName: "Open"),
-      ),
-      onDidReceiveNotificationResponse: (details) {
-        if (details.payload case final eventId?) {
-          if (navigatorKey.currentContext case final context?) {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => NotificationsPage(eventId: eventId),
-              ),
-            );
-          }
-        }
-      },
-    );
+      );
 
-    return notifications;
+      return currentNotifications.addAll(newNotifications);
+    });
   }
 
-  Future<bool> requestPermissions() async {
-    final controller = await future;
-
-    if (Platform.isIOS) {
-      return await controller
-              .resolvePlatformSpecificImplementation<
-                IOSFlutterLocalNotificationsPlugin
-              >()
-              ?.requestPermissions(alert: true, badge: true, sound: true) ??
-          true;
-    } else if (Platform.isMacOS) {
-      return await controller
-              .resolvePlatformSpecificImplementation<
-                MacOSFlutterLocalNotificationsPlugin
-              >()
-              ?.requestPermissions(alert: true, badge: true, sound: true) ??
-          true;
-    } else if (Platform.isAndroid) {
-      return await controller
-              .resolvePlatformSpecificImplementation<
-                AndroidFlutterLocalNotificationsPlugin
-              >()
-              ?.requestNotificationsPermission() ??
-          true;
-    }
-
-    return true;
-  }
-
-  Future<void> send({
-    required int id,
-    required String title,
-    String? body,
-    File? icon,
-    String? payload,
-  }) async {
-    final notificationDetails = NotificationDetails(
-      android: .new(
-        "messages",
-        "Messages",
-        largeIcon: icon == null ? null : FilePathAndroidBitmap(icon.path),
-      ),
-      linux: .new(
-        customHints: icon == null
-            ? null
-            : [
-                .new(
-                  name: "image-path",
-                  value: LinuxHintStringValue(icon.path),
-                ),
-              ],
-      ),
-      // TODO: See if icons can be added to iOS, macOS, and Windows notifications (#68)
-      iOS: .new(),
-      macOS: .new(),
-      windows: .new(),
-    );
-
-    final controller = await future;
-    await controller.show(
-      id: id,
-      title: title,
-      body: body,
-      notificationDetails: notificationDetails,
-      payload: payload,
-    );
-  }
-
-  static final provider =
-      AsyncNotifierProvider<
+  static final provider = AsyncNotifierProvider.family
+      .autoDispose<
         NotificationsController,
-        FlutterLocalNotificationsPlugin
+        IList<Event>,
+        NotificationsRequest?
       >(NotificationsController.new);
 }

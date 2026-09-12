@@ -6,6 +6,7 @@ import "package:navigation_rail_m3e/navigation_rail_m3e.dart";
 import "package:nexus/controllers/key.dart";
 import "package:nexus/controllers/spaces.dart";
 import "package:nexus/models/room.dart";
+import "package:nexus/pages/notifications.dart";
 import "package:nexus/pages/settings.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/widgets/divider_widget.dart";
@@ -188,6 +189,15 @@ class const Sidebar({required final bool isDesktop, super.key})
                             tooltip: "Explore other rooms",
                             onPressed: null,
                             icon: Icon(Icons.explore),
+                          ),
+                          IconButton(
+                            tooltip: "Open notifications",
+                            onPressed: () => Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => NotificationsPage(),
+                              ),
+                            ),
+                            icon: Icon(Icons.notifications),
                           ),
                           IconButton(
                             tooltip: "Open settings",

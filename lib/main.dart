@@ -8,7 +8,7 @@ import "package:media_kit/media_kit.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/client_state.dart";
 import "package:nexus/controllers/multi_provider.dart";
-import "package:nexus/controllers/notifications.dart";
+import "package:nexus/controllers/notification.dart";
 import "package:nexus/controllers/settings.dart";
 import "package:nexus/controllers/shared_prefs.dart";
 import "package:nexus/controllers/unified_push.dart";
@@ -147,7 +147,7 @@ class const App(final bool isInBackground, {super.key})
                   IListConst([
                     SharedPrefsController.provider,
                     ClientController.provider,
-                    NotificationsController.provider,
+                    NotificationController.provider,
                     UnifiedPushController.provider,
                   ]),
                 ),

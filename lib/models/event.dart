@@ -29,7 +29,7 @@ class const Event({
   final String? sendError,
   final IMap<String, int> reactions = const IMap.empty(),
   @JsonKey(name: "last_edit_rowid") final int lastEditRowId = 0,
-  @UnreadTypeConverter() final UnreadType? unreadType,
+  final UnreadType? unreadType,
   final Profile? pmp,
   required final Content content,
   required final Content? previousContent,
@@ -91,22 +91,10 @@ class const LocalContent({
       _$LocalContentFromJson(json);
 }
 
-class UnreadTypeConverter implements JsonConverter<UnreadType?, int?> {
-  const UnreadTypeConverter();
-
-  @override
-  UnreadType? fromJson(int? json) => json == null ? null : UnreadType(json);
-
-  @override
-  int? toJson(UnreadType? object) => object?.value;
-}
-
-// I think this is correct but I'm not sure, its some type of bitmask.
-@immutable
-class UnreadType {
-  final int value;
-
-  const UnreadType(this.value);
+@Freezed(toJson: false, fromJson: false)
+class const UnreadType(final int value) with _$UnreadType {
+  factory UnreadType.fromJson(int json) => UnreadType(json);
+  int toJson() => value;
 
   static const none = UnreadType(0);
   static const normal = UnreadType(1);
@@ -114,9 +102,9 @@ class UnreadType {
   static const highlight = UnreadType(4);
   static const sound = UnreadType(8);
 
-  bool get isNone => value == 0;
-  bool get isNormal => (value & 1) != 0;
-  bool get shouldNotify => (value & 2) != 0;
-  bool get isHighlighted => (value & 4) != 0;
-  bool get playsSound => (value & 8) != 0;
+  bool isNone() => value == 0;
+  bool isNormal() => (value & 1) != 0;
+  bool shouldNotify() => (value & 2) != 0;
+  bool isHighlighted() => (value & 4) != 0;
+  bool playsSound() => (value & 8) != 0;
 }
