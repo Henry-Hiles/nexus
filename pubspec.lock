@@ -898,10 +898,10 @@ packages:
     dependency: "direct main"
     description:
       name: material_emoji_picker
-      sha256: "1547195a419134cf0b2396d119dc873589804f461424917b1b61a0966bfb7e5a"
+      sha256: bb1d5a467e2f83fd13dc83bd5a3c827bbfc525041921ed74a1d85b905fdc77e8
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.0+1"
+    version: "1.0.2"
   material_ui:
     dependency: "direct main"
     description:

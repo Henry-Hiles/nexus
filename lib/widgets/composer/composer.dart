@@ -2,7 +2,7 @@ import "dart:io";
 
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:file_selector/file_selector.dart";
-import "package:material_emoji_picker/material_emoji_picker.dart";
+import "package:nexus/widgets/emoji_picker.dart";
 import "package:material_ui/material_ui.dart";
 import "package:flutter/services.dart";
 import "package:flutter_hooks/flutter_hooks.dart";

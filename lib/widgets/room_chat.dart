@@ -17,7 +17,7 @@ import "package:nexus/models/content/message.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/models/relation_type.dart";
 import "package:nexus/widgets/composer/composer.dart";
-import "package:material_emoji_picker/material_emoji_picker.dart";
+import "package:nexus/widgets/emoji_picker.dart";
 import "package:nexus/widgets/pinned_events_drawer.dart";
 import "package:nexus/widgets/renderers/event.dart";
 import "package:nexus/widgets/member_list.dart";
