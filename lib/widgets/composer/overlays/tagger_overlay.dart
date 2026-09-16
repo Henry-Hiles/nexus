@@ -5,8 +5,8 @@ import "package:nexus/widgets/composer/overlays/user_overlay.dart";
 import "package:nexus/widgets/loading.dart";
 
 class const TaggerOverlay(
-  final String roomId, {
-  required final String query,
+  final String query, {
+  required final String roomId,
   required final void Function({required String id, required String name})
   addTag,
   required final String? triggerCharacter,
@@ -22,8 +22,8 @@ class const TaggerOverlay(
           color: Theme.of(context).colorScheme.surfaceContainerHigh,
           padding: .all(8),
           child: switch (triggerCharacter) {
-            "@" => UserOverlay(roomId, query: query, addTag: addTag),
-            "#" => RoomOverlay(roomId, query: query, addTag: addTag),
+            "@" => UserOverlay(query, roomId: roomId, addTag: addTag),
+            "#" => RoomOverlay(query, addTag: addTag),
 
             _ => Loading(),
           },

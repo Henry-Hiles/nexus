@@ -7,8 +7,8 @@ import "package:nexus/models/content/membership.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 
 class const UserOverlay(
-  final String roomId, {
-  required final String query,
+  final String query, {
+  required final String roomId,
   required final void Function({required String id, required String name})
   addTag,
   super.key,

@@ -5,8 +5,7 @@ import "package:nexus/controllers/via.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 
 class const RoomOverlay(
-  final String roomId, {
-  required final String query,
+  final String query, {
   required final void Function({required String id, required String name})
   addTag,
   super.key,

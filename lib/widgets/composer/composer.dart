@@ -196,8 +196,8 @@ class const Composer(
                               child: FlutterTagger(
                                 triggerStrategy: .eager,
                                 overlay: TaggerOverlay(
-                                  roomId,
-                                  query: query.value,
+                                  query.value,
+                                  roomId: roomId,
                                   triggerCharacter: triggerCharacter.value,
                                   addTag: ({required id, required name}) {
                                     controller.value.addTag(id: id, name: name);
