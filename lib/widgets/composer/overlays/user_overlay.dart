@@ -41,21 +41,18 @@ class const UserOverlay(
                   .map(
                     (member) => switch (member.content) {
                       MembershipContent(:final displayName, :final avatarUrl) =>
-                        Material(
-                          color: Colors.transparent,
-                          child: ListTile(
-                            leading: AvatarOrHash(
-                              avatarUrl,
-                              displayName ?? member.stateKey!.localpart,
-                            ),
-                            title: Text(
-                              displayName ?? member.stateKey!.localpart,
-                            ),
-                            subtitle: Text(member.stateKey!),
-                            onTap: () => addTag(
-                              id: "[@$displayName](matrix:u/${member.stateKey!.substring(1)})",
-                              name: member.stateKey!.localpart,
-                            ),
+                        ListTile(
+                          leading: AvatarOrHash(
+                            avatarUrl,
+                            displayName ?? member.stateKey!.localpart,
+                          ),
+                          title: Text(
+                            displayName ?? member.stateKey!.localpart,
+                          ),
+                          subtitle: Text(member.stateKey!),
+                          onTap: () => addTag(
+                            id: "[@$displayName](matrix:u/${member.stateKey!.substring(1)})",
+                            name: member.stateKey!.localpart,
                           ),
                         ),
                       _ => SizedBox.shrink(),

@@ -28,31 +28,28 @@ class const RoomOverlay(
                     room.metadata?.canonicalAlias ??
                     room.metadata?.id ??
                     "Unknown Room";
-                return Material(
-                  color: Colors.transparent,
-                  child: ListTile(
-                    leading: AvatarOrHash(
-                      room.metadata?.avatar,
-                      name,
-                      fallback: Icon(Icons.numbers),
-                    ),
-                    title: Text(name),
-                    subtitle: room.metadata?.topic == null
-                        ? null
-                        : Text(room.metadata!.topic!, maxLines: 1),
-                    onTap: () {
-                      final vias = ref.watch(ViaController.provider(room));
-                      addTag(
-                        id: "[#$name](matrix:roomid/${room.metadata?.id.substring(1)}$vias)",
-                        name:
-                            (room.metadata?.canonicalAlias ?? room.metadata?.id)
-                                ?.substring(1)
-                                .split(":")
-                                .first ??
-                            "",
-                      );
-                    },
+                return ListTile(
+                  leading: AvatarOrHash(
+                    room.metadata?.avatar,
+                    name,
+                    fallback: Icon(Icons.numbers),
                   ),
+                  title: Text(name),
+                  subtitle: room.metadata?.topic == null
+                      ? null
+                      : Text(room.metadata!.topic!, maxLines: 1),
+                  onTap: () {
+                    final vias = ref.watch(ViaController.provider(room));
+                    addTag(
+                      id: "[#$name](matrix:roomid/${room.metadata?.id.substring(1)}$vias)",
+                      name:
+                          (room.metadata?.canonicalAlias ?? room.metadata?.id)
+                              ?.substring(1)
+                              .split(":")
+                              .first ??
+                          "",
+                    );
+                  },
                 );
               })
               .toList(),

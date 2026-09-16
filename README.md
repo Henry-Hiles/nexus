@@ -55,10 +55,10 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
         - [x] Per message profiles
         - [x] Attachments
         - [ ] Commands with [MSC4391](https://github.com/matrix-org/matrix-spec-proposals/pull/4391)
-        - [x] Mentions
+        - [x] Tags
             - [x] Users
             - [x] Rooms
-            - [ ] Inline emoji picker (Putting this here since it'll be implemented the same way as mentions)
+            - [x] Emojis
         - [ ] Custom emojis/stickers
         - [ ] GIFs using Gomuks' GIF proxies
     - [x] Receiving
