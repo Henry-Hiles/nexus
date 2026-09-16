@@ -14,7 +14,7 @@ import "package:nexus/controllers/power_level.dart";
 import "package:nexus/models/content/message.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/models/relation_type.dart";
-import "package:nexus/widgets/composer/mention_overlay.dart";
+import "package:nexus/widgets/composer/overlays/tagger_overlay.dart";
 import "package:nexus/widgets/composer/relation_preview.dart";
 import "package:nexus/main.dart";
 
@@ -195,7 +195,7 @@ class const Composer(
                             Expanded(
                               child: FlutterTagger(
                                 triggerStrategy: .eager,
-                                overlay: MentionOverlay(
+                                overlay: TaggerOverlay(
                                   roomId,
                                   query: query.value,
                                   triggerCharacter: triggerCharacter.value,
@@ -212,6 +212,7 @@ class const Composer(
                                 triggerCharacterAndStyles: {
                                   "@": style,
                                   "#": style,
+                                  ":": style,
                                 },
                                 builder: (context, key) => Focus(
                                   onKeyEvent: (_, event) {
