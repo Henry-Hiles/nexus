@@ -14,22 +14,9 @@ class const AccountData({
   @JsonKey(name: AccountData.directKey)
   final IMap<String, IList<String>> directMessages = const IMap.empty(),
 
-  @JsonKey(
-    name: AccountData.recentEmojiKey,
-    readValue: AccountData.readRecentEmojiValue,
-    toJson: AccountData.recentEmojiToJson,
-  )
-  final IList<RecentEmoji> recentEmoji = const IList.empty(),
+  @JsonKey(name: AccountData.recentEmojiKey)
+  final RecentEmojiData recentEmoji = const RecentEmojiData(),
 }) with _$AccountData {
-  static List<dynamic>? readRecentEmojiValue(
-    Map<dynamic, dynamic> json,
-    String key,
-  ) => json[key]?["recent_emoji"];
-
-  static Map<String, List<dynamic>>? recentEmojiToJson(
-    IList<RecentEmoji> recentEmoji,
-  ) => {"recent_emoji": recentEmoji.map((emoji) => emoji.toJson()).toList()};
-
   static const invitePermissionConfigKey = "m.invite_permission_config";
   static const directKey = "m.direct";
   static const recentEmojiKey = "m.recent_emoji";
@@ -38,6 +25,17 @@ class const AccountData({
 
   factory AccountData.fromJson(Map<String, Object?> json) =>
       _$AccountDataFromJson(json);
+}
+
+@Freezed(toJson: false, fromJson: false)
+@JsonSerializable()
+class const RecentEmojiData({
+  final IList<RecentEmoji> recentEmoji = const IList.empty(),
+}) with _$RecentEmojiData {
+  Map<String, Object?> toJson() => _$RecentEmojiDataToJson(this);
+
+  factory RecentEmojiData.fromJson(Map<String, Object?> json) =>
+      _$RecentEmojiDataFromJson(json);
 }
 
 @Freezed(toJson: false, fromJson: false)

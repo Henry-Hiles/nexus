@@ -4,12 +4,12 @@ import "package:flutter/services.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:measure_size/measure_size.dart";
-import "package:nexus/controllers/account_data.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/client_state.dart";
 import "package:nexus/controllers/member_list_opened.dart";
 import "package:nexus/controllers/pinned_ids.dart";
 import "package:nexus/controllers/power_level.dart";
+import "package:nexus/controllers/recent_emoji.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/controllers/room_chat.dart";
 import "package:nexus/controllers/via.dart";
@@ -196,6 +196,8 @@ final class const RoomChat({
       final danger = theme.colorScheme.error;
       final isSentByMe = event.sender == userId;
 
+      final recentEmoji = ref.watch(RecentEmojiController.provider);
+
       return [
         if (ref.watch(
           PowerLevelController.provider(
@@ -209,13 +211,7 @@ final class const RoomChat({
               child: Row(
                 children: [
                   ...{
-                        ...ref.watch(
-                          AccountDataController.provider.select(
-                            (value) => value.recentEmoji
-                                .map((entry) => entry.emoji)
-                                .toIList(),
-                          ),
-                        ),
+                        ...recentEmoji.map((entry) => entry.emoji),
                         "👍",
                         "🤣",
                         "😭",
@@ -229,6 +225,11 @@ final class const RoomChat({
                             Navigator.of(context).pop();
                             await notifier
                                 .sendReaction(emoji, event)
+                                .onError(showError);
+
+                            ref
+                                .watch(RecentEmojiController.provider.notifier)
+                                .add(emoji)
                                 .onError(showError);
                           },
                           icon: Text(emoji),
