@@ -17,7 +17,7 @@ import "package:nexus/models/content/message.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/models/relation_type.dart";
 import "package:nexus/widgets/composer/composer.dart";
-import "package:nexus/widgets/emoji_picker_button.dart";
+import "package:material_emoji_picker/material_emoji_picker.dart";
 import "package:nexus/widgets/pinned_events_drawer.dart";
 import "package:nexus/widgets/renderers/event.dart";
 import "package:nexus/widgets/member_list.dart";
@@ -234,11 +234,26 @@ final class const RoomChat({
                           icon: Text(emoji),
                         ),
                       ),
-                  EmojiPickerButton(
-                    context: context,
-                    onPressed: Navigator.of(context).pop,
-                    onSelection: (emoji) =>
-                        notifier.sendReaction(emoji, event).onError(showError),
+                  IconButton(
+                    icon: Icon(Icons.emoji_emotions),
+
+                    onPressed: () {
+                      // TODO: More adaptive, e.g. dialog on desktop
+                      Navigator.of(context).pop();
+                      showModalBottomSheet(
+                        isScrollControlled: true,
+                        context: context,
+                        builder: (context) => EmojiPicker(
+                          onSelection: (value) {
+                            Navigator.of(context).pop();
+                            notifier
+                                .sendReaction(value, event)
+                                .onError(showError);
+                          },
+                          allowFreeText: true,
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),

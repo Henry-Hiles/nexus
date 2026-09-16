@@ -1,18 +1,25 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:freezed_annotation/freezed_annotation.dart";
+import "package:flutter/widgets.dart";
 part "emoji.freezed.dart";
 part "emoji.g.dart";
 
 @Freezed(toJson: false, fromJson: false)
-@JsonSerializable()
+@JsonSerializable(createToJson: false)
 class Emoji({
-  required final String emoji,
-  required final String category,
+  @JsonKey(
+    fromJson: Emoji.widgetFromJson,
+    readValue: Emoji.readWidgetValueFromJson,
+  )
+  required final Widget widget,
+  @JsonKey(name: "emoji") required final String value,
   required final IList<String> aliases,
   required final String description,
   required final IList<String> tags,
 }) with _$Emoji {
-  Map<String, Object?> toJson() => _$EmojiToJson(this);
+  static Widget widgetFromJson(String emoji) => Text(emoji);
 
+  static String readWidgetValueFromJson(Map<dynamic, dynamic> json, _) =>
+      json["emoji"];
   factory Emoji.fromJson(Map<String, Object?> json) => _$EmojiFromJson(json);
 }

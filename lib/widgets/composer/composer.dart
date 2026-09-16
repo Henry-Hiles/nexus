@@ -2,6 +2,7 @@ import "dart:io";
 
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:file_selector/file_selector.dart";
+import "package:material_emoji_picker/material_emoji_picker.dart";
 import "package:material_ui/material_ui.dart";
 import "package:flutter/services.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
@@ -15,7 +16,6 @@ import "package:nexus/models/event.dart";
 import "package:nexus/models/relation_type.dart";
 import "package:nexus/widgets/composer/mention_overlay.dart";
 import "package:nexus/widgets/composer/relation_preview.dart";
-import "package:nexus/widgets/emoji_picker_button.dart";
 import "package:nexus/main.dart";
 
 class const Composer(
@@ -119,10 +119,19 @@ class const Composer(
                           ),
                         )
                         ? [
-                            EmojiPickerButton(
-                              context: context,
-                              onSelection: (_) => node?.requestFocus(),
-                              controller: controller.value,
+                            IconButton(
+                              onPressed: () => showModalBottomSheet(
+                                isScrollControlled: true,
+                                context: context,
+                                builder: (context) => EmojiPicker(
+                                  onSelection: (value) {
+                                    Navigator.of(context).pop();
+                                    controller.value.text += value;
+                                    node?.requestFocus();
+                                  },
+                                ),
+                              ),
+                              icon: Icon(Icons.emoji_emotions),
                             ),
                             PopupMenuButton(
                               tooltip: "Add media",

@@ -1,6 +1,5 @@
 import "package:material_ui/material_ui.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
-import "package:nexus/controllers/emoji.dart";
 import "package:nexus/controllers/init_complete.dart";
 import "package:nexus/controllers/key.dart";
 import "package:nexus/widgets/appbar.dart";
@@ -16,8 +15,6 @@ class const ChatPage({super.key}) extends ConsumerWidget {
       final showMembersByDefault = constraints.maxWidth > 1000;
       final initComplete = ref.watch(InitCompleteController.provider);
       final roomId = ref.watch(KeyController.provider(KeyController.roomKey));
-
-      ref.read(EmojiController.provider);
 
       return SafeArea(
         child: Scaffold(

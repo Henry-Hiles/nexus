@@ -7,7 +7,7 @@ import "package:nexus/helpers/extensions/get_xcode_sdk.dart";
 void main(List<String> args) async {
   final repoDir = Directory.fromUri(Platform.script.resolve("../gomuks"));
 
-  print("Generating FFI Bindings...");
+  print("Generating FFI bindings...");
 
   final libclangPath = Platform.environment["LIBCLANG_PATH"];
   FfiGenerator(
@@ -40,5 +40,5 @@ void main(List<String> args) async {
             ),
           ),
   );
-  print("Done!");
+  print("FFI bindings generated!");
 }
