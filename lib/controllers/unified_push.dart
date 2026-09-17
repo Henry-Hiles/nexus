@@ -21,7 +21,7 @@ import "package:window_manager/window_manager.dart";
 class UnifiedPushController extends AsyncNotifier<bool> {
   @override
   Future<bool> build() async {
-    if (Platform.isLinux ^ Platform.isAndroid) return false;
+    if (!Platform.isLinux && !Platform.isAndroid) return false;
 
     final client = ref.watch(ClientController.provider.notifier);
     final registered = await UnifiedPush.initialize(
