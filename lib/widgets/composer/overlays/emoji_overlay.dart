@@ -27,7 +27,10 @@ class const EmojiOverlay(
               )
               .map(
                 (emoji) => ListTile(
-                  leading: emoji.widget,
+                  leading: SizedBox.square(
+                    dimension: 28,
+                    child: FittedBox(child: emoji.widget),
+                  ),
                   title: Text(emoji.aliases.first),
                   subtitle: Text(emoji.description),
                   onTap: () => addTag(
