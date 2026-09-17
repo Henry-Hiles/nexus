@@ -8,11 +8,11 @@ class UnifiedPushAllowedController extends AsyncNotifier<String?> {
   @override
   Future<String?> build() async {
     if (!await UnifiedPush.tryUseCurrentOrDefaultDistributor()) {
-      return "No valid distributors found. Try installing ${Platform.isLinux
-          ? "KUnifiedPush"
+      return "No valid distributors found. ${Platform.isLinux
+          ? "Try installing KUnifiedPush"
           : Platform.isAndroid
-          ? "Google Play Services or NTFY"
-          : "NTFY"}.";
+          ? "Try installing Google Play Services or NTFY"
+          : "Your platform is not currently supported by UnifiedPush"}.";
     }
 
     final capabilities = await ref
