@@ -40,26 +40,21 @@ class const MentionChip(final String content, final String? roomId, {super.key})
                 // TODO: Handle summary
               }
             },
-            child: IgnorePointer(
-              child: Chip(
-                label: Text(
-                  switch (data) {
-                    RoomSummary summary =>
-                      (summary.name == null ? null : "#${summary.name}") ??
-                          summary.canonicalAlias ??
-                          summary.roomId,
-                    MembershipContent membership =>
-                      membership.displayName == null
-                          ? mention
-                          : "@${membership.displayName}",
-                    _ => mention,
-                  },
-                  style: .new(
-                    fontWeight: .bold,
-                    color: Theme.of(context).colorScheme.onPrimary,
-                  ),
-                ),
-                backgroundColor: Theme.of(context).colorScheme.primary,
+            child: Text(
+              switch (data) {
+                RoomSummary summary =>
+                  (summary.name == null ? null : "#${summary.name}") ??
+                      summary.canonicalAlias ??
+                      summary.roomId,
+                MembershipContent membership =>
+                  membership.displayName == null
+                      ? mention
+                      : "@${membership.displayName}",
+                _ => mention,
+              },
+              style: .new(
+                fontWeight: .bold,
+                color: Theme.of(context).colorScheme.primary,
               ),
             ),
           );
