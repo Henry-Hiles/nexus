@@ -10,9 +10,10 @@ class const GenericEventRenderer(
     padding: .symmetric(vertical: 4),
     child: Row(
       spacing: 8,
+      mainAxisSize: .min,
       children: [
         Padding(padding: .symmetric(horizontal: 4), child: Icon(icon)),
-        Expanded(child: Wrap(spacing: 4, children: children)),
+        Flexible(child: Wrap(spacing: 4, children: children)),
       ],
     ),
   );

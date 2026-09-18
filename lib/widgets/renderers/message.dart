@@ -15,6 +15,7 @@ import "package:nexus/widgets/lazy_loading/message_displayname.dart";
 import "package:nexus/widgets/linkified_text.dart";
 import "package:nexus/widgets/message_image.dart";
 import "package:nexus/widgets/reaction_row.dart";
+import "package:nexus/widgets/timestamp.dart";
 import "package:nexus/widgets/url_preview.dart";
 import "package:timeago/timeago.dart";
 import "package:nexus/widgets/event_preview.dart";
@@ -34,16 +35,6 @@ class const MessageRenderer(
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final errorStyle = TextStyle(color: colorScheme.error);
-
-    final timestamp = Tooltip(
-      message: event.timestamp.toString(),
-      child: Text(
-        format(event.timestamp),
-        maxLines: 1,
-        overflow: .ellipsis,
-        style: theme.textTheme.labelSmall?.copyWith(color: Colors.grey),
-      ),
-    );
 
     final textStyle = TextStyle(
       fontSize: event.localContent?.bigEmoji == true ? 32 : null,
@@ -70,7 +61,7 @@ class const MessageRenderer(
                   spacing: 4,
                   children: [
                     Flexible(child: MessageDisplayname(event)),
-                    Flexible(flex: 0, child: timestamp),
+                    Flexible(flex: 0, child: Timestamp(event.timestamp)),
                   ],
                 ),
               Card(

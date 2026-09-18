@@ -24,6 +24,7 @@ import "package:nexus/widgets/renderers/message.dart";
 import "package:nexus/widgets/reaction_row.dart";
 import "package:nexus/widgets/renderers/membership.dart";
 import "package:nexus/widgets/renderers/generic_event.dart";
+import "package:nexus/widgets/timestamp.dart";
 
 class const EventRenderer(
   final Event event, {
@@ -196,7 +197,18 @@ class const EventRenderer(
                     child: Padding(
                       padding: EdgeInsets.symmetric(horizontal: 8)
                           .copyWith(top: isGrouped ? 0 : 8),
-                      child: child,
+                      child: Row(
+                        mainAxisSize: .min,
+                        spacing: 6,
+                        children: [
+                          Flexible(child: child),
+                          if (child is! MessageRenderer)
+                            Flexible(
+                              flex: 0,
+                              child: Timestamp(event.timestamp),
+                            ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -204,10 +216,7 @@ class const EventRenderer(
             ),
 
             ...[
-              if (event.content is! MessageContent &&
-                  event.content is! StickerContent &&
-                  event.content is! EncryptedContent)
-                ReactionRow(event),
+              if (child is! MessageRenderer) ReactionRow(event),
 
               if (event.sendError != null && event.sendError != "not sent")
                 Padding(
