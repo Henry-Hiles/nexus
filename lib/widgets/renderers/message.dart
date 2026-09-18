@@ -17,7 +17,6 @@ import "package:nexus/widgets/message_image.dart";
 import "package:nexus/widgets/reaction_row.dart";
 import "package:nexus/widgets/timestamp.dart";
 import "package:nexus/widgets/url_preview.dart";
-import "package:timeago/timeago.dart";
 import "package:nexus/widgets/event_preview.dart";
 import "package:nexus/widgets/players/video.dart";
 import "package:nexus/widgets/players/audio.dart";

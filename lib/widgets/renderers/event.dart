@@ -197,16 +197,14 @@ class const EventRenderer(
                     child: Padding(
                       padding: EdgeInsets.symmetric(horizontal: 8)
                           .copyWith(top: isGrouped ? 0 : 8),
-                      child: Row(
-                        mainAxisSize: .min,
+                      child: Wrap(
+                        verticalDirection: .up,
                         spacing: 6,
+                        crossAxisAlignment: .center,
                         children: [
-                          Flexible(child: child),
+                          child,
                           if (child is! MessageRenderer)
-                            Flexible(
-                              flex: 0,
-                              child: Timestamp(event.timestamp),
-                            ),
+                            Timestamp(event.timestamp),
                         ],
                       ),
                     ),
