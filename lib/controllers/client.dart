@@ -54,8 +54,19 @@ import "package:path_provider/path_provider.dart";
 class ClientController extends AsyncNotifier<int> {
   @override
   Future<int> build() async {
-    final path = "${(await getApplicationSupportDirectory()).path}/gomuks";
-    final handle = await init(path);
+    if (Platform.isAndroid || Platform.isIOS) {
+      final env = {
+        "GOMUKS_ROOT": (await getApplicationSupportDirectory()).path,
+        "GOMUKS_CACHE_HOME": (await getApplicationCacheDirectory()).path,
+      };
+      for (final MapEntry(:key, :value) in env.entries) {
+        GomuksSetEnv(
+          key.toNativeUtf8().cast<Char>(),
+          value.toNativeUtf8().cast<Char>(),
+        );
+      }
+    }
+    final handle = await Isolate.run(GomuksInit);
 
     final callable =
         NativeCallable<
@@ -151,13 +162,6 @@ class ClientController extends AsyncNotifier<int> {
     if (errorCode == 0) return handle;
     throw Exception("GomuksStart returned error code $errorCode");
   }
-
-  Future<int> init(String path) => Isolate.run(
-    () => GomuksInit(
-      ((Platform.isAndroid || Platform.isIOS) ? path.toNativeUtf8() : nullptr)
-          .cast(),
-    ),
-  );
 
   Future<dynamic> callGomuksMethod(
     Map<String, dynamic> data,
