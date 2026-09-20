@@ -1501,20 +1501,22 @@ packages:
     source: hosted
     version: "3.5.0"
   unifiedpush_linux:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
-      name: unifiedpush_linux
-      sha256: c062d5eedd1cec70bcd33270cc4e01ae0ff6501f33d471167c06b34a968adfeb
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.0"
+      path: unifiedpush_linux
+      ref: "quad/feat/should-write-service-option"
+      resolved-ref: "7589b07ef4280820e4adea165d3d86b219f6022c"
+      url: "https://codeberg.org/Henry-Hiles/flutter-connector"
+    source: git
+    version: "1.0.1"
   unifiedpush_platform_interface:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
-      name: unifiedpush_platform_interface
-      sha256: "83372bc8d794b8b12ef6993b518d7be907dcfc2191bdf6de0ece5c4445d89880"
-      url: "https://pub.dev"
-    source: hosted
+      path: unifiedpush_platform_interface
+      ref: "quad/feat/should-write-service-option"
+      resolved-ref: "7589b07ef4280820e4adea165d3d86b219f6022c"
+      url: "https://codeberg.org/Henry-Hiles/flutter-connector"
+    source: git
     version: "4.0.0"
   unifiedpush_storage_interface:
     dependency: transitive
