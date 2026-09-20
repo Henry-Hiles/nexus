@@ -16,67 +16,12 @@
       ...
     }@inputs:
     flake-parts.lib.mkFlake { inherit inputs; } {
+      imports = [ ./linux/nix ];
       systems = [
         "x86_64-linux"
         "aarch64-linux"
         "aarch64-darwin"
         "x86_64-darwin"
       ];
-
-      perSystem =
-        {
-          lib,
-          pkgs,
-          system,
-          ...
-        }:
-
-        {
-          _module.args.pkgs = import nixpkgs {
-            inherit system;
-            config = {
-              android_sdk.accept_license = true;
-              allowUnfree = true;
-            };
-          };
-
-          packages =
-            let
-              default = pkgs.callPackage ./linux/nix/pkg {
-                src = self;
-              };
-            in
-            {
-              inherit default;
-
-              flatpak = inputs.nix2flatpak.lib.${system}.mkFlatpak {
-                appName = "Nexus";
-                developer = "QuadRadical";
-                appId = "nexus.federated.nexus";
-                package = default;
-                runtime = "org.gnome.Platform/49";
-                permissions = {
-                  share = [ "network" ];
-                  sockets = [
-                    "pulseaudio"
-                    "fallback-x11"
-                    "wayland"
-                  ];
-
-                  talk-names = [
-                    "org.unifiedpush.Distributor.*"
-                    "org.freedesktop.Notifications"
-                  ];
-                  devices = [ "dri" ];
-                };
-              };
-
-              gomuks = pkgs.callPackage ./linux/nix/pkg/gomuks.nix {
-                src = self;
-              };
-            };
-
-          devShells.default = pkgs.callPackage ./linux/nix/devshell.nix { };
-        };
     };
 }
