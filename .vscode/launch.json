@@ -1,0 +1,17 @@
+{
+    "configurations": [
+        {
+            "name": "Flutter",
+            "type": "dart",
+            "request": "launch",
+            "program": "lib/main.dart"
+        },
+        {
+            "name": "Flutter (Headless)",
+            "type": "dart",
+            "request": "launch",
+            "program": "lib/main.dart",
+            "env": { "FLUTTER_HEADLESS": "1" }
+        }
+    ]
+}

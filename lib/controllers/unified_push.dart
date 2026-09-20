@@ -13,7 +13,6 @@ import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/client_state.dart";
 import "package:nexus/models/content/message.dart";
 import "package:nexus/models/content/sticker.dart";
-import "package:nexus/models/requests/register_pusher.dart";
 import "package:unifiedpush/unifiedpush.dart";
 import "package:unifiedpush_storage_shared_preferences/storage.dart";
 import "package:window_manager/window_manager.dart";
@@ -40,8 +39,8 @@ class UnifiedPushController extends AsyncNotifier<bool> {
           .new(
             appDisplayName: "Nexus",
             appId: "nexus.federated.nexus",
-            data: PusherData.webPush(
-              url: Uri.parse(endpoint.url),
+            data: .webPush(
+              url: .parse(endpoint.url),
               auth: endpoint.pubKeySet!.auth,
             ),
             deviceDisplayName:
@@ -67,7 +66,9 @@ class UnifiedPushController extends AsyncNotifier<bool> {
             event.unreadType?.shouldNotify() != true ||
             (!isInBackground &&
                 await windowManager.isFocused().onError((_, _) => false) &&
-                ref.watch(KeyController.provider(KeyController.roomKey)) ==
+                await ref.watch(
+                      KeyController.provider(KeyController.roomKey).future,
+                    ) ==
                     event.roomId)) {
           if (isInBackground) exit(0);
           return;
@@ -146,7 +147,9 @@ class UnifiedPushController extends AsyncNotifier<bool> {
 
   Future<void> deregister() async {
     final clientState = ref.watch(ClientStateController.provider);
-    final key = ref.watch(PushKeyController.provider(clientState!.deviceId!));
+    final key = await ref.watch(
+      PushKeyController.provider(clientState!.deviceId!).future,
+    );
 
     if (key != null) {
       await ref

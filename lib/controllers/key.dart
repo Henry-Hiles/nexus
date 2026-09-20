@@ -1,28 +1,28 @@
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/shared_prefs.dart";
 
-class KeyController(final String key) extends Notifier<String?> {
+class KeyController(final String key) extends AsyncNotifier<String?> {
   static const String spaceKey = "space";
   static const String roomKey = "room";
   static const String pushKeyKey = "pushKey";
 
   @override
-  String? build() =>
-      ref.watch(SharedPrefsController.provider).requireValue.getString(key);
+  Future<String?> build() =>
+      ref.watch(SharedPrefsController.provider).getString(key);
 
   Future<void> set(String? value) async {
-    final prefs = ref.watch(SharedPrefsController.provider).requireValue;
-    state = value;
+    final prefs = ref.watch(SharedPrefsController.provider);
+    state = .data(value);
 
     if (value == null) {
-      prefs.remove(key);
+      await prefs.remove(key);
     } else {
-      prefs.setString(key, value);
+      await prefs.setString(key, value);
     }
   }
 
   static final provider =
-      NotifierProvider.family<KeyController, String?, String>(
+      AsyncNotifierProvider.family<KeyController, String?, String>(
         KeyController.new,
       );
 }

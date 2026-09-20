@@ -1,12 +1,12 @@
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:shared_preferences/shared_preferences.dart";
 
-class SharedPrefsController extends AsyncNotifier<SharedPreferences> {
+class SharedPrefsController extends Notifier<SharedPreferencesAsync> {
   @override
-  Future<SharedPreferences> build() async => .getInstance();
+  SharedPreferencesAsync build() => SharedPreferencesAsync();
 
   static final provider =
-      AsyncNotifierProvider<SharedPrefsController, SharedPreferences>(
+      NotifierProvider<SharedPrefsController, SharedPreferencesAsync>(
         SharedPrefsController.new,
       );
 }

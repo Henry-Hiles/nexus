@@ -43,7 +43,9 @@ final class const RoomChat({
     final composerSize = useState<double>(64);
 
     final userId = ref.watch(ClientStateController.provider)?.userId;
-    final memberListOpened = ref.watch(MemberListOpenedController.provider);
+    final memberListOpened = ref
+        .watch(MemberListOpenedController.provider)
+        .requireValue;
     final theme = Theme.of(context);
 
     final nothing = Center(

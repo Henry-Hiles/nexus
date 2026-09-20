@@ -14,7 +14,9 @@ class const ChatPage({super.key}) extends ConsumerWidget {
       final isDesktop = constraints.maxWidth > 650;
       final showMembersByDefault = constraints.maxWidth > 1000;
       final initComplete = ref.watch(InitCompleteController.provider);
-      final roomId = ref.watch(KeyController.provider(KeyController.roomKey));
+      final roomId = ref
+          .watch(KeyController.provider(KeyController.roomKey))
+          .requireValue;
 
       return SafeArea(
         child: Scaffold(

@@ -7,10 +7,11 @@ import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:media_kit/media_kit.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/client_state.dart";
+import "package:nexus/controllers/key.dart";
+import "package:nexus/controllers/member_list_opened.dart";
 import "package:nexus/controllers/multi_provider.dart";
 import "package:nexus/controllers/notification.dart";
 import "package:nexus/controllers/settings.dart";
-import "package:nexus/controllers/shared_prefs.dart";
 import "package:nexus/controllers/unified_push.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
 import "package:nexus/helpers/extensions/scheme_to_theme.dart";
@@ -81,9 +82,9 @@ void main(List<String> args) async {
     await windowManager.setMinimumSize(Size.square(500));
   }
 
-  isInBackground = args.contains("--unifiedpush-bg");
+  isInBackground = Platform.environment["FLUTTER_HEADLESS"] != null;
 
-  LicenseRegistry.addLicense(() => Stream.fromIterable(fontLicenses));
+  LicenseRegistry.addLicense(() => .fromIterable(fontLicenses));
 
   FlutterError.onError = (FlutterErrorDetails details) =>
       showError(details.exception.toString(), details.stack);
@@ -103,14 +104,13 @@ void main(List<String> args) async {
           // ignore: dead_code
           if (false && kDebugMode) Logger(),
         ],
-        child: App(isInBackground),
+        child: App(),
       ),
     );
   }
 }
 
-class const App(final bool isInBackground, {super.key})
-    extends StatelessWidget {
+class const App({super.key}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) => DynamicColorBuilder(
     builder: (lightDynamic, darkDynamic) => Consumer(
@@ -151,10 +151,12 @@ class const App(final bool isInBackground, {super.key})
               .watch(
                 MultiProviderController.provider(
                   IListConst([
-                    SharedPrefsController.provider,
                     ClientController.provider,
                     NotificationController.provider,
                     UnifiedPushController.provider,
+                    MemberListOpenedController.provider,
+                    KeyController.provider(KeyController.roomKey),
+                    KeyController.provider(KeyController.spaceKey),
                   ]),
                 ),
               )

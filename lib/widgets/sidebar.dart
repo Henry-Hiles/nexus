@@ -23,13 +23,13 @@ class const Sidebar({required final bool isDesktop, super.key})
     final selectedSpaceProvider = KeyController.provider(
       KeyController.spaceKey,
     );
-    final selectedSpaceId = ref.watch(selectedSpaceProvider);
+    final selectedSpaceId = ref.watch(selectedSpaceProvider).requireValue;
     final selectedSpaceIdNotifier = ref.watch(selectedSpaceProvider.notifier);
 
     final selectedRoomController = KeyController.provider(
       KeyController.roomKey,
     );
-    final selectedRoomId = ref.watch(selectedRoomController);
+    final selectedRoomId = ref.watch(selectedRoomController).requireValue;
     final selectedRoomIdNotifier = ref.watch(selectedRoomController.notifier);
 
     final spaces = ref.watch(SpacesController.provider);
