@@ -103,7 +103,7 @@ class UnifiedPushController extends AsyncNotifier<bool> {
         await ref
             .watch(PushKeyController.provider(instance).notifier)
             .set(null);
-        state = .data(false);
+        ref.invalidateSelf();
       },
     );
 
@@ -139,7 +139,7 @@ class UnifiedPushController extends AsyncNotifier<bool> {
       vapid: capabilities.webpush?.vapid,
     );
 
-    state = .data(true);
+    if (!alreadyRegistered) ref.invalidateSelf();
   }
 
   Future<void> deregister() async {
@@ -157,7 +157,7 @@ class UnifiedPushController extends AsyncNotifier<bool> {
     }
 
     await UnifiedPush.unregister(clientState.deviceId!);
-    state = .data(false);
+    ref.invalidateSelf();
   }
 
   static final provider = AsyncNotifierProvider<UnifiedPushController, bool>(
