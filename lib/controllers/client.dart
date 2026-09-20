@@ -60,10 +60,12 @@ class ClientController extends AsyncNotifier<int> {
         "GOMUKS_CACHE_HOME": (await getApplicationCacheDirectory()).path,
       };
       for (final MapEntry(:key, :value) in env.entries) {
-        GomuksSetEnv(
-          key.toNativeUtf8().cast<Char>(),
-          value.toNativeUtf8().cast<Char>(),
-        );
+        final keyPtr = key.toNativeUtf8().cast<Char>();
+        final valuePtr = value.toNativeUtf8().cast<Char>();
+        GomuksSetEnv(keyPtr, valuePtr);
+        calloc
+          ..free(keyPtr)
+          ..free(valuePtr);
       }
     }
     final handle = await Isolate.run(GomuksInit);
@@ -193,14 +195,17 @@ class ClientController extends AsyncNotifier<int> {
     return response == null ? null : .fromJson(response);
   }
 
-  Future<dynamic> _sendCommand(
+  dynamic _sendCommand(
     String command, [
     Map<String, dynamic> data = const {},
-  ]) => callGomuksMethod(
-    data,
-    (handle, data) async =>
-        GomuksSubmitCommand(handle, command.toNativeUtf8().cast<Char>(), data),
-  );
+  ]) => callGomuksMethod(data, (handle, data) {
+    final commandPointer = command.toNativeUtf8().cast<Char>();
+    try {
+      return GomuksSubmitCommand(handle, commandPointer, data);
+    } finally {
+      calloc.free(commandPointer);
+    }
+  });
 
   Future<void> redactEvent(RedactEventRequest report) =>
       _sendCommand("redact_event", report.toJson());
