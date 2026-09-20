@@ -19,7 +19,7 @@ in
 {
   options.programs.nexus = {
     enable = mkEnableOption "Nexus, a simple and user-friendly Matrix client";
-    package = mkPackageOption self.packages.${pkgs.stdenv.hostPlatform.system} "nexus" { };
+    package = mkPackageOption self.packages.${pkgs.stdenv.hostPlatform.system} "default" { };
 
     enableNotifications = mkEnableOption "notifications support via UnifiedPush";
   };

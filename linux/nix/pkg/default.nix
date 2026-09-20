@@ -32,6 +32,8 @@ flutter.buildFlutterApplication {
     emoji_text_field = "sha256-3TOys09EP2GRo6pUBGPXaqBlE39O2Cmwt42Hs1cTDKo=";
     linkify = "sha256-TpMD6+0zyY6i9l+6d8ErnVufmepCv362rCtnbOht/z4=";
     navigation_rail_m3e = "sha256-+2awDTQnK58gGRY1nuHckG/jjxarsYSRu9ovR4i4TEc=";
+    unifiedpush_linux = "sha256-aIF/8oabSuuZo7K6qr4r7UBmf57qgoGAXyJ40fdntuQ=";
+    unifiedpush_platform_interface = "sha256-aIF/8oabSuuZo7K6qr4r7UBmf57qgoGAXyJ40fdntuQ=";
   };
 
   postInstall = ''
