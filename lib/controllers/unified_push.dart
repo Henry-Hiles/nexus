@@ -28,7 +28,7 @@ class UnifiedPushController extends AsyncNotifier<bool> {
         dbusName: "nexus.federated.nexus.UnifiedPush",
         storage: UnifiedPushStorageSharedPreferences(),
         background: isInBackground,
-        shouldWriteService: true,
+        shouldWriteService: false,
       ),
       onNewEndpoint: (endpoint, instance) async {
         final pushKey = endpoint.pubKeySet!.pubKey;
