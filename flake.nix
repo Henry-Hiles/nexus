@@ -63,12 +63,10 @@
                     "wayland"
                   ];
 
-                  talk-names = [ "org.unifiedpush.Distributor.*" ];
-                  own-names = [
-                    "nexus.federated.nexus"
-                    "nexus.federated.nexus.*"
+                  talk-names = [
+                    "org.unifiedpush.Distributor.*"
+                    "org.freedesktop.Notifications"
                   ];
-
                   devices = [ "dri" ];
                 };
               };
