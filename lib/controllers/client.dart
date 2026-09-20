@@ -7,6 +7,7 @@ import "dart:math";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:ffi/ffi.dart";
 import "package:flutter/foundation.dart";
+import "package:intl/intl.dart";
 import "package:nexus/controllers/account_data.dart";
 import "package:nexus/controllers/client_state.dart";
 import "package:nexus/controllers/init_complete.dart";
@@ -68,7 +69,17 @@ class ClientController extends AsyncNotifier<int> {
           ..free(valuePtr);
       }
     }
-    final handle = await Isolate.run(GomuksInit);
+    final handle = await Isolate.run(() {
+      final message =
+          "Nexus on ${toBeginningOfSentenceCase(Platform.operatingSystem)}"
+              .toNativeUtf8()
+              .cast<Char>();
+      try {
+        return GomuksInit(message);
+      } finally {
+        calloc.free(message);
+      }
+    });
 
     final callable =
         NativeCallable<

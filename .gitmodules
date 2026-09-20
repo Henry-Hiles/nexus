@@ -1,4 +1,4 @@
 [submodule "gomuks"]
 	path = gomuks
 	url = https://github.com/Henry-Hiles/gomuks
-	branch = quad/chore/remove-root-set
+	branch = quad/feat/customizable-device-name
