@@ -83,6 +83,7 @@ class NotificationController
     File? icon,
     String? payload,
   }) async {
+    debugPrint("Sending notification for $id");
     final notificationDetails = NotificationDetails(
       android: .new(
         "messages",

@@ -53,6 +53,7 @@ class UnifiedPushController extends AsyncNotifier<bool> {
         );
       },
       onMessage: (message, instance) async {
+        debugPrint("UP message received for $instance");
         if (message.decrypted == false) {
           throw Exception(
             "Failed to decrypt notification. Try toggling off and on UnifiedPush in settings.",
