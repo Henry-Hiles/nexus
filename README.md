@@ -127,6 +127,7 @@ If you want to try out Nexus, grab one of the following artifacts from CI:
 - Flatpak
     - [AArch64/Arm64](https://nightly.link/Henry-Hiles/nexus/workflows/flatpak/main/flatpak-aarch64.zip)
     - [x86_64/AMD64](https://nightly.link/Henry-Hiles/nexus/workflows/flatpak/main/flatpak-x86_64.zip)
+- [NixOS Module](linux/nix/module.nix)
 
 ## Build it yourself
 
