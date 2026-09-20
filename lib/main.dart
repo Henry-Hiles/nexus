@@ -88,7 +88,13 @@ void main(List<String> args) async {
   FlutterError.onError = (FlutterErrorDetails details) =>
       showError(details.exception.toString(), details.stack);
 
-  if (!isInBackground) {
+  if (isInBackground) {
+    await ProviderContainer().read(UnifiedPushController.provider.future);
+
+    // In case it didn't exit for some reason
+    await Future.delayed(Duration(seconds: 20));
+    exit(0);
+  } else {
     runApp(
       ProviderScope(
         retry: (_, _) => null,
