@@ -1,0 +1,3 @@
+[D-BUS Service]
+Name=nexus.federated.nexus
+Exec=/usr/bin/env FLUTTER_HEADLESS=1 nexus

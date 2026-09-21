@@ -35,6 +35,16 @@ dependency_overrides:
         git:
             url: https://github.com/appelladev/linkify
             ref: fix/consecutive-periods-loose-url
+    flutter_local_notifications_linux:
+        git:
+            url: https://github.com/Henry-Hiles/flutter_local_notifications
+            ref: quad/feat/xdg-portal-notifs
+            path: flutter_local_notifications_linux
+    flutter_local_notifications_platform_interface:
+        git:
+            url: https://github.com/Henry-Hiles/flutter_local_notifications
+            ref: quad/feat/xdg-portal-notifs
+            path: flutter_local_notifications_platform_interface
 
 dependencies:
     flutter:

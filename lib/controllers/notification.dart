@@ -3,8 +3,6 @@ import "dart:io";
 import "package:material_ui/material_ui.dart";
 import "package:nexus/main.dart";
 import "package:flutter_local_notifications/flutter_local_notifications.dart";
-// ignore: implementation_imports
-import "package:flutter_local_notifications_linux/src/model/hint.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/pages/notifications.dart";
 
@@ -91,14 +89,9 @@ class NotificationController
         largeIcon: icon == null ? null : FilePathAndroidBitmap(icon.path),
       ),
       linux: .new(
-        customHints: icon == null
-            ? null
-            : [
-                .new(
-                  name: "image-path",
-                  value: LinuxHintStringValue(icon.path),
-                ),
-              ],
+        category: LinuxNotificationCategory.imReceived,
+        defaultActionName: "app.event",
+        icon: icon == null ? null : FilePathLinuxIcon(icon.path),
       ),
       // TODO: See if icons can be added to iOS, macOS, and Windows notifications (#68)
       iOS: .new(),

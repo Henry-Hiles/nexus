@@ -34,6 +34,8 @@ flutter.buildFlutterApplication {
     navigation_rail_m3e = "sha256-+2awDTQnK58gGRY1nuHckG/jjxarsYSRu9ovR4i4TEc=";
     unifiedpush_linux = "sha256-aIF/8oabSuuZo7K6qr4r7UBmf57qgoGAXyJ40fdntuQ=";
     unifiedpush_platform_interface = "sha256-aIF/8oabSuuZo7K6qr4r7UBmf57qgoGAXyJ40fdntuQ=";
+    flutter_local_notifications_linux = "sha256-I1X+Taw4+hxDHOUxCcqiWoJbZJqbrdVUXUC0vj1Adjc=";
+    flutter_local_notifications_platform_interface = "sha256-I1X+Taw4+hxDHOUxCcqiWoJbZJqbrdVUXUC0vj1Adjc=";
   };
 
   postInstall = ''
