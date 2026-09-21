@@ -1,6 +1,7 @@
+import "dart:async";
 import "dart:io";
 
-import "package:flutter/foundation.dart";
+import "package:flutter/services.dart";
 import "package:material_ui/material_ui.dart";
 import "package:nexus/controllers/portal.dart";
 import "package:nexus/main.dart";
@@ -47,36 +48,27 @@ class NotificationController
     }
 
     if (Platform.isLinux) {
-      final portal = await ref.watch(PortalController.provider.future);
+      const notificationChannel = MethodChannel("nexus/notifications");
 
-      portal.notification.actionInvoked.listen((event) {
-        if (event.action != "app.event") {
+      notificationChannel.setMethodCallHandler((call) async {
+        if (call.method != "notificationClicked") {
           return;
         }
 
+        final eventId = call.arguments as String;
+
         if (navigatorKey.currentContext case final context?) {
-          if (context.mounted) {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => NotificationsPage(
-                  highlightedEventId: event.id,
-                  defaultToAllNotifications: true,
-                ),
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => NotificationsPage(
+                highlightedEventId: eventId,
+                defaultToAllNotifications: true,
               ),
-            );
-          }
+            ),
+          );
         }
       });
     }
-
-    ref.onDispose(() {
-      // The portal client owns its D-Bus connection.
-      if (Platform.isLinux) {
-        ref.read(PortalController.provider.future).then((portal) {
-          portal.close();
-        });
-      }
-    });
 
     return notifications;
   }
@@ -124,7 +116,7 @@ class NotificationController
     debugPrint("Sending notification for $id");
 
     if (Platform.isLinux) {
-      final portal = await ref.read(PortalController.provider.future);
+      final portal = await ref.watch(PortalController.provider.future);
 
       await portal.notification.addNotification(
         id.toString(),
@@ -132,6 +124,7 @@ class NotificationController
         body: body,
         icon: icon == null ? null : XdgNotificationIconFile(icon.path),
         defaultAction: "app.event",
+        defaultActionTarget: payload,
       );
     } else {
       final notificationDetails = NotificationDetails(

@@ -7,6 +7,7 @@ class PortalController extends AsyncNotifier<XdgDesktopPortalClient> {
     final portal = XdgDesktopPortalClient();
     await portal.registerApplication("nexus.federated.nexus");
 
+    ref.onDispose(portal.close);
     return portal;
   }
 

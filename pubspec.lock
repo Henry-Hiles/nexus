@@ -1747,7 +1747,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "6d070b677f908b01065b4dce79ddc9a208daadbf"
+      resolved-ref: "9ead341e908da2972293b2edc345f2b0a6423d78"
       url: "https://github.com/Henry-Hiles/xdg_desktop_portal.dart"
     source: git
     version: "0.1.14"
