@@ -35,16 +35,6 @@ dependency_overrides:
         git:
             url: https://github.com/appelladev/linkify
             ref: fix/consecutive-periods-loose-url
-    flutter_local_notifications_linux:
-        git:
-            url: https://github.com/Henry-Hiles/flutter_local_notifications
-            ref: quad/feat/xdg-portal-notifs
-            path: flutter_local_notifications_linux
-    flutter_local_notifications_platform_interface:
-        git:
-            url: https://github.com/Henry-Hiles/flutter_local_notifications
-            ref: quad/feat/xdg-portal-notifs
-            path: flutter_local_notifications_platform_interface
 
 dependencies:
     flutter:
@@ -99,8 +89,10 @@ dependencies:
     unifiedpush: 6.2.0
     unifiedpush_storage_shared_preferences: 1.0.0
     flutter_local_notifications: 22.3.0
-    flutter_local_notifications_linux: 8.0.1
     material_emoji_picker: 1.1.1
+    xdg_desktop_portal:
+        git:
+            url: https://github.com/Henry-Hiles/xdg_desktop_portal.dart
 
 dev_dependencies:
     build_runner: 2.16.1
