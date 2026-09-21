@@ -42,16 +42,16 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1789876218,
-        "narHash": "sha256-/sUFGNLvcwf9MxGw+QS24o1bg217fQRY9NpinlmSjH4=",
+        "lastModified": 1790025133,
+        "narHash": "sha256-wxHdwhJ5SzJ8uI7hNrP0pDn+STDhzbeXRYOYPZQ1RVU=",
         "owner": "Henry-Hiles",
         "repo": "nix2flatpak",
-        "rev": "8264b886c1e64bffc172c49e9dfcb551cbd863f4",
+        "rev": "56025d55f17272493678e38fa1d219d19a447bf8",
         "type": "github"
       },
       "original": {
         "owner": "Henry-Hiles",
-        "ref": "quad/fix/names",
+        "ref": "quad/nexus",
         "repo": "nix2flatpak",
         "type": "github"
       }
