@@ -69,7 +69,7 @@ class UnifiedPushController extends AsyncNotifier<bool> {
         if (event == null ||
             event.unreadType?.shouldNotify() != true ||
             (!isInBackground &&
-                await windowManager.isFocused().onError((_, _) => false) &&
+                await windowManager.isFocused().onError((_, _) => true) &&
                 await ref.read(
                       KeyController.provider(KeyController.roomKey).future,
                     ) ==
