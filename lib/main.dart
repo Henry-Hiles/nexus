@@ -151,54 +151,56 @@ class const App({super.key}) extends StatelessWidget {
           builder: (_, ref, _) => ref
               .watch(ClientController.provider)
               .betterWhen(
-                data: (_) => ref
-                    .watch(
-                      MultiProviderController.provider(
-                        .new([
-                          NotificationController.provider,
-                          UnifiedPushController.provider,
-                          MemberListOpenedController.provider,
-                          KeyController.provider(KeyController.roomKey),
-                          KeyController.provider(KeyController.spaceKey),
-                        ]),
-                      ),
-                    )
-                    .betterWhen(
-                      data: (_) => Consumer(
-                        builder: (_, ref, _) {
-                          final clientState = ref.watch(
-                            ClientStateController.provider,
-                          );
-
-                          if (clientState == null ||
-                              !clientState.isInitialized) {
-                            return Loading();
-                          }
-
-                          if (!clientState.isLoggedIn) {
-                            return SelectServerPage();
-                          } else if (!clientState.isVerified) {
-                            return VerifyPage();
-                          } else {
-                            return ChatPage();
-                          }
-                        },
-                      ),
-                    ),
-                loading: () => Scaffold(
-                  appBar: Appbar(
-                    actions: .new([
-                      IconButton(
-                        onPressed: () => showDialog(
-                          context: context,
-                          builder: (_) => SettingsPage(),
-                        ),
-                        icon: Icon(Icons.settings),
-                      ),
+                data: (_) => switch (ref.watch(
+                  MultiProviderController.provider(
+                    .new([
+                      NotificationController.provider,
+                      UnifiedPushController.provider,
+                      MemberListOpenedController.provider,
+                      KeyController.provider(KeyController.roomKey),
+                      KeyController.provider(KeyController.spaceKey),
                     ]),
                   ),
-                  body: Loading(),
-                ),
+                )) {
+                  AsyncData(value: _) || AsyncLoading(value: _?) => Consumer(
+                    builder: (_, ref, _) {
+                      final clientState = ref.watch(
+                        ClientStateController.provider,
+                      );
+
+                      if (clientState == null || !clientState.isInitialized) {
+                        return Loading();
+                      }
+
+                      if (!clientState.isLoggedIn) {
+                        return SelectServerPage();
+                      } else if (!clientState.isVerified) {
+                        return VerifyPage();
+                      } else {
+                        return ChatPage();
+                      }
+                    },
+                  ),
+
+                  AsyncLoading _ => Scaffold(
+                    appBar: Appbar(
+                      actions: .new([
+                        IconButton(
+                          onPressed: () => showDialog(
+                            context: context,
+                            builder: (_) => SettingsPage(),
+                          ),
+                          icon: Icon(Icons.settings),
+                        ),
+                      ]),
+                    ),
+                    body: Loading(),
+                  ),
+                  AsyncError(:final error, :final stackTrace) => ErrorDialog(
+                    error,
+                    stackTrace,
+                  ),
+                },
               ),
         ),
       ),

@@ -7,7 +7,7 @@ class MultiProviderController(final IList<AsyncNotifierProvider> providers)
     extends AsyncNotifier<void> {
   @override
   Future<void> build() => .wait(
-    providers.map((provider) => ref.read(provider.future)),
+    providers.map((provider) => ref.watch(provider.future)),
     eagerError: true,
   );
 

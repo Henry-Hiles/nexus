@@ -22,7 +22,6 @@ class UnifiedPushController extends AsyncNotifier<bool> {
   Future<bool> build() async {
     if (!Platform.isLinux && !Platform.isAndroid) return false;
 
-    final client = ref.watch(ClientController.provider.notifier);
     final registered = await UnifiedPush.initialize(
       linuxOptions: .new(
         dbusName: "nexus.federated.nexus.UnifiedPush",
@@ -36,21 +35,23 @@ class UnifiedPushController extends AsyncNotifier<bool> {
             .watch(PushKeyController.provider(instance).notifier)
             .set(pushKey);
 
-        await client.registerPusher(
-          .new(
-            appDisplayName: "Nexus",
-            appId: "nexus.federated.nexus",
-            data: .webPush(
-              url: .parse(endpoint.url),
-              auth: endpoint.pubKeySet!.auth,
-            ),
-            deviceDisplayName:
-                "Nexus on ${toBeginningOfSentenceCase(Platform.operatingSystem)}",
-            kind: .webPush,
-            lang: "en",
-            pushKey: pushKey,
-          ),
-        );
+        await ref
+            .watch(ClientController.provider.notifier)
+            .registerPusher(
+              .new(
+                appDisplayName: "Nexus",
+                appId: "nexus.federated.nexus",
+                data: .webPush(
+                  url: .parse(endpoint.url),
+                  auth: endpoint.pubKeySet!.auth,
+                ),
+                deviceDisplayName:
+                    "Nexus on ${toBeginningOfSentenceCase(Platform.operatingSystem)}",
+                kind: .webPush,
+                lang: "en",
+                pushKey: pushKey,
+              ),
+            );
       },
       onMessage: (message, instance) async {
         debugPrint("UP message received for $instance");
@@ -59,9 +60,9 @@ class UnifiedPushController extends AsyncNotifier<bool> {
             "Failed to decrypt notification. Try toggling off and on UnifiedPush in settings.",
           );
         }
-        final event = await client.handlePush(
-          json.decode(String.fromCharCodes(message.content)),
-        );
+        final event = await ref
+            .watch(ClientController.provider.notifier)
+            .handlePush(json.decode(String.fromCharCodes(message.content)));
 
         if (event == null ||
             event.unreadType?.shouldNotify() != true ||
@@ -120,8 +121,11 @@ class UnifiedPushController extends AsyncNotifier<bool> {
   }
 
   Future<void> register([bool alreadyRegistered = false]) async {
-    final clientState = ref.watch(ClientStateController.provider);
-    if (clientState?.deviceId == null) return ref.invalidateSelf();
+    final clientStateProvider = ClientStateController.provider;
+    while (ref.watch(clientStateProvider)?.deviceId == null) {
+      await Future.delayed(.new(milliseconds: 250));
+    }
+    final clientState = ref.watch(clientStateProvider);
 
     final capabilities = await ref
         .watch(ClientController.provider.notifier)
