@@ -1,5 +1,6 @@
 import "dart:math";
 
+import "package:flutter/services.dart";
 import "package:material_ui/material_ui.dart";
 
 class const CodeBlock(
@@ -28,7 +29,7 @@ class const CodeBlock(
                     ),
                   ),
                   TextButton.icon(
-                    onPressed: () {},
+                    onPressed: () => Clipboard.setData(.new(text: code)),
                     icon: Icon(Icons.copy),
                     label: Text("Copy"),
                   ),
