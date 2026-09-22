@@ -20,6 +20,7 @@ import "package:nexus/main.dart";
 import "package:nexus/models/capabilities.dart";
 import "package:nexus/models/content/message.dart";
 import "package:nexus/models/event.dart";
+import "package:nexus/models/gomuks_config.dart";
 import "package:nexus/models/oauth_auth_code_response.dart";
 import "package:nexus/models/open_graph_data.dart";
 import "package:nexus/models/paginate.dart";
@@ -70,14 +71,17 @@ class ClientController extends AsyncNotifier<int> {
       }
     }
     final handle = await Isolate.run(() {
-      final message =
-          "Nexus on ${toBeginningOfSentenceCase(Platform.operatingSystem)}"
-              .toNativeUtf8()
-              .cast<Char>();
+      final bufferPointer = GomuksConfig(
+        matrix: .new(
+          initialDeviceDisplayName:
+              "Nexus on ${toBeginningOfSentenceCase(Platform.operatingSystem)}",
+        ),
+      ).toJson().toGomuksBufferPtr();
+
       try {
-        return GomuksInit(message);
+        return GomuksInit(bufferPointer.ref);
       } finally {
-        calloc.free(message);
+        calloc.free(bufferPointer);
       }
     });
 

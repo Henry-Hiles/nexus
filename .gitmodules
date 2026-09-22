@@ -1,4 +1,3 @@
 [submodule "gomuks"]
 	path = gomuks
-	url = https://github.com/Henry-Hiles/gomuks
-	branch = quad/feat/customizable-device-name
+	url = https://github.com/gomuks/gomuks
