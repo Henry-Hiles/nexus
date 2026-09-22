@@ -119,11 +119,8 @@ class UnifiedPushController extends AsyncNotifier<bool> {
   Future<void> register([bool alreadyRegistered = false]) async {
     state = .loading();
     try {
-      final clientStateProvider = ClientStateController.provider;
-      while (ref.read(clientStateProvider)?.deviceId == null) {
-        await Future.delayed(.new(milliseconds: 250));
-      }
-      final clientState = ref.read(clientStateProvider);
+      final clientState = ref.watch(ClientStateController.provider);
+      if (clientState?.deviceId == null) return;
 
       final capabilities = await ref
           .read(ClientController.provider.notifier)

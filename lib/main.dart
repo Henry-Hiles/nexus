@@ -12,7 +12,6 @@ import "package:nexus/controllers/multi_provider.dart";
 import "package:nexus/controllers/notification.dart";
 import "package:nexus/controllers/settings.dart";
 import "package:nexus/controllers/unified_push.dart";
-import "package:nexus/helpers/extensions/better_when.dart";
 import "package:nexus/helpers/extensions/scheme_to_theme.dart";
 import "package:nexus/helpers/font_licenses.dart";
 import "package:nexus/pages/chat.dart";
@@ -150,60 +149,55 @@ class const App({super.key}) extends StatelessWidget {
       ),
       child: Scaffold(
         body: Consumer(
-          builder: (_, ref, _) => ref
-              .watch(ClientController.provider)
-              .betterWhen(
-                data: (_) => switch (ref.watch(
-                  MultiProviderController.provider(
-                    .new([
-                      NotificationController.provider,
-                      UnifiedPushController.provider,
-                      MemberListOpenedController.provider,
-                      KeyController.provider(KeyController.roomKey),
-                      KeyController.provider(KeyController.spaceKey),
-                    ]),
-                  ),
-                )) {
-                  AsyncData(value: _) || AsyncLoading(value: _?) => Consumer(
-                    builder: (_, ref, _) {
-                      final clientState = ref.watch(
-                        ClientStateController.provider,
-                      );
+          builder: (_, ref, _) => switch (ref.watch(
+            MultiProviderController.provider(
+              .new([
+                ClientController.provider,
+                NotificationController.provider,
+                UnifiedPushController.provider,
+                MemberListOpenedController.provider,
+                KeyController.provider(KeyController.roomKey),
+                KeyController.provider(KeyController.spaceKey),
+              ]),
+            ),
+          )) {
+            AsyncData(value: _) || AsyncLoading(value: _?) => Consumer(
+              builder: (_, ref, _) {
+                final clientState = ref.watch(ClientStateController.provider);
 
-                      if (clientState == null || !clientState.isInitialized) {
-                        return Loading();
-                      }
+                if (clientState == null || !clientState.isInitialized) {
+                  return Loading();
+                }
 
-                      if (!clientState.isLoggedIn) {
-                        return SelectServerPage();
-                      } else if (!clientState.isVerified) {
-                        return VerifyPage();
-                      } else {
-                        return ChatPage();
-                      }
-                    },
-                  ),
+                if (!clientState.isLoggedIn) {
+                  return SelectServerPage();
+                } else if (!clientState.isVerified) {
+                  return VerifyPage();
+                } else {
+                  return ChatPage();
+                }
+              },
+            ),
 
-                  AsyncLoading _ => Scaffold(
-                    appBar: Appbar(
-                      actions: .new([
-                        IconButton(
-                          onPressed: () => showDialog(
-                            context: context,
-                            builder: (_) => SettingsPage(),
-                          ),
-                          icon: Icon(Icons.settings),
-                        ),
-                      ]),
+            AsyncLoading _ => Scaffold(
+              appBar: Appbar(
+                actions: .new([
+                  IconButton(
+                    onPressed: () => showDialog(
+                      context: context,
+                      builder: (_) => SettingsPage(),
                     ),
-                    body: Loading(),
+                    icon: Icon(Icons.settings),
                   ),
-                  AsyncError(:final error, :final stackTrace) => ErrorDialog(
-                    error,
-                    stackTrace,
-                  ),
-                },
+                ]),
               ),
+              body: Loading(),
+            ),
+            AsyncError(:final error, :final stackTrace) => ErrorDialog(
+              error,
+              stackTrace,
+            ),
+          },
         ),
       ),
     ),
