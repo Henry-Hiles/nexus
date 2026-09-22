@@ -1,7 +1,6 @@
 import "dart:io";
 
 import "package:dynamic_color/dynamic_color.dart";
-import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/foundation.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:media_kit/media_kit.dart";
@@ -18,7 +17,9 @@ import "package:nexus/helpers/extensions/scheme_to_theme.dart";
 import "package:nexus/helpers/font_licenses.dart";
 import "package:nexus/pages/chat.dart";
 import "package:nexus/pages/select_server.dart";
+import "package:nexus/pages/settings.dart";
 import "package:nexus/pages/verify.dart";
+import "package:nexus/widgets/appbar.dart";
 import "package:nexus/widgets/error_dialog.dart";
 import "package:nexus/widgets/loading.dart";
 import "package:window_manager/window_manager.dart";
@@ -148,37 +149,55 @@ class const App({super.key}) extends StatelessWidget {
       child: Scaffold(
         body: Consumer(
           builder: (_, ref, _) => ref
-              .watch(
-                MultiProviderController.provider(
-                  IListConst([
-                    ClientController.provider,
-                    NotificationController.provider,
-                    UnifiedPushController.provider,
-                    MemberListOpenedController.provider,
-                    KeyController.provider(KeyController.roomKey),
-                    KeyController.provider(KeyController.spaceKey),
-                  ]),
-                ),
-              )
+              .watch(ClientController.provider)
               .betterWhen(
-                data: (_) => Consumer(
-                  builder: (_, ref, _) {
-                    final clientState = ref.watch(
-                      ClientStateController.provider,
-                    );
+                data: (_) => ref
+                    .watch(
+                      MultiProviderController.provider(
+                        .new([
+                          NotificationController.provider,
+                          UnifiedPushController.provider,
+                          MemberListOpenedController.provider,
+                          KeyController.provider(KeyController.roomKey),
+                          KeyController.provider(KeyController.spaceKey),
+                        ]),
+                      ),
+                    )
+                    .betterWhen(
+                      data: (_) => Consumer(
+                        builder: (_, ref, _) {
+                          final clientState = ref.watch(
+                            ClientStateController.provider,
+                          );
 
-                    if (clientState == null || !clientState.isInitialized) {
-                      return Loading();
-                    }
+                          if (clientState == null ||
+                              !clientState.isInitialized) {
+                            return Loading();
+                          }
 
-                    if (!clientState.isLoggedIn) {
-                      return SelectServerPage();
-                    } else if (!clientState.isVerified) {
-                      return VerifyPage();
-                    } else {
-                      return ChatPage();
-                    }
-                  },
+                          if (!clientState.isLoggedIn) {
+                            return SelectServerPage();
+                          } else if (!clientState.isVerified) {
+                            return VerifyPage();
+                          } else {
+                            return ChatPage();
+                          }
+                        },
+                      ),
+                    ),
+                loading: () => Scaffold(
+                  appBar: Appbar(
+                    actions: .new([
+                      IconButton(
+                        onPressed: () => showDialog(
+                          context: context,
+                          builder: (_) => SettingsPage(),
+                        ),
+                        icon: Icon(Icons.settings),
+                      ),
+                    ]),
+                  ),
+                  body: Loading(),
                 ),
               ),
         ),
