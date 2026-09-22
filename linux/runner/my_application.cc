@@ -279,7 +279,7 @@ static gboolean my_application_local_command_line(
 
   *exit_status = 0;
 
-  return TRUE;
+  return FALSE;
 }
 
 static void my_application_startup(
