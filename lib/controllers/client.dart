@@ -296,9 +296,9 @@ class ClientController extends AsyncNotifier<int> {
   }
 
   Future<IList<Event>> getMentions(GetMentionsRequest request) async => .new(
-    ((await _sendCommand("get_mentions", request.toJson())) as List).map(
-      (event) => .fromJson(event),
-    ),
+    // TODO: Handle `related_events`
+    ((await _sendCommand("get_mentions", request.toJson()))["events"] as List)
+        .map((event) => .fromJson(event)),
   );
 
   Future<Event?> getEvent(GetEventRequest request) async {
