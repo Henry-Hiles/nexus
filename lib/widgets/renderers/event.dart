@@ -1,4 +1,5 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
+import "package:flutter/gestures.dart";
 import "package:material_ui/material_ui.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
@@ -152,7 +153,7 @@ class const EventRenderer(
 
     final contextMenuCallback = getEventOptions == null
         ? null
-        : (details) => context.showContextMenu(
+        : (PositionedGestureDetails details) => context.showContextMenu(
             globalPosition: details.globalPosition,
             children: getEventOptions!(event).toList(),
           );
