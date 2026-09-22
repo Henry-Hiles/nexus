@@ -132,9 +132,8 @@ class UnifiedPushController extends AsyncNotifier<bool> {
         );
       }
 
-      if (!alreadyRegistered &&
-          !await UnifiedPush.tryUseCurrentOrDefaultDistributor()) {
-        throw Exception("No UnifiedPush distributors found");
+      if (!await UnifiedPush.tryUseCurrentOrDefaultDistributor()) {
+        throw Exception("No UnifiedPush distributors found.");
       }
 
       await UnifiedPush.register(

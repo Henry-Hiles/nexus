@@ -78,9 +78,11 @@ class const SelectServerPage({super.key}) extends HookConsumerWidget {
                             ClientIdController.provider(url).future,
                           ),
                         ),
-                      )
-                      .onError(showError);
+                      );
                 }
+              } catch (error, stackTrace) {
+                showError(error, stackTrace);
+                rethrow;
               } finally {
                 isLoading.value = false;
               }
@@ -95,7 +97,7 @@ class const SelectServerPage({super.key}) extends HookConsumerWidget {
                   style: .new(color: theme.colorScheme.onErrorContainer),
                 ),
                 action: SnackBarAction(
-                  onPressed: () => tryLogin(newHomeserver!),
+                  onPressed: () => tryLogin(newHomeserver!).onError(showError),
                   label: "Attempt log in anyways",
                   textColor: theme.colorScheme.onErrorContainer,
                 ),
@@ -103,11 +105,12 @@ class const SelectServerPage({super.key}) extends HookConsumerWidget {
               ),
             );
           } else {
-            tryLogin(newUrl);
+            await tryLogin(newUrl);
           }
         }
       } catch (error, stackTrace) {
         showError(error, stackTrace);
+        rethrow;
       } finally {
         isLoading.value = false;
       }
