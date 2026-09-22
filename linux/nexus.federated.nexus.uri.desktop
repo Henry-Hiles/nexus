@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Nexus URI Handler
+Exec=nexus %u
+Icon=nexus
+Terminal=false
+Type=Application
+NoDisplay=true
+MimeType=x-scheme-handler/nexus.federated.nexus;

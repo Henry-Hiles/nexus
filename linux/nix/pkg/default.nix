@@ -39,7 +39,7 @@ flutter.buildFlutterApplication {
 
   postInstall = ''
     install -D assets/bundled/icon.svg $out/share/icons/hicolor/scalable/apps/nexus.svg
-    install -Dm755 linux/nexus.federated.nexus.desktop -t $out/share/applications
+    install -Dm755 linux/*.desktop -t $out/share/applications
     install -Dm644 linux/*.service -t $out/share/dbus-1/services
     wrapProgram $out/bin/nexus \
       --suffix LD_LIBRARY_PATH : $out/app/nexus/lib
