@@ -15,7 +15,7 @@ class NotificationsController([final NotificationsRequest? request])
 
     final (unreadType, roomId) = request ?? (null, null);
 
-    final mentions = await client.getMentions(
+    return await client.getMentions(
       .new(
         maxTimestamp: .now(),
         unreadType: unreadType ?? .highlight,
@@ -23,8 +23,6 @@ class NotificationsController([final NotificationsRequest? request])
         roomId: roomId,
       ),
     );
-
-    return mentions;
   }
 
   Future<void> loadOlder() async {
