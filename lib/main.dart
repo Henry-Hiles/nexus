@@ -83,7 +83,9 @@ void main(List<String> args) async {
     await windowManager.setMinimumSize(Size.square(500));
   }
 
-  isInBackground = Platform.environment["FLUTTER_HEADLESS"] != null;
+  isInBackground =
+      Platform.environment["FLUTTER_HEADLESS"] != null ||
+      args.contains("--unifiedpush-bg");
 
   LicenseRegistry.addLicense(() => .fromIterable(fontLicenses));
 
