@@ -32,11 +32,11 @@ class UnifiedPushController extends AsyncNotifier<bool> {
       onNewEndpoint: (endpoint, instance) async {
         final pushKey = endpoint.pubKeySet!.pubKey;
         await ref
-            .watch(PushKeyController.provider(instance).notifier)
+            .read(PushKeyController.provider(instance).notifier)
             .set(pushKey);
 
         await ref
-            .watch(ClientController.provider.notifier)
+            .read(ClientController.provider.notifier)
             .registerPusher(
               .new(
                 appDisplayName: "Nexus",
@@ -52,6 +52,8 @@ class UnifiedPushController extends AsyncNotifier<bool> {
                 pushKey: pushKey,
               ),
             );
+
+        state = .data(true);
       },
       onMessage: (message, instance) async {
         debugPrint("UP message received for $instance");
@@ -61,14 +63,14 @@ class UnifiedPushController extends AsyncNotifier<bool> {
           );
         }
         final event = await ref
-            .watch(ClientController.provider.notifier)
+            .read(ClientController.provider.notifier)
             .handlePush(json.decode(String.fromCharCodes(message.content)));
 
         if (event == null ||
             event.unreadType?.shouldNotify() != true ||
             (!isInBackground &&
                 await windowManager.isFocused().onError((_, _) => false) &&
-                await ref.watch(
+                await ref.read(
                       KeyController.provider(KeyController.roomKey).future,
                     ) ==
                     event.roomId)) {
@@ -103,13 +105,7 @@ class UnifiedPushController extends AsyncNotifier<bool> {
 
         if (isInBackground) exit(0);
       },
-      onRegistrationFailed: (error, instance) => throw error,
-      onUnregistered: (instance) async {
-        await ref
-            .watch(PushKeyController.provider(instance).notifier)
-            .set(null);
-        ref.invalidateSelf();
-      },
+      onUnregistered: deregister,
     );
 
     if (registered) {
@@ -121,53 +117,60 @@ class UnifiedPushController extends AsyncNotifier<bool> {
   }
 
   Future<void> register([bool alreadyRegistered = false]) async {
-    final clientStateProvider = ClientStateController.provider;
-    while (ref.watch(clientStateProvider)?.deviceId == null) {
-      await Future.delayed(.new(milliseconds: 250));
-    }
-    final clientState = ref.watch(clientStateProvider);
+    state = .loading();
+    try {
+      final clientStateProvider = ClientStateController.provider;
+      while (ref.read(clientStateProvider)?.deviceId == null) {
+        await Future.delayed(.new(milliseconds: 250));
+      }
+      final clientState = ref.read(clientStateProvider);
 
-    final capabilities = await ref
-        .watch(ClientController.provider.notifier)
-        .getCapabilities();
+      final capabilities = await ref
+          .read(ClientController.provider.notifier)
+          .getCapabilities();
 
-    if (capabilities.webpush?.vapid == null) {
-      throw UnsupportedError(
-        "Your homeserver does not support MSC4174 (Web Push), and therefore cannot send notifications to Nexus.",
+      if (capabilities.webpush?.vapid == null) {
+        throw UnsupportedError(
+          "Your homeserver does not support MSC4174 (Web Push), and therefore cannot send notifications to Nexus.",
+        );
+      }
+
+      if (!alreadyRegistered &&
+          !await UnifiedPush.tryUseCurrentOrDefaultDistributor()) {
+        throw Exception("No UnifiedPush distributors found");
+      }
+
+      await UnifiedPush.register(
+        instance: clientState!.deviceId!,
+        vapid: capabilities.webpush?.vapid,
       );
+    } catch (_) {
+      state = .data(false);
+      rethrow;
     }
-
-    if (!alreadyRegistered &&
-        !await UnifiedPush.tryUseCurrentOrDefaultDistributor()) {
-      throw Exception("No UnifiedPush distributors found");
-    }
-
-    await UnifiedPush.register(
-      instance: clientState!.deviceId!,
-      vapid: capabilities.webpush?.vapid,
-    );
-
-    if (!alreadyRegistered) ref.invalidateSelf();
   }
 
-  Future<void> deregister() async {
-    final clientState = ref.watch(ClientStateController.provider);
-    final key = await ref.watch(
-      PushKeyController.provider(clientState!.deviceId!).future,
+  Future<void> deregister([String? instance]) async {
+    final clientState = ref.read(ClientStateController.provider);
+
+    final keyProvider = PushKeyController.provider(
+      instance ?? clientState!.deviceId!,
     );
+    final key = await ref.read(keyProvider.future);
 
     if (key != null) {
       await ref
-          .watch(ClientController.provider.notifier)
+          .read(ClientController.provider.notifier)
           .deregisterPusher(.new(appId: "nexus.federated.nexus", pushKey: key));
+      await ref.read(keyProvider.notifier).set(null);
     } else {
       debugPrint(
         "No matching pushKey found. Skipping deregistration from homeserver.",
       );
     }
 
-    await UnifiedPush.unregister(clientState.deviceId!);
-    ref.invalidateSelf();
+    await UnifiedPush.unregister(instance ?? clientState!.deviceId!);
+    state = .data(false);
   }
 
   static final provider = AsyncNotifierProvider<UnifiedPushController, bool>(

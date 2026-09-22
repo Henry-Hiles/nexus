@@ -15,6 +15,7 @@ import "package:nexus/controllers/rooms.dart";
 import "package:nexus/controllers/space_edges.dart";
 import "package:nexus/controllers/sync_status.dart";
 import "package:nexus/controllers/top_level_spaces.dart";
+import "package:nexus/controllers/unified_push.dart";
 import "package:nexus/helpers/extensions/gomuks_buffer.dart";
 import "package:nexus/main.dart";
 import "package:nexus/models/capabilities.dart";
@@ -344,7 +345,10 @@ class ClientController extends AsyncNotifier<int> {
   Future<File> downloadMedia(DownloadMediaRequest request) async =>
       .new((await _sendCommand("download_media", request.toJson()))["path"]);
 
-  Future<void> logout() => _sendCommand("logout");
+  Future<void> logout() async {
+    await ref.watch(UnifiedPushController.provider.notifier).deregister();
+    await _sendCommand("logout");
+  }
 
   Future<void> markRead(Room room) async {
     final eventRowId = room.timeline[room.timeline.keys.reduce(max)];
