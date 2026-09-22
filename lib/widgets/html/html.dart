@@ -1,10 +1,7 @@
-import "dart:io";
-
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:material_ui/material_ui.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart";
-import "package:nexus/controllers/settings.dart";
 import "package:nexus/helpers/extensions/link_to_mention.dart";
 import "package:nexus/helpers/launch_helper.dart";
 import "package:nexus/helpers/mxc_image.dart";
@@ -21,9 +18,10 @@ class const Html(
   super.key,
 }) extends ConsumerWidget {
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context, WidgetRef ref) => SelectableRegion(
+    selectionControls: materialTextSelectionControls,
     // needed until https://github.com/daohoangson/flutter_widget_from_html/issues/1618 is resolved
-    final htmlWidget = MaterialUiCompatibilityBridge(
+    child: MaterialUiCompatibilityBridge(
       child: HtmlWidget(
         html,
         buildAsync: false,
@@ -148,25 +146,6 @@ class const Html(
         onTapUrl: (url) =>
             ref.watch(LaunchHelper.provider).launchUrl(.parse(url)),
       ),
-    );
-
-    final shouldBeSelectable =
-        ref
-            .watch(SettingsController.provider)
-            .when(
-              data: (data) => !data.linuxMobileMode,
-              error: (_, _) => false,
-              loading: () => false,
-            ) ||
-        Platform.isIOS ||
-        Platform.isAndroid;
-    return shouldBeSelectable
-        ? SelectableRegion(
-            contextMenuBuilder: (context, selectableRegionState) =>
-                Text("data"),
-            selectionControls: materialTextSelectionControls,
-            child: htmlWidget,
-          )
-        : htmlWidget;
-  }
+    ),
+  );
 }
