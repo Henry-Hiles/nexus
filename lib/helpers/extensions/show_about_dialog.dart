@@ -50,8 +50,8 @@ extension ShowAboutDialog on BuildContext {
               M3ECardColumn(
                 onTap: (index) =>
                     ref.watch(LaunchHelper.provider).launchUrl(switch (index) {
-                      0 => Uri.https("git.federated.nexus", "nexus/nexus"),
-                      _ => Uri.https("liberapay.com", "QuadRadical"),
+                      0 => .https("git.federated.nexus", "nexus/nexus"),
+                      _ => .https("liberapay.com", "QuadRadical"),
                     }),
                 children: [
                   ListTile(
