@@ -1,4 +1,5 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
+import "package:flutter/rendering.dart";
 import "package:material_ui/material_ui.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart";
@@ -18,10 +19,9 @@ class const Html(
   super.key,
 }) extends ConsumerWidget {
   @override
-  Widget build(BuildContext context, WidgetRef ref) => SelectableRegion(
-    selectionControls: materialTextSelectionControls,
+  Widget build(BuildContext context, WidgetRef ref) {
     // needed until https://github.com/daohoangson/flutter_widget_from_html/issues/1618 is resolved
-    child: MaterialUiCompatibilityBridge(
+    final htmlWidget = MaterialUiCompatibilityBridge(
       child: HtmlWidget(
         html,
         buildAsync: false,
@@ -146,6 +146,13 @@ class const Html(
         onTapUrl: (url) =>
             ref.watch(LaunchHelper.provider).launchUrl(.parse(url)),
       ),
-    ),
-  );
+    );
+
+    return RendererBinding.instance.mouseTracker.mouseIsConnected
+        ? SelectableRegion(
+            selectionControls: materialTextSelectionControls,
+            child: htmlWidget,
+          )
+        : htmlWidget;
+  }
 }
