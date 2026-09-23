@@ -68,6 +68,8 @@ class NotificationController
           );
         }
       });
+
+      ref.onDispose(() => notificationChannel.setMethodCallHandler(null));
     }
 
     return notifications;
