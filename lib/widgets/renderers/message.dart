@@ -1,4 +1,5 @@
 import "package:collection/collection.dart";
+import "package:flutter/rendering.dart";
 import "package:material_ui/material_ui.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:linkify/linkify.dart";
@@ -39,6 +40,111 @@ class const MessageRenderer(
       fontSize: event.localContent?.bigEmoji == true ? 32 : null,
       fontStyle: event.content is EmoteMessageContent ? .italic : null,
     );
+
+    final rendered = switch (event.content) {
+      EncryptedContent() => Text("Unable to decrypt event", style: errorStyle),
+      StickerContent(:final body, :final url, :final info) =>
+        textOnly
+            ? Text(body, maxLines: maxLines, overflow: .ellipsis)
+            : ConstrainedBox(
+                constraints: .loose(.square(200)),
+                child: MessageImage(url, info: info, encrypted: false),
+              ),
+      // TODO: Handle locations
+      // LocationMessageContent(:final body , :final geoUri) =>
+      TextMessageContent(:final body, :final formattedBody, :final format) ||
+      NoticeMessageContent(:final body, :final formattedBody, :final format) ||
+      EmoteMessageContent(:final body, :final formattedBody, :final format) ||
+      ImageMessageContent(:final body, :final formattedBody, :final format) ||
+      VideoMessageContent(:final body, :final formattedBody, :final format) ||
+      AudioMessageContent(:final body, :final formattedBody, :final format) ||
+      FileMessageContent(
+        :final body,
+        :final formattedBody,
+        :final format,
+      ) => Column(
+        crossAxisAlignment: .start,
+        children: [
+          format == .html && !textOnly
+              ? Html(
+                  roomId: event.roomId,
+                  textStyle: textStyle,
+                  formattedBody!.replaceAllMapped(
+                    RegExp(
+                      r"(<a\b[^>]*>.*?<\/a>)|(\bhttps?:\/\/[^\s<]+)",
+                      caseSensitive: false,
+                      dotAll: true,
+                    ),
+                    (m) {
+                      // If it's already an <a> tag, leave it unchanged
+                      if (m.group(1) != null) {
+                        return m.group(1)!;
+                      }
+
+                      // Otherwise, wrap the bare URL
+                      final url = m.group(2)!;
+                      return "<a href=\"$url\">$url</a>";
+                    },
+                  ),
+                )
+              : LinkifiedText(body, style: textStyle, maxLines: maxLines),
+
+          if (!textOnly) ...[
+            if (event.content
+                case ImageMessageContent(:final url) ||
+                    FileMessageContent(:final url) ||
+                    VideoMessageContent(:final url) ||
+                    AudioMessageContent(:final url))
+              ConstrainedBox(
+                constraints: .loose(.square(500)),
+                child: switch (event.content) {
+                  VideoMessageContent(:final info, :final file) => VideoPlayer(
+                    url,
+                    info,
+                    encrypted: file != null,
+                  ),
+                  AudioMessageContent(:final info, :final file) => AudioPlayer(
+                    url,
+                    info,
+
+                    encrypted: file != null,
+                  ),
+                  FileMessageContent(:final info, :final filename) => FileCard(
+                    url,
+                    info,
+                    filename: filename,
+                  ),
+                  ImageMessageContent(:final info, :final file) => MessageImage(
+                    url,
+                    info: info,
+                    encrypted: file != null,
+                  ),
+                  _ => SizedBox.shrink(),
+                },
+              ),
+
+            if (event.lastEditRowId != 0)
+              Text("(edited)", style: theme.textTheme.labelSmall),
+
+            if (linkify(body)
+                    .firstWhereOrNull((element) => element is UrlElement)
+                case final UrlElement link?)
+              if (Uri.tryParse(link.url) case final Uri url?) UrlPreview(url),
+          ],
+        ],
+      ),
+      MessageContent(:final body) =>
+        body == null
+            ? Text("This message is redacted", style: errorStyle)
+            : Wrap(
+                spacing: 8,
+                children: [
+                  Text("Unknown message type:", style: errorStyle),
+                  Text(body),
+                ],
+              ),
+      _ => throw Exception("This is impossible"),
+    };
 
     return Row(
       crossAxisAlignment: .start,
@@ -113,172 +219,13 @@ class const MessageRenderer(
                             ),
                           ),
                         ),
-                      switch (event.content) {
-                        EncryptedContent() => Text(
-                          "Unable to decrypt event",
-                          style: errorStyle,
-                        ),
-                        StickerContent(:final body, :final url, :final info) =>
-                          textOnly
-                              ? Text(
-                                  body,
-                                  maxLines: maxLines,
-                                  overflow: .ellipsis,
-                                )
-                              : ConstrainedBox(
-                                  constraints: .loose(.square(200)),
-                                  child: MessageImage(
-                                    url,
-                                    info: info,
-                                    encrypted: false,
-                                  ),
-                                ),
-                        // TODO: Handle locations
-                        // LocationMessageContent(:final body , :final geoUri) =>
-                        TextMessageContent(
-                          :final body,
-                          :final formattedBody,
-                          :final format,
-                        ) ||
-                        NoticeMessageContent(
-                          :final body,
-                          :final formattedBody,
-                          :final format,
-                        ) ||
-                        EmoteMessageContent(
-                          :final body,
-                          :final formattedBody,
-                          :final format,
-                        ) ||
-                        ImageMessageContent(
-                          :final body,
-                          :final formattedBody,
-                          :final format,
-                        ) ||
-                        VideoMessageContent(
-                          :final body,
-                          :final formattedBody,
-                          :final format,
-                        ) ||
-                        AudioMessageContent(
-                          :final body,
-                          :final formattedBody,
-                          :final format,
-                        ) ||
-                        FileMessageContent(
-                          :final body,
-                          :final formattedBody,
-                          :final format,
-                        ) => Column(
-                          crossAxisAlignment: .start,
-                          children: [
-                            format == .html && !textOnly
-                                ? Html(
-                                    roomId: event.roomId,
-                                    textStyle: textStyle,
-                                    formattedBody!.replaceAllMapped(
-                                      RegExp(
-                                        r"(<a\b[^>]*>.*?<\/a>)|(\bhttps?:\/\/[^\s<]+)",
-                                        caseSensitive: false,
-                                        dotAll: true,
-                                      ),
-                                      (m) {
-                                        // If it's already an <a> tag, leave it unchanged
-                                        if (m.group(1) != null) {
-                                          return m.group(1)!;
-                                        }
 
-                                        // Otherwise, wrap the bare URL
-                                        final url = m.group(2)!;
-                                        return "<a href=\"$url\">$url</a>";
-                                      },
-                                    ),
-                                  )
-                                : LinkifiedText(
-                                    body,
-                                    style: textStyle,
-                                    maxLines: maxLines,
-                                  ),
-
-                            if (!textOnly) ...[
-                              if (event.content
-                                  case ImageMessageContent(:final url) ||
-                                      FileMessageContent(:final url) ||
-                                      VideoMessageContent(:final url) ||
-                                      AudioMessageContent(:final url))
-                                ConstrainedBox(
-                                  constraints: .loose(.square(500)),
-                                  child: switch (event.content) {
-                                    VideoMessageContent(
-                                      :final info,
-                                      :final file,
-                                    ) =>
-                                      VideoPlayer(
-                                        url,
-                                        info,
-                                        encrypted: file != null,
-                                      ),
-                                    AudioMessageContent(
-                                      :final info,
-                                      :final file,
-                                    ) =>
-                                      AudioPlayer(
-                                        url,
-                                        info,
-
-                                        encrypted: file != null,
-                                      ),
-                                    FileMessageContent(
-                                      :final info,
-                                      :final filename,
-                                    ) =>
-                                      FileCard(url, info, filename: filename),
-                                    ImageMessageContent(
-                                      :final info,
-                                      :final file,
-                                    ) =>
-                                      MessageImage(
-                                        url,
-                                        info: info,
-                                        encrypted: file != null,
-                                      ),
-                                    _ => SizedBox.shrink(),
-                                  },
-                                ),
-
-                              if (event.lastEditRowId != 0)
-                                Text(
-                                  "(edited)",
-                                  style: theme.textTheme.labelSmall,
-                                ),
-
-                              if (linkify(body).firstWhereOrNull(
-                                    (element) => element is UrlElement,
-                                  )
-                                  case final UrlElement link?)
-                                if (Uri.tryParse(link.url) case final Uri url?)
-                                  UrlPreview(url),
-                            ],
-                          ],
-                        ),
-                        MessageContent(:final body) =>
-                          body == null
-                              ? Text(
-                                  "This message is redacted",
-                                  style: errorStyle,
-                                )
-                              : Wrap(
-                                  spacing: 8,
-                                  children: [
-                                    Text(
-                                      "Unknown message type:",
-                                      style: errorStyle,
-                                    ),
-                                    Text(body),
-                                  ],
-                                ),
-                        _ => throw Exception("This is impossible"),
-                      },
+                      RendererBinding.instance.mouseTracker.mouseIsConnected
+                          ? SelectableRegion(
+                              selectionControls: materialTextSelectionControls,
+                              child: rendered,
+                            )
+                          : rendered,
                       if (!textOnly) ReactionRow(event),
                     ],
                   ),
