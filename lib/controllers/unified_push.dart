@@ -128,19 +128,26 @@ class UnifiedPushController extends AsyncNotifier<bool> {
       onUnregistered: deregister,
     );
 
+    ref.listen(
+      ClientStateController.provider.select((value) => value?.deviceId),
+      (_, _) => register(),
+    );
+
     if (registered) {
       // Needs to be registered every startup
-      await register(true);
+      await register();
     }
 
     return registered;
   }
 
-  Future<void> register([bool alreadyRegistered = false]) async {
+  Future<void> register() async {
     state = .loading();
     try {
-      final clientState = ref.watch(ClientStateController.provider);
-      if (clientState?.deviceId == null) return;
+      final deviceId = ref.read(
+        ClientStateController.provider.select((value) => value?.deviceId),
+      );
+      if (deviceId == null) return;
 
       final capabilities = await ref
           .read(ClientController.provider.notifier)
@@ -157,7 +164,7 @@ class UnifiedPushController extends AsyncNotifier<bool> {
       }
 
       await UnifiedPush.register(
-        instance: clientState!.deviceId!,
+        instance: deviceId,
         vapid: capabilities.webpush?.vapid,
       );
     } catch (_) {
