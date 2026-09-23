@@ -1,3 +1,4 @@
+import "dart:async";
 import "dart:convert";
 import "dart:io";
 
@@ -78,10 +79,29 @@ class UnifiedPushController extends AsyncNotifier<bool> {
           return;
         }
 
-        final room = ref.read(
-          RoomsController.provider.select((rooms) => rooms[event.roomId]),
+        final provider = RoomsController.provider.select(
+          (rooms) => rooms[event.roomId],
         );
 
+        if (ref.read(provider)?.metadata == null) {
+          final completer = Completer<void>();
+
+          final subscription = ref.listen(provider, (previous, next) {
+            if (next?.metadata != null && !completer.isCompleted) {
+              completer.complete();
+            }
+          }, fireImmediately: true);
+
+          try {
+            await completer.future.timeout(.new(seconds: 10));
+          } on TimeoutException {
+            // metadata didn't show up in time
+          } finally {
+            subscription.close();
+          }
+        }
+
+        final room = ref.read(provider);
         final avatar = room?.metadata?.avatar;
         final icon = avatar == null
             ? null
