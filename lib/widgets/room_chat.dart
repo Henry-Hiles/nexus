@@ -331,6 +331,16 @@ final class const RoomChat({
           },
           child: ListTile(leading: Icon(Icons.link), title: Text("Copy Link")),
         ),
+        if (event.content case MessageContent(:final body?))
+          PopupMenuItem(
+            onTap: () async {
+              await Clipboard.setData(ClipboardData(text: body));
+            },
+            child: ListTile(
+              leading: Icon(Icons.copy),
+              title: Text("Copy Text"),
+            ),
+          ),
         if (ref.watch(
           PowerLevelController.provider(
             .redaction(targetUser: event.sender, roomId: roomId),
