@@ -9,6 +9,7 @@ import "package:nexus/controllers/client_state.dart";
 import "package:nexus/controllers/member_list_opened.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/controllers/room_chat.dart";
+import "package:nexus/helpers/hooks/chat_scroll.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/models/relation_type.dart";
 import "package:nexus/widgets/composer/composer.dart";
@@ -16,7 +17,6 @@ import "package:nexus/widgets/pinned_events_drawer.dart";
 import "package:nexus/widgets/member_list.dart";
 import "package:nexus/widgets/room_appbar.dart";
 import "package:nexus/main.dart";
-import "package:super_sliver_list/super_sliver_list.dart";
 import "package:nexus/widgets/room_chat/chat_timeline.dart";
 import "package:nexus/helpers/extensions/build_event_options.dart";
 
@@ -64,123 +64,27 @@ final class const RoomChat({
 
     final client = ref.watch(ClientController.provider.notifier);
 
-    final listController = useRef(ListController());
-    final scrollController = useScrollController();
     final controllerData = ref.watch(controllerProvider);
 
-    final topEventBeforeLoad = useState<String?>(null);
-    final hasMore = useState<bool>(true);
-    final loadingOlder = useRef(false);
-
-    Future<void> jumpToId(String eventId) async {
-      final index =
-          controllerData.value?.indexWhere(
-            (element) => element.eventId == eventId,
-          ) ??
-          -1;
-      if (index == -1) return;
-
-      listController.value.animateToItem(
-        index: index,
-        scrollController: scrollController,
-        alignment: 0.5,
-        duration: (_) => .new(milliseconds: 700),
-        curve: (_) => Curves.easeInOut,
-      );
-      highlightedEvent.value = eventId;
-      await Future.delayed(.new(seconds: 1), () {
-        if (highlightedEvent.value == eventId) {
-          highlightedEvent.value = null;
-        }
-      });
-    }
-
-    Future<void> loadOlder() async {
-      if (loadingOlder.value || !hasMore.value) return;
-      if (controllerData case AsyncData(:final value?)) {
-        loadingOlder.value = true;
-        topEventBeforeLoad.value = value.firstOrNull?.eventId;
-        try {
-          hasMore.value = await notifier.loadOlder();
-        } finally {
-          loadingOlder.value = false;
-        }
-      }
-    }
-
-    useEffect(() {
-      ref
-          .read(controllerProvider.future)
-          .then(
-            (_) => WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (scrollController.hasClients) {
-                scrollController.jumpTo(
-                  scrollController.position.maxScrollExtent - .000001,
-                );
-              }
-            }),
-          );
-
-      return null;
-    }, [scrollController.hasClients]);
-
-    useEffect(() {
-      if (controllerData case AsyncData(:final value?)
-          when scrollController.hasClients) {
-        if (topEventBeforeLoad.value != null) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (scrollController.hasClients) {
-              final index = value.indexWhere(
-                (event) => event.eventId == topEventBeforeLoad.value,
-              );
-              if (index != -1) {
-                listController.value.jumpToItem(
-                  index: index,
-                  scrollController: scrollController,
-                  alignment: 0,
-                );
-              }
-            }
-            topEventBeforeLoad.value = null;
-          });
-        } else if (scrollController.position.atEdge &&
-            scrollController.position.pixels != 0) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (scrollController.hasClients) {
-              scrollController.jumpTo(
-                scrollController.position.maxScrollExtent,
-              );
-            }
-          });
-        }
-      }
-
-      return null;
-    }, [controllerData]);
-
-    useEffect(() {
-      Future<void> listener() async {
-        if (!scrollController.hasClients || !scrollController.position.atEdge) {
-          return;
-        }
-
+    final scroll = ChatScroll.use(
+      controllerData: controllerData,
+      id: (event) => event.eventId,
+      loadOlder: notifier.loadOlder,
+      shouldLoadOlder: () => ref.read(
+        RoomsController.provider.select(
+          (rooms) => rooms[roomId]?.hasMore ?? false,
+        ),
+      ),
+      onReachedBottom: () async {
         final room = ref.read(
-          RoomsController.provider.select((value) => value[roomId]),
+          RoomsController.provider.select((rooms) => rooms[roomId]),
         );
-        if (room == null) return;
 
-        if (scrollController.position.pixels == 0) {
-          if (room.hasMore) {
-            await loadOlder();
-          }
-        } else {
+        if (room != null) {
           await client.markRead(room);
         }
-      }
-
-      scrollController.addListener(listener);
-      return () => scrollController.removeListener(listener);
-    }, [roomId, controllerData]);
+      },
+    );
 
     final composerNode = useFocusNode(
       onKeyEvent: (_, event) {
@@ -192,6 +96,15 @@ final class const RoomChat({
         return .ignored;
       },
     );
+
+    Future<void> jumpToId(String eventId) async {
+      highlightedEvent.value = eventId;
+
+      await scroll.jumpToId(eventId);
+      await Future.delayed(.new(seconds: 1), () {
+        if (highlightedEvent.value == eventId) highlightedEvent.value = null;
+      });
+    }
 
     IList<PopupMenuEntry> getEventOptions(Event event) =>
         event.buildEventOptions(
@@ -237,10 +150,10 @@ final class const RoomChat({
                         padding: .symmetric(horizontal: 4),
                         child: ChatTimeline(
                           controllerData: controllerData,
-                          scrollController: scrollController,
-                          listController: listController.value,
-                          hasMore: hasMore.value,
-                          loadOlder: loadOlder,
+                          scrollController: scroll.scrollController,
+                          listController: scroll.listController,
+                          hasMore: scroll.hasMore,
+                          loadOlder: scroll.loadOlder,
                           jumpToId: jumpToId,
                           getEventOptions: getEventOptions,
                           highlightedEvent: highlightedEvent.value,

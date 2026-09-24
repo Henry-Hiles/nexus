@@ -27,6 +27,7 @@ class const ChatPage({super.key}) extends ConsumerWidget {
                     if (isDesktop) Sidebar(isDesktop: isDesktop),
                     Expanded(
                       child: RoomChat(
+                        key: ValueKey(roomId),
                         roomId: roomId,
                         isDesktop: isDesktop,
                         showMembersByDefault: showMembersByDefault,
