@@ -71,14 +71,14 @@ void main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
   MediaKit.ensureInitialized();
 
-  isInBackground =
-      Platform.environment["FLUTTER_HEADLESS"] != null ||
-      args.contains("--unifiedpush-bg");
-
   LicenseRegistry.addLicense(() => .fromIterable(fontLicenses));
 
   FlutterError.onError = (FlutterErrorDetails details) =>
       showError(details.exception.toString(), details.stack);
+
+  isInBackground =
+      Platform.environment["FLUTTER_HEADLESS"] != null ||
+      args.contains("--unifiedpush-bg");
 
   if (isInBackground) {
     await ProviderContainer()
