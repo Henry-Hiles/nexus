@@ -71,17 +71,6 @@ void main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
   MediaKit.ensureInitialized();
 
-  if (Platform.isLinux || Platform.isMacOS || Platform.isWindows) {
-    await windowManager.ensureInitialized();
-    await windowManager.waitUntilReadyToShow(
-      WindowOptions(
-        titleBarStyle: TitleBarStyle.hidden,
-        windowButtonVisibility: false,
-      ),
-    );
-    await windowManager.setMinimumSize(Size.square(500));
-  }
-
   isInBackground =
       Platform.environment["FLUTTER_HEADLESS"] != null ||
       args.contains("--unifiedpush-bg");
@@ -92,12 +81,23 @@ void main(List<String> args) async {
       showError(details.exception.toString(), details.stack);
 
   if (isInBackground) {
-    await ProviderContainer().read(UnifiedPushController.provider.future);
+    await ProviderContainer()
+        .read(UnifiedPushController.provider.future)
+        .timeout(Duration(seconds: 20), onTimeout: () => false);
 
-    // In case it didn't exit for some reason
-    await Future.delayed(Duration(seconds: 20));
     exit(0);
   } else {
+    if (Platform.isLinux || Platform.isMacOS || Platform.isWindows) {
+      await windowManager.ensureInitialized();
+      await windowManager.waitUntilReadyToShow(
+        WindowOptions(
+          titleBarStyle: TitleBarStyle.hidden,
+          windowButtonVisibility: false,
+        ),
+      );
+      await windowManager.setMinimumSize(Size.square(500));
+    }
+
     runApp(
       ProviderScope(
         retry: (_, _) => null,
