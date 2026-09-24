@@ -18,7 +18,7 @@ import "package:nexus/widgets/room_appbar.dart";
 import "package:nexus/main.dart";
 import "package:super_sliver_list/super_sliver_list.dart";
 import "package:nexus/widgets/room_chat/chat_timeline.dart";
-import "package:nexus/helpers/build_event_options.dart";
+import "package:nexus/helpers/extensions/build_event_options.dart";
 
 final class const RoomChat({
   required final String? roomId,
@@ -193,18 +193,18 @@ final class const RoomChat({
       },
     );
 
-    IList<PopupMenuEntry> getEventOptions(Event event) => buildEventOptions(
-      context: context,
-      ref: ref,
-      roomId: roomId,
-      userId: userId,
-      event: event,
-      onRelation: (event, type) {
-        relatedEvent.value = event;
-        relationType.value = type;
-        composerNode.requestFocus();
-      },
-    );
+    IList<PopupMenuEntry> getEventOptions(Event event) =>
+        event.buildEventOptions(
+          context: context,
+          ref: ref,
+          roomId: roomId,
+          userId: userId,
+          onRelation: (event, type) {
+            relatedEvent.value = event;
+            relationType.value = type;
+            composerNode.requestFocus();
+          },
+        );
 
     return Scaffold(
       endDrawer: PinnedEventsDrawer(
