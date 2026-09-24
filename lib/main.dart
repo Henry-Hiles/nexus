@@ -83,8 +83,9 @@ void main(List<String> args) async {
   if (isInBackground) {
     await ProviderContainer()
         .read(UnifiedPushController.provider.future)
-        .timeout(Duration(seconds: 20), onTimeout: () => false);
+        .timeout(Duration(seconds: 5));
 
+    await Future.delayed(Duration(seconds: 10));
     exit(0);
   } else {
     if (Platform.isLinux || Platform.isMacOS || Platform.isWindows) {
