@@ -4,8 +4,8 @@ import "package:dynamic_color/dynamic_color.dart";
 import "package:flutter/foundation.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:media_kit/media_kit.dart";
-import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/client_state.dart";
+import "package:nexus/controllers/gomuks_listener.dart";
 import "package:nexus/controllers/key.dart";
 import "package:nexus/controllers/member_list_opened.dart";
 import "package:nexus/controllers/multi_provider.dart";
@@ -152,7 +152,7 @@ class const App({super.key}) extends StatelessWidget {
           builder: (_, ref, _) => switch (ref.watch(
             MultiProviderController.provider(
               .new([
-                ClientController.provider,
+                GomuksListenerController.provider,
                 NotificationController.provider,
                 UnifiedPushController.provider,
                 MemberListOpenedController.provider,

@@ -8,7 +8,6 @@ import "package:intl/intl.dart";
 import "package:nexus/controllers/key.dart";
 import "package:nexus/controllers/notification.dart";
 import "package:nexus/controllers/push_key.dart";
-import "package:nexus/controllers/rooms.dart";
 import "package:nexus/main.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/client_state.dart";
@@ -63,12 +62,11 @@ class UnifiedPushController extends AsyncNotifier<bool> {
             "Failed to decrypt notification. Try toggling off and on UnifiedPush in settings.",
           );
         }
-        final event = await ref
+        final (event, roomMetadata) = await ref
             .read(ClientController.provider.notifier)
             .handlePush(json.decode(String.fromCharCodes(message.content)));
 
-        if (event == null ||
-            event.unreadType?.shouldNotify() != true ||
+        if (event.unreadType?.shouldNotify() != true ||
             (!isInBackground &&
                 await windowManager.isFocused().onError((_, _) => true) &&
                 await ref.read(
@@ -79,41 +77,19 @@ class UnifiedPushController extends AsyncNotifier<bool> {
           return;
         }
 
-        final provider = RoomsController.provider.select(
-          (rooms) => rooms[event.roomId],
-        );
-
-        if (ref.read(provider)?.metadata == null) {
-          final completer = Completer<void>();
-
-          final subscription = ref.listen(provider, (previous, next) {
-            if (next?.metadata != null && !completer.isCompleted) {
-              completer.complete();
-            }
-          }, fireImmediately: true);
-
-          try {
-            await completer.future.timeout(.new(seconds: 10));
-          } on TimeoutException {
-            // metadata didn't show up in time
-          } finally {
-            subscription.close();
-          }
-        }
-
-        final room = ref.read(provider);
-        final avatar = room?.metadata?.avatar;
-        final icon = avatar == null
+        final icon = roomMetadata.avatar == null
             ? null
             : await ref
                   .read(ClientController.provider.notifier)
-                  .downloadMedia(.new(mxc: avatar, isAvatar: true));
+                  .downloadMedia(
+                    .new(mxc: roomMetadata.avatar!, isAvatar: true),
+                  );
 
         await ref
             .read(NotificationController.provider.notifier)
             .send(
               id: event.eventId.hashCode & 0x7fffffff,
-              title: room?.metadata?.name ?? "New Event",
+              title: roomMetadata.name ?? "New Event",
               icon: icon,
               payload: event.eventId,
               body: switch (event.content) {

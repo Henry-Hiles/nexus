@@ -6,17 +6,9 @@ import "dart:math";
 
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:ffi/ffi.dart";
-import "package:flutter/foundation.dart";
+import "package:flutter/cupertino.dart";
 import "package:intl/intl.dart";
-import "package:nexus/controllers/account_data.dart";
-import "package:nexus/controllers/client_state.dart";
-import "package:nexus/controllers/init_complete.dart";
-import "package:nexus/controllers/rooms.dart";
-import "package:nexus/controllers/space_edges.dart";
-import "package:nexus/controllers/sync_status.dart";
-import "package:nexus/controllers/top_level_spaces.dart";
 import "package:nexus/helpers/extensions/gomuks_buffer.dart";
-import "package:nexus/main.dart";
 import "package:nexus/models/capabilities.dart";
 import "package:nexus/models/content/message.dart";
 import "package:nexus/models/event.dart";
@@ -46,9 +38,9 @@ import "package:nexus/models/requests/set_membership.dart";
 import "package:nexus/models/requests/set_state.dart";
 import "package:nexus/models/requests/upload_media.dart";
 import "package:nexus/models/room.dart";
+import "package:nexus/models/room_metadata.dart";
 import "package:nexus/models/room_summary.dart";
 import "package:nexus/models/spec_versions_response.dart";
-import "package:nexus/models/sync_data.dart";
 import "package:nexus/src/third_party/gomuks.g.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:path_provider/path_provider.dart";
@@ -56,6 +48,7 @@ import "package:path_provider/path_provider.dart";
 class ClientController extends AsyncNotifier<int> {
   @override
   Future<int> build() async {
+    debugPrint("Setting Gomuks env...");
     if (Platform.isAndroid || Platform.isIOS) {
       final env = {
         "GOMUKS_ROOT": (await getApplicationSupportDirectory()).path,
@@ -70,6 +63,8 @@ class ClientController extends AsyncNotifier<int> {
           ..free(valuePtr);
       }
     }
+
+    debugPrint("Initializing Gomuks...");
     final handle = await Isolate.run(() {
       final bufferPointer = GomuksConfig(
         matrix: .new(
@@ -85,99 +80,9 @@ class ClientController extends AsyncNotifier<int> {
       }
     });
 
-    final callable =
-        NativeCallable<
-          Void Function(Pointer<Char>, Int64, GomuksOwnedBuffer)
-        >.listener((
-          Pointer<Char> command,
-          int requestId,
-          GomuksOwnedBuffer data,
-        ) {
-          try {
-            final muksEventType = command.cast<Utf8>().toDartString();
-            debugPrint("Handling $muksEventType...");
-            final decodedMuksEvent = data.toJson();
-
-            switch (muksEventType) {
-              case "client_state":
-                ref
-                    .watch(ClientStateController.provider.notifier)
-                    .set(.fromJson(decodedMuksEvent));
-                break;
-              case "sync_status":
-                ref
-                    .watch(SyncStatusController.provider.notifier)
-                    .set(.fromJson(decodedMuksEvent));
-                break;
-              case "init_complete":
-                ref.watch(InitCompleteController.provider.notifier).complete();
-                break;
-              case "send_complete":
-                final event = Event.fromJson(decodedMuksEvent["event"]);
-                ref
-                    .watch(RoomsController.provider.notifier)
-                    .update(
-                      .new({
-                        event.roomId: .new(events: .new({event.rowId: event})),
-                      }),
-                      .new(),
-                    );
-
-                break;
-              case "sync_complete":
-                final syncData = SyncData.fromJson(decodedMuksEvent);
-                final roomProvider = RoomsController.provider;
-                final accountDataProvider = AccountDataController.provider;
-
-                if (syncData.clearState) {
-                  ref.invalidate(roomProvider);
-                  ref.invalidate(accountDataProvider);
-                }
-
-                ref
-                    .watch(roomProvider.notifier)
-                    .update(syncData.rooms, syncData.leftRooms);
-                ref
-                    .watch(accountDataProvider.notifier)
-                    .update(syncData.accountData);
-
-                if (syncData.topLevelSpaces != null) {
-                  ref
-                      .watch(TopLevelSpacesController.provider.notifier)
-                      .set(syncData.topLevelSpaces!);
-                }
-
-                if (syncData.spaceEdges != null) {
-                  ref
-                      .watch(SpaceEdgesController.provider.notifier)
-                      .set(syncData.spaceEdges!);
-                }
-
-                // ref
-                //     .watch(SyncStatusController.provider.notifier)
-                //     .set(SyncStatus.fromJson(decodedMuksEvent));
-                break;
-              default:
-                debugPrint("Unhandled event: $muksEventType");
-            }
-            debugPrint("Finished handling $muksEventType...");
-          } catch (error, stackTrace) {
-            if (kDebugMode) {
-              debugPrintStack(stackTrace: stackTrace, label: error.toString());
-              rethrow;
-            } else {
-              showError(error, stackTrace);
-            }
-          }
-        });
-
     ref.onDispose(() => GomuksDestroy(handle));
-    ref.onDispose(callable.close);
 
-    final errorCode = GomuksStart(handle, callable.nativeFunction);
-
-    if (errorCode == 0) return handle;
-    throw Exception("GomuksStart returned error code $errorCode");
+    return handle;
   }
 
   Future<dynamic> callGomuksMethod(
@@ -201,13 +106,16 @@ class ClientController extends AsyncNotifier<int> {
     return json;
   }
 
-  Future<Event?> handlePush(Map<String, dynamic> data) async {
+  Future<(Event, RoomMetadata)> handlePush(Map<String, dynamic> data) async {
     final response = await callGomuksMethod(
       data,
       (handle, data) async => GomuksHandlePush(handle, data),
     );
 
-    return response == null ? null : .fromJson(response);
+    return (
+      Event.fromJson(response["event"]),
+      RoomMetadata.fromJson(response["room"]),
+    );
   }
 
   dynamic _sendCommand(
@@ -269,11 +177,6 @@ class ClientController extends AsyncNotifier<int> {
     if (room.metadata == null) return;
     await _sendCommand("leave_room", {"room_id": room.metadata!.id});
   }
-
-  // (await _sendCommand("get_event_context", {
-  //   "room_id": request.roomId,
-  //   "event_id": r"$OqZT4NuTj0J1-771IOEEWRI4XdumRNu6ighlvO3K3gc",
-  // }));
 
   Future<IList<Event>> getRoomState(GetRoomStateRequest request) async {
     Future<List?> getState(GetRoomStateRequest request) async =>
