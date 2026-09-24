@@ -57,7 +57,7 @@ class const Profile({
     try {
       return Profile.fromJson(json);
     } catch (error) {
-      return _Profile(parseError: error.toString());
+      return Profile(parseError: error.toString());
     }
   }
 }

@@ -33,7 +33,8 @@ class const Mentions({
       _$MentionsFromJson(json);
 }
 
-@Freezed(toJson: false)
+@Freezed(toJson: false, fromJson: false)
+@JsonSerializable(createToJson: false)
 class const Relation({
   required final String eventId,
   required final RelationType relationType,
