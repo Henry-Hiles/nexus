@@ -4,7 +4,7 @@ import "package:nexus/controllers/init_complete.dart";
 import "package:nexus/controllers/key.dart";
 import "package:nexus/widgets/appbar.dart";
 import "package:nexus/widgets/sidebar.dart";
-import "package:nexus/widgets/room_chat.dart";
+import "package:nexus/widgets/room_chat/room_chat.dart";
 import "package:nexus/widgets/loading.dart";
 
 class const ChatPage({super.key}) extends ConsumerWidget {
