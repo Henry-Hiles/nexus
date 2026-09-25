@@ -66,7 +66,9 @@ class RoomChatController(final String roomId)
         ),
       );
 
-  Future<bool> loadOlder() async {
+  Future<void> loadOlder() async {
+    if (state.isLoading) return;
+
     state = .loading();
     final timelineKeys = ref
         .read(RoomsController.provider.select((value) => value[roomId]))
@@ -85,30 +87,28 @@ class RoomChatController(final String roomId)
 
     if (response.events.isEmpty) {
       state = .data(state.value);
-    } else {
-      ref
-          .read(RoomsController.provider.notifier)
-          .update(
-            IMap({
-              roomId: Room(
-                events: IMap.fromIterable(
-                  response.events.addAll(response.relatedEvents),
-                  keyMapper: (event) => event.rowId,
-                  valueMapper: (event) => event,
-                ),
-                hasMore: response.hasMore,
-                timeline: IMap.fromIterable(
-                  response.events,
-                  keyMapper: (event) => event.timelineRowId,
-                  valueMapper: (event) => event.rowId,
-                ),
-              ),
-            }),
-            .new(),
-          );
     }
 
-    return response.hasMore;
+    ref
+        .read(RoomsController.provider.notifier)
+        .update(
+          IMap({
+            roomId: Room(
+              events: IMap.fromIterable(
+                response.events.addAll(response.relatedEvents),
+                keyMapper: (event) => event.rowId,
+                valueMapper: (event) => event,
+              ),
+              hasMore: response.hasMore,
+              timeline: IMap.fromIterable(
+                response.events,
+                keyMapper: (event) => event.timelineRowId,
+                valueMapper: (event) => event.rowId,
+              ),
+            ),
+          }),
+          .new(),
+        );
   }
 
   Future<void> send(
@@ -123,7 +123,7 @@ class RoomChatController(final String roomId)
       baseContent = relation?.content;
     } else {
       final provider = AttachmentController.provider(roomId);
-      baseContent = ref.watch(provider)?.$2;
+      baseContent = ref.read(provider)?.$2;
       ref.invalidate(provider);
     }
 
@@ -139,7 +139,7 @@ class RoomChatController(final String roomId)
       );
     }
 
-    final client = ref.watch(ClientController.provider.notifier);
+    final client = ref.read(ClientController.provider.notifier);
     final event = await client.sendMessage(
       SendMessageRequest(
         roomId: roomId,
@@ -161,7 +161,7 @@ class RoomChatController(final String roomId)
     );
 
     ref
-        .watch(RoomsController.provider.notifier)
+        .read(RoomsController.provider.notifier)
         .update(
           .new({
             roomId: .new(
