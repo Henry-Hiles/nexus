@@ -80,8 +80,8 @@ class ClientController extends AsyncNotifier<int> {
         return GomuksInit(bufferPointer.ref);
       } finally {
         calloc
-          ..free(bufferPointer)
-          ..free(bufferPointer.ref.base);
+          ..free(bufferPointer.ref.base)
+          ..free(bufferPointer);
       }
     });
 
