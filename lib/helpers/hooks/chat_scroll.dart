@@ -11,9 +11,6 @@ final class ChatScroll<T>({
   required final ListController historyListController,
   required final ListController liveListController,
   required final ScrollController scrollController,
-  required final bool hasMore,
-  required final bool isLoadingOlder,
-  required final Future<void> Function() loadOlder,
   required final Future<void> Function(String id) jumpToId,
 }) {
   static ChatScroll<T> use<T>({
@@ -28,8 +25,6 @@ final class ChatScroll<T>({
     final centerKey = useMemoized(GlobalKey.new);
 
     final anchorId = useState<String?>(null);
-    final hasMore = useState(true);
-    final isLoadingOlder = useState(false);
 
     final anchorIdValue = anchorId.value;
 
@@ -65,16 +60,39 @@ final class ChatScroll<T>({
     }, [controllerData, anchorIdValue]);
 
     Future<void> loadOlderItems() async {
-      if (!hasMore.value || isLoadingOlder.value) return;
+      if (controllerData.isLoading) return;
 
-      isLoadingOlder.value = true;
-
-      try {
-        hasMore.value = await loadOlder();
-      } finally {
-        isLoadingOlder.value = false;
-      }
+      await loadOlder();
     }
+
+    useEffect(() {
+      const loadThreshold = 500.0;
+      const bottomThreshold = 50.0;
+
+      void checkPosition() {
+        if (!scrollController.hasClients) return;
+
+        final position = scrollController.position;
+
+        if (position.extentAfter <= loadThreshold) {
+          loadOlderItems();
+        }
+
+        if (position.extentBefore <= bottomThreshold) {
+          onReachedBottom();
+        }
+      }
+
+      scrollController.addListener(checkPosition);
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        checkPosition();
+      });
+
+      return () {
+        scrollController.removeListener(checkPosition);
+      };
+    }, [scrollController, controllerData, loadOlder, onReachedBottom]);
 
     Future<void> jumpToId(String itemId) async {
       if (!scrollController.hasClients) return;
@@ -108,35 +126,6 @@ final class ChatScroll<T>({
       }
     }
 
-    useEffect(() {
-      const loadThreshold = 500.0;
-      const bottomThreshold = 50.0;
-
-      void checkPosition() {
-        if (!scrollController.hasClients) {
-          return;
-        }
-
-        final position = scrollController.position;
-
-        if (position.extentAfter <= loadThreshold) {
-          if (hasMore.value && !isLoadingOlder.value) {
-            loadOlderItems();
-          }
-        }
-
-        if (position.extentBefore <= bottomThreshold) {
-          onReachedBottom();
-        }
-      }
-
-      scrollController.addListener(checkPosition);
-
-      WidgetsBinding.instance.addPostFrameCallback((_) => checkPosition());
-
-      return () => scrollController.removeListener(checkPosition);
-    }, [scrollController, onReachedBottom]);
-
     return .new(
       historyItems: split.history,
       liveItems: split.live,
@@ -144,9 +133,6 @@ final class ChatScroll<T>({
       historyListController: historyListController.value,
       liveListController: liveListController.value,
       scrollController: scrollController,
-      hasMore: hasMore.value,
-      isLoadingOlder: isLoadingOlder.value,
-      loadOlder: loadOlderItems,
       jumpToId: jumpToId,
     );
   }

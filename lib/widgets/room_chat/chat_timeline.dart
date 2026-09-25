@@ -68,7 +68,7 @@ class const ChatTimeline({
         itemCount: scroll.historyItems.length,
         itemBuilder: (_, index) => eventRow(
           scroll.historyItems[index],
-          scroll.historyItems.getOrNull(index),
+          scroll.historyItems.getOrNull(index + 1),
           jumpToId: jumpToId,
           getEventOptions: getEventOptions,
           highlightedEvent: highlightedEvent,
