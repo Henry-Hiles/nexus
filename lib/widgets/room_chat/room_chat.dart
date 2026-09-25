@@ -62,7 +62,7 @@ final class const RoomChat({
     final controllerProvider = RoomChatController.provider(roomId);
     final notifier = ref.watch(controllerProvider.notifier);
 
-    final client = ref.watch(ClientController.provider.notifier);
+    final client = ref.read(ClientController.provider.notifier);
 
     final controllerData = ref.watch(controllerProvider);
 

@@ -26,7 +26,7 @@ final class const UserBottomSheet(
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
-    final client = ref.watch(ClientController.provider.notifier);
+    final client = ref.read(ClientController.provider.notifier);
 
     void showMembershipDialog(MembershipAction action) => showDialog(
       context: context,

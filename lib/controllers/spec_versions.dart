@@ -5,7 +5,7 @@ import "package:nexus/models/spec_versions_response.dart";
 class SpecVersionsController extends AsyncNotifier<SpecVersionsResponse> {
   @override
   Future<SpecVersionsResponse> build() =>
-      ref.watch(ClientController.provider.notifier).getSpecVersions();
+      ref.read(ClientController.provider.notifier).getSpecVersions();
 
   static final provider =
       AsyncNotifierProvider.autoDispose<

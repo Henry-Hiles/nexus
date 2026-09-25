@@ -14,7 +14,7 @@ final class const RoomMenu(
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final danger = Theme.of(context).colorScheme.error;
-    final client = ref.watch(ClientController.provider.notifier);
+    final client = ref.read(ClientController.provider.notifier);
 
     return PopupMenuButton(
       itemBuilder: (_) => [

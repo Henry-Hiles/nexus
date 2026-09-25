@@ -6,7 +6,7 @@ class ProfileController(final String userId)
     extends AsyncNotifier<ProfileResponse> {
   @override
   Future<ProfileResponse> build() {
-    final client = ref.watch(ClientController.provider.notifier);
+    final client = ref.read(ClientController.provider.notifier);
     return client.getProfile(userId);
   }
 

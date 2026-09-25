@@ -20,7 +20,7 @@ class RoomChatController(final String roomId)
     extends AsyncNotifier<IList<Event>?> {
   @override
   Future<IList<Event>?> build() async {
-    final client = ref.watch(ClientController.provider.notifier);
+    final client = ref.read(ClientController.provider.notifier);
     final room = ref.watch(
       RoomsController.provider.select((rooms) => rooms[roomId]),
     );
@@ -178,7 +178,7 @@ class RoomChatController(final String roomId)
     Event event,
     String userId,
   ) async {
-    final client = ref.watch(ClientController.provider.notifier);
+    final client = ref.read(ClientController.provider.notifier);
     final allReactionEvents = await client.getRelatedEvents(
       .new(
         roomId: roomId,
@@ -207,7 +207,7 @@ class RoomChatController(final String roomId)
   }
 
   Future<void> sendReaction(String reaction, Event event) async {
-    final client = ref.watch(ClientController.provider.notifier);
+    final client = ref.read(ClientController.provider.notifier);
 
     await client.sendEvent(
       .new(

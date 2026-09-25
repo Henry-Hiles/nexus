@@ -7,7 +7,7 @@ class RoomSummaryController(final JoinRoomRequest request)
     extends AsyncNotifier<RoomSummary> {
   @override
   Future<RoomSummary> build() =>
-      ref.watch(ClientController.provider.notifier).getRoomSummary(request);
+      ref.read(ClientController.provider.notifier).getRoomSummary(request);
 
   static final provider = AsyncNotifierProvider.family
       .autoDispose<RoomSummaryController, RoomSummary, JoinRoomRequest>(

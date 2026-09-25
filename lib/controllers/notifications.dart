@@ -11,7 +11,7 @@ class NotificationsController([final NotificationsRequest? request])
 
   @override
   Future<IList<Event>> build() async {
-    final client = ref.watch(ClientController.provider.notifier);
+    final client = ref.read(ClientController.provider.notifier);
 
     final (unreadType, roomId) = request ?? (null, null);
 
@@ -32,7 +32,7 @@ class NotificationsController([final NotificationsRequest? request])
       final lastTs = currentNotifications.lastOrNull?.timestamp;
       if (lastTs == null) return const .empty();
 
-      final client = ref.watch(ClientController.provider.notifier);
+      final client = ref.read(ClientController.provider.notifier);
       final (unreadType, roomId) = request ?? (null, null);
 
       final newNotifications = await client.getMentions(
