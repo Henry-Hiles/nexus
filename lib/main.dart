@@ -42,15 +42,7 @@ New Value: ${newValue is AsyncData ? newValue.value : newValue}
 }
 
 void showError(Object error, [StackTrace? stackTrace]) {
-  if (error.toString().contains("DioException") ||
-      error.toString().contains(
-        "setState() or markNeedsBuild() called during build.",
-      ) ||
-      error.toString().contains("Invalid source") ||
-      error.toString().contains("UTF-16") ||
-      error.toString().contains("HTTP request failed") ||
-      error.toString().contains("'_nextFrame != null': is not true.") ||
-      error.toString().contains("Invalid image data")) {
+  if (error.toString().contains("'_nextFrame != null': is not true.")) {
     return;
   }
 
