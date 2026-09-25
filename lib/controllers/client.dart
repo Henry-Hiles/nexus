@@ -57,10 +57,13 @@ class ClientController extends AsyncNotifier<int> {
       for (final MapEntry(:key, :value) in env.entries) {
         final keyPtr = key.toNativeUtf8().cast<Char>();
         final valuePtr = value.toNativeUtf8().cast<Char>();
-        GomuksSetEnv(keyPtr, valuePtr);
-        calloc
-          ..free(keyPtr)
-          ..free(valuePtr);
+        try {
+          GomuksSetEnv(keyPtr, valuePtr);
+        } finally {
+          calloc
+            ..free(keyPtr)
+            ..free(valuePtr);
+        }
       }
     }
 
@@ -76,7 +79,9 @@ class ClientController extends AsyncNotifier<int> {
       try {
         return GomuksInit(bufferPointer.ref);
       } finally {
-        calloc.free(bufferPointer);
+        calloc
+          ..free(bufferPointer)
+          ..free(bufferPointer.ref.base);
       }
     });
 
@@ -107,8 +112,9 @@ class ClientController extends AsyncNotifier<int> {
 
       return json;
     } finally {
-      calloc.free(bufferPointer.ref.base);
-      calloc.free(bufferPointer);
+      calloc
+        ..free(bufferPointer.ref.base)
+        ..free(bufferPointer);
     }
   }
 

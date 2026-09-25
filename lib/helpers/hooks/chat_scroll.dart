@@ -71,7 +71,7 @@ final class ChatScroll<T>({
         if (position.extentAfter <= topThreshold) {
           await loadOlder();
         } else if (position.extentBefore <= bottomThreshold) {
-          onReachedBottom();
+          await onReachedBottom();
         }
       }
 
