@@ -92,27 +92,34 @@ final class ChatScroll<T>({
       );
 
       if (historyIndex != -1) {
-        historyListController.value.animateToItem(
-          index: historyIndex,
-          scrollController: scrollController,
-          alignment: 0.5,
-          duration: (_) => .new(milliseconds: 700),
-          curve: (_) => Curves.easeInOut,
+        // TODO: Replace SuperSliverView because of the bug that requires this: #94
+        // ignore: invalid_use_of_visible_for_testing_member
+        final offset = historyListController.value.getOffsetToReveal(
+          historyIndex,
+          0.5,
         );
 
-        return;
-      }
-
-      final liveIndex = split.live.indexWhere((item) => id(item) == itemId);
-
-      if (liveIndex != -1) {
-        liveListController.value.animateToItem(
-          index: liveIndex,
-          scrollController: scrollController,
-          alignment: 0.5,
-          duration: (_) => .new(milliseconds: 700),
-          curve: (_) => Curves.easeInOut,
+        await scrollController.animateTo(
+          offset,
+          duration: const Duration(milliseconds: 700),
+          curve: Curves.easeInOut,
         );
+      } else {
+        final liveIndex = split.live.indexWhere((item) => id(item) == itemId);
+
+        if (liveIndex != -1) {
+          // ignore: invalid_use_of_visible_for_testing_member
+          final offset = liveListController.value.getOffsetToReveal(
+            liveIndex,
+            0.5,
+          );
+
+          await scrollController.animateTo(
+            offset,
+            duration: const Duration(milliseconds: 700),
+            curve: Curves.easeInOut,
+          );
+        }
       }
     }
 
