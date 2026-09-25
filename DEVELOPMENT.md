@@ -21,7 +21,7 @@ See [Effective Dart: Style](https://dart.dev/effective-dart/style) for general r
 Controllers live in `lib/controllers/` and provide a source that exposes data and logic via Riverpod providers, allowing other parts of the code to watch state changes with ref.watch (`ref.watch(MyController.provider)`), access the current value with ref.read (`ref.read(MyController.provider)`), and run helper methods on those classes using the notifier:
 
 ```dart
-ref.watch(MyController.provider.notifier).helperMethod()
+ref.read(MyController.provider.notifier).helperMethod()
 ```
 
 We use an object oriented style for controllers, where `provider` is a static member on the controller class. E.g.

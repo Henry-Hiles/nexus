@@ -91,19 +91,25 @@ class ClientController extends AsyncNotifier<int> {
     callback,
   ) async {
     final bufferPointer = data.toGomuksBufferPtr();
-    final handle = await future;
-    final response = await Isolate.run(
-      () => callback(handle, bufferPointer.ref),
-    );
 
-    calloc.free(bufferPointer);
+    try {
+      final handle = await future;
 
-    final json = response.buf.toJson();
-    if (response.command.cast<Utf8>().toDartString() == "error") {
-      throw json;
+      final response = await Isolate.run(
+        () => callback(handle, bufferPointer.ref),
+      );
+
+      final json = response.buf.toJson();
+
+      if (response.command.cast<Utf8>().toDartString() == "error") {
+        throw json;
+      }
+
+      return json;
+    } finally {
+      calloc.free(bufferPointer.ref.base);
+      calloc.free(bufferPointer);
     }
-
-    return json;
   }
 
   Future<(Event, RoomMetadata)> handlePush(Map<String, dynamic> data) async {
@@ -250,9 +256,11 @@ class ClientController extends AsyncNotifier<int> {
   Future<void> logout() => _sendCommand("logout");
 
   Future<void> markRead(Room room) async {
+    if (room.timeline.isEmpty || room.metadata == null) return;
     final eventRowId = room.timeline[room.timeline.keys.reduce(max)];
     final event = eventRowId == null ? null : room.events[eventRowId];
-    if (event == null || room.metadata == null) return;
+
+    if (event == null) return;
 
     await _sendCommand("mark_read", {
       "room_id": room.metadata!.id,

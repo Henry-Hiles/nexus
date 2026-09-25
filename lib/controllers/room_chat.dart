@@ -70,6 +70,7 @@ class RoomChatController(final String roomId)
     if (state.isLoading) return;
 
     state = .loading();
+
     final timelineKeys = ref
         .read(RoomsController.provider.select((value) => value[roomId]))
         ?.timeline
