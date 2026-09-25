@@ -70,11 +70,6 @@ final class const RoomChat({
       controllerData: controllerData,
       id: (event) => event.eventId,
       loadOlder: notifier.loadOlder,
-      shouldLoadOlder: () => ref.read(
-        RoomsController.provider.select(
-          (rooms) => rooms[roomId]?.hasMore ?? false,
-        ),
-      ),
       onReachedBottom: () async {
         final room = ref.read(
           RoomsController.provider.select((rooms) => rooms[roomId]),
@@ -149,11 +144,7 @@ final class const RoomChat({
                       child: Padding(
                         padding: .symmetric(horizontal: 4),
                         child: ChatTimeline(
-                          controllerData: controllerData,
-                          scrollController: scroll.scrollController,
-                          listController: scroll.listController,
-                          hasMore: scroll.hasMore,
-                          loadOlder: scroll.loadOlder,
+                          scroll: scroll,
                           jumpToId: jumpToId,
                           getEventOptions: getEventOptions,
                           highlightedEvent: highlightedEvent.value,

@@ -29,14 +29,7 @@ class RoomChatController(final String roomId)
 
     if (!room.hasFetchedState) {
       final state = await client.getRoomState(.new(roomId: roomId));
-
       await ref.read(RoomsController.provider.notifier).addState(roomId, state);
-    }
-
-    // While there are under 20 events, try to load more
-    // until there's no more or the conditions are met.
-    if (room.hasMore && room.timeline.length < 20) {
-      loadOlder();
     }
 
     return room.timeline
