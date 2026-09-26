@@ -126,6 +126,7 @@ class NotificationController
         body: body,
         icon: icon == null ? null : XdgNotificationIconFile(icon.path),
         defaultAction: "app.event",
+        priority: .urgent,
         defaultActionTarget: payload,
       );
     } else {
