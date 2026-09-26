@@ -9,7 +9,7 @@ import "package:nexus/controllers/client_id.dart";
 import "package:nexus/helpers/launch_helper.dart";
 import "package:nexus/main.dart";
 import "package:nexus/models/homeserver.dart";
-import "package:nexus/pages/settings.dart";
+import "package:nexus/widgets/pages/settings.dart";
 import "package:nexus/widgets/appbar.dart";
 import "package:nexus/widgets/divider_text.dart";
 

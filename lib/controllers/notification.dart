@@ -7,7 +7,7 @@ import "package:nexus/controllers/portal.dart";
 import "package:nexus/main.dart";
 import "package:flutter_local_notifications/flutter_local_notifications.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
-import "package:nexus/pages/notifications.dart";
+import "package:nexus/widgets/pages/notifications.dart";
 import "package:xdg_desktop_portal/xdg_desktop_portal.dart";
 
 class NotificationController

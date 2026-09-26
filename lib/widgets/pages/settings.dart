@@ -8,7 +8,7 @@ import "package:navigation_rail_m3e/navigation_rail_m3e.dart";
 import "package:nexus/controllers/settings_sections.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
 import "package:nexus/helpers/extensions/show_about_dialog.dart";
-import "package:nexus/pages/settings_category.dart";
+import "package:nexus/widgets/pages/settings_category.dart";
 import "package:nexus/widgets/divider_text.dart";
 import "package:nexus/widgets/highlight_wrapper.dart";
 import "package:super_sliver_list/super_sliver_list.dart";
