@@ -24,13 +24,15 @@ final class const RoomChat({
   required final String? roomId,
   required final bool isDesktop,
   required final bool showMembersByDefault,
+  final String? initialHighlightedEvent,
   super.key,
 }) extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final relatedEvent = useState<Event?>(null);
     final relationType = useState(RelationType.reply);
-    final highlightedEvent = useState<String?>(null);
+    final contextualEvent = useState<String?>(initialHighlightedEvent);
+    final highlightedEvent = useState<String?>(initialHighlightedEvent);
 
     final composerSize = useState<double>(64);
 
@@ -59,7 +61,10 @@ final class const RoomChat({
 
     final roomId = this.roomId!;
 
-    final controllerProvider = RoomChatController.provider(roomId);
+    final controllerProvider = RoomChatController.provider((
+      roomId,
+      contextualEvent.value,
+    ));
     final notifier = ref.watch(controllerProvider.notifier);
 
     final client = ref.read(ClientController.provider.notifier);
@@ -68,9 +73,9 @@ final class const RoomChat({
 
     final scroll = ChatScroll.use(
       controllerData: controllerData,
-      id: (event) => event.eventId,
-      loadOlder: notifier.loadOlder,
-      onReachedBottom: () async {
+      paginate: notifier.paginate,
+      contextualEvent: contextualEvent,
+      markRead: () async {
         final room = ref.read(
           RoomsController.provider.select((rooms) => rooms[roomId]),
         );
@@ -150,6 +155,21 @@ final class const RoomChat({
                           getEventOptions: getEventOptions,
                           highlightedEvent: highlightedEvent.value,
                           composerHeight: composerSize.value,
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      right: 16,
+                      bottom: composerSize.value,
+                      child: IgnorePointer(
+                        ignoring: scroll.atBottom,
+                        child: AnimatedOpacity(
+                          opacity: scroll.atBottom ? 0 : 1,
+                          duration: const Duration(milliseconds: 200),
+                          child: FloatingActionButton.small(
+                            onPressed: scroll.jumpToBottom,
+                            child: const Icon(Icons.keyboard_arrow_down),
+                          ),
                         ),
                       ),
                     ),

@@ -12,13 +12,16 @@ import "package:nexus/helpers/extensions/gomuks_buffer.dart";
 import "package:nexus/models/capabilities.dart";
 import "package:nexus/models/content/message.dart";
 import "package:nexus/models/event.dart";
+import "package:nexus/models/event_context.dart";
 import "package:nexus/models/gomuks_config.dart";
 import "package:nexus/models/oauth_auth_code_response.dart";
 import "package:nexus/models/open_graph_data.dart";
 import "package:nexus/models/paginate.dart";
+import "package:nexus/models/paginate_manual.dart";
 import "package:nexus/models/requests/deregister_pusher.dart";
 import "package:nexus/models/requests/download_media.dart";
 import "package:nexus/models/requests/get_event.dart";
+import "package:nexus/models/requests/get_event_context.dart";
 import "package:nexus/models/requests/get_mentions.dart";
 import "package:nexus/models/requests/get_related_events.dart";
 import "package:nexus/models/requests/get_room_state.dart";
@@ -28,6 +31,7 @@ import "package:nexus/models/requests/oauth/exchange_token.dart";
 import "package:nexus/models/requests/oauth/get_auth_url.dart";
 import "package:nexus/models/requests/oauth/register_client.dart";
 import "package:nexus/models/requests/paginate.dart";
+import "package:nexus/models/requests/paginate_manual.dart";
 import "package:nexus/models/requests/redact_event.dart";
 import "package:nexus/models/requests/register_pusher.dart";
 import "package:nexus/models/requests/report.dart";
@@ -226,6 +230,12 @@ class ClientController extends AsyncNotifier<int> {
 
   Future<Paginate> paginate(PaginateRequest request) async =>
       .fromJson(await _sendCommand("paginate", request.toJson()));
+
+  Future<PaginateManual> paginateManual(PaginateManualRequest request) async =>
+      .fromJson(await _sendCommand("paginate_manual", request.toJson()));
+
+  Future<EventContext> getEventContext(GetEventContextRequest request) async =>
+      .fromJson(await _sendCommand("get_event_context", request.toJson()));
 
   Future<ProfileResponse> getProfile(String userId) async {
     try {

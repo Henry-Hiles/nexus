@@ -8,7 +8,7 @@ import "package:nexus/widgets/highlight_wrapper.dart";
 import "package:super_sliver_list/super_sliver_list.dart";
 
 class const ChatTimeline({
-  required final ChatScroll<Event> scroll,
+  required final ChatScroll scroll,
   required final Future<void> Function(String) jumpToId,
   required final IList<PopupMenuEntry> Function(Event) getEventOptions,
   required final String? highlightedEvent,
@@ -28,6 +28,7 @@ class const ChatTimeline({
     required Future<void> Function(String) jumpToId,
     required IList<PopupMenuEntry> Function(Event) getEventOptions,
     required String? highlightedEvent,
+    required Key key,
   }) => HighlightWrapper(
     EventRenderer(
       event,
@@ -35,7 +36,7 @@ class const ChatTimeline({
       getEventOptions: getEventOptions,
       isGrouped: isGrouped(event, previousEvent),
     ),
-    key: ValueKey(event.eventId),
+    key: key,
     isHighlighted: highlightedEvent == event.eventId,
   );
 
@@ -59,6 +60,9 @@ class const ChatTimeline({
           jumpToId: jumpToId,
           getEventOptions: getEventOptions,
           highlightedEvent: highlightedEvent,
+          key: index == 0
+              ? scroll.anchorItemKey
+              : ValueKey(scroll.liveItems[index].eventId),
         ),
       ),
 
@@ -72,6 +76,7 @@ class const ChatTimeline({
           jumpToId: jumpToId,
           getEventOptions: getEventOptions,
           highlightedEvent: highlightedEvent,
+          key: ValueKey(scroll.historyItems[index].eventId),
         ),
       ),
     ],

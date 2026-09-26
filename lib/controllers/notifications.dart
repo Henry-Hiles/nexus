@@ -7,8 +7,6 @@ typedef NotificationsRequest = (UnreadType? unreadType, String? roomId);
 
 class NotificationsController([final NotificationsRequest? request])
     extends AsyncNotifier<IList<Event>> {
-  static const limit = 20;
-
   @override
   Future<IList<Event>> build() async {
     final client = ref.read(ClientController.provider.notifier);
@@ -19,7 +17,6 @@ class NotificationsController([final NotificationsRequest? request])
       .new(
         maxTimestamp: .now(),
         unreadType: unreadType ?? .highlight,
-        limit: limit,
         roomId: roomId,
       ),
     );
@@ -39,7 +36,6 @@ class NotificationsController([final NotificationsRequest? request])
         .new(
           maxTimestamp: lastTs,
           unreadType: unreadType ?? .highlight,
-          limit: limit,
           roomId: roomId,
         ),
       );

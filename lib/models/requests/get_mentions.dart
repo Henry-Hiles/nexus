@@ -9,7 +9,7 @@ part "get_mentions.g.dart";
 class GetMentionsRequest({
   @EpochDateTimeConverter() required final DateTime maxTimestamp,
   @JsonKey(name: "type") required final UnreadType unreadType,
-  required final int limit,
+  final int limit = 20,
   final String? roomId,
 }) with _$GetMentionsRequest {
   Map<String, Object?> toJson() => _$GetMentionsRequestToJson(this);

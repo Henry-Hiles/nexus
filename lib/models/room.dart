@@ -12,17 +12,26 @@ part "room.g.dart";
 class const Room({
   @JsonKey(name: "meta") final RoomMetadata? metadata,
 
+  /// [timeline] is an IMap of timelineRowId to eventRowId
   @JsonKey(fromJson: Room.timelineTupleJsonToIMap)
   final IMap<int, int?> timeline = const IMap.empty(),
 
+  /// [clientSticky] is an ISet of eventRowId
+  @JsonKey(includeFromJson: false, includeToJson: false)
   final ISet<int> clientSticky = const ISet.empty(),
 
+  /// [events] is an IMap of eventRowId to event
   @JsonKey(fromJson: Room.eventsJsonToIMap)
   final IMap<int, Event> events = const IMap.empty(),
 
   final bool reset = false,
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
   final bool hasFetchedState = false,
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
   final bool hasFetchedMembers = false,
+
   final IMap<String, IMap<String, int>> state = const IMap.empty(),
 
   final IMap<String, IList<ReadReceipt>> receipts = const IMap.empty(),
@@ -32,9 +41,6 @@ class const Room({
   // IMap<String, AccountData> accountData,
   // IList<Notification> notifications,
 }) with _$Room {
-  /// [timeline] is an IMap of timelineRowId to eventRowId
-  /// [events] is an IMap of eventRowId to event
-  /// [clientSticky] is an ISet of eventRowId
   static IMap<int, int?> timelineTupleJsonToIMap(List<dynamic> json) =>
       IMap.fromEntries(
         json.map(
