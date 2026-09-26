@@ -66,11 +66,13 @@ final class const PinnedEventsDrawer(
                 },
                 child: Padding(
                   padding: .symmetric(vertical: 4),
-                  child: EventRenderer(
-                    event,
-                    maxLines: 2,
-                    isGrouped: false,
-                    getEventOptions: getEventOptions,
+                  child: IgnorePointer(
+                    child: EventRenderer(
+                      event,
+                      maxLines: 2,
+                      isGrouped: false,
+                      getEventOptions: getEventOptions,
+                    ),
                   ),
                 ),
               );
