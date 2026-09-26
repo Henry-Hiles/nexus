@@ -12,11 +12,11 @@ final class ChatScroll({
   required final IList<Event> historyItems,
   required final IList<Event> liveItems,
   required final GlobalKey centerKey,
-  required final GlobalKey anchorItemKey,
   required final ScrollController scrollController,
   required final bool atBottom,
   required final Future<void> Function(String id) jumpToId,
   required final Future<void> Function() jumpToBottom,
+  required final GlobalKey Function(String eventId) keyFor,
 }) {
   factory use({
     required AsyncValue<RoomChat?> controllerData,
@@ -26,7 +26,9 @@ final class ChatScroll({
   }) {
     final anchorId = useState<String?>(null);
 
-    final anchorItemKey = useMemoized(GlobalKey.new, [anchorId.value]);
+    final itemKeys = useMemoized(() => <String, GlobalKey>{}, []);
+    GlobalKey keyFor(String eventId) =>
+        itemKeys.putIfAbsent(eventId, GlobalKey.new);
 
     final scrollController = useScrollController();
     final centerKey = useMemoized(GlobalKey.new);
@@ -83,7 +85,7 @@ final class ChatScroll({
       if (completer == null) return null;
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        final context = anchorItemKey.currentContext;
+        final context = keyFor(anchorId.value!).currentContext;
         if (context != null && context.mounted) {
           anchorMountedCompleter.value?.complete(context);
           anchorMountedCompleter.value = null;
@@ -151,62 +153,58 @@ final class ChatScroll({
       ],
     );
 
-    Future<void> jumpToId(String itemId) async {
-      if (!scrollController.hasClients) return;
-
-      if (anchorId.value != itemId) {
-        final completer = Completer<BuildContext>();
-        anchorMountedCompleter.value = completer;
-        pendingAnchorTarget.value = itemId;
-        contextualEvent.value = itemId;
-
-        final context = await completer.future;
-        if (!context.mounted) return;
-
-        await Scrollable.ensureVisible(
-          context,
-          alignment: 0.5,
-          duration: const .new(milliseconds: 700),
-          curve: Curves.easeInOut,
-        );
-        return;
-      }
-
-      final context = anchorItemKey.currentContext;
-      if (context != null && context.mounted) {
-        await Scrollable.ensureVisible(
-          context,
-          alignment: 0.5,
-          duration: const .new(milliseconds: 700),
-          curve: Curves.easeInOut,
-        );
-      }
-    }
-
-    Future<void> jumpToBottom() async {
-      if (contextualEvent.value != null) {
-        anchorId.value = null;
-        contextualEvent.value = null;
-      }
-
-      if (!scrollController.hasClients) return;
-
-      await scrollController.animateTo(
-        scrollController.position.minScrollExtent,
-        duration: const .new(milliseconds: 700),
-        curve: Curves.easeInOut,
-      );
-    }
-
     return .new(
       historyItems: split.history,
       liveItems: split.live,
       centerKey: centerKey,
-      anchorItemKey: anchorItemKey,
       scrollController: scrollController,
       atBottom: atBottom.value,
-      jumpToId: jumpToId,
-      jumpToBottom: jumpToBottom,
+      jumpToId: (String itemId) async {
+        if (!scrollController.hasClients) return;
+
+        final existing = keyFor(itemId).currentContext;
+        if (existing != null && existing.mounted) {
+          // Already mounted, just scroll
+          await Scrollable.ensureVisible(
+            existing,
+            alignment: 0.5,
+            duration: const .new(milliseconds: 700),
+            curve: Curves.easeInOut,
+          );
+        } else {
+          final completer = Completer<BuildContext>();
+          anchorMountedCompleter.value = completer;
+          pendingAnchorTarget.value = itemId;
+          contextualEvent.value = itemId;
+
+          final context = await completer.future;
+          if (!context.mounted) return;
+
+          await Scrollable.ensureVisible(context, alignment: 10);
+          if (!context.mounted) return;
+          await Scrollable.ensureVisible(
+            context,
+            alignment: 0.5,
+            duration: const .new(milliseconds: 700),
+            curve: Curves.easeOutCirc,
+          );
+        }
+      },
+      jumpToBottom: () async {
+        if (contextualEvent.value != null) {
+          anchorId.value = null;
+          contextualEvent.value = null;
+        }
+
+        if (!scrollController.hasClients) return;
+
+        await scrollController.animateTo(
+          scrollController.position.minScrollExtent,
+          duration: const .new(milliseconds: 700),
+          curve: Curves.easeInOut,
+        );
+      },
+      keyFor: keyFor,
     );
   }
 }

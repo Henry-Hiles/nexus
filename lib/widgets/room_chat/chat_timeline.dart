@@ -59,9 +59,7 @@ class const ChatTimeline({
           jumpToId: jumpToId,
           getEventOptions: getEventOptions,
           highlightedEvent: highlightedEvent,
-          key: index == 0
-              ? scroll.anchorItemKey
-              : ValueKey(scroll.liveItems[index].eventId),
+          key: scroll.keyFor(scroll.liveItems[index].eventId),
         ),
       ),
 
@@ -74,7 +72,7 @@ class const ChatTimeline({
           jumpToId: jumpToId,
           getEventOptions: getEventOptions,
           highlightedEvent: highlightedEvent,
-          key: ValueKey(scroll.historyItems[index].eventId),
+          key: scroll.keyFor(scroll.historyItems[index].eventId),
         ),
       ),
     ],
