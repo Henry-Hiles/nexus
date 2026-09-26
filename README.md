@@ -68,9 +68,7 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
         - [x] URL Previews
         - [x] Replies
             - [x] Viewing
-            - [ ] Jump to original message
-                - [x] In loaded timeline
-                - [ ] Out of loaded timeline
+            - [x] Jump to original message
         - [x] Edits
         - [x] Attachments
             - [x] Unencrypted
