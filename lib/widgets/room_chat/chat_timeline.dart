@@ -50,7 +50,6 @@ class const ChatTimeline({
       SliverToBoxAdapter(child: SizedBox(height: composerHeight)),
 
       SuperSliverList.builder(
-        listController: scroll.liveListController,
         itemCount: scroll.liveItems.length,
         itemBuilder: (_, index) => eventRow(
           scroll.liveItems[index],
@@ -68,7 +67,6 @@ class const ChatTimeline({
 
       SuperSliverList.builder(
         key: scroll.centerKey,
-        listController: scroll.historyListController,
         itemCount: scroll.historyItems.length,
         itemBuilder: (_, index) => eventRow(
           scroll.historyItems[index],

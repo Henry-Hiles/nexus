@@ -7,15 +7,12 @@ import "package:material_ui/material_ui.dart";
 import "package:nexus/models/direction.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/models/room_chat.dart";
-import "package:super_sliver_list/super_sliver_list.dart";
 
 final class ChatScroll({
   required final IList<Event> historyItems,
   required final IList<Event> liveItems,
   required final GlobalKey centerKey,
   required final GlobalKey anchorItemKey,
-  required final ListController historyListController,
-  required final ListController liveListController,
   required final ScrollController scrollController,
   required final bool atBottom,
   required final Future<void> Function(String id) jumpToId,
@@ -31,8 +28,6 @@ final class ChatScroll({
 
     final anchorItemKey = useMemoized(GlobalKey.new, [anchorId.value]);
 
-    final historyListController = useMemoized(ListController.new);
-    final liveListController = useMemoized(ListController.new);
     final scrollController = useScrollController();
     final centerKey = useMemoized(GlobalKey.new);
 
@@ -156,47 +151,29 @@ final class ChatScroll({
       ],
     );
 
-    double? resolveOffset(String itemId) {
-      final historyIndex = split.history.indexWhere(
-        (item) => item.eventId == itemId,
-      );
-      if (historyIndex != -1) {
-        // TODO: Replace SuperSliverView because of the bug that requires this: #94
-        // ignore: invalid_use_of_visible_for_testing_member
-        return historyListController.getOffsetToReveal(historyIndex, 0.5);
-      }
-
-      final liveIndex = split.live.indexWhere((item) => item.eventId == itemId);
-      if (liveIndex != -1) {
-        // ignore: invalid_use_of_visible_for_testing_member
-        return liveListController.getOffsetToReveal(liveIndex, 0.5);
-      }
-
-      return null;
-    }
-
     Future<void> jumpToId(String itemId) async {
       if (!scrollController.hasClients) return;
 
-      final offset = resolveOffset(itemId);
+      if (anchorId.value != itemId) {
+        final completer = Completer<BuildContext>();
+        anchorMountedCompleter.value = completer;
+        pendingAnchorTarget.value = itemId;
+        contextualEvent.value = itemId;
 
-      if (offset != null) {
-        await scrollController.animateTo(
-          offset,
+        final context = await completer.future;
+        if (!context.mounted) return;
+
+        await Scrollable.ensureVisible(
+          context,
+          alignment: 0.5,
           duration: const .new(milliseconds: 700),
           curve: Curves.easeInOut,
         );
         return;
       }
 
-      final completer = Completer<BuildContext>();
-      anchorMountedCompleter.value = completer;
-      pendingAnchorTarget.value = itemId;
-      contextualEvent.value = itemId;
-
-      final context = await completer.future;
-
-      if (context.mounted) {
+      final context = anchorItemKey.currentContext;
+      if (context != null && context.mounted) {
         await Scrollable.ensureVisible(
           context,
           alignment: 0.5,
@@ -226,8 +203,6 @@ final class ChatScroll({
       liveItems: split.live,
       centerKey: centerKey,
       anchorItemKey: anchorItemKey,
-      historyListController: historyListController,
-      liveListController: liveListController,
       scrollController: scrollController,
       atBottom: atBottom.value,
       jumpToId: jumpToId,
