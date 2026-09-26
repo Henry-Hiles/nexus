@@ -68,6 +68,14 @@ final class ChatScroll({
       if (found || controllerData is AsyncError) {
         if (found) {
           anchorId.value = target;
+
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            final context = keyFor(target).currentContext;
+            if (context != null && context.mounted) {
+              anchorMountedCompleter.value?.complete(context);
+              anchorMountedCompleter.value = null;
+            }
+          });
         } else {
           anchorMountedCompleter.value?.completeError(
             StateError("Failed to load context for $target"),
@@ -79,21 +87,6 @@ final class ChatScroll({
 
       return null;
     }, [controllerData, pendingAnchorTarget.value]);
-
-    useEffect(() {
-      final completer = anchorMountedCompleter.value;
-      if (completer == null) return null;
-
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        final context = keyFor(anchorId.value!).currentContext;
-        if (context != null && context.mounted) {
-          anchorMountedCompleter.value?.complete(context);
-          anchorMountedCompleter.value = null;
-        }
-      });
-
-      return null;
-    }, [anchorId.value]);
 
     final ({IList<Event> history, IList<Event> live}) split = useMemoized(() {
       final items = controllerData.value?.timeline;

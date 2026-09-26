@@ -16,8 +16,11 @@ import "package:nexus/widgets/room_menu.dart";
 // Needed for navigation_rail_m3e (#65).
 import "package:flutter/material.dart" as old_mat;
 
-class const Sidebar({required final bool isDesktop, super.key})
-    extends HookConsumerWidget {
+class const Sidebar({
+  required final bool isDesktop,
+  required final void Function(String eventId) jumpToEvent,
+  super.key,
+}) extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedSpaceProvider = KeyController.provider(
@@ -194,7 +197,8 @@ class const Sidebar({required final bool isDesktop, super.key})
                             tooltip: "Open notifications",
                             onPressed: () => Navigator.of(context).push(
                               MaterialPageRoute(
-                                builder: (_) => NotificationsPage(),
+                                builder: (_) =>
+                                    NotificationsPage(jumpToEvent: jumpToEvent),
                               ),
                             ),
                             icon: Icon(Icons.notifications),

@@ -32,7 +32,7 @@ final class const RoomChat({
     final relatedEvent = useState<Event?>(null);
     final relationType = useState(RelationType.reply);
     final contextualEvent = useState<String?>(initialHighlightedEvent);
-    final highlightedEvent = useState<String?>(initialHighlightedEvent);
+    final highlightedEvent = useState<String?>(null);
 
     final composerSize = useState<double>(64);
 
@@ -105,6 +105,24 @@ final class const RoomChat({
         if (highlightedEvent.value == eventId) highlightedEvent.value = null;
       });
     }
+
+    useEffect(() {
+      if (initialHighlightedEvent == null) return null;
+
+      void check() {
+        if (!context.mounted) return;
+
+        if (scroll.scrollController.hasClients) {
+          jumpToId(initialHighlightedEvent!);
+        } else {
+          WidgetsBinding.instance.addPostFrameCallback((_) => check());
+        }
+      }
+
+      check();
+
+      return null;
+    }, [initialHighlightedEvent]);
 
     IList<PopupMenuEntry> getEventOptions(Event event) =>
         event.buildEventOptions(
