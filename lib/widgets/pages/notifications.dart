@@ -5,6 +5,7 @@ import "package:m3e_buttons/m3e_buttons.dart";
 import "package:material_ui/material_ui.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
+import "package:nexus/controllers/jump_to_event.dart";
 import "package:nexus/controllers/key.dart";
 import "package:nexus/controllers/notifications.dart";
 import "package:nexus/controllers/spaces.dart";
@@ -19,7 +20,6 @@ import "package:super_sliver_list/super_sliver_list.dart";
 class const NotificationsPage({
   final String? highlightedEventId,
   final bool defaultToAllNotifications = false,
-  required final void Function(String eventId) jumpToEvent,
   super.key,
 }) extends HookConsumerWidget {
   @override
@@ -166,7 +166,13 @@ class const NotificationsPage({
                                             ).notifier,
                                           )
                                           .set(event.roomId);
-                                      jumpToEvent(event.eventId);
+                                      ref
+                                          .read(
+                                            JumpToEventController
+                                                .provider
+                                                .notifier,
+                                          )
+                                          .set(event.eventId);
 
                                       Navigator.of(context).pop();
                                     },

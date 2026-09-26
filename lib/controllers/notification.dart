@@ -37,7 +37,6 @@ class NotificationController
                 MaterialPageRoute(
                   builder: (_) => NotificationsPage(
                     highlightedEventId: eventId,
-                    jumpToEvent: (eventId) {},
                     defaultToAllNotifications: true,
                   ),
                 ),
@@ -63,7 +62,6 @@ class NotificationController
             MaterialPageRoute(
               builder: (_) => NotificationsPage(
                 highlightedEventId: eventId,
-                jumpToEvent: (eventId) {},
                 defaultToAllNotifications: true,
               ),
             ),
