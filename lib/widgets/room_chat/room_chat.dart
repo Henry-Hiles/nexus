@@ -100,11 +100,10 @@ final class const RoomChat({
     Future<void> jumpToId(String eventId) async {
       highlightedEvent.value = eventId;
 
-      final jump = scroll.jumpToId(eventId);
-      await Future.delayed(.new(seconds: 1), () {
+      await scroll.jumpToId(eventId);
+      await Future.delayed(.new(milliseconds: 700), () {
         if (highlightedEvent.value == eventId) highlightedEvent.value = null;
       });
-      await jump;
     }
 
     IList<PopupMenuEntry> getEventOptions(Event event) =>
