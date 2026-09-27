@@ -192,11 +192,13 @@ class const Sidebar({required final bool isDesktop, super.key})
                           ),
                           IconButton(
                             tooltip: "Open notifications",
-                            onPressed: () => Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) => NotificationsPage(),
+                            onPressed: () => Navigator.of(context)
+                              ..pop()
+                              ..push(
+                                MaterialPageRoute(
+                                  builder: (_) => NotificationsPage(),
+                                ),
                               ),
-                            ),
                             icon: Icon(Icons.notifications),
                           ),
                           IconButton(
