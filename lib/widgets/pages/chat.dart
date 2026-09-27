@@ -30,7 +30,7 @@ class const ChatPage({super.key}) extends HookConsumerWidget {
                       child: Consumer(
                         builder: (context, ref, _) {
                           final initialHighlight = ref.watch(
-                            JumpToEventController.provider,
+                            JumpToEventController.provider(roomId),
                           );
                           return RoomChat(
                             key: ValueKey((roomId, initialHighlight)),

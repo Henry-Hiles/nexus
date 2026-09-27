@@ -130,7 +130,7 @@ class const NotificationsPage({
                                 padding: .only(top: 8),
                                 child: HighlightWrapper(
                                   InkWell(
-                                    onTap: () {
+                                    onTap: () async {
                                       final spaces = ref.read(
                                         SpacesController.provider,
                                       );
@@ -152,14 +152,14 @@ class const NotificationsPage({
                                       );
                                       if (space == null) return;
 
-                                      ref
+                                      await ref
                                           .read(
                                             KeyController.provider(
                                               KeyController.spaceKey,
                                             ).notifier,
                                           )
                                           .set(space.id);
-                                      ref
+                                      await ref
                                           .read(
                                             KeyController.provider(
                                               KeyController.roomKey,
@@ -167,14 +167,16 @@ class const NotificationsPage({
                                           )
                                           .set(event.roomId);
                                       ref
-                                          .read(
-                                            JumpToEventController
-                                                .provider
-                                                .notifier,
+                                          .watch(
+                                            JumpToEventController.provider(
+                                              event.roomId,
+                                            ).notifier,
                                           )
                                           .set(event.eventId);
 
-                                      Navigator.of(context).pop();
+                                      if (context.mounted) {
+                                        Navigator.of(context).pop();
+                                      }
                                     },
                                     child: IgnorePointer(
                                       child: EventRenderer(event),
