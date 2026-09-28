@@ -9,33 +9,33 @@ import "package:nexus/models/event.dart";
 import "package:nexus/models/room_chat.dart";
 
 final class ChatScroll({
-  required final IList<Event> historyItems,
-  required final IList<Event> liveItems,
+  required final IList<int> historyRows,
+  required final IList<int> liveRows,
   required final GlobalKey centerKey,
   required final ScrollController scrollController,
   required final bool atBottom,
-  required final Future<void> Function(String id) jumpToId,
+  required final Future<void> Function(Event event) jumpToEvent,
   required final Future<void> Function() jumpToBottom,
-  required final GlobalKey Function(String eventId) keyFor,
+  required final GlobalKey Function(int eventRowId) keyFor,
 }) {
   factory use({
     required AsyncValue<RoomChat?> controllerData,
     required Future<void> Function(Direction direction) paginate,
     required Future<void> Function() markRead,
-    required ValueNotifier<String?> contextualEvent,
+    required ValueNotifier<Event?> contextualEvent,
   }) {
-    final anchorId = useState<String?>(null);
+    final anchorId = useState<int?>(null);
 
-    final itemKeys = useMemoized(() => <String, GlobalKey>{}, []);
-    GlobalKey keyFor(String eventId) =>
-        itemKeys.putIfAbsent(eventId, GlobalKey.new);
+    final itemKeys = useMemoized(() => <int, GlobalKey>{}, []);
+    GlobalKey keyFor(int eventRowId) =>
+        itemKeys.putIfAbsent(eventRowId, GlobalKey.new);
 
     final scrollController = useScrollController();
     final centerKey = useMemoized(GlobalKey.new);
 
     final atBottom = useState(true);
 
-    final pendingAnchorTarget = useState<String?>(null);
+    final pendingAnchorTarget = useState<int?>(null);
     final anchorMountedCompleter = useRef<Completer<BuildContext>?>(null);
 
     useEffect(() {
@@ -43,12 +43,12 @@ final class ChatScroll({
         if (controllerData case AsyncData(:final value?)
             when value.timeline.isNotEmpty) {
           final hasContextualEvent = value.timeline.any(
-            (event) => event.eventId == contextualEvent.value,
+            (event) => event == contextualEvent.value?.rowId,
           );
 
           anchorId.value = hasContextualEvent
-              ? contextualEvent.value
-              : value.timeline.last.eventId;
+              ? contextualEvent.value?.rowId
+              : value.timeline.last;
         }
       }
 
@@ -60,9 +60,7 @@ final class ChatScroll({
       if (target == null) return null;
 
       final found =
-          controllerData.value?.timeline.any(
-            (event) => event.eventId == target,
-          ) ??
+          controllerData.value?.timeline.any((event) => event == target) ??
           false;
 
       if (found || controllerData is AsyncError) {
@@ -88,7 +86,7 @@ final class ChatScroll({
       return null;
     }, [controllerData, pendingAnchorTarget.value]);
 
-    final ({IList<Event> history, IList<Event> live}) split = useMemoized(() {
+    final ({IList<int> history, IList<int> live}) split = useMemoized(() {
       final items = controllerData.value?.timeline;
       final anchor = anchorId.value;
 
@@ -96,7 +94,7 @@ final class ChatScroll({
         return (history: const .empty(), live: const .empty());
       }
 
-      final anchorIndex = items.indexWhere((item) => item.eventId == anchor);
+      final anchorIndex = items.indexOf(anchor);
 
       if (anchorIndex == -1) {
         return (history: const .empty(), live: items);
@@ -155,15 +153,15 @@ final class ChatScroll({
     );
 
     return .new(
-      historyItems: split.history,
-      liveItems: split.live,
+      historyRows: split.history,
+      liveRows: split.live,
       centerKey: centerKey,
       scrollController: scrollController,
       atBottom: atBottom.value,
-      jumpToId: (String itemId) async {
+      jumpToEvent: (Event event) async {
         if (!scrollController.hasClients) return;
 
-        final existing = keyFor(itemId).currentContext;
+        final existing = keyFor(event.rowId).currentContext;
         if (existing != null && existing.mounted) {
           // Already mounted, just scroll
           await Scrollable.ensureVisible(
@@ -175,8 +173,8 @@ final class ChatScroll({
         } else {
           final completer = Completer<BuildContext>();
           anchorMountedCompleter.value = completer;
-          pendingAnchorTarget.value = itemId;
-          contextualEvent.value = itemId;
+          pendingAnchorTarget.value = event.rowId;
+          contextualEvent.value = event;
 
           final context = await completer.future;
           if (!context.mounted) return;

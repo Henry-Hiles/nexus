@@ -3,6 +3,8 @@ import "package:flutter/gestures.dart";
 import "package:material_ui/material_ui.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
+import "package:nexus/controllers/event.dart";
+import "package:nexus/controllers/rooms.dart";
 import "package:nexus/helpers/extensions/show_context_menu.dart";
 import "package:nexus/models/content/avatar.dart";
 import "package:nexus/models/content/canonical_alias.dart";
@@ -28,11 +30,12 @@ import "package:nexus/widgets/renderers/generic_event.dart";
 import "package:nexus/widgets/timestamp.dart";
 
 class const EventRenderer(
-  final Event event, {
+  final int eventRowId, {
+  required final String roomId,
+  final int? previousEventRowId,
   final bool textOnly = false,
-  final bool isGrouped = false,
   final int? maxLines,
-  final VoidCallback? onTapReply,
+  final Future<void> Function(Event event)? jumpToEvent,
   final IList<PopupMenuEntry> Function(Event event)? getEventOptions,
   super.key,
 }) extends HookConsumerWidget {
@@ -43,6 +46,26 @@ class const EventRenderer(
     final errorStyle = TextStyle(color: colorScheme.error);
     final focusNode = useFocusNode();
     useListenable(focusNode);
+
+    final (event, previousEvent) = ref.watch(
+      RoomsController.provider.select(
+        (value) => (
+          value[roomId]?.events[eventRowId],
+          previousEventRowId == null
+              ? null
+              : value[roomId]?.events[previousEventRowId!],
+        ),
+      ),
+    );
+
+    if (event == null) return SizedBox.shrink();
+
+    final isGrouped =
+        previousEvent?.content is MessageContent &&
+        previousEvent?.redactedBy == null &&
+        previousEvent?.relationType != "m.replace" &&
+        event.sender == previousEvent?.sender &&
+        event.pmp?.id == previousEvent?.pmp?.id;
 
     final child = event.redactedBy != null || event.relationType == "m.replace"
         ? null
@@ -60,7 +83,16 @@ class const EventRenderer(
             EncryptedContent() ||
             StickerContent() => MessageRenderer(
               event,
-              onTapReply: onTapReply,
+              onTapReply: jumpToEvent == null
+                  ? null
+                  : () async {
+                      final replyEvent = await ref.read(
+                        EventController.provider(
+                          .new(roomId: roomId, eventId: event.replyTo!),
+                        ).future,
+                      );
+                      if (replyEvent != null) await jumpToEvent!(replyEvent);
+                    },
               isGrouped: isGrouped,
               maxLines: maxLines,
               textOnly: textOnly,

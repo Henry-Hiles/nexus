@@ -24,15 +24,15 @@ final class const RoomChat({
   required final String? roomId,
   required final bool isDesktop,
   required final bool showMembersByDefault,
-  final String? initialHighlightedEvent,
+  final Event? initialHighlightedEvent,
   super.key,
 }) extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final relatedEvent = useState<Event?>(null);
     final relationType = useState(RelationType.reply);
-    final contextualEvent = useState<String?>(initialHighlightedEvent);
-    final highlightedEvent = useState<String?>(null);
+    final contextualEvent = useState<Event?>(initialHighlightedEvent);
+    final highlightedEvent = useState<int?>(null);
 
     final composerSize = useState<double>(64);
 
@@ -63,7 +63,9 @@ final class const RoomChat({
 
     final controllerProvider = RoomChatController.provider((
       roomId,
-      contextualEvent.value,
+      contextualEvent.value == null
+          ? null
+          : (contextualEvent.value!.rowId, contextualEvent.value!.eventId),
     ));
     final notifier = ref.watch(controllerProvider.notifier);
 
@@ -97,12 +99,14 @@ final class const RoomChat({
       },
     );
 
-    Future<void> jumpToId(String eventId) async {
-      highlightedEvent.value = eventId;
+    Future<void> jumpToEvent(Event event) async {
+      highlightedEvent.value = event.rowId;
 
-      await scroll.jumpToId(eventId);
+      await scroll.jumpToEvent(event);
       await Future.delayed(.new(milliseconds: 700), () {
-        if (highlightedEvent.value == eventId) highlightedEvent.value = null;
+        if (highlightedEvent.value == event.rowId) {
+          highlightedEvent.value = null;
+        }
       });
     }
 
@@ -113,7 +117,7 @@ final class const RoomChat({
         if (!context.mounted) return;
 
         if (scroll.scrollController.hasClients) {
-          jumpToId(initialHighlightedEvent!);
+          jumpToEvent(initialHighlightedEvent!);
         } else {
           WidgetsBinding.instance.addPostFrameCallback((_) => check());
         }
@@ -141,7 +145,7 @@ final class const RoomChat({
       endDrawer: PinnedEventsDrawer(
         roomId,
         getEventOptions: getEventOptions,
-        jumpToId: jumpToId,
+        jumpToEvent: jumpToEvent,
       ),
       body: Builder(
         builder: (middleContext) => Scaffold(
@@ -168,7 +172,8 @@ final class const RoomChat({
                         padding: .symmetric(horizontal: 4),
                         child: ChatTimeline(
                           scroll: scroll,
-                          jumpToId: jumpToId,
+                          roomId: roomId,
+                          jumpToEvent: jumpToEvent,
                           getEventOptions: getEventOptions,
                           highlightedEvent: highlightedEvent.value,
                           composerHeight: composerSize.value,

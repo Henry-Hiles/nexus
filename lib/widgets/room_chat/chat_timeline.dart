@@ -1,43 +1,34 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:material_ui/material_ui.dart";
 import "package:nexus/helpers/hooks/chat_scroll.dart";
-import "package:nexus/models/content/message.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/widgets/renderers/event.dart";
 import "package:nexus/widgets/highlight_wrapper.dart";
 import "package:super_sliver_list/super_sliver_list.dart";
 
 class const ChatTimeline({
+  required final String roomId,
   required final ChatScroll scroll,
-  required final Future<void> Function(String) jumpToId,
+  required final Future<void> Function(Event event) jumpToEvent,
   required final IList<PopupMenuEntry> Function(Event) getEventOptions,
-  required final String? highlightedEvent,
+  required final int? highlightedEvent,
   required final double composerHeight,
   super.key,
 }) extends StatelessWidget {
-  bool isGrouped(Event event, Event? previousEvent) =>
-      previousEvent?.content is MessageContent &&
-      previousEvent?.redactedBy == null &&
-      previousEvent?.relationType != "m.replace" &&
-      event.sender == previousEvent?.sender &&
-      event.pmp?.id == previousEvent?.pmp?.id;
-
   Widget eventRow(
-    Event event,
-    Event? previousEvent, {
-    required Future<void> Function(String) jumpToId,
-    required IList<PopupMenuEntry> Function(Event) getEventOptions,
-    required String? highlightedEvent,
+    int eventRowId,
+    int? previousEventRowId, {
     required Key key,
   }) => HighlightWrapper(
     EventRenderer(
-      event,
-      onTapReply: () => jumpToId(event.replyTo!),
+      eventRowId,
+      previousEventRowId: previousEventRowId,
+      roomId: roomId,
+      jumpToEvent: jumpToEvent,
       getEventOptions: getEventOptions,
-      isGrouped: isGrouped(event, previousEvent),
     ),
     key: key,
-    isHighlighted: highlightedEvent == event.eventId,
+    isHighlighted: highlightedEvent == eventRowId,
   );
 
   @override
@@ -50,29 +41,23 @@ class const ChatTimeline({
       SliverToBoxAdapter(child: SizedBox(height: composerHeight)),
 
       SuperSliverList.builder(
-        itemCount: scroll.liveItems.length,
+        itemCount: scroll.liveRows.length,
         itemBuilder: (_, index) => eventRow(
-          scroll.liveItems[index],
+          scroll.liveRows[index],
           index > 0
-              ? scroll.liveItems.getOrNull(index - 1)
-              : scroll.historyItems.firstOrNull,
-          jumpToId: jumpToId,
-          getEventOptions: getEventOptions,
-          highlightedEvent: highlightedEvent,
-          key: scroll.keyFor(scroll.liveItems[index].eventId),
+              ? scroll.liveRows.getOrNull(index - 1)
+              : scroll.historyRows.firstOrNull,
+          key: scroll.keyFor(scroll.liveRows[index]),
         ),
       ),
 
       SuperSliverList.builder(
         key: scroll.centerKey,
-        itemCount: scroll.historyItems.length,
+        itemCount: scroll.historyRows.length,
         itemBuilder: (_, index) => eventRow(
-          scroll.historyItems[index],
-          scroll.historyItems.getOrNull(index + 1),
-          jumpToId: jumpToId,
-          getEventOptions: getEventOptions,
-          highlightedEvent: highlightedEvent,
-          key: scroll.keyFor(scroll.historyItems[index].eventId),
+          scroll.historyRows[index],
+          scroll.historyRows.getOrNull(index + 1),
+          key: scroll.keyFor(scroll.historyRows[index]),
         ),
       ),
     ],

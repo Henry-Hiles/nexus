@@ -5,7 +5,7 @@ import "package:m3e_buttons/m3e_buttons.dart";
 import "package:material_ui/material_ui.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
-import "package:nexus/controllers/jump_to_event.dart";
+import "package:nexus/controllers/contextual_event.dart";
 import "package:nexus/controllers/key.dart";
 import "package:nexus/controllers/notifications.dart";
 import "package:nexus/controllers/spaces.dart";
@@ -168,18 +168,21 @@ class const NotificationsPage({
                                           .set(event.roomId);
                                       ref
                                           .watch(
-                                            JumpToEventController.provider(
+                                            ContextualEventController.provider(
                                               event.roomId,
                                             ).notifier,
                                           )
-                                          .set(event.eventId);
+                                          .set(event);
 
                                       if (context.mounted) {
                                         Navigator.of(context).pop();
                                       }
                                     },
                                     child: IgnorePointer(
-                                      child: EventRenderer(event),
+                                      child: EventRenderer(
+                                        event.rowId,
+                                        roomId: event.roomId,
+                                      ),
                                     ),
                                   ),
                                   isHighlighted: isHighlighted,

@@ -10,7 +10,7 @@ import "package:nexus/widgets/renderers/event.dart";
 final class const PinnedEventsDrawer(
   final String roomId, {
   required final IList<PopupMenuEntry> Function(Event event) getEventOptions,
-  required final Future<void> Function(String eventId) jumpToId,
+  required final Future<void> Function(Event event) jumpToEvent,
   super.key,
 }) extends HookConsumerWidget {
   @override
@@ -62,15 +62,15 @@ final class const PinnedEventsDrawer(
                 borderRadius: .circular(12),
                 onTap: () {
                   Navigator.of(context).pop();
-                  jumpToId(event.eventId);
+                  jumpToEvent(event);
                 },
                 child: Padding(
                   padding: .symmetric(vertical: 4),
                   child: IgnorePointer(
                     child: EventRenderer(
-                      event,
+                      event.rowId,
+                      roomId: roomId,
                       maxLines: 2,
-                      isGrouped: false,
                       getEventOptions: getEventOptions,
                     ),
                   ),

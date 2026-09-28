@@ -18,8 +18,9 @@ import "package:nexus/models/requests/send_message.dart";
 import "package:nexus/models/room.dart";
 import "package:nexus/models/room_chat.dart";
 
-class RoomChatController(final (String roomId, String? contextualEvent) info)
-    extends AsyncNotifier<RoomChat?> {
+class RoomChatController(
+  final (String roomId, (int rowId, String eventId)? contextualEvent) info,
+) extends AsyncNotifier<RoomChat?> {
   @override
   Future<RoomChat?> build() async {
     final (roomId, eventId) = info;
@@ -37,29 +38,15 @@ class RoomChatController(final (String roomId, String? contextualEvent) info)
 
     final timeline = room.timeline
         .toEntryIList(compare: (a, b) => (a?.key ?? 0).compareTo(b?.key ?? 0))
-        .map((element) => element.value)
+        .map((e) => e.value)
         .toIList()
         .addAll(room.clientSticky)
-        .map((entry) {
-          final foundEvent = entry == null ? null : room.events[entry];
-
-          final editedEvent =
-              foundEvent == null || foundEvent.lastEditRowId == 0
-              ? null
-              : room.events[foundEvent.lastEditRowId];
-
-          return editedEvent == null
-              ? foundEvent
-              : foundEvent?.copyWith(
-                  content: editedEvent.content,
-                  localContent: editedEvent.localContent,
-                );
-        })
         .nonNulls
         .toIList();
-
-    if (info.$2 == null || timeline.map((e) => e.eventId).contains(info.$2)) {
-      ref.watch(RoomsController.provider.select((rooms) => rooms[roomId]));
+    if (info.$2 == null || timeline.contains(info.$2!.$1)) {
+      ref.watch(
+        RoomsController.provider.select((rooms) => rooms[roomId]?.timeline),
+      );
 
       return .new(
         timeline: timeline,
@@ -68,10 +55,25 @@ class RoomChatController(final (String roomId, String? contextualEvent) info)
       );
     } else {
       final context = await client.getEventContext(
-        .new(roomId: roomId, eventId: info.$2!),
+        .new(roomId: roomId, eventId: info.$2!.$2),
       );
+
+      final events = context.before.add(context.event).addAll(context.after);
+      ref
+          .read(RoomsController.provider.notifier)
+          .update(
+            .new({
+              roomId: Room(
+                events: IMap.fromIterable(
+                  events,
+                  keyMapper: (event) => event.rowId,
+                ),
+              ),
+            }),
+            .new(),
+          );
       return .new(
-        timeline: context.before.add(context.event).addAll(context.after),
+        timeline: .new(events.map((element) => element.rowId)),
         hasMoreBackward: true,
         hasMoreForward: true,
         historicalData: .new(start: context.start, end: context.end),
@@ -153,11 +155,29 @@ class RoomChatController(final (String roomId, String? contextualEvent) info)
         ),
       );
 
+      ref
+          .read(RoomsController.provider.notifier)
+          .update(
+            .new({
+              info.$1: Room(
+                events: IMap.fromIterable(
+                  paginationResponse.events,
+                  keyMapper: (event) => event.rowId,
+                ),
+              ),
+            }),
+            .new(),
+          );
+
+      final eventRowIds = paginationResponse.events
+          .map((element) => element.rowId)
+          .toIList();
+
       state = .data(
         .new(
           timeline: direction == .forward
-              ? chat.timeline.addAll(paginationResponse.events)
-              : paginationResponse.events.addAll(chat.timeline),
+              ? chat.timeline.addAll(eventRowIds)
+              : eventRowIds.addAll(chat.timeline),
           hasMoreForward:
               direction == .forward && paginationResponse.nextBatch == null
               ? false
@@ -293,7 +313,9 @@ class RoomChatController(final (String roomId, String? contextualEvent) info)
   }
 
   static final provider = AsyncNotifierProvider.family
-      .autoDispose<RoomChatController, RoomChat?, (String, String?)>(
-        RoomChatController.new,
-      );
+      .autoDispose<
+        RoomChatController,
+        RoomChat?,
+        (String, (int rowId, String eventId)?)
+      >(RoomChatController.new);
 }

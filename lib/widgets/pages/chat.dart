@@ -1,7 +1,7 @@
 import "package:material_ui/material_ui.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/init_complete.dart";
-import "package:nexus/controllers/jump_to_event.dart";
+import "package:nexus/controllers/contextual_event.dart";
 import "package:nexus/controllers/key.dart";
 import "package:nexus/widgets/appbar.dart";
 import "package:nexus/widgets/sidebar.dart";
@@ -30,7 +30,7 @@ class const ChatPage({super.key}) extends HookConsumerWidget {
                       child: Consumer(
                         builder: (context, ref, _) {
                           final initialHighlight = ref.watch(
-                            JumpToEventController.provider(roomId),
+                            ContextualEventController.provider(roomId),
                           );
                           return RoomChat(
                             key: ValueKey((roomId, initialHighlight)),

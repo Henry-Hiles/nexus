@@ -8,7 +8,8 @@ part "room_chat.g.dart";
 @Freezed(toJson: false, fromJson: false)
 @JsonSerializable()
 class const RoomChat({
-  required final IList<Event> timeline,
+  /// List of eventRowId
+  required final IList<int> timeline,
   required final bool hasMoreForward,
   required final bool hasMoreBackward,
   final HistoricalData? historicalData,

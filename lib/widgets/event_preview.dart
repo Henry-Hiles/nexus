@@ -24,7 +24,12 @@ class const EventPreview(final Event event, {super.key})
               runSpacing: 2,
               children: [
                 if (event.content is MessageContent) MessageDisplayname(event),
-                EventRenderer(event, textOnly: true, maxLines: 1),
+                EventRenderer(
+                  event.rowId,
+                  roomId: event.roomId,
+                  textOnly: true,
+                  maxLines: 1,
+                ),
               ],
             ),
           ),
