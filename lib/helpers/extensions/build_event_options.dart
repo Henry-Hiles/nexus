@@ -27,7 +27,10 @@ extension BuildEventOptions on Event {
     final theme = Theme.of(context);
     final danger = theme.colorScheme.error;
 
-    final notifier = RoomChatController.provider((roomId, null)).notifier;
+    final notifier = RoomChatController.provider((
+      roomId: roomId,
+      contextualEvent: null,
+    )).notifier;
 
     final isPinned = ref
         .watch(PinnedIdsController.provider(roomId))

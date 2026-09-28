@@ -65,8 +65,8 @@ class const ReactionRow(final Event event, {super.key}) extends ConsumerWidget {
                                 try {
                                   final controller = ref.watch(
                                     RoomChatController.provider((
-                                      event.roomId,
-                                      null,
+                                      roomId: event.roomId,
+                                      contextualEvent: null,
                                     )).notifier,
                                   );
 

@@ -62,10 +62,13 @@ final class const RoomChat({
     final roomId = this.roomId!;
 
     final controllerProvider = RoomChatController.provider((
-      roomId,
-      contextualEvent.value == null
+      roomId: roomId,
+      contextualEvent: contextualEvent.value == null
           ? null
-          : (contextualEvent.value!.rowId, contextualEvent.value!.eventId),
+          : (
+              rowId: contextualEvent.value!.rowId,
+              eventId: contextualEvent.value!.eventId,
+            ),
     ));
     final notifier = ref.watch(controllerProvider.notifier);
 

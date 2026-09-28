@@ -1,6 +1,5 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:freezed_annotation/freezed_annotation.dart";
-import "package:nexus/models/event.dart";
 
 part "room_chat.freezed.dart";
 part "room_chat.g.dart";
