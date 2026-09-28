@@ -129,6 +129,14 @@ final class ChatScroll({
           } else if (position.extentBefore <= readThreshold) {
             await markRead();
           }
+
+          if (controllerData.isLoading == false &&
+              position.extentBefore <= readThreshold &&
+              controllerData.value?.hasMoreForward == false &&
+              contextualEvent.value != null) {
+            anchorId.value = null;
+            contextualEvent.value = null;
+          }
         }
 
         scrollController.addListener(checkPosition);
