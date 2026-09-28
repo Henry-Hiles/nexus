@@ -1,37 +1,94 @@
 name: "Build Flatpaks"
 
 on:
-  push:
-    branches: ["main"]
-    tags: ["*"]
-  workflow_dispatch:
+    push:
+        branches: ["main"]
+        tags: ["*"]
+    workflow_dispatch:
 
 jobs:
-  build-flatpak:
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - arch: x86_64
-            runner: ubuntu-latest
-          - arch: aarch64
-            runner: ubuntu-24.04-arm
-    runs-on: ${{ matrix.runner }}
+    build-flatpak:
+        strategy:
+            fail-fast: false
+            matrix:
+                include:
+                    - arch: x86_64
+                      runner: ubuntu-latest
+                    - arch: aarch64
+                      runner: ubuntu-24.04-arm
+        runs-on: ${{ matrix.runner }}
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v6
 
-      - name: Lix GHA Installer Action
-        uses: samueldr/lix-gha-installer-action@v2026-02-22
-        with:
-          extra_nix_config: experimental-features = nix-command flakes flake-self-attrs
+            - name: Lix GHA Installer Action
+              uses: samueldr/lix-gha-installer-action@v2026-02-22
+              with:
+                  extra_nix_config: experimental-features = nix-command flakes flake-self-attrs
 
-      - name: Build app
-        run: nix build .#flatpak
+            - name: Build app
+              run: nix build .#flatpak
 
-      - name: Upload installer artifact
-        uses: actions/upload-artifact@v6
-        with:
-          name: flatpak-${{ matrix.arch }}
-          path: result/nexus.federated.nexus.flatpak
+            - name: Upload installer artifact
+              uses: actions/upload-artifact@v6
+              with:
+                  name: flatpak-${{ matrix.arch }}
+                  path: result/nexus.federated.nexus.flatpak
+
+    publish:
+        needs: build-flatpak
+        if: github.ref == 'refs/heads/main'
+        runs-on: ubuntu-latest
+        permissions:
+            pages: write
+            id-token: write
+        environment:
+            name: github-pages
+            url: ${{ steps.deployment.outputs.page_url }}
+        steps:
+            - name: Install flatpak tooling
+              run: sudo apt-get update && sudo apt-get install -y flatpak ostree
+
+            - name: Download bundles
+              uses: actions/download-artifact@v7
+              with:
+                  pattern: flatpak-*
+                  path: bundles
+
+            - name: Build OSTree repo
+              run: |
+                  ostree init --repo=repo --mode=archive-z2
+                  for bundle in bundles/*/nexus.federated.nexus.flatpak; do
+                    flatpak build-import-bundle repo "$bundle"
+                  done
+                  flatpak build-update-repo --prune repo
+
+            - name: Assemble site
+              run: |
+                  mkdir site
+                  cp -a repo/. site/
+
+                  cat > site/nexus.flatpakrepo <<EOF
+                  [Flatpak Repo]
+                  Title=Nexus
+                  Url=https://nexus.federated.nexus/flatpak/
+                  EOF
+
+                  cat > site/nexus.flatpakref <<EOF
+                  [Flatpak Ref]
+                  Title=Nexus
+                  Name=nexus.federated.nexus
+                  Url=https://nexus.federated.nexus/flatpak/
+                  SuggestRemoteName=nexus
+                  IsRuntime=false
+                  RuntimeRepo=https://dl.flathub.org/repo/flathub.flatpakrepo
+                  EOF
+
+            - uses: actions/upload-pages-artifact@v4
+              with:
+                  path: site
+
+            - name: Deploy to Pages
+              id: deployment
+              uses: actions/deploy-pages@v4
