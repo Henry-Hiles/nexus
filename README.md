@@ -122,10 +122,45 @@ If you want to try out Nexus, grab one of the following artifacts from CI:
 - [Unsigned iOS IPA](https://nightly.link/Henry-Hiles/nexus/workflows/ios/main/Nexus.ipa.zip)
 - [Unsigned MacOS DMG](https://nightly.link/Henry-Hiles/nexus/workflows/macos/main/nexus.dmg.zip)
 - [Windows EXE](https://nightly.link/Henry-Hiles/nexus/workflows/windows/main/windows-installer.zip)
-- Flatpak
-    - [AArch64/Arm64](https://nightly.link/Henry-Hiles/nexus/workflows/flatpak/main/flatpak-aarch64.zip)
-    - [x86_64/AMD64](https://nightly.link/Henry-Hiles/nexus/workflows/flatpak/main/flatpak-x86_64.zip)
-- [NixOS Module](linux/nix/module.nix)
+
+Or, use one of the below methods:
+
+### Flatpak
+
+Make sure Flatpak is set up on your system, then run:
+
+```bash
+flatpak install --user https://nexus.federated.nexus/flatpak/nexus.flatpakref
+```
+
+This adds the Nexus remote and installs the app for your user only, so no root access is needed (x86_64 and aarch64 are supported). To install system-wide instead, use `--system` in place of `--user`. Updates arrive through your usual flatpak update or software center.
+
+### NixOS Module
+
+Add Nexus as a flake input, following `nixpkgs` for less fetches:
+
+```nix
+nexus = {
+  url = "git+https://git.federated.nexus/Nexus/nexus";
+  inputs.nixpkgs.follows = "nixpkgs";
+};
+```
+
+Then import the module and enable it in your NixOS configuration:
+
+```nix
+{ inputs, ... }:
+{
+  imports = [ inputs.nexus.nixosModules.default ];
+
+  programs.nexus = {
+    enable = true;
+    enableNotifications = true; # optional: push notifications via UnifiedPush
+  };
+}
+```
+
+This installs Nexus system-wide. With `enableNotifications`, it also installs KUnifiedPush and registers its systemd and D-Bus services so notifications work. The `package` option lets you override the package if you need to.
 
 ## Build it yourself
 
