@@ -133,7 +133,7 @@ Make sure Flatpak is set up on your system, then run:
 flatpak install --user https://nexus.federated.nexus/flatpak/nexus.flatpakref
 ```
 
-This adds the Nexus remote and installs the app for your user only, so no root access is needed (x86_64 and aarch64 are supported). To install system-wide instead, use `--system` in place of `--user`. Updates arrive through your usual flatpak update or software center.
+This adds the Nexus remote and installs the app for your user only, so no root access is needed (x86_64 and aarch64 are supported). To install system-wide instead, use `--system` in place of `--user`. Updates arrive through `flatpak update` or your software center.
 
 ### NixOS Module
 
