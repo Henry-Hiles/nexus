@@ -124,9 +124,18 @@ class NotificationController
         id.toString(),
         title: title,
         body: body,
-        icon: icon == null ? null : XdgNotificationIconFile(icon.path),
         defaultAction: "app.event",
         defaultActionTarget: payload,
+        category: XdgNotificationCategory.imReceived,
+        priority: .normal,
+        buttons: [
+          // TODO: Impl when notif daemons actualy support imReplyWithText
+          // .new(
+          //   label: "Reply",
+          //   action: "app.reply",
+          //   purpose: XdgNotificationButtonPurpose.imReplyWithText,
+          // ),
+        ],
       );
     } else {
       final notificationDetails = NotificationDetails(

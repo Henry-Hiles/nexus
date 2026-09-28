@@ -85,14 +85,15 @@ dependencies:
     package_info_plus: 10.2.1
     app_links: 7.2.1
     file_selector: 1.1.0
-    material_ui: 1.4.0
+    material_ui: 1.5.0
     unifiedpush: 6.2.0
     unifiedpush_storage_shared_preferences: 1.0.0
     flutter_local_notifications: 22.3.1
-    material_emoji_picker: 1.1.1+2
+    material_emoji_picker: 1.1.2
     xdg_desktop_portal:
         git:
             url: https://github.com/Henry-Hiles/xdg_desktop_portal.dart
+            ref: quad/nexus
 
 dev_dependencies:
     build_runner: 2.16.1
