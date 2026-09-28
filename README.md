@@ -168,7 +168,7 @@ This installs Nexus system-wide. With `enableNotifications`, it also installs KU
 
 #### Linux
 
-- On NixOS: Either use direnv and `direnv allow`, or `nix flake develop`
+- On NixOS: Either use direnv and `direnv allow`, or `nix develop`
 - On other distros: Install Flutter, Go, Git, Libclang, Libass, MPV, and Glibc. Do not use any Snap packages, they cause various compilation issues.
 
 #### Windows

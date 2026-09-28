@@ -134,7 +134,7 @@ class ClientController extends AsyncNotifier<int> {
     );
   }
 
-  dynamic _sendCommand(
+  Future<dynamic> _sendCommand(
     String command, [
     Map<String, dynamic> data = const {},
   ]) => callGomuksMethod(data, (handle, data) {
@@ -156,7 +156,7 @@ class ClientController extends AsyncNotifier<int> {
     final json = request.toJson();
     final content = request.content.toJson();
 
-    return Event.fromJson(
+    return .fromJson(
       await _sendCommand("send_event", {
         ...json,
         "content": {
@@ -241,7 +241,7 @@ class ClientController extends AsyncNotifier<int> {
     try {
       return .fromJson(await _sendCommand("get_profile", {"user_id": userId}));
     } catch (_) {
-      return ProfileResponse(profile: .new(id: userId));
+      return .new(profile: .new(id: userId));
     }
   }
 
@@ -302,9 +302,8 @@ class ClientController extends AsyncNotifier<int> {
   Future<SpecVersionsResponse> getSpecVersions() async =>
       .fromJson(await _sendCommand("get_versions"));
 
-  Future<Capabilities> getCapabilities() async => Capabilities.fromJson(
-    (await _sendCommand("get_capabilities"))["capabilities"],
-  );
+  Future<Capabilities> getCapabilities() async =>
+      .fromJson((await _sendCommand("get_capabilities"))["capabilities"]);
 
   Future<Uri?> discoverHomeserver(Uri homeserver) async {
     try {
