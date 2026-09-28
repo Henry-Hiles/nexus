@@ -64,30 +64,9 @@ jobs:
                   done
                   flatpak build-update-repo --prune repo
 
-            - name: Assemble site
-              run: |
-                  mkdir site
-                  cp -a repo/. site/
-
-                  cat > site/nexus.flatpakrepo <<EOF
-                  [Flatpak Repo]
-                  Title=Nexus
-                  Url=https://nexus.federated.nexus/flatpak/
-                  EOF
-
-                  cat > site/nexus.flatpakref <<EOF
-                  [Flatpak Ref]
-                  Title=Nexus
-                  Name=nexus.federated.nexus
-                  Url=https://nexus.federated.nexus/flatpak/
-                  SuggestRemoteName=nexus
-                  IsRuntime=false
-                  RuntimeRepo=https://dl.flathub.org/repo/flathub.flatpakrepo
-                  EOF
-
             - uses: actions/upload-pages-artifact@v4
               with:
-                  path: site
+                  path: repo
 
             - name: Deploy to Pages
               id: deployment
