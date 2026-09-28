@@ -25,7 +25,7 @@ class const ChatPage({super.key}) extends HookConsumerWidget {
           body: initComplete
               ? Row(
                   children: [
-                    if (isDesktop) Sidebar(isDesktop: isDesktop),
+                    if (isDesktop) Sidebar(),
                     Expanded(
                       child: Consumer(
                         builder: (context, ref, _) {
@@ -50,9 +50,7 @@ class const ChatPage({super.key}) extends HookConsumerWidget {
                     children: [Loading(), Text("Syncing...")],
                   ),
                 ),
-          drawer: isDesktop || !initComplete
-              ? null
-              : Sidebar(isDesktop: isDesktop),
+          drawer: isDesktop || !initComplete ? null : Sidebar(),
         ),
       );
     },
