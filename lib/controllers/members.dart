@@ -27,7 +27,7 @@ class MembersController(final String roomId)
             ),
           );
 
-      await ref
+      ref
           .read(RoomsController.provider.notifier)
           .addState(roomId, fetchedState, isMembers: true);
     }

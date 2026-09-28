@@ -36,9 +36,7 @@ class RoomChatController(final ChatParams info)
 
     if (!room.hasFetchedState) {
       final state = await client.getRoomState(.new(roomId: info.roomId));
-      await ref
-          .read(RoomsController.provider.notifier)
-          .addState(info.roomId, state);
+      ref.read(RoomsController.provider.notifier).addState(info.roomId, state);
     }
 
     final timeline = room.timeline

@@ -1,5 +1,4 @@
-import "dart:isolate";
-
+import "package:collection/collection.dart";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/models/event.dart";
@@ -9,29 +8,26 @@ class RoomsController extends Notifier<IMap<String, Room>> {
   @override
   IMap<String, Room> build() => .new();
 
-  Future<void> addState(
+  void addState(
     String roomId,
     IList<Event> state, {
     bool isMembers = false,
-  }) async => update(
+  }) => update(
     .new({
       roomId: Room(
         events: .fromEntries(state.map((event) => .new(event.rowId, event))),
         hasFetchedState: true,
         hasFetchedMembers: isMembers,
-        state: await Isolate.run(() {
-          final newState = state.fold<IMap<String, IMap<String, int>>>(
-            .new(),
-            (previousValue, stateEvent) => previousValue.add(
-              stateEvent.type,
-              (previousValue[stateEvent.type] ?? .new()).add(
-                stateEvent.stateKey!,
-                stateEvent.rowId,
+        state: .new(
+          state
+              .groupListsBy((event) => event.type)
+              .map(
+                (type, group) => .new(
+                  type,
+                  .fromEntries(group.map((e) => .new(e.stateKey!, e.rowId))),
+                ),
               ),
-            ),
-          );
-          return newState;
-        }),
+        ),
       ),
     }),
     .new(),
