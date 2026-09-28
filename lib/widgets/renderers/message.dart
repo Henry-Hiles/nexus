@@ -1,5 +1,4 @@
 import "package:collection/collection.dart";
-import "package:flutter/rendering.dart";
 import "package:material_ui/material_ui.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:linkify/linkify.dart";
@@ -219,13 +218,7 @@ class const MessageRenderer(
                             ),
                           ),
                         ),
-
-                      RendererBinding.instance.mouseTracker.mouseIsConnected
-                          ? SelectableRegion(
-                              selectionControls: materialTextSelectionControls,
-                              child: rendered,
-                            )
-                          : rendered,
+                      rendered,
                       if (!textOnly) ReactionRow(event),
                     ],
                   ),
