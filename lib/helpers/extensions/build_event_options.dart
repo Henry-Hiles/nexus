@@ -27,17 +27,14 @@ extension BuildEventOptions on Event {
     final theme = Theme.of(context);
     final danger = theme.colorScheme.error;
 
-    final notifier = ref.read(
-      RoomChatController.provider((roomId, null)).notifier,
-    );
-    final client = ref.read(ClientController.provider.notifier);
+    final notifier = RoomChatController.provider((roomId, null)).notifier;
 
     final isPinned = ref
         .watch(PinnedIdsController.provider(roomId))
         .contains(eventId);
 
     Future<void> sendReaction(String emoji) async {
-      await notifier.sendReaction(emoji, this).onError(showError);
+      await ref.watch(notifier).sendReaction(emoji, this).onError(showError);
 
       await ref
           .read(RecentEmojiController.provider.notifier)
@@ -233,7 +230,8 @@ extension BuildEventOptions on Event {
                 "Are you sure you want to delete this message? "
                 "This cannot be reversed.",
             action: "Delete",
-            onConfirm: (reason) => notifier.deleteMessage(this, reason: reason),
+            onConfirm: (reason) =>
+                ref.watch(notifier).deleteMessage(this, reason: reason),
           ),
           child: ListTile(
             leading: Icon(Icons.delete, color: danger),
@@ -248,13 +246,15 @@ extension BuildEventOptions on Event {
               "Report this this to your server administrators, "
               "who can take action like banning this server or room.",
           action: "Report",
-          onConfirm: (reason) => client.reportEvent(
-            .new(
-              roomId: roomId,
-              eventId: eventId,
-              reason: reason.isEmpty ? null : reason,
-            ),
-          ),
+          onConfirm: (reason) => ref
+              .read(ClientController.provider.notifier)
+              .reportEvent(
+                .new(
+                  roomId: roomId,
+                  eventId: eventId,
+                  reason: reason.isEmpty ? null : reason,
+                ),
+              ),
         ),
         child: ListTile(
           leading: Icon(Icons.report, color: danger),

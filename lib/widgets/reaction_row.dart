@@ -8,7 +8,6 @@ import "package:nexus/helpers/mxc_image.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/widgets/error_dialog.dart";
 import "package:nexus/main.dart";
-import "package:fast_immutable_collections/fast_immutable_collections.dart";
 
 class const ReactionRow(final Event event, {super.key}) extends ConsumerWidget {
   @override
@@ -22,22 +21,20 @@ class const ReactionRow(final Event event, {super.key}) extends ConsumerWidget {
           .new(roomId: event.roomId, eventRowId: event.rowId),
         ),
       )) {
-        AsyncData(value: final IMap<String, IList<String>>? reactors) ||
-        AsyncLoading(value: final reactors) => Wrap(
+        AsyncData(value: final reactions) ||
+        AsyncLoading(value: final reactions?) => Wrap(
           spacing: 4,
           runSpacing: 4,
-          children: event.reactions
-              .where((_, value) => value != 0)
+          children: reactions
+              .where((_, value) => value.isNotEmpty)
               .mapTo(
-                (reaction, count) => HookBuilder(
+                (reaction, reactors) => HookBuilder(
                   builder: (context) {
                     final enabled = useState(true);
 
-                    final selected =
-                        reactors?[reaction]?.contains(clientState!.userId) ??
-                        false;
+                    final selected = reactors.contains(clientState!.userId);
                     return Tooltip(
-                      message: reactors?[reaction]?.join(", ") ?? "",
+                      message: reactors.join(", "),
                       child: ChoiceChip(
                         showCheckmark: false,
                         selected: selected,
@@ -56,7 +53,10 @@ class const ReactionRow(final Event event, {super.key}) extends ConsumerWidget {
                                     )
                                   : Text(reaction, overflow: .ellipsis),
                             ),
-                            Text(count.toString(), overflow: .ellipsis),
+                            Text(
+                              reactors.length.toString(),
+                              overflow: .ellipsis,
+                            ),
                           ],
                         ),
                         onSelected: enabled.value
@@ -75,7 +75,7 @@ class const ReactionRow(final Event event, {super.key}) extends ConsumerWidget {
                                         .removeReaction(
                                           reaction,
                                           event,
-                                          clientState!.userId!,
+                                          clientState.userId!,
                                         )
                                         .onError(showError);
                                   } else {
@@ -100,6 +100,8 @@ class const ReactionRow(final Event event, {super.key}) extends ConsumerWidget {
           error,
           stackTrace,
         ),
+
+        _ => SizedBox.shrink(),
       },
     );
   }
