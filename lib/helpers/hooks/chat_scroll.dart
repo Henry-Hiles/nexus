@@ -1,5 +1,3 @@
-import "dart:async";
-
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
@@ -26,28 +24,20 @@ final class ChatScroll({
     required ValueNotifier<int?> contextualEvent,
   }) {
     final anchorId = useState<int?>(null);
+    final atBottom = useState(true);
+    final pendingJump = useState<int?>(null);
+    final scrollController = useScrollController();
+    final centerKey = useMemoized(GlobalKey.new);
 
     final itemKeys = useMemoized(() => <int, GlobalKey>{}, []);
     GlobalKey keyFor(int eventRowId) =>
         itemKeys.putIfAbsent(eventRowId, GlobalKey.new);
 
-    final scrollController = useScrollController();
-    final centerKey = useMemoized(GlobalKey.new);
-
-    final atBottom = useState(true);
-
-    final pendingAnchorTarget = useState<int?>(null);
-    final anchorMountedCompleter = useRef<Completer<BuildContext>?>(null);
-
     useEffect(() {
       if (anchorId.value == null) {
         if (controllerData case AsyncData(:final value?)
             when value.timeline.isNotEmpty) {
-          final hasContextualEvent = value.timeline.any(
-            (event) => event == contextualEvent.value,
-          );
-
-          anchorId.value = hasContextualEvent
+          anchorId.value = value.timeline.contains(contextualEvent.value)
               ? contextualEvent.value
               : value.timeline.last;
         }
@@ -57,35 +47,34 @@ final class ChatScroll({
     }, [controllerData, contextualEvent.value]);
 
     useEffect(() {
-      final target = pendingAnchorTarget.value;
-      if (target == null) return null;
+      final rowId = pendingJump.value;
+      if (rowId == null || anchorId.value != rowId) return null;
+      pendingJump.value = null;
 
-      final found =
-          controllerData.value?.timeline.any((event) => event == target) ??
-          false;
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        if (!scrollController.hasClients) return;
 
-      if (found || controllerData is AsyncError) {
-        if (found) {
-          anchorId.value = target;
+        final position = scrollController.position;
+        scrollController.jumpTo(
+          (-position.viewportDimension)
+              .clamp(position.minScrollExtent, position.maxScrollExtent)
+              .toDouble(),
+        );
+        await WidgetsBinding.instance.endOfFrame;
 
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            final context = keyFor(target).currentContext;
-            if (context != null && context.mounted) {
-              anchorMountedCompleter.value?.complete(context);
-              anchorMountedCompleter.value = null;
-            }
-          });
-        } else {
-          anchorMountedCompleter.value?.completeError(
-            StateError("Failed to load context for $target"),
+        final context = keyFor(rowId).currentContext;
+        if (context?.mounted == true) {
+          await Scrollable.ensureVisible(
+            context!,
+            alignment: 0.5,
+            duration: const .new(milliseconds: 700),
+            curve: Curves.easeInOut,
           );
-          anchorMountedCompleter.value = null;
         }
-        pendingAnchorTarget.value = null;
-      }
+      });
 
       return null;
-    }, [controllerData, pendingAnchorTarget.value]);
+    }, [anchorId.value, pendingJump.value]);
 
     final ({IList<int> history, IList<int> live}) split = useMemoized(() {
       final items = controllerData.value?.timeline;
@@ -97,9 +86,7 @@ final class ChatScroll({
 
       final anchorIndex = items.indexOf(anchor);
 
-      if (anchorIndex == -1) {
-        return (history: const .empty(), live: items);
-      }
+      if (anchorIndex == -1) return (history: const .empty(), live: items);
 
       return (
         history: items.take(anchorIndex).toIList().reversed.toIList(),
@@ -138,7 +125,6 @@ final class ChatScroll({
         }
 
         scrollController.addListener(checkPosition);
-
         WidgetsBinding.instance.addPostFrameCallback((_) => checkPosition());
 
         return () => scrollController.removeListener(checkPosition);
@@ -158,35 +144,27 @@ final class ChatScroll({
       centerKey: centerKey,
       scrollController: scrollController,
       atBottom: atBottom.value,
+      keyFor: keyFor,
       jumpToEvent: (int rowId) async {
         if (!scrollController.hasClients) return;
 
-        final existing = keyFor(rowId).currentContext;
-        if (existing != null && existing.mounted) {
-          // Already mounted, just scroll
-          await Scrollable.ensureVisible(
-            existing,
-            alignment: 0.5,
-            duration: const .new(milliseconds: 700),
-            curve: Curves.easeInOut,
-          );
-        } else {
-          final completer = Completer<BuildContext>();
-          anchorMountedCompleter.value = completer;
-          pendingAnchorTarget.value = rowId;
-          contextualEvent.value = rowId;
-
-          final context = await completer.future;
-          if (!context.mounted) return;
-
-          await Scrollable.ensureVisible(context, alignment: 10);
-          if (!context.mounted) return;
+        final context = keyFor(rowId).currentContext;
+        if (context != null) {
           await Scrollable.ensureVisible(
             context,
             alignment: 0.5,
             duration: const .new(milliseconds: 700),
-            curve: Curves.easeOutCirc,
+            curve: Curves.easeInOut,
           );
+          return;
+        }
+
+        pendingJump.value = rowId;
+        if (controllerData.value?.timeline.contains(rowId) ?? false) {
+          anchorId.value = rowId;
+        } else {
+          anchorId.value = null;
+          contextualEvent.value = rowId;
         }
       },
       jumpToBottom: () async {
@@ -203,7 +181,6 @@ final class ChatScroll({
           curve: Curves.easeInOut,
         );
       },
-      keyFor: keyFor,
     );
   }
 }
