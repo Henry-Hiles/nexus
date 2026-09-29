@@ -1,17 +1,16 @@
 import "package:flutter_riverpod/flutter_riverpod.dart";
-import "package:nexus/models/event.dart";
 
-class ContextualEventController(String? _) extends Notifier<Event?> {
+class ContextualEventController(String? _) extends Notifier<int?> {
   @override
-  Event? build() => null;
+  int? build() => null;
 
-  void set(Event? event) => state = event;
+  void set(int? event) => state = event;
 
   @override
   bool updateShouldNotify(_, _) => true;
 
   static final provider = NotifierProvider.family
-      .autoDispose<ContextualEventController, Event?, String?>(
+      .autoDispose<ContextualEventController, int?, String?>(
         ContextualEventController.new,
       );
 }

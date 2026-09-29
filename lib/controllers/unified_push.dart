@@ -91,7 +91,7 @@ class UnifiedPushController extends AsyncNotifier<bool> {
               id: event.eventId.hashCode & 0x7fffffff,
               title: roomMetadata.name ?? "New Event",
               icon: icon,
-              payload: event.eventId,
+              payload: event.rowId.toString(),
               body: switch (event.content) {
                 MessageContent(:final body?) ||
                 StickerContent(:final body) => body,

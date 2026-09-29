@@ -16,7 +16,7 @@ import "package:nexus/widgets/renderers/event.dart";
 import "package:super_sliver_list/super_sliver_list.dart";
 
 class const NotificationsPage({
-  final String? highlightedEventId,
+  final int? highlightedEvent,
   final bool defaultToAllNotifications = false,
   super.key,
 }) extends HookConsumerWidget {
@@ -34,7 +34,7 @@ class const NotificationsPage({
     };
     final unreadTypeIndex = useState(defaultToAllNotifications ? 1 : 0);
 
-    final highlightedId = useState(highlightedEventId);
+    final highlightedId = useState(highlightedEvent);
     final listController = useRef(ListController());
     final scrollController = useScrollController();
 
@@ -56,7 +56,7 @@ class const NotificationsPage({
             final notifications = await ref.watch(provider.future);
 
             final index = notifications.indexWhere(
-              (element) => element.eventId == highlightedId.value!,
+              (tuple) => tuple.$1 == highlightedId.value!,
             );
 
             if (index == -1) return;
@@ -120,23 +120,23 @@ class const NotificationsPage({
                             ),
                             reverse: true,
                             itemBuilder: (context, index) {
-                              final event = value[index];
+                              final (rowId, roomId) = value[index];
                               final isHighlighted =
-                                  event.eventId == highlightedId.value;
+                                  rowId == highlightedId.value;
 
                               return Padding(
                                 padding: .only(top: 8),
                                 child: HighlightWrapper(
                                   InkWell(
                                     onTap: () async {
-                                      await ref.focusRoom(event.roomId);
+                                      await ref.focusRoom(roomId);
                                       ref
                                           .watch(
                                             ContextualEventController.provider(
-                                              event.roomId,
+                                              roomId,
                                             ).notifier,
                                           )
-                                          .set(event);
+                                          .set(rowId);
 
                                       if (context.mounted) {
                                         Navigator.of(context).pop();
@@ -144,8 +144,9 @@ class const NotificationsPage({
                                     },
                                     child: IgnorePointer(
                                       child: EventRenderer(
-                                        event.rowId,
-                                        roomId: event.roomId,
+                                        rowId,
+                                        roomId: NotificationsController
+                                            .virtualRoomId,
                                       ),
                                     ),
                                   ),

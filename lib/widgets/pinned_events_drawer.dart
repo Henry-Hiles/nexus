@@ -2,6 +2,7 @@ import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:material_ui/material_ui.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/pinned_events.dart";
+import "package:nexus/helpers/hooks/chat_scroll.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/widgets/error_dialog.dart";
 import "package:nexus/widgets/loading.dart";
@@ -10,7 +11,7 @@ import "package:nexus/widgets/renderers/event.dart";
 final class const PinnedEventsDrawer(
   final String roomId, {
   required final IList<PopupMenuEntry> Function(Event event) getEventOptions,
-  required final Future<void> Function(Event event) jumpToEvent,
+  required final JumpToEvent jumpToEvent,
   super.key,
 }) extends HookConsumerWidget {
   @override
@@ -62,7 +63,7 @@ final class const PinnedEventsDrawer(
                 borderRadius: .circular(12),
                 onTap: () {
                   Navigator.of(context).pop();
-                  jumpToEvent(event);
+                  jumpToEvent(event.rowId);
                 },
                 child: Padding(
                   padding: .symmetric(vertical: 4),

@@ -9,7 +9,7 @@ import "package:super_sliver_list/super_sliver_list.dart";
 class const ChatTimeline({
   required final String roomId,
   required final ChatScroll scroll,
-  required final Future<void> Function(Event event) jumpToEvent,
+  required final JumpToEvent jumpToEvent,
   required final IList<PopupMenuEntry> Function(Event) getEventOptions,
   required final int? highlightedEvent,
   required final double composerHeight,

@@ -18,10 +18,7 @@ import "package:nexus/models/requests/send_message.dart";
 import "package:nexus/models/room.dart";
 import "package:nexus/models/room_chat.dart";
 
-typedef ChatParams = ({
-  String roomId,
-  ({int rowId, String eventId})? contextualEvent,
-});
+typedef ChatParams = ({String roomId, int? contextualEvent});
 
 class RoomChatController(final ChatParams info)
     extends AsyncNotifier<RoomChat?> {
@@ -47,7 +44,7 @@ class RoomChatController(final ChatParams info)
         .nonNulls
         .toIList();
     if (info.contextualEvent == null ||
-        timeline.contains(info.contextualEvent!.rowId)) {
+        timeline.contains(info.contextualEvent)) {
       ref.watch(
         RoomsController.provider.select(
           (rooms) =>
@@ -62,7 +59,10 @@ class RoomChatController(final ChatParams info)
       );
     } else {
       final context = await client.getEventContext(
-        .new(roomId: info.roomId, eventId: info.contextualEvent!.eventId),
+        .new(
+          roomId: info.roomId,
+          eventId: room.events[info.contextualEvent!]!.eventId,
+        ),
       );
 
       final events = context.before.add(context.event).addAll(context.after);

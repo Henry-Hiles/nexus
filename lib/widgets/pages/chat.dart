@@ -36,7 +36,7 @@ class const ChatPage({super.key}) extends HookConsumerWidget {
                             key: ValueKey((roomId, initialHighlight)),
                             roomId: roomId,
                             isDesktop: isDesktop,
-                            initialHighlightedEvent: initialHighlight,
+                            initialHighlight: initialHighlight,
                             showMembersByDefault: showMembersByDefault,
                           );
                         },

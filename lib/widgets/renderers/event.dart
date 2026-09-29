@@ -6,6 +6,7 @@ import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/event.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/helpers/extensions/show_context_menu.dart";
+import "package:nexus/helpers/hooks/chat_scroll.dart";
 import "package:nexus/models/content/avatar.dart";
 import "package:nexus/models/content/canonical_alias.dart";
 import "package:nexus/models/content/content.dart";
@@ -35,7 +36,7 @@ class const EventRenderer(
   final int? previousEventRowId,
   final bool textOnly = false,
   final int? maxLines,
-  final Future<void> Function(Event event)? jumpToEvent,
+  final JumpToEvent? jumpToEvent,
   final IList<PopupMenuEntry> Function(Event event)? getEventOptions,
   super.key,
 }) extends HookConsumerWidget {
@@ -106,7 +107,8 @@ class const EventRenderer(
                           .new(roomId: roomId, eventId: event.replyTo!),
                         ).future,
                       );
-                      if (replyEvent != null) await jumpToEvent!(replyEvent);
+                      if (replyEvent != null)
+                        await jumpToEvent!(replyEvent.rowId);
                     },
               isGrouped: isGrouped,
               maxLines: maxLines,

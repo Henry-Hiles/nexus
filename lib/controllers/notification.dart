@@ -31,12 +31,14 @@ class NotificationController
           macOS: darwin,
         ),
         onDidReceiveNotificationResponse: (details) {
-          if (details.payload case final eventId?) {
+          if (details.payload == null) return;
+
+          if (int.tryParse(details.payload!) case final rowId?) {
             if (navigatorKey.currentContext case final context?) {
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (_) => NotificationsPage(
-                    highlightedEventId: eventId,
+                    highlightedEvent: rowId,
                     defaultToAllNotifications: true,
                   ),
                 ),
@@ -55,17 +57,17 @@ class NotificationController
           return;
         }
 
-        final eventId = call.arguments as String;
-
-        if (navigatorKey.currentContext case final context?) {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => NotificationsPage(
-                highlightedEventId: eventId,
-                defaultToAllNotifications: true,
+        if (int.tryParse(call.arguments) case int rowId) {
+          if (navigatorKey.currentContext case final context?) {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => NotificationsPage(
+                  highlightedEvent: rowId,
+                  defaultToAllNotifications: true,
+                ),
               ),
-            ),
-          );
+            );
+          }
         }
       });
 

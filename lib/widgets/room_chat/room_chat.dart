@@ -24,14 +24,14 @@ final class const RoomChat({
   required final String? roomId,
   required final bool isDesktop,
   required final bool showMembersByDefault,
-  final Event? initialHighlightedEvent,
+  final int? initialHighlight,
   super.key,
 }) extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final relatedEvent = useState<Event?>(null);
     final relationType = useState(RelationType.reply);
-    final contextualEvent = useState<Event?>(initialHighlightedEvent);
+    final contextualEvent = useState<int?>(initialHighlight);
     final highlightedEvent = useState<int?>(null);
 
     final composerSize = useState<double>(64);
@@ -63,12 +63,7 @@ final class const RoomChat({
 
     final controllerProvider = RoomChatController.provider((
       roomId: roomId,
-      contextualEvent: contextualEvent.value == null
-          ? null
-          : (
-              rowId: contextualEvent.value!.rowId,
-              eventId: contextualEvent.value!.eventId,
-            ),
+      contextualEvent: contextualEvent.value,
     ));
     final notifier = ref.watch(controllerProvider.notifier);
 
@@ -102,25 +97,25 @@ final class const RoomChat({
       },
     );
 
-    Future<void> jumpToEvent(Event event) async {
-      highlightedEvent.value = event.rowId;
+    Future<void> jumpToEvent(int rowId) async {
+      highlightedEvent.value = rowId;
 
-      await scroll.jumpToEvent(event);
+      await scroll.jumpToEvent(rowId);
       await Future.delayed(.new(milliseconds: 700), () {
-        if (highlightedEvent.value == event.rowId) {
+        if (highlightedEvent.value == rowId) {
           highlightedEvent.value = null;
         }
       });
     }
 
     useEffect(() {
-      if (initialHighlightedEvent == null) return null;
+      if (initialHighlight == null) return null;
 
       void check() {
         if (!context.mounted) return;
 
         if (scroll.scrollController.hasClients) {
-          jumpToEvent(initialHighlightedEvent!);
+          jumpToEvent(initialHighlight!);
         } else {
           WidgetsBinding.instance.addPostFrameCallback((_) => check());
         }
@@ -129,7 +124,7 @@ final class const RoomChat({
       check();
 
       return null;
-    }, [initialHighlightedEvent]);
+    }, [initialHighlight]);
 
     IList<PopupMenuEntry> getEventOptions(Event event) =>
         event.buildEventOptions(
