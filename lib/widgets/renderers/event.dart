@@ -47,7 +47,7 @@ class const EventRenderer(
     final focusNode = useFocusNode();
     useListenable(focusNode);
 
-    final (event, previousEvent) = ref.watch(
+    final (initialEvent, previousEvent) = ref.watch(
       RoomsController.provider.select(
         (value) => (
           value[roomId]?.events[eventRowId],
@@ -58,7 +58,22 @@ class const EventRenderer(
       ),
     );
 
-    if (event == null) return SizedBox.shrink();
+    if (initialEvent == null) return SizedBox.shrink();
+
+    final edited = initialEvent.lastEditRowId == 0
+        ? null
+        : ref.watch(
+            RoomsController.provider.select(
+              (value) => value[roomId]?.events[initialEvent.lastEditRowId],
+            ),
+          );
+
+    final event = edited == null
+        ? initialEvent
+        : initialEvent.copyWith(
+            content: edited.content,
+            localContent: edited.localContent,
+          );
 
     final isGrouped =
         previousEvent?.content is MessageContent &&
