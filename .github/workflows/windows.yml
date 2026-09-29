@@ -29,7 +29,7 @@ jobs:
             - name: Setup MSYS2
               uses: msys2/setup-msys2@v2
               with:
-                  msystem: MINGW64
+                  msystem: CLANG64
                   install: >-
                       mingw-w64-x86_64-gcc
 
