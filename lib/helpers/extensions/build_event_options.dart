@@ -22,7 +22,7 @@ extension BuildEventOptions on Event {
     required WidgetRef ref,
     required String roomId,
     required String userId,
-    required void Function(Event, RelationType) onRelation,
+    required void Function(int, RelationType) onRelation,
   }) {
     final theme = Theme.of(context);
     final danger = theme.colorScheme.error;
@@ -150,7 +150,7 @@ extension BuildEventOptions on Event {
         ),
       ))
         PopupMenuItem(
-          onTap: () => onRelation(this, .reply),
+          onTap: () => onRelation(rowId, .reply),
           child: const ListTile(
             leading: Icon(Icons.reply),
             title: Text("Reply"),
@@ -159,7 +159,7 @@ extension BuildEventOptions on Event {
 
       if (content is MessageContent && sender == userId)
         PopupMenuItem(
-          onTap: () => onRelation(this, .edit),
+          onTap: () => onRelation(rowId, .edit),
           child: const ListTile(leading: Icon(Icons.edit), title: Text("Edit")),
         ),
 

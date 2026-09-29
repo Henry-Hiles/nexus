@@ -213,11 +213,19 @@ class RoomChatController(final ChatParams info)
     bool shouldMention = true,
     required IList<Tag> tags,
     required RelationType relationType,
-    Event? relation,
+    int? relatedEventRowId,
   }) async {
     Content? baseContent;
+    final relatedEvent = relatedEventRowId == null
+        ? null
+        : ref.watch(
+            RoomsController.provider.select(
+              (rooms) => rooms[info.roomId]?.events[relatedEventRowId],
+            ),
+          );
+
     if (relationType == .edit) {
-      baseContent = relation?.content;
+      baseContent = relatedEvent?.content;
     } else {
       final provider = AttachmentController.provider(info.roomId);
       baseContent = ref.read(provider)?.$2;
@@ -244,16 +252,16 @@ class RoomChatController(final ChatParams info)
         mentions: Mentions(
           userIds: [
             if (shouldMention == true &&
-                relation != null &&
+                relatedEvent != null &&
                 relationType == RelationType.reply)
-              relation.sender,
+              relatedEvent.sender,
           ].toIList(),
           room: taggedMessage.contains("@room"),
         ),
         text: taggedMessage,
-        relation: relation == null
+        relation: relatedEvent == null
             ? null
-            : .new(eventId: relation.eventId, relationType: relationType),
+            : .new(eventId: relatedEvent.eventId, relationType: relationType),
       ),
     );
 

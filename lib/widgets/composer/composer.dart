@@ -2,6 +2,7 @@ import "dart:io";
 
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:file_selector/file_selector.dart";
+import "package:nexus/controllers/rooms.dart";
 import "package:nexus/widgets/emoji_picker.dart";
 import "package:material_ui/material_ui.dart";
 import "package:flutter/services.dart";
@@ -12,7 +13,6 @@ import "package:nexus/controllers/attachment.dart";
 import "package:nexus/controllers/image_picker.dart";
 import "package:nexus/controllers/power_level.dart";
 import "package:nexus/models/content/message.dart";
-import "package:nexus/models/event.dart";
 import "package:nexus/models/relation_type.dart";
 import "package:nexus/widgets/composer/overlays/tagger_overlay.dart";
 import "package:nexus/widgets/composer/relation_preview.dart";
@@ -20,7 +20,7 @@ import "package:nexus/main.dart";
 
 class const Composer(
   final String roomId, {
-  required final Event? relatedEvent,
+  required final int? relatedEvent,
   required final RelationType relationType,
   required final VoidCallback onDismiss,
   required final Future<void> Function(
@@ -39,6 +39,13 @@ class const Composer(
     final triggerCharacter = useState("");
     final shouldMention = useState(true);
     final query = useState("");
+    final relatedEvent = this.relatedEvent == null
+        ? null
+        : ref.watch(
+            RoomsController.provider.select(
+              (rooms) => rooms[roomId]?.events[this.relatedEvent!],
+            ),
+          );
 
     if (relationType == .edit && controller.value.text.isEmpty) {
       controller.value.text =

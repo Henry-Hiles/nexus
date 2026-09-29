@@ -29,7 +29,7 @@ final class const RoomChat({
 }) extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final relatedEvent = useState<Event?>(null);
+    final relatedEvent = useState<int?>(null);
     final relationType = useState(RelationType.reply);
     final contextualEvent = useState<int?>(initialHighlight);
     final highlightedEvent = useState<int?>(null);
@@ -132,8 +132,8 @@ final class const RoomChat({
           ref: ref,
           roomId: roomId,
           userId: userId,
-          onRelation: (event, type) {
-            relatedEvent.value = event;
+          onRelation: (rowId, type) {
+            relatedEvent.value = rowId;
             relationType.value = type;
             composerNode.requestFocus();
           },
@@ -210,7 +210,7 @@ final class const RoomChat({
                                         tags: tags,
                                         relationType: relationType.value,
                                         shouldMention: shouldMention,
-                                        relation: relatedEvent.value,
+                                        relatedEventRowId: relatedEvent.value,
                                       )
                                       .onError(showError),
                           relationType: relationType.value,
