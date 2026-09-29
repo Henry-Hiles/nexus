@@ -109,14 +109,13 @@ final class ChatScroll({
     useEffect(
       () {
         const loadThreshold = 500.0;
-        const readThreshold = 50.0;
 
         Future<void> checkPosition() async {
           if (!scrollController.hasClients) return;
 
           final position = scrollController.position;
 
-          final isAtBottom = position.extentBefore <= readThreshold;
+          final isAtBottom = position.extentBefore <= 0;
           if (isAtBottom != atBottom.value) atBottom.value = isAtBottom;
 
           if (position.extentAfter <= loadThreshold) {
@@ -124,12 +123,12 @@ final class ChatScroll({
           } else if (contextualEvent.value != null &&
               position.extentBefore <= loadThreshold) {
             await paginate(.forward);
-          } else if (position.extentBefore <= readThreshold) {
+          } else if (position.extentBefore <= 0) {
             await markRead();
           }
 
           if (controllerData.isLoading == false &&
-              position.extentBefore <= readThreshold &&
+              position.extentBefore <= 0 &&
               controllerData.value?.hasMoreForward == false &&
               contextualEvent.value != null) {
             anchorId.value = null;
