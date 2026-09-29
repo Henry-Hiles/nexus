@@ -84,9 +84,7 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
                 - [x] Clickable
                 - [x] Matrix URIs
                 - [x] Matrix.to links
-            - [ ] Events
-                - [ ] Render more nicely
-                - [ ] Clickable
+            - [x] Events
         - [x] Custom emojis/stickers
         - [x] History loading
     - [x] Editing

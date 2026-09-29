@@ -13,6 +13,8 @@ import "package:nexus/helpers/hooks/chat_scroll.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/models/relation_type.dart";
 import "package:nexus/widgets/composer/composer.dart";
+import "package:nexus/widgets/error_dialog.dart";
+import "package:nexus/widgets/loading.dart";
 import "package:nexus/widgets/pinned_events_drawer.dart";
 import "package:nexus/widgets/member_list.dart";
 import "package:nexus/widgets/room_appbar.dart";
@@ -168,14 +170,20 @@ final class const RoomChat({
                     Positioned.fill(
                       child: Padding(
                         padding: .symmetric(horizontal: 4),
-                        child: ChatTimeline(
-                          scroll: scroll,
-                          roomId: roomId,
-                          jumpToEvent: jumpToEvent,
-                          getEventOptions: getEventOptions,
-                          highlightedEvent: highlightedEvent.value,
-                          composerHeight: composerSize.value,
-                        ),
+                        child: switch (controllerData) {
+                          AsyncLoading(value: _?) ||
+                          AsyncData(value: _) => ChatTimeline(
+                            scroll: scroll,
+                            roomId: roomId,
+                            jumpToEvent: jumpToEvent,
+                            getEventOptions: getEventOptions,
+                            highlightedEvent: highlightedEvent.value,
+                            composerHeight: composerSize.value,
+                          ),
+                          AsyncLoading _ => Loading(),
+                          AsyncError(:final error, :final stackTrace) =>
+                            ErrorDialog(error, stackTrace),
+                        },
                       ),
                     ),
                     Positioned(

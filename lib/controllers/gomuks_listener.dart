@@ -59,7 +59,6 @@ class GomuksListenerController extends AsyncNotifier<void> {
                       .new({
                         event.roomId: .new(events: .new({event.rowId: event})),
                       }),
-                      .new(),
                     );
 
                 break;

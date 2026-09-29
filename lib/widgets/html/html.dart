@@ -2,7 +2,7 @@ import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:material_ui/material_ui.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart";
-import "package:nexus/helpers/extensions/link_to_mention.dart";
+import "package:nexus/helpers/extensions/get_link_info.dart";
 import "package:nexus/helpers/launch_helper.dart";
 import "package:nexus/helpers/mxc_image.dart";
 import "package:nexus/widgets/expandable_image.dart";
@@ -70,7 +70,7 @@ class const Html(
           ),
 
           "a" =>
-            element.attributes["href"]?.mention == null
+            element.attributes["href"]?.linkInfo == null
                 ? null
                 : InlineCustomWidget(
                     child: MentionChip(element.attributes["href"]!, roomId),

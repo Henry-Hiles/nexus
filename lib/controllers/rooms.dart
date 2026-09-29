@@ -33,7 +33,10 @@ class RoomsController extends Notifier<IMap<String, Room>> {
     .new(),
   );
 
-  void update(IMap<String, Room> rooms, ISet<String> leftRooms) {
+  void update(
+    IMap<String, Room> rooms, [
+    ISet<String> leftRooms = const ISet.empty(),
+  ]) {
     final merged = rooms.entries.fold(state, (acc, entry) {
       final roomId = entry.key;
       final incoming = entry.value;

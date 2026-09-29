@@ -35,7 +35,6 @@ class NotificationsController([final NotificationsRequest? request])
               ),
             ),
           }),
-          .new(),
         );
 
     return .new(mentions.map((event) => (event.rowId, event.roomId)));
@@ -79,7 +78,6 @@ class NotificationsController([final NotificationsRequest? request])
                 ),
               ),
             }),
-            .new(),
           );
 
       return currentNotifications.addAll(

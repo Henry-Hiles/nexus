@@ -202,7 +202,7 @@ extension BuildEventOptions on Event {
           await Clipboard.setData(
             ClipboardData(
               text:
-                  "matrix:roomid/${room.metadata?.id.substring(1)}/e/$eventId$vias",
+                  "matrix:roomid/${room.metadata?.id.substring(1)}/e/${eventId.substring(1)}$vias",
             ),
           );
         },

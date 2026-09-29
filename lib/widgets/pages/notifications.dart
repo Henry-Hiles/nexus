@@ -4,7 +4,6 @@ import "package:m3e_buttons/m3e_buttons.dart";
 import "package:material_ui/material_ui.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
-import "package:nexus/controllers/contextual_event.dart";
 import "package:nexus/controllers/notifications.dart";
 import "package:nexus/helpers/extensions/focus_room.dart";
 import "package:nexus/models/event.dart";
@@ -129,18 +128,8 @@ class const NotificationsPage({
                                 child: HighlightWrapper(
                                   InkWell(
                                     onTap: () async {
-                                      await ref.focusRoom(roomId);
-                                      ref
-                                          .watch(
-                                            ContextualEventController.provider(
-                                              roomId,
-                                            ).notifier,
-                                          )
-                                          .set(rowId);
-
-                                      if (context.mounted) {
-                                        Navigator.of(context).pop();
-                                      }
+                                      Navigator.of(context).pop();
+                                      await ref.focusRoom(roomId, rowId);
                                     },
                                     child: IgnorePointer(
                                       child: EventRenderer(

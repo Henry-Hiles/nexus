@@ -16,11 +16,28 @@ class EventController(final GetEventRequest request)
       (event) => event.eventId == request.eventId,
     );
 
-    return event ??
-        await ref
-            .watch(ClientController.provider.notifier)
-            .getEvent(request)
-            .onError((_, _) => null);
+    if (event != null) return event;
+
+    final fetchedEvent = await ref
+        .watch(ClientController.provider.notifier)
+        .getEvent(request)
+        .onError((_, _) => null);
+
+    if (fetchedEvent != null) {
+      ref
+          .watch(RoomsController.provider.notifier)
+          .update(
+            .new({
+              request.roomId: .new(
+                events: .new({fetchedEvent.rowId: fetchedEvent}),
+              ),
+            }),
+          );
+
+      return fetchedEvent;
+    }
+
+    return null;
   }
 
   static final provider = AsyncNotifierProvider.family

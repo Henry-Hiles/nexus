@@ -1,8 +1,9 @@
+import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:material_ui/material_ui.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/room_summary.dart";
-import "package:nexus/helpers/extensions/link_to_mention.dart";
+import "package:nexus/helpers/extensions/get_link_info.dart";
 import "package:nexus/widgets/room_summary_dialog.dart";
 
 class const JoinDialog(final WidgetRef ref, {super.key}) extends HookWidget {
@@ -13,20 +14,26 @@ class const JoinDialog(final WidgetRef ref, {super.key}) extends HookWidget {
     Future<void> onJoin() async {
       Navigator.of(context).pop();
 
-      final roomIdOrAlias = roomAlias.text.mention ?? roomAlias.text;
-      final via = roomAlias.text.via;
+      final linkInfo = roomAlias.text.linkInfo;
+      final roomIdOrAlias = linkInfo?.identifier ?? roomAlias.text;
 
       showDialog(
         context: context,
         builder: (context) => switch (ref.watch(
           RoomSummaryController.provider(
-            .new(roomIdOrAlias: roomIdOrAlias, via: via),
+            .new(
+              roomIdOrAlias: roomIdOrAlias,
+              via: linkInfo?.via ?? const IList.empty(),
+            ),
           ),
         )) {
-          AsyncData(:final value) => RoomSummaryDialog(value, via: via),
+          AsyncData(:final value) => RoomSummaryDialog(
+            value,
+            via: linkInfo?.via,
+          ),
           AsyncError _ || AsyncLoading _ => RoomSummaryDialog(
             .new(roomId: roomAlias.text),
-            via: via,
+            via: linkInfo?.via,
           ),
         },
       );

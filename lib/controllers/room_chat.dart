@@ -77,7 +77,6 @@ class RoomChatController(final ChatParams info)
                 ),
               ),
             }),
-            .new(),
           );
       return .new(
         timeline: .new(events.map((element) => element.rowId)),
@@ -149,7 +148,6 @@ class RoomChatController(final ChatParams info)
                 ),
               ),
             }),
-            .new(),
           );
     } else {
       final paginationResponse = await client.paginateManual(
@@ -173,7 +171,6 @@ class RoomChatController(final ChatParams info)
                 ),
               ),
             }),
-            .new(),
           );
 
       final eventRowIds = paginationResponse.events
@@ -274,7 +271,6 @@ class RoomChatController(final ChatParams info)
               clientSticky: .new({event.rowId}),
             ),
           }),
-          .new(),
         );
   }
 

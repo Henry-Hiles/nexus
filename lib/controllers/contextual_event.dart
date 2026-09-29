@@ -9,8 +9,8 @@ class ContextualEventController(String? _) extends Notifier<int?> {
   @override
   bool updateShouldNotify(_, _) => true;
 
-  static final provider = NotifierProvider.family
-      .autoDispose<ContextualEventController, int?, String?>(
+  static final provider =
+      NotifierProvider.family<ContextualEventController, int?, String?>(
         ContextualEventController.new,
       );
 }
