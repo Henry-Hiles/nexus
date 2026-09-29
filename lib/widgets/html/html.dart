@@ -51,7 +51,19 @@ class const Html(
                     element.text,
                     lang: element.className.replaceAll("language-", ""),
                   )
-                : null,
+                : ClipRRect(
+                    borderRadius: .all(.circular(4)),
+                    child: Container(
+                      padding: .all(8),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .surfaceContainerHighest,
+                      child: SelectableText(
+                        element.text,
+                        style: .new(fontFamily: "bundled-mono"),
+                      ),
+                    ),
+                  ),
 
           "blockquote" => Quoted(
             Html(element.innerHtml, textStyle: textStyle, roomId: roomId),

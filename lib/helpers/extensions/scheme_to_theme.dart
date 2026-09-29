@@ -3,7 +3,8 @@ import "package:material_ui/material_ui.dart";
 extension SchemeToTheme on ColorScheme {
   ThemeData get theme {
     final textTheme = ThemeData(
-      fontFamilyFallback: ["sans", "emoji", "fallback-sans", "fallback-emoji"],
+      fontFamily: "bundled-sans",
+      fontFamilyFallback: ["bundled-emoji"],
       brightness: brightness,
     ).textTheme;
     return .from(colorScheme: this).copyWith(

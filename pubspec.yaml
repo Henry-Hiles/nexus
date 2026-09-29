@@ -5,12 +5,15 @@ publish_to: none
 
 flutter:
     fonts:
-        - family: fallback-emoji
+        - family: bundled-emoji
           fonts:
-              - asset: assets/fonts/NotoColorEmoji.ttf
-        - family: fallback-sans
+              - asset: assets/fonts/Twemoji.ttf
+        - family: bundled-sans
           fonts:
-              - asset: assets/fonts/Roboto.ttf
+              - asset: assets/fonts/Inter.ttf
+        - family: bundled-mono
+          fonts:
+              - asset: assets/fonts/AtkinsonHyperlegibleMono.ttf
     assets:
         - assets/bundled/
     uses-material-design: true

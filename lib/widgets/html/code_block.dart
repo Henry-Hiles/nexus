@@ -25,7 +25,7 @@ class const CodeBlock(
                     padding: .symmetric(horizontal: 8),
                     child: Text(
                       lang.substring(0, min(lang.length, 15)),
-                      style: .new(fontFamily: "monospace"),
+                      style: .new(fontFamily: "bundled-mono"),
                     ),
                   ),
                   TextButton.icon(
@@ -44,7 +44,7 @@ class const CodeBlock(
                     code,
                     minLines: 1,
                     maxLines: 99,
-                    style: .new(fontFamily: "monospace"),
+                    style: .new(fontFamily: "bundled-mono"),
                   ),
                 ),
               ),
