@@ -1,6 +1,8 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
-import "package:hooks_riverpod/hooks_riverpod.dart";
+import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:material_ui/material_ui.dart";
+import "package:nexus/controllers/client.dart";
+import "package:nexus/helpers/extensions/focus_room.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/widgets/expandable_image.dart";
 import "package:nexus/widgets/linkified_text.dart";
@@ -8,11 +10,11 @@ import "package:nexus/models/room_summary.dart";
 
 class const RoomSummaryDialog(
   final RoomSummary summary, {
-  final IList<Widget> extraActions = const IList.empty(),
+  final IList<String>? via,
   super.key,
-}) extends ConsumerWidget {
+}) extends StatelessWidget {
   @override
-  Widget build(BuildContext context, WidgetRef ref) => AlertDialog(
+  Widget build(BuildContext context) => AlertDialog(
     constraints: .loose(.fromWidth(400)),
     scrollable: true,
     contentPadding: EdgeInsets.all(24).copyWith(top: 8),
@@ -25,14 +27,14 @@ class const RoomSummaryDialog(
             summary.avatarUrl == null ? null : .new(mxc: summary.avatarUrl!),
             child: AvatarOrHash(
               summary.avatarUrl,
-              summary.name ?? "Unnamed Room",
+              "",
               height: 64,
               fallback: Icon(Icons.numbers),
             ),
           ),
         Expanded(
           child: Text(
-            summary.name ?? summary.canonicalAlias ?? summary.roomId,
+            summary.name ?? summary.canonicalAlias ?? "Unnamed Room",
             overflow: .ellipsis,
             maxLines: 3,
           ),
@@ -42,7 +44,9 @@ class const RoomSummaryDialog(
     content: Column(
       children: [
         ListTile(
-          title: Text("${summary.joinedMembers} members"),
+          title: Text(
+            "${summary.joinedMembers ?? "Unknown number of"} members",
+          ),
           leading: Icon(Icons.people),
         ),
         ListTile(
@@ -66,7 +70,55 @@ class const RoomSummaryDialog(
 
     actions: [
       TextButton(onPressed: Navigator.of(context).pop, child: Text("Cancel")),
-      ...extraActions,
+      if (via != null)
+        TextButton(
+          onPressed: () async {
+            // Capture everything before the dialog closes.
+            final container = ProviderScope.containerOf(context);
+            final scaffoldMessenger = ScaffoldMessenger.of(context);
+            final colors = Theme.of(context).colorScheme;
+            Navigator.of(context).pop();
+
+            final roomIdOrAlias = summary.canonicalAlias ?? summary.roomId;
+
+            final snackbar = scaffoldMessenger.showSnackBar(
+              .new(
+                content: Text("Joining room $roomIdOrAlias."),
+                duration: Duration(days: 999),
+              ),
+            );
+
+            try {
+              final id = await container
+                  .read(ClientController.provider.notifier)
+                  .joinRoom(.new(roomIdOrAlias: summary.roomId, via: via!));
+
+              snackbar.close();
+
+              scaffoldMessenger.showSnackBar(
+                .new(
+                  content: Text("Room $roomIdOrAlias successfully joined."),
+                  action: .new(
+                    label: "Open",
+                    onPressed: () => container.focusRoom(id),
+                  ),
+                ),
+              );
+            } catch (error) {
+              snackbar.close();
+              scaffoldMessenger.showSnackBar(
+                .new(
+                  backgroundColor: colors.errorContainer,
+                  content: Text(
+                    error.toString(),
+                    style: .new(color: colors.onErrorContainer),
+                  ),
+                ),
+              );
+            }
+          },
+          child: Text("Join"),
+        ),
     ],
   );
 }

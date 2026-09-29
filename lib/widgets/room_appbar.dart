@@ -32,7 +32,7 @@ final class const RoomAppbar({
                 .new(
                   roomId: room!.metadata!.id,
                   joinedMembers:
-                      room.metadata!.lazyLoadSummary?.joinedMemberCount ?? -1,
+                      room.metadata!.lazyLoadSummary?.joinedMemberCount,
                   avatarUrl: room.metadata?.avatar,
                   canonicalAlias: room.metadata?.canonicalAlias,
                   name: room.metadata?.name,

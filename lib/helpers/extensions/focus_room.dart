@@ -5,13 +5,14 @@ import "package:nexus/controllers/spaces.dart";
 import "package:nexus/models/space.dart";
 
 extension FocusRoom on MutationTarget {
-  Future<void> focusRoom(String id) async {
+  Future<bool> focusRoom(String id) async {
     final spaces = container.read(SpacesController.provider);
 
     if (spaces.firstWhereOrNull((space) => space.id == id) case Space _?) {
-      return await container
+      await container
           .read(KeyController.provider(KeyController.spaceKey).notifier)
           .set(id);
+      return true;
     }
 
     final parent = spaces.firstWhereOrNull(
@@ -23,7 +24,7 @@ extension FocusRoom on MutationTarget {
                 sub.children.any((room) => room.metadata?.id == id),
           ),
     );
-    if (parent == null) return;
+    if (parent == null) return false;
 
     await container
         .read(KeyController.provider(KeyController.spaceKey).notifier)
@@ -32,5 +33,7 @@ extension FocusRoom on MutationTarget {
     await container
         .read(KeyController.provider(KeyController.roomKey).notifier)
         .set(id);
+
+    return true;
   }
 }

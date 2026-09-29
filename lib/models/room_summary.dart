@@ -9,7 +9,7 @@ part "room_summary.g.dart";
 @JsonSerializable()
 class const RoomSummary({
   required final String roomId,
-  @JsonKey(name: "num_joined_members") required final int joinedMembers,
+  @JsonKey(name: "num_joined_members") final int? joinedMembers,
   final JoinRule? joinRule,
   final String? name,
   final Uri? avatarUrl,

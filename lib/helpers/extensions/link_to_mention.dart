@@ -1,3 +1,5 @@
+import "package:fast_immutable_collections/fast_immutable_collections.dart";
+
 extension LinkToMention on String {
   /// Extracts a Matrix identifier from this string.
   ///
@@ -43,4 +45,7 @@ extension LinkToMention on String {
 
     return null;
   }
+
+  IList<String> get via =>
+      .new(Uri.tryParse(replaceAll("/#", ""))?.queryParametersAll["via"] ?? []);
 }

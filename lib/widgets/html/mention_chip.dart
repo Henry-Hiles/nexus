@@ -2,10 +2,12 @@ import "package:material_ui/material_ui.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/room_summary.dart";
 import "package:nexus/controllers/user.dart";
+import "package:nexus/helpers/extensions/focus_room.dart";
 import "package:nexus/helpers/extensions/link_to_mention.dart";
 import "package:nexus/helpers/extensions/show_user_popover.dart";
 import "package:nexus/models/content/membership.dart";
 import "package:nexus/models/room_summary.dart";
+import "package:nexus/widgets/room_summary_dialog.dart";
 
 class const MentionChip(final String content, final String? roomId, {super.key})
     extends ConsumerWidget {
@@ -22,10 +24,11 @@ class const MentionChip(final String content, final String? roomId, {super.key})
 
       "#" || "!" =>
         ref
-            .watch(
-              RoomSummaryController.provider(.new(roomIdOrAlias: mention!)),
-            )
-            .whenOrNull(data: (data) => data),
+                .watch(
+                  RoomSummaryController.provider(.new(roomIdOrAlias: mention!)),
+                )
+                .whenOrNull(data: (data) => data) ??
+            RoomSummary(roomId: mention),
 
       _ => null,
     };
@@ -33,11 +36,28 @@ class const MentionChip(final String content, final String? roomId, {super.key})
     return mention == null
         ? SizedBox.shrink()
         : InkWell(
-            onTap: () {
+            onTap: () async {
               if (data case MembershipContent membership) {
                 context.showUserPopover(membership, mention, roomId: roomId);
               } else if (data case RoomSummary summary) {
-                // TODO: Handle summary
+                if (!await ref.focusRoom(summary.roomId) && context.mounted) {
+                  showDialog(
+                    context: context,
+                    builder: (context) => Consumer(
+                      builder: (context, ref, _) => RoomSummaryDialog(
+                        ref
+                                .watch(
+                                  RoomSummaryController.provider(
+                                    .new(roomIdOrAlias: mention),
+                                  ),
+                                )
+                                .whenOrNull(data: (data) => data) ??
+                            summary,
+                        via: content.via,
+                      ),
+                    ),
+                  );
+                }
               }
             },
             child: Text(
