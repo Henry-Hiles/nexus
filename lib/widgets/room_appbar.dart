@@ -3,9 +3,8 @@ import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/widgets/appbar.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
-import "package:nexus/widgets/expandable_image.dart";
-import "package:nexus/widgets/linkified_text.dart";
 import "package:nexus/widgets/room_menu.dart";
+import "package:nexus/widgets/room_summary_dialog.dart";
 
 final class const RoomAppbar({
   required final String? roomId,
@@ -25,61 +24,19 @@ final class const RoomAppbar({
         : ref.watch(RoomsController.provider.select((value) => value[roomId!]));
 
     return Appbar(
-      onTap: room == null
+      onTap: room?.metadata == null
           ? null
           : () => showDialog(
               context: context,
-              builder: (context) => Dialog(
-                constraints: .loose(.fromWidth(400)),
-                child: Padding(
-                  padding: .all(24),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisSize: .min,
-                      crossAxisAlignment: .start,
-                      spacing: 8,
-                      children: [
-                        Row(
-                          spacing: 12,
-                          mainAxisSize: .min,
-                          children: [
-                            if (room.metadata?.avatar != null)
-                              ExpandableImage(
-                                room.metadata?.avatar == null
-                                    ? null
-                                    : .new(mxc: room.metadata!.avatar!),
-                                child: AvatarOrHash(
-                                  room.metadata?.avatar,
-                                  room.metadata?.name ?? "Unnamed Room",
-                                  height: 64,
-                                  fallback: Icon(Icons.numbers),
-                                ),
-                              ),
-                            Expanded(
-                              child: Text(
-                                room.metadata?.name ?? "Unnamed Room",
-                                overflow: .ellipsis,
-                                maxLines: 3,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .headlineSmall,
-                              ),
-                            ),
-                          ],
-                        ),
-                        if (room.metadata?.topic?.isNotEmpty == true)
-                          LinkifiedText(
-                            room.metadata!.topic!,
-                            style: Theme.of(context).textTheme.bodyLarge
-                                ?.copyWith(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurfaceVariant,
-                                ),
-                          ),
-                      ],
-                    ),
-                  ),
+              builder: (context) => RoomSummaryDialog(
+                .new(
+                  roomId: room!.metadata!.id,
+                  joinedMembers:
+                      room.metadata!.lazyLoadSummary?.joinedMemberCount ?? -1,
+                  avatarUrl: room.metadata?.avatar,
+                  canonicalAlias: room.metadata?.canonicalAlias,
+                  name: room.metadata?.name,
+                  topic: room.metadata?.topic,
                 ),
               ),
             ),

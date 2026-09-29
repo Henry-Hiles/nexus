@@ -23,9 +23,8 @@ final class const AvatarOrHash(
       child: Center(
         child: ClipRRect(
           borderRadius: .all(.circular((height - 8) / 2.5)),
-          child: SizedBox(
-            width: height,
-            height: height,
+          child: SizedBox.square(
+            dimension: height,
             child: avatar == null
                 ? fallback ?? box
                 : Image(

@@ -9,9 +9,6 @@ part "room_metadata.g.dart";
 @JsonSerializable()
 class const RoomMetadata({
   @JsonKey(name: "room_id") required final String id,
-
-  // CreateEventContent creationContent,
-  // TombstoneEventContent tombstoneEventContent,
   final String? name,
   final Uri? avatar,
   final String? dmUserId,

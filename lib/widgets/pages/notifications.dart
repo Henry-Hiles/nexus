@@ -1,14 +1,12 @@
 import "dart:async";
 
-import "package:collection/collection.dart";
 import "package:m3e_buttons/m3e_buttons.dart";
 import "package:material_ui/material_ui.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/contextual_event.dart";
-import "package:nexus/controllers/key.dart";
 import "package:nexus/controllers/notifications.dart";
-import "package:nexus/controllers/spaces.dart";
+import "package:nexus/helpers/extensions/focus_room.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/widgets/appbar.dart";
 import "package:nexus/widgets/error_dialog.dart";
@@ -131,41 +129,7 @@ class const NotificationsPage({
                                 child: HighlightWrapper(
                                   InkWell(
                                     onTap: () async {
-                                      final spaces = ref.read(
-                                        SpacesController.provider,
-                                      );
-                                      final space = spaces.firstWhereOrNull(
-                                        (space) =>
-                                            space.children.any(
-                                              (room) =>
-                                                  room.metadata?.id ==
-                                                  event.roomId,
-                                            ) ||
-                                            space.subSpaces.any(
-                                              (subSpace) =>
-                                                  subSpace.children.any(
-                                                    (room) =>
-                                                        room.metadata?.id ==
-                                                        event.roomId,
-                                                  ),
-                                            ),
-                                      );
-                                      if (space == null) return;
-
-                                      await ref
-                                          .read(
-                                            KeyController.provider(
-                                              KeyController.spaceKey,
-                                            ).notifier,
-                                          )
-                                          .set(space.id);
-                                      await ref
-                                          .read(
-                                            KeyController.provider(
-                                              KeyController.roomKey,
-                                            ).notifier,
-                                          )
-                                          .set(event.roomId);
+                                      await ref.focusRoom(event.roomId);
                                       ref
                                           .watch(
                                             ContextualEventController.provider(
