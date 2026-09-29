@@ -20,6 +20,7 @@ jobs:
               uses: subosito/flutter-action@v2
               with:
                   flutter-version: 3.47.4
+
             - name: Set up Go
               uses: actions/setup-go@v6
               with:
@@ -50,6 +51,15 @@ jobs:
                   cp /mingw64/bin/libgcc_s_seh-1.dll build/windows/x64/runner/Release/
                   cp /mingw64/bin/libwinpthread-1.dll build/windows/x64/runner/Release/
                   cp /mingw64/bin/libstdc++-6.dll build/windows/x64/runner/Release/
+
+            - name: Copy MSVC runtime DLLs
+              shell: powershell
+              run: |
+                  $release = "build/windows/x64/runner/Release"
+
+                  Copy-Item C:\Windows\System32\MSVCP140.dll $release -Force
+                  Copy-Item C:\Windows\System32\VCRUNTIME140.dll $release -Force
+                  Copy-Item C:\Windows\System32\VCRUNTIME140_1.dll $release -Force
 
             - name: Install Inno Setup
               run: choco install innosetup -y
