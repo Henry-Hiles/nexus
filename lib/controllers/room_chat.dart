@@ -50,7 +50,8 @@ class RoomChatController(final ChatParams info)
         timeline.contains(info.contextualEvent!.rowId)) {
       ref.watch(
         RoomsController.provider.select(
-          (rooms) => rooms[info.roomId]?.timeline,
+          (rooms) =>
+              (rooms[info.roomId]?.timeline, rooms[info.roomId]?.clientSticky),
         ),
       );
 
