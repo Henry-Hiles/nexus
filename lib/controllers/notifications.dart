@@ -1,3 +1,4 @@
+import "package:collection/collection.dart";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client.dart";
@@ -6,15 +7,33 @@ import "package:nexus/models/event.dart";
 
 typedef NotificationsRequest = (UnreadType? unreadType, String? roomId);
 
-class NotificationsController([final NotificationsRequest? request])
+class NotificationsController(final NotificationsRequest request)
     extends AsyncNotifier<IList<(int, String)>> {
-  static const virtualRoomId = "!notifications";
+  void storeEvents(Iterable<Event> events) => ref
+      .read(RoomsController.provider.notifier)
+      .update(
+        .new(
+          events
+              .groupListsBy((event) => event.roomId)
+              .map(
+                (roomId, roomEvents) => .new(
+                  roomId,
+                  .new(
+                    events: IMap.fromIterable(
+                      roomEvents,
+                      keyMapper: (event) => event.rowId,
+                    ),
+                  ),
+                ),
+              ),
+        ),
+      );
 
   @override
   Future<IList<(int, String)>> build() async {
     final client = ref.read(ClientController.provider.notifier);
 
-    final (unreadType, roomId) = request ?? (null, null);
+    final (unreadType, roomId) = request;
 
     final mentions = await client.getMentions(
       .new(
@@ -24,18 +43,7 @@ class NotificationsController([final NotificationsRequest? request])
       ),
     );
 
-    ref
-        .watch(RoomsController.provider.notifier)
-        .update(
-          .new({
-            virtualRoomId: .new(
-              events: IMap.fromIterable(
-                mentions,
-                keyMapper: (event) => event.rowId,
-              ),
-            ),
-          }),
-        );
+    storeEvents(mentions);
 
     return .new(mentions.map((event) => (event.rowId, event.roomId)));
   }
@@ -44,20 +52,21 @@ class NotificationsController([final NotificationsRequest? request])
     final currentNotifications = await future;
     state = .loading();
     state = await .guard(() async {
-      final lastNotification = currentNotifications.lastOrNull?.$1;
+      final lastNotification = currentNotifications.lastOrNull;
       final lastTs = lastNotification == null
           ? null
           : ref.watch(
               RoomsController.provider.select(
-                (rooms) =>
-                    rooms[virtualRoomId]?.events[lastNotification]?.timestamp,
+                (rooms) => rooms[lastNotification.$2]
+                    ?.events[lastNotification.$1]
+                    ?.timestamp,
               ),
             );
 
       if (lastTs == null) return currentNotifications;
 
       final client = ref.read(ClientController.provider.notifier);
-      final (unreadType, roomId) = request ?? (null, null);
+      final (unreadType, roomId) = request;
 
       final newNotifications = await client.getMentions(
         .new(
@@ -67,18 +76,7 @@ class NotificationsController([final NotificationsRequest? request])
         ),
       );
 
-      ref
-          .watch(RoomsController.provider.notifier)
-          .update(
-            .new({
-              virtualRoomId: .new(
-                events: IMap.fromIterable(
-                  newNotifications,
-                  keyMapper: (event) => event.rowId,
-                ),
-              ),
-            }),
-          );
+      storeEvents(newNotifications);
 
       return currentNotifications.addAll(
         newNotifications.map((event) => (event.rowId, event.roomId)),
@@ -90,6 +88,6 @@ class NotificationsController([final NotificationsRequest? request])
       .autoDispose<
         NotificationsController,
         IList<(int, String)>,
-        NotificationsRequest?
+        NotificationsRequest
       >(NotificationsController.new);
 }

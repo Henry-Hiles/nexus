@@ -134,8 +134,7 @@ class const NotificationsPage({
                                     child: IgnorePointer(
                                       child: EventRenderer(
                                         rowId,
-                                        roomId: NotificationsController
-                                            .virtualRoomId,
+                                        roomId: roomId,
                                       ),
                                     ),
                                   ),
