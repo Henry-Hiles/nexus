@@ -1,6 +1,6 @@
 import "package:collection/collection.dart";
 import "package:flutter_riverpod/experimental/mutation.dart";
-import "package:nexus/controllers/contextual_event.dart";
+import "package:nexus/controllers/jump_request.dart";
 import "package:nexus/controllers/key.dart";
 import "package:nexus/controllers/spaces.dart";
 import "package:nexus/models/space.dart";
@@ -31,15 +31,15 @@ extension FocusRoom on MutationTarget {
         .read(KeyController.provider(KeyController.spaceKey).notifier)
         .set(parent.id);
 
+    if (eventRowId != null) {
+      container
+          .read(JumpRequestController.provider.notifier)
+          .request(roomId, eventRowId);
+    }
+
     await container
         .read(KeyController.provider(KeyController.roomKey).notifier)
         .set(roomId);
-
-    if (eventRowId != null) {
-      container
-          .read(ContextualEventController.provider(roomId).notifier)
-          .set(eventRowId);
-    }
 
     return true;
   }

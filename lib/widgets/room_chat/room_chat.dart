@@ -21,19 +21,24 @@ import "package:nexus/widgets/room_appbar.dart";
 import "package:nexus/main.dart";
 import "package:nexus/widgets/room_chat/chat_timeline.dart";
 import "package:nexus/helpers/extensions/build_event_options.dart";
+import "package:nexus/controllers/jump_request.dart";
 
 final class const RoomChat({
   required final String? roomId,
   required final bool isDesktop,
   required final bool showMembersByDefault,
-  final int? initialHighlight,
   super.key,
 }) extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final relatedEvent = useState<int?>(null);
     final relationType = useState(RelationType.reply);
-    final contextualEvent = useState<int?>(initialHighlight);
+    final pendingJump = ref.read(JumpRequestController.provider);
+    final contextualEvent = useState<int?>(
+      pendingJump != null && pendingJump.roomId == this.roomId
+          ? pendingJump.rowId
+          : null,
+    );
     final highlightedEvent = useState<int?>(null);
 
     final composerSize = useState<double>(64);
@@ -110,23 +115,23 @@ final class const RoomChat({
       });
     }
 
-    useEffect(() {
-      if (initialHighlight == null) return null;
+    ref.listen(JumpRequestController.provider, (_, request) {
+      if (request == null || request.roomId != roomId) return;
 
-      void check() {
+      void tryJump() {
         if (!context.mounted) return;
+        if (ref.read(JumpRequestController.provider) != request) return;
 
         if (scroll.scrollController.hasClients) {
-          jumpToEvent(initialHighlight!);
+          ref.read(JumpRequestController.provider.notifier).consume();
+          jumpToEvent(request.rowId);
         } else {
-          WidgetsBinding.instance.addPostFrameCallback((_) => check());
+          WidgetsBinding.instance.addPostFrameCallback((_) => tryJump());
         }
       }
 
-      check();
-
-      return null;
-    }, [initialHighlight]);
+      WidgetsBinding.instance.addPostFrameCallback((_) => tryJump());
+    });
 
     IList<PopupMenuEntry> getEventOptions(Event event) =>
         event.buildEventOptions(
