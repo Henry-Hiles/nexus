@@ -95,6 +95,7 @@ extension BuildEventOptions on Event {
           child: IconTheme(
             data: theme.iconTheme,
             child: Row(
+              mainAxisAlignment: .center,
               children: [
                 for (final emoji in {
                   ...ref
@@ -104,7 +105,7 @@ extension BuildEventOptions on Event {
                   "🤣",
                   "😭",
                   "🤔",
-                }.take(4))
+                }.take(3))
                   IconButton(
                     icon: Text(emoji),
                     onPressed: () async {

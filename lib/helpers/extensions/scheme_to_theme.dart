@@ -28,6 +28,7 @@ extension SchemeToTheme on ColorScheme {
           borderRadius: .circular(8),
         ),
       ),
+      iconButtonTheme: .new(variant: StyleVariant.material3Expressive),
       textTheme: textTheme,
       inputDecorationTheme: const InputDecorationTheme(
         border: OutlineInputBorder(),

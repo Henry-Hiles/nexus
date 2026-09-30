@@ -117,7 +117,6 @@ class const Composer(
                   color: theme.colorScheme.surfaceContainerHighest,
                   padding: .symmetric(horizontal: 8),
                   child: Row(
-                    spacing: 8,
                     mainAxisAlignment: .center,
                     children:
                         ref.watch(
@@ -127,6 +126,7 @@ class const Composer(
                         )
                         ? [
                             IconButton(
+                              style: .new(iconButtonWidth: .narrow),
                               onPressed: () => showModalBottomSheet(
                                 isScrollControlled: true,
                                 context: context,
@@ -141,6 +141,7 @@ class const Composer(
                               icon: Icon(Icons.emoji_emotions),
                             ),
                             PopupMenuButton(
+                              style: .new(iconButtonWidth: .narrow),
                               tooltip: "Add media",
                               enabled: attachment == null,
                               itemBuilder: (context) => [
@@ -199,6 +200,7 @@ class const Composer(
                               ],
                               icon: Icon(Icons.add),
                             ),
+                            SizedBox(width: 8),
                             Expanded(
                               child: FlutterTagger(
                                 triggerStrategy: .eager,

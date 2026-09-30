@@ -158,7 +158,6 @@ class const Sidebar({super.key}) extends HookConsumerWidget {
                     trailing: Padding(
                       padding: .symmetric(vertical: 16),
                       child: Column(
-                        spacing: 8,
                         children: [
                           PopupMenuButton(
                             itemBuilder: (_) => [
