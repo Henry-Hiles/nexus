@@ -21,12 +21,15 @@ class const EmojiPicker({
         .watch(upstream.EmojiController.provider)
         .betterWhen(
           data: (categories) => upstream.EmojiPicker(
-            onSelection: (emoji) async {
+            onSelection: (emoji, isFreeText) async {
               await onSelection(emoji);
-              await ref
-                  .watch(RecentEmojiController.provider.notifier)
-                  .add(emoji)
-                  .onError(showError);
+
+              if (!isFreeText) {
+                await ref
+                    .watch(RecentEmojiController.provider.notifier)
+                    .add(emoji)
+                    .onError(showError);
+              }
             },
             allowFreeText: allowFreeText,
             prependCategories: .new([

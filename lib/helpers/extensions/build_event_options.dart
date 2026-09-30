@@ -36,15 +36,6 @@ extension BuildEventOptions on Event {
         .watch(PinnedIdsController.provider(roomId))
         .contains(eventId);
 
-    Future<void> sendReaction(String emoji) async {
-      await ref.watch(notifier).sendReaction(emoji, this).onError(showError);
-
-      await ref
-          .read(RecentEmojiController.provider.notifier)
-          .add(emoji)
-          .onError(showError);
-    }
-
     void showReasonDialog({
       required String title,
       required String description,
@@ -116,9 +107,17 @@ extension BuildEventOptions on Event {
                 }.take(4))
                   IconButton(
                     icon: Text(emoji),
-                    onPressed: () {
+                    onPressed: () async {
                       Navigator.of(context).pop();
-                      sendReaction(emoji);
+                      await ref
+                          .watch(notifier)
+                          .sendReaction(emoji, this)
+                          .onError(showError);
+
+                      await ref
+                          .read(RecentEmojiController.provider.notifier)
+                          .add(emoji)
+                          .onError(showError);
                     },
                   ),
                 IconButton(
@@ -133,7 +132,10 @@ extension BuildEventOptions on Event {
                         allowFreeText: true,
                         onSelection: (emoji) {
                           Navigator.of(context).pop();
-                          sendReaction(emoji);
+                          ref
+                              .watch(notifier)
+                              .sendReaction(emoji, this)
+                              .onError(showError);
                         },
                       ),
                     );
