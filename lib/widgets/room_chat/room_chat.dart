@@ -68,6 +68,12 @@ final class const RoomChat({
 
     final roomId = this.roomId!;
 
+    final jumpRowId = ref.watch(
+      JumpRequestController.provider.select(
+        (request) => request?.roomId == roomId ? request?.rowId : null,
+      ),
+    );
+
     final controllerProvider = RoomChatController.provider((
       roomId: roomId,
       contextualEvent: contextualEvent.value,
@@ -115,23 +121,26 @@ final class const RoomChat({
       });
     }
 
-    ref.listen(JumpRequestController.provider, (_, request) {
-      if (request == null || request.roomId != roomId) return;
+    useEffect(() {
+      if (jumpRowId == null) return null;
 
-      void tryJump() {
+      void check() {
         if (!context.mounted) return;
-        if (ref.read(JumpRequestController.provider) != request) return;
 
         if (scroll.scrollController.hasClients) {
-          ref.read(JumpRequestController.provider.notifier).consume();
-          jumpToEvent(request.rowId);
+          jumpToEvent(jumpRowId);
+          Future.microtask(
+            () => ref.read(JumpRequestController.provider.notifier).consume(),
+          );
         } else {
-          WidgetsBinding.instance.addPostFrameCallback((_) => tryJump());
+          WidgetsBinding.instance.addPostFrameCallback((_) => check());
         }
       }
 
-      WidgetsBinding.instance.addPostFrameCallback((_) => tryJump());
-    });
+      check();
+
+      return null;
+    }, [jumpRowId]);
 
     IList<PopupMenuEntry> getEventOptions(Event event) =>
         event.buildEventOptions(
