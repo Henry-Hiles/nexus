@@ -43,7 +43,7 @@ jobs:
                   flutter pub get
                   dart scripts/generate.dart
                   flutter pub run build_runner build
-                  flutter build windows --release
+                  flutter build windows --dart-define=GIT_COMMIT=${{ github.sha }}
 
             - name: Copy MinGW runtime DLLs
               shell: msys2 {0}

@@ -1,39 +1,39 @@
 name: "Build APK"
 
 on:
-  push:
-    branches: ["main"]
-    tags: ["*"]
-  workflow_dispatch:
+    push:
+        branches: ["main"]
+        tags: ["*"]
+    workflow_dispatch:
 
 jobs:
-  build-apk:
-    runs-on: ubuntu-latest
+    build-apk:
+        runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-        with:
-          submodules: recursive
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v6
+              with:
+                  submodules: recursive
 
-      - name: Lix GHA Installer Action
-        uses: samueldr/lix-gha-installer-action@v2026-02-22
-        with:
-          extra_nix_config: experimental-features = nix-command flakes flake-self-attrs
-      
-      - name: Decode keystore
-        run: echo "$KEYSTORE_CONTENT" | base64 --decode > keystore.jks
-        env:
-          KEYSTORE_CONTENT: ${{ secrets.KEYSTORE_CONTENT }}
+            - name: Lix GHA Installer Action
+              uses: samueldr/lix-gha-installer-action@v2026-02-22
+              with:
+                  extra_nix_config: experimental-features = nix-command flakes flake-self-attrs
 
-      - name: Build app
-        run: nix develop --command bash -c "flutter pub get && dart scripts/generate.dart && flutter pub run build_runner build && flutter build apk --target-platform android-arm64"
-        env:
-          KEYSTORE_PATH: ../../keystore.jks
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+            - name: Decode keystore
+              run: echo "$KEYSTORE_CONTENT" | base64 --decode > keystore.jks
+              env:
+                  KEYSTORE_CONTENT: ${{ secrets.KEYSTORE_CONTENT }}
 
-      - name: Upload installer artifact
-        uses: actions/upload-artifact@v6
-        with:
-          name: APK
-          path: build/app/outputs/flutter-apk/app-release.apk
+            - name: Build app
+              run: nix develop --command bash -c "flutter pub get && dart scripts/generate.dart && flutter pub run build_runner build && flutter build apk --target-platform android-arm64 --dart-define=GIT_COMMIT=${{ github.sha }}"
+              env:
+                  KEYSTORE_PATH: ../../keystore.jks
+                  KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+
+            - name: Upload installer artifact
+              uses: actions/upload-artifact@v6
+              with:
+                  name: APK
+                  path: build/app/outputs/flutter-apk/app-release.apk

@@ -33,7 +33,9 @@ extension ShowAboutDialog on BuildContext {
                               "Nexus",
                               style: Theme.of(context).textTheme.headlineMedium,
                             ),
-                            Text("(${packageInfo.version})"),
+                            Text(
+                              "(${packageInfo.version}+${const String.fromEnvironment("GIT_COMMIT", defaultValue: "dev")})",
+                            ),
                           ],
                         ),
 

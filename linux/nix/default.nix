@@ -20,6 +20,7 @@
         let
           default = pkgs.callPackage ./pkg {
             src = self;
+            commit = self.shortRev or self.dirtyShortRev;
           };
         in
         {

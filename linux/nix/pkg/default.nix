@@ -6,6 +6,7 @@
   libclang,
   flutter,
   src,
+  commit ? "dev",
 }:
 
 flutter.buildFlutterApplication {
@@ -18,6 +19,10 @@ flutter.buildFlutterApplication {
     packageRunCustom nexus generate source/scripts test
     packageRun build_runner build
   '';
+
+  flutterBuildFlags = [
+    "--dart-define=GIT_COMMIT=${commit}"
+  ];
 
   buildInputs = [
     mpv-unwrapped

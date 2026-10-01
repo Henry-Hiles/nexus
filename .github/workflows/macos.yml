@@ -31,7 +31,7 @@ jobs:
                   flutter pub get
                   dart scripts/generate.dart
                   flutter pub run build_runner build
-                  flutter build macos --release
+                  flutter build macos --dart-define=GIT_COMMIT=${{ github.sha }}
 
             - name: Create DMG
               id: create-dmg
