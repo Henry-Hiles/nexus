@@ -30,7 +30,7 @@
             developer = "QuadRadical";
             appId = "nexus.federated.nexus";
             package = default;
-            runtime = "org.gnome.Platform/49";
+            runtime = "org.gnome.Platform/51";
             permissions = {
               share = [ "network" ];
               sockets = [
