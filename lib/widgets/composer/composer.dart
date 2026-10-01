@@ -115,7 +115,6 @@ class const Composer(
                 ),
                 Container(
                   color: theme.colorScheme.surfaceContainerHighest,
-                  padding: .symmetric(horizontal: 8),
                   child: Row(
                     mainAxisAlignment: .center,
                     children:
@@ -126,7 +125,6 @@ class const Composer(
                         )
                         ? [
                             IconButton(
-                              style: .new(iconButtonWidth: .narrow),
                               onPressed: () => showModalBottomSheet(
                                 isScrollControlled: true,
                                 context: context,
@@ -142,10 +140,6 @@ class const Composer(
                             ),
                             PopupMenuButton(
                               tooltip: "Add media",
-
-                              // `style` has no effect due to https://github.com/flutter/flutter/issues/193656, so `padding` is set from material_ui/lib/src/generated/icon_button_defaults_m3e.g.dart manually.
-                              padding: .fromSTEB(4.0, 6.0, 4.0, 6.0),
-                              style: .new(iconButtonWidth: .narrow),
                               enabled: attachment == null,
                               itemBuilder: (context) => [
                                 if (Platform.isAndroid || Platform.isIOS)
@@ -264,7 +258,6 @@ class const Composer(
                               ),
                             ),
                             IconButton(
-                              style: .new(iconButtonWidth: .narrow),
                               onPressed:
                                   attachment != null && attachment.$2 == null
                                   ? null
