@@ -77,9 +77,9 @@ final class const UserBottomSheet(
       ),
     );
 
-    return Padding(
-      padding: .all(42),
-      child: SingleChildScrollView(
+    return SingleChildScrollView(
+      child: Padding(
+        padding: .all(42),
         child: Column(
           spacing: 4,
           mainAxisSize: .min,
