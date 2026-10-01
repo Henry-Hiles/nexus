@@ -79,176 +79,178 @@ final class const UserBottomSheet(
 
     return Padding(
       padding: .all(42),
-      child: Column(
-        spacing: 4,
-        mainAxisSize: .min,
-        crossAxisAlignment: .center,
-        children: [
-          Row(
-            mainAxisAlignment: .end,
-            children: [
-              M3EButton(
-                onPressed: Navigator.of(context).pop,
-                child: Icon(Icons.close),
-              ),
-            ],
-          ),
-          SizedBox(height: 18),
-
-          ExpandableImage(
-            member.avatarUrl == null ? null : .new(mxc: member.avatarUrl!),
-            child: AvatarOrHash(
-              member.avatarUrl,
-              member.displayName ?? userId.localpart,
-              height: 200,
-            ),
-          ),
-
-          SizedBox(height: 8),
-
-          SelectableText(
-            member.displayName ?? userId.localpart,
-            style: textTheme.headlineLarge,
-            textAlign: .center,
-          ),
-          SelectableText(
-            userId,
-            textAlign: .center,
-            style: textTheme.titleSmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-          ),
-
-          ref
-              .watch(ProfileController.provider(userId))
-              .betterWhen(
-                loading: () => Text(""),
-                data: (profileResponse) => Column(
-                  children: [
-                    if (profileResponse.profile.timezone == null &&
-                        profileResponse.profile.pronouns.isEmpty)
-                      Text(""),
-                    Wrap(
-                      crossAxisAlignment: .center,
-                      alignment: .center,
-                      spacing: 4,
-                      runSpacing: 4,
-                      children: [
-                        ...profileResponse.profile.pronouns
-                            .where(
-                              // TODO: Check system language (l10n)
-                              (pronoun) => pronoun.language == "en",
-                            )
-                            .mapIndexed(
-                              (index, pronoun) => [
-                                if (index != 0)
-                                  Icon(
-                                    Icons.circle,
-                                    size: 4,
-                                    color: theme.colorScheme.onSurfaceVariant,
-                                  ),
-                                Text(
-                                  pronoun.summary,
-                                  textAlign: .center,
-                                  style: textTheme.titleSmall?.copyWith(
-                                    color: theme.colorScheme.onSurfaceVariant,
-                                  ),
-                                ),
-                              ],
-                            )
-                            .flattened,
-
-                        if (profileResponse.profile.timezone != null) ...[
-                          if (profileResponse.profile.pronouns.isNotEmpty)
-                            SizedBox(
-                              height: 16,
-                              child: VerticalDivider(
-                                thickness: 1.5,
-                                width: 4,
-                                color: theme.colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                          Text(
-                            profileResponse.profile.timezone!,
-                            textAlign: .center,
-                            style: textTheme.titleSmall?.copyWith(
-                              color: theme.colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-
-          SizedBox(height: 8),
-          if (userId != ref.watch(ClientStateController.provider)?.userId &&
-              roomId != null) ...[
+      child: SingleChildScrollView(
+        child: Column(
+          spacing: 4,
+          mainAxisSize: .min,
+          crossAxisAlignment: .center,
+          children: [
             Row(
+              mainAxisAlignment: .end,
               children: [
-                Expanded(
-                  child: M3EButton.icon(
-                    onPressed: null,
-                    shape: .square,
-                    style: .tonal,
-                    icon: Icon(Icons.message),
-                    label: Text("Message"),
-                  ),
+                M3EButton(
+                  onPressed: Navigator.of(context).pop,
+                  child: Icon(Icons.close),
                 ),
               ],
             ),
+            SizedBox(height: 18),
 
-            if (ref.watch(
-              PowerLevelController.provider(
-                .membershipAction(
-                  action: .kick,
-                  roomId: roomId!,
-                  targetUser: userId,
-                ),
+            ExpandableImage(
+              member.avatarUrl == null ? null : .new(mxc: member.avatarUrl!),
+              child: AvatarOrHash(
+                member.avatarUrl,
+                member.displayName ?? userId.localpart,
+                height: 200,
               ),
-            ))
-              Padding(
-                padding: .only(top: 4),
-                child: Row(
-                  mainAxisSize: MainAxisSize.max,
-                  spacing: 8,
-                  children: [
-                    if (member.status == .join || member.status == .invite)
+            ),
+
+            SizedBox(height: 8),
+
+            SelectableText(
+              member.displayName ?? userId.localpart,
+              style: textTheme.headlineLarge,
+              textAlign: .center,
+            ),
+            SelectableText(
+              userId,
+              textAlign: .center,
+              style: textTheme.titleSmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+
+            ref
+                .watch(ProfileController.provider(userId))
+                .betterWhen(
+                  loading: () => Text(""),
+                  data: (profileResponse) => Column(
+                    children: [
+                      if (profileResponse.profile.timezone == null &&
+                          profileResponse.profile.pronouns.isEmpty)
+                        Text(""),
+                      Wrap(
+                        crossAxisAlignment: .center,
+                        alignment: .center,
+                        spacing: 4,
+                        runSpacing: 4,
+                        children: [
+                          ...profileResponse.profile.pronouns
+                              .where(
+                                // TODO: Check system language (l10n)
+                                (pronoun) => pronoun.language == "en",
+                              )
+                              .mapIndexed(
+                                (index, pronoun) => [
+                                  if (index != 0)
+                                    Icon(
+                                      Icons.circle,
+                                      size: 4,
+                                      color: theme.colorScheme.onSurfaceVariant,
+                                    ),
+                                  Text(
+                                    pronoun.summary,
+                                    textAlign: .center,
+                                    style: textTheme.titleSmall?.copyWith(
+                                      color: theme.colorScheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ],
+                              )
+                              .flattened,
+
+                          if (profileResponse.profile.timezone != null) ...[
+                            if (profileResponse.profile.pronouns.isNotEmpty)
+                              SizedBox(
+                                height: 16,
+                                child: VerticalDivider(
+                                  thickness: 1.5,
+                                  width: 4,
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            Text(
+                              profileResponse.profile.timezone!,
+                              textAlign: .center,
+                              style: textTheme.titleSmall?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+            SizedBox(height: 8),
+            if (userId != ref.watch(ClientStateController.provider)?.userId &&
+                roomId != null) ...[
+              Row(
+                children: [
+                  Expanded(
+                    child: M3EButton.icon(
+                      onPressed: null,
+                      shape: .square,
+                      style: .tonal,
+                      icon: Icon(Icons.message),
+                      label: Text("Message"),
+                    ),
+                  ),
+                ],
+              ),
+
+              if (ref.watch(
+                PowerLevelController.provider(
+                  .membershipAction(
+                    action: .kick,
+                    roomId: roomId!,
+                    targetUser: userId,
+                  ),
+                ),
+              ))
+                Padding(
+                  padding: .only(top: 4),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    spacing: 8,
+                    children: [
+                      if (member.status == .join || member.status == .invite)
+                        M3EButton.icon(
+                          onPressed: () => showMembershipDialog(.kick),
+                          shape: .square,
+                          icon: Icon(Icons.sports_martial_arts),
+                          label: Text("Kick"),
+                          decoration: .new(
+                            backgroundColor: WidgetStatePropertyAll(
+                              theme.colorScheme.error,
+                            ),
+                            foregroundColor: WidgetStatePropertyAll(
+                              theme.colorScheme.onError,
+                            ),
+                          ),
+                        ),
+
                       M3EButton.icon(
-                        onPressed: () => showMembershipDialog(.kick),
+                        onPressed: () => showMembershipDialog(.ban),
                         shape: .square,
-                        icon: Icon(Icons.sports_martial_arts),
-                        label: Text("Kick"),
+                        icon: Icon(Icons.gavel),
+                        label: Text("Ban"),
                         decoration: .new(
                           backgroundColor: WidgetStatePropertyAll(
-                            theme.colorScheme.error,
+                            theme.colorScheme.errorContainer,
                           ),
                           foregroundColor: WidgetStatePropertyAll(
-                            theme.colorScheme.onError,
+                            theme.colorScheme.onErrorContainer,
                           ),
                         ),
                       ),
-
-                    M3EButton.icon(
-                      onPressed: () => showMembershipDialog(.ban),
-                      shape: .square,
-                      icon: Icon(Icons.gavel),
-                      label: Text("Ban"),
-                      decoration: .new(
-                        backgroundColor: WidgetStatePropertyAll(
-                          theme.colorScheme.errorContainer,
-                        ),
-                        foregroundColor: WidgetStatePropertyAll(
-                          theme.colorScheme.onErrorContainer,
-                        ),
-                      ),
-                    ),
-                  ].map((e) => Expanded(child: e)).toList(),
+                    ].map((e) => Expanded(child: e)).toList(),
+                  ),
                 ),
-              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }

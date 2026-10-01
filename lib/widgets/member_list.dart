@@ -7,6 +7,7 @@ import "package:m3e_card_list/m3e_card_list.dart";
 import "package:nexus/controllers/members_by_status.dart";
 import "package:nexus/controllers/members_grouped.dart";
 import "package:nexus/helpers/extensions/get_localpart.dart";
+import "package:nexus/helpers/extensions/show_user_popover.dart";
 import "package:nexus/helpers/extensions/string_to_color.dart";
 import "package:nexus/models/content/membership.dart";
 import "package:nexus/models/membership_status.dart";
@@ -14,7 +15,6 @@ import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/widgets/divider_text.dart";
 import "package:nexus/widgets/error_dialog.dart";
 import "package:nexus/widgets/loading.dart";
-import "package:nexus/widgets/user_bottom_sheet.dart";
 
 class const MemberList(final String roomId, {super.key})
     extends HookConsumerWidget {
@@ -140,20 +140,10 @@ class const MemberList(final String roomId, {super.key})
                                   final member = members[index];
                                   if (member.content
                                       case MembershipContent content) {
-                                    showModalBottomSheet(
-                                      constraints: .loose(
-                                        .new(
-                                          500,
-                                          (context.size?.height ?? 1000) - 80,
-                                        ),
-                                      ),
-                                      isScrollControlled: true,
-                                      context: context,
-                                      builder: (context) => UserBottomSheet(
-                                        content,
-                                        member.stateKey!,
-                                        roomId: roomId,
-                                      ),
+                                    context.showUserPopover(
+                                      content,
+                                      member.stateKey!,
+                                      roomId: roomId,
                                     );
                                   }
                                 },
