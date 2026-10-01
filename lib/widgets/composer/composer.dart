@@ -264,6 +264,7 @@ class const Composer(
                               ),
                             ),
                             IconButton(
+                              style: .new(iconButtonWidth: .narrow),
                               onPressed:
                                   attachment != null && attachment.$2 == null
                                   ? null
