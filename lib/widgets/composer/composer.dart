@@ -141,8 +141,11 @@ class const Composer(
                               icon: Icon(Icons.emoji_emotions),
                             ),
                             PopupMenuButton(
-                              style: .new(iconButtonWidth: .narrow),
                               tooltip: "Add media",
+
+                              // `style` has no effect due to https://github.com/flutter/flutter/issues/193656, so `padding` is set from material_ui/lib/src/generated/icon_button_defaults_m3e.g.dart manually.
+                              padding: .fromSTEB(4.0, 6.0, 4.0, 6.0),
+                              style: .new(iconButtonWidth: .narrow),
                               enabled: attachment == null,
                               itemBuilder: (context) => [
                                 if (Platform.isAndroid || Platform.isIOS)
