@@ -57,19 +57,19 @@ final class const PinnedEventsDrawer(
             reverse: true,
             itemCount: value.length,
             itemBuilder: (context, index) {
-              final event = value.reversed[index];
+              final rowId = value.reversed[index];
 
               return InkWell(
                 borderRadius: .circular(12),
                 onTap: () {
                   Navigator.of(context).pop();
-                  jumpToEvent(event.rowId);
+                  jumpToEvent(rowId);
                 },
                 child: Padding(
                   padding: .symmetric(vertical: 4),
                   child: IgnorePointer(
                     child: EventRenderer(
-                      event.rowId,
+                      rowId,
                       roomId: roomId,
                       maxLines: 2,
                       getEventOptions: getEventOptions,
