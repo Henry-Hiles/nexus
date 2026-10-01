@@ -221,7 +221,7 @@ class RoomChatController(final ChatParams info)
             ),
           );
 
-    if (relationType == .edit) {
+    if (relationType == .edit && relatedEventRowId != null) {
       baseContent = relatedEvent?.content;
     } else {
       final provider = AttachmentController.provider(info.roomId);
