@@ -48,33 +48,34 @@ class const EventRenderer(
     final focusNode = useFocusNode();
     useListenable(focusNode);
 
-    final (initialEvent, previousEvent) = ref.watch(
-      RoomsController.provider.select(
-        (value) => (
-          value[roomId]?.events[eventRowId],
+    final (event, previousEvent) = ref.watch(
+      RoomsController.provider.select((rooms) {
+        final event = rooms[roomId]?.events[eventRowId];
+        if (event == null) return (null, null);
+
+        final edited = event.lastEditRowId == 0
+            ? null
+            : ref.watch(
+                RoomsController.provider.select(
+                  (value) => value[roomId]?.events[event.lastEditRowId],
+                ),
+              );
+
+        return (
+          edited == null
+              ? event
+              : event.copyWith(
+                  content: edited.content,
+                  localContent: edited.localContent,
+                ),
           previousEventRowId == null
               ? null
-              : value[roomId]?.events[previousEventRowId!],
-        ),
-      ),
+              : rooms[roomId]?.events[previousEventRowId!],
+        );
+      }),
     );
 
-    if (initialEvent == null) return SizedBox.shrink();
-
-    final edited = initialEvent.lastEditRowId == 0
-        ? null
-        : ref.watch(
-            RoomsController.provider.select(
-              (value) => value[roomId]?.events[initialEvent.lastEditRowId],
-            ),
-          );
-
-    final event = edited == null
-        ? initialEvent
-        : initialEvent.copyWith(
-            content: edited.content,
-            localContent: edited.localContent,
-          );
+    if (event == null) return SizedBox.shrink();
 
     final isGrouped =
         previousEvent?.content is MessageContent &&

@@ -42,9 +42,25 @@ class const Composer(
     final relatedEvent = this.relatedEvent == null
         ? null
         : ref.watch(
-            RoomsController.provider.select(
-              (rooms) => rooms[roomId]?.events[this.relatedEvent!],
-            ),
+            RoomsController.provider.select((rooms) {
+              final event = rooms[roomId]?.events[this.relatedEvent!];
+              if (event == null) return null;
+
+              final edited = event.lastEditRowId == 0
+                  ? null
+                  : ref.watch(
+                      RoomsController.provider.select(
+                        (value) => value[roomId]?.events[event.lastEditRowId],
+                      ),
+                    );
+
+              return edited == null
+                  ? event
+                  : event.copyWith(
+                      content: edited.content,
+                      localContent: edited.localContent,
+                    );
+            }),
           );
 
     if (relationType == .edit && controller.value.text.isEmpty) {
