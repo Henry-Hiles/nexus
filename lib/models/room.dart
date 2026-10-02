@@ -25,6 +25,8 @@ class const Room({
   final IMap<int, Event> events = const IMap.empty(),
 
   final bool reset = false,
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  final bool resetClientSticky = false,
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   final bool hasFetchedState = false,

@@ -4,6 +4,7 @@ import "package:material_ui/material_ui.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/event.dart";
+import "package:nexus/controllers/room_chat.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/helpers/extensions/show_context_menu.dart";
 import "package:nexus/helpers/hooks/chat_scroll.dart";
@@ -270,11 +271,34 @@ class const EventRenderer(
               if (event.sendError != null && event.sendError != "not sent")
                 Padding(
                   padding: .only(bottom: 4),
-                  child: Text(
-                    event.sendError!,
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: theme.colorScheme.error,
-                    ),
+                  child: Row(
+                    spacing: 4,
+                    children: [
+                      Text(
+                        event.sendError!,
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.colorScheme.error,
+                        ),
+                      ),
+                      InkWell(
+                        child: Text(
+                          "Hide",
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: theme.colorScheme.primary,
+                            decoration: .underline,
+                            decorationColor: theme.colorScheme.primary,
+                          ),
+                        ),
+                        onTap: () => ref
+                            .read(
+                              RoomChatController.provider((
+                                roomId: roomId,
+                                contextualEvent: null,
+                              )).notifier,
+                            )
+                            .hideClientSticky(event.rowId),
+                      ),
+                    ],
                   ),
                 ),
             ].map((child) => Padding(padding: .only(left: 4), child: child)),

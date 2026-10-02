@@ -97,6 +97,25 @@ class RoomChatController(final ChatParams info)
         ),
       );
 
+  void hideClientSticky(int eventRowId) => ref
+      .read(RoomsController.provider.notifier)
+      .update(
+        .new({
+          info.roomId: Room(
+            resetClientSticky: true,
+            clientSticky:
+                ref
+                    .read(
+                      RoomsController.provider.select(
+                        (rooms) => rooms[info.roomId]?.clientSticky,
+                      ),
+                    )
+                    ?.remove(eventRowId) ??
+                .new(),
+          ),
+        }),
+      );
+
   Future<void> paginate(Direction direction) async {
     if (state.isLoading) return;
 

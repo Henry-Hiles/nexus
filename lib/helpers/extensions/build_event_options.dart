@@ -225,10 +225,11 @@ extension BuildEventOptions on Event {
         ),
 
       if (ref.watch(
-        PowerLevelController.provider(
-          .redaction(targetUser: sender, roomId: roomId),
-        ),
-      ))
+            PowerLevelController.provider(
+              .redaction(targetUser: sender, roomId: roomId),
+            ),
+          ) &&
+          !eventId.startsWith("~"))
         PopupMenuItem(
           onTap: () => showReasonDialog(
             title: "Delete Message",
@@ -242,6 +243,15 @@ extension BuildEventOptions on Event {
           child: ListTile(
             leading: Icon(Icons.delete, color: danger),
             title: Text("Delete", style: .new(color: danger)),
+          ),
+        ),
+
+      if (eventId.startsWith("~"))
+        PopupMenuItem(
+          onTap: () => ref.watch(notifier).hideClientSticky(rowId),
+          child: ListTile(
+            leading: Icon(Icons.delete, color: danger),
+            title: Text("Hide", style: .new(color: danger)),
           ),
         ),
 

@@ -46,13 +46,16 @@ class RoomsController extends Notifier<IMap<String, Room>> {
         roomId,
         existing?.copyWith(
               hasMore: incoming.hasMore,
-              clientSticky:
-                  (incoming.clientSticky.isEmpty == true
-                          ? existing.clientSticky
-                          : existing.clientSticky.addAll(incoming.clientSticky))
-                      .removeWhere(
-                        (rowId) => incoming.timeline.values.contains(rowId),
-                      ),
+              clientSticky: incoming.resetClientSticky
+                  ? incoming.clientSticky
+                  : (incoming.clientSticky.isEmpty == true
+                            ? existing.clientSticky
+                            : existing.clientSticky.addAll(
+                                incoming.clientSticky,
+                              ))
+                        .removeWhere(
+                          (rowId) => incoming.timeline.values.contains(rowId),
+                        ),
               metadata: incoming.metadata ?? existing.metadata,
               events: incoming.events.isEmpty
                   ? existing.events
@@ -64,6 +67,7 @@ class RoomsController extends Notifier<IMap<String, Room>> {
                   (previousValue[event.key] ?? .new()).addAll(event.value),
                 ),
               ),
+              resetClientSticky: false,
               reset: false,
               hasFetchedMembers:
                   incoming.hasFetchedMembers || existing.hasFetchedMembers,
