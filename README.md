@@ -17,15 +17,20 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
 
 - [x] Platform Support
     - [x] Linux
+        - [x] Notifications through UnifiedPush
     - [x] Windows
-        - Currently has some bugs, due to us not having any developers on Windows. If you want to fix these, get in contact with us though the [Nexus Client Matrix room](https://matrix.to/#/#nexus:federated.nexus).
+        - [ ] Background notifications
     - [x] Android
+        - [x] Notifications through UnifiedPush
+        - [x] Notifications through FCM
     - [x] MacOS
         - [x] Unsigned .ipa
         - [ ] App Store
+        - [ ] Background notifications
     - [x] iOS
         - [x] Unsigned .ipa
         - [ ] App Store
+        - [ ] Background notifications
     - [ ] Web (may not be possible)
 - [x] Login (via OAuth)
 - [x] Rooms / Spaces
