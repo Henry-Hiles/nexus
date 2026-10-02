@@ -94,6 +94,27 @@ final class ChatScroll({
       );
     }, [controllerData, anchorId.value]);
 
+    final lastRowId = split.live.lastOrNull;
+    final previousLastRowId = useRef<int?>(null);
+
+    useEffect(() {
+      final previous = previousLastRowId.value;
+      previousLastRowId.value = lastRowId;
+
+      if (previous == null || lastRowId == null || previous == lastRowId) {
+        return null;
+      }
+      if (!atBottom.value || contextualEvent.value != null) return null;
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!scrollController.hasClients) return;
+
+        scrollController.jumpTo(scrollController.position.minScrollExtent);
+      });
+
+      return null;
+    }, [lastRowId]);
+
     useEffect(
       () {
         const loadThreshold = 500.0;
