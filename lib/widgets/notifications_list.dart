@@ -135,7 +135,9 @@ class const NotificationsList({
                               child: HighlightWrapper(
                                 InkWell(
                                   onTap: () async {
-                                    Navigator.of(context).pop();
+                                    final navigator = Navigator.of(context);
+                                    if (navigator.canPop()) navigator.pop();
+
                                     await ref.focusRoom(roomId, rowId);
                                   },
                                   child: IgnorePointer(
