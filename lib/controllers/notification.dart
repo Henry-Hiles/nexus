@@ -7,7 +7,7 @@ import "package:nexus/controllers/portal.dart";
 import "package:nexus/main.dart";
 import "package:flutter_local_notifications/flutter_local_notifications.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
-import "package:nexus/widgets/pages/notifications.dart";
+import "package:nexus/widgets/notifications_list.dart";
 import "package:xdg_desktop_portal/xdg_desktop_portal.dart";
 
 class NotificationController
@@ -37,7 +37,7 @@ class NotificationController
             if (navigatorKey.currentContext case final context?) {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (_) => NotificationsPage(
+                  builder: (_) => NotificationsList(
                     highlightedEvent: rowId,
                     defaultToAllNotifications: true,
                   ),
@@ -61,7 +61,7 @@ class NotificationController
           if (navigatorKey.currentContext case final context?) {
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (_) => NotificationsPage(
+                builder: (_) => NotificationsList(
                   highlightedEvent: rowId,
                   defaultToAllNotifications: true,
                 ),

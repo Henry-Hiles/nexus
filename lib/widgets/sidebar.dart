@@ -1,323 +1,34 @@
-import "package:collection/collection.dart";
-import "package:fast_immutable_collections/fast_immutable_collections.dart";
+import "package:flutter_hooks/flutter_hooks.dart";
 import "package:material_ui/material_ui.dart";
-import "package:hooks_riverpod/hooks_riverpod.dart";
-import "package:navigation_rail_m3e/navigation_rail_m3e.dart";
-import "package:nexus/controllers/key.dart";
-import "package:nexus/controllers/spaces.dart";
-import "package:nexus/models/room.dart";
-import "package:nexus/widgets/pages/notifications.dart";
-import "package:nexus/widgets/pages/settings.dart";
-import "package:nexus/widgets/avatar_or_hash.dart";
-import "package:nexus/widgets/divider_widget.dart";
-import "package:nexus/widgets/join_dialog.dart";
-import "package:nexus/widgets/room_menu.dart";
+import "package:nexus/models/nav_page.dart";
+import "package:nexus/widgets/invites_list.dart";
+import "package:nexus/widgets/notifications_list.dart";
+import "package:nexus/widgets/room_list.dart";
 
-// Needed for navigation_rail_m3e (#65).
-import "package:flutter/material.dart" as old_mat;
-
-class const Sidebar({super.key}) extends HookConsumerWidget {
+class const Sidebar({super.key}) extends HookWidget {
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final selectedSpaceProvider = KeyController.provider(
-      KeyController.spaceKey,
-    );
-    final selectedSpaceId = ref.watch(selectedSpaceProvider).requireValue;
-    final selectedSpaceIdNotifier = ref.watch(selectedSpaceProvider.notifier);
-
-    final selectedRoomController = KeyController.provider(
-      KeyController.roomKey,
-    );
-    final selectedRoomId = ref.watch(selectedRoomController).requireValue;
-    final selectedRoomIdNotifier = ref.watch(selectedRoomController.notifier);
-
-    final spaces = ref.watch(SpacesController.provider);
-    final indexOfSelected = spaces.indexWhere(
-      (space) => space.id == selectedSpaceId,
-    );
-    final selectedIndex = indexOfSelected == -1 ? 0 : indexOfSelected;
-
-    final selectedSpace =
-        spaces.firstWhereOrNull((space) => space.id == selectedSpaceId) ??
-        spaces.first;
-
-    final indexOfSelectedRoom = selectedSpace.children
-        .addAll(
-          selectedSpace.subSpaces.map((element) => element.children).flattened,
-        )
-        .indexWhere((room) => room.metadata?.id == selectedRoomId);
-    final selectedRoomIndex = indexOfSelectedRoom == -1
-        ? null
-        : indexOfSelectedRoom;
-
-    List<NavigationRailM3EDestination> roomsToDestinations(IList<Room> rooms) =>
-        rooms
-            .map(
-              (room) => NavigationRailM3EDestination(
-                label: room.metadata?.name ?? "Unnamed Room",
-                badgeCount: switch (room.metadata?.unreadNotifications) {
-                  0 || null => room.metadata?.unreadMessages == 0 ? null : 0,
-                  int unread => unread,
-                },
-                icon: AvatarOrHash(
-                  room.metadata?.avatar,
-                  room.metadata?.name ?? "Unnamed Room",
-                  fallback: selectedSpaceId == "dms"
-                      ? null
-                      : Icon(Icons.numbers),
-                ),
-              ),
-            )
-            .toList();
+  Widget build(BuildContext context) {
+    final selectedIndex = useState(0);
+    const pages = <NavPage>[RoomList(), NotificationsList(), InvitesList()];
 
     return Drawer(
       width: 330,
       shape: Border(),
-      child: Row(
-        children: [
-          MaterialUiCompatibilityBridge(
-            child: Builder(
-              builder: (context) => old_mat.Theme(
-                data: old_mat.Theme.of(context).copyWith(
-                  extensions: [
-                    NavigationRailM3ETheme(
-                      itemCollapsedHeight: 48,
-                      itemVerticalGap: 0,
-                    ),
-                  ],
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: pages[selectedIndex.value],
+        bottomNavigationBar: NavigationBar(
+          selectedIndex: selectedIndex.value,
+          destinations: pages
+              .map(
+                (element) => NavigationDestination(
+                  icon: Icon(element.icon),
+                  label: element.title,
                 ),
-                child: Container(
-                  color: NavigationRailTokensAdapter(context).containerColor,
-                  padding: EdgeInsets.only(top: 16),
-                  child: NavigationRailM3E(
-                    type: .alwaysCollapse,
-                    labelBehavior: .alwaysHide,
-                    scrollable: true,
-                    onDestinationSelected: (value) {
-                      selectedSpaceIdNotifier.set(spaces[value].id);
-                      selectedRoomIdNotifier.set(
-                        spaces[value].children.firstOrNull?.metadata?.id,
-                      );
-                    },
-                    sections: [
-                      .new(
-                        destinations: spaces
-                            .map(
-                              (space) => NavigationRailM3EDestination(
-                                badgeCount: switch (space.children
-                                    .addAll(
-                                      space.subSpaces
-                                          .map((element) => element.children)
-                                          .flattened,
-                                    )
-                                    .fold(
-                                      0,
-                                      (previousValue, room) =>
-                                          previousValue +
-                                          (room.metadata?.unreadNotifications ??
-                                              0),
-                                    )) {
-                                  0 =>
-                                    space.children
-                                            .addAll(
-                                              space.subSpaces
-                                                  .map(
-                                                    (element) =>
-                                                        element.children,
-                                                  )
-                                                  .flattened,
-                                            )
-                                            .any(
-                                              (room) =>
-                                                  room
-                                                      .metadata
-                                                      ?.unreadMessages !=
-                                                  0,
-                                            )
-                                        ? 0
-                                        : null,
-                                  int badgeCount => badgeCount,
-                                },
-                                short: true,
-                                icon: AvatarOrHash(
-                                  height: 28,
-                                  space.room?.metadata?.avatar,
-                                  fallback: space.icon == null
-                                      ? null
-                                      : Icon(space.icon),
-                                  space.title,
-                                ),
-                                label: space.title,
-                              ),
-                            )
-                            .toList(),
-                      ),
-                    ],
-                    selectedIndex: selectedIndex,
-                    trailingAtBottom: true,
-                    trailing: Padding(
-                      padding: .symmetric(vertical: 16),
-                      child: Column(
-                        children: [
-                          PopupMenuButton(
-                            itemBuilder: (_) => [
-                              PopupMenuItem(
-                                onTap: () => showDialog(
-                                  context: context,
-                                  builder: (_) => JoinDialog(ref),
-                                ),
-                                child: ListTile(
-                                  title: Text(
-                                    "Join an existing room (or space)",
-                                  ),
-                                  leading: Icon(Icons.numbers),
-                                ),
-                              ),
-                              PopupMenuItem(
-                                onTap: null,
-                                child: ListTile(
-                                  title: Text("Create a new room"),
-                                  leading: Icon(Icons.add),
-                                ),
-                              ),
-                            ],
-                            icon: Icon(Icons.add),
-                          ),
-                          IconButton(
-                            tooltip: "Explore other rooms",
-                            onPressed: null,
-                            icon: Icon(Icons.explore),
-                          ),
-                          IconButton(
-                            tooltip: "Open notifications",
-                            onPressed: () {
-                              if (Navigator.of(context).canPop())
-                                Navigator.of(context).pop();
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (_) => NotificationsPage(),
-                                ),
-                              );
-                            },
-                            icon: Icon(Icons.notifications),
-                          ),
-                          IconButton(
-                            tooltip: "Open settings",
-                            onPressed: () => showDialog(
-                              context: context,
-                              builder: (_) => SettingsPage(),
-                            ),
-                            icon: Icon(Icons.settings),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-
-          Expanded(
-            child: Scaffold(
-              backgroundColor: Colors.transparent,
-              appBar: AppBar(
-                leading: AvatarOrHash(
-                  selectedSpace.room?.metadata?.avatar,
-                  fallback: selectedSpace.icon == null
-                      ? null
-                      : Icon(selectedSpace.icon),
-
-                  selectedSpace.title,
-                ),
-                title: Text(selectedSpace.title, overflow: .ellipsis),
-                backgroundColor: Colors.transparent,
-                actions: [
-                  RoomMenu(
-                    selectedSpace.room,
-                    children: selectedSpace.children.addAll(
-                      selectedSpace.subSpaces
-                          .map((element) => element.children)
-                          .flattened,
-                    ),
-                  ),
-                ],
-              ),
-              body: MaterialUiCompatibilityBridge(
-                child: Builder(
-                  builder: (context) => old_mat.Theme(
-                    data: old_mat.Theme.of(context).copyWith(
-                      extensions: [
-                        NavigationRailM3ETheme(
-                          itemExpandedHeight: 48,
-                          iconLabelGap: 16,
-                        ),
-                      ],
-                    ),
-                    child: NavigationRailM3E(
-                      expandedWidth: double.infinity,
-                      scrollable: true,
-                      background: Colors.transparent,
-                      type: .alwaysExpand,
-                      selectedIndex: selectedRoomIndex ?? 0,
-                      sections: [
-                        .new(
-                          header: selectedSpace.room == null
-                              ? null
-                              : DividerWidget(Text("Rooms")),
-                          destinations: roomsToDestinations(
-                            selectedSpace.children,
-                          ),
-                        ),
-                        for (final subSpace in selectedSpace.subSpaces)
-                          .new(
-                            header: DividerWidget(
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                spacing: 8,
-                                children: [
-                                  if (subSpace.room.metadata?.avatar != null)
-                                    AvatarOrHash(
-                                      subSpace.room.metadata?.avatar,
-                                      subSpace.room.metadata?.name ??
-                                          "Unnamed Room",
-                                      height: 16,
-                                    ),
-                                  Flexible(
-                                    child: Text(
-                                      subSpace.room.metadata?.name ??
-                                          "Unnamed Space",
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            destinations: roomsToDestinations(
-                              subSpace.children,
-                            ),
-                          ),
-                      ],
-                      onDestinationSelected: (value) {
-                        final children = selectedSpace.children.addAll(
-                          selectedSpace.subSpaces
-                              .map((element) => element.children)
-                              .flattened,
-                        );
-                        selectedRoomIdNotifier.set(
-                          children[value].metadata?.id, //
-                        );
-                        if (Navigator.of(context).canPop())
-                          Navigator.of(context).pop();
-                      },
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
+              )
+              .toList(),
+          onDestinationSelected: (value) => selectedIndex.value = value,
+        ),
       ),
     );
   }

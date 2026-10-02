@@ -7,18 +7,28 @@ import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/notifications.dart";
 import "package:nexus/helpers/extensions/focus_room.dart";
 import "package:nexus/models/event.dart";
-import "package:nexus/widgets/appbar.dart";
+import "package:nexus/models/nav_page.dart";
 import "package:nexus/widgets/error_dialog.dart";
 import "package:nexus/widgets/highlight_wrapper.dart";
 import "package:nexus/widgets/loading.dart";
 import "package:nexus/widgets/renderers/event.dart";
 import "package:super_sliver_list/super_sliver_list.dart";
 
-class const NotificationsPage({
+class const NotificationsList({
   final int? highlightedEvent,
   final bool defaultToAllNotifications = false,
   super.key,
-}) extends HookConsumerWidget {
+}) extends HookConsumerWidget implements NavPage {
+  @override
+  String get title => "Notifications";
+
+  @override
+  IconData get icon => Icons.notifications;
+
+  // TODO: Show notification badge here
+  @override
+  Future<int>? badgeBuilder(WidgetRef ref) => null;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final options = <M3EToggleButtonGroupAction, UnreadType>{
@@ -91,81 +101,74 @@ class const NotificationsPage({
       return () => scrollController.removeListener(listener);
     }, [scrollController, notifications]);
 
-    return Scaffold(
-      appBar: Appbar(title: Text("Notifications")),
-      body: Stack(
-        children: [
-          Column(
-            children: [
-              if (notifications is AsyncLoading && notifications.value != null)
-                const LinearProgressIndicator(minHeight: 2),
-              Expanded(
-                child: switch (notifications) {
-                  AsyncData(:final value) || AsyncLoading(:final value?) =>
-                    value.isEmpty
-                        ? Center(
-                            child: Text(
-                              "No notifications yet",
-                              style: Theme.of(context).textTheme.headlineMedium,
-                            ),
-                          )
-                        : SuperListView.builder(
-                            listController: listController.value,
-                            controller: scrollController,
-                            itemCount: value.length,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 12,
-                            ),
-                            reverse: true,
-                            itemBuilder: (context, index) {
-                              final (rowId, roomId) = value[index];
-                              final isHighlighted =
-                                  rowId == highlightedId.value;
-
-                              return Padding(
-                                padding: .only(top: 8),
-                                child: HighlightWrapper(
-                                  InkWell(
-                                    onTap: () async {
-                                      Navigator.of(context).pop();
-                                      await ref.focusRoom(roomId, rowId);
-                                    },
-                                    child: IgnorePointer(
-                                      child: EventRenderer(
-                                        rowId,
-                                        roomId: roomId,
-                                      ),
-                                    ),
-                                  ),
-                                  isHighlighted: isHighlighted,
-                                ),
-                              );
-                            },
+    return Stack(
+      children: [
+        Column(
+          children: [
+            if (notifications is AsyncLoading && notifications.value != null)
+              const LinearProgressIndicator(minHeight: 2),
+            Expanded(
+              child: switch (notifications) {
+                AsyncData(:final value) || AsyncLoading(:final value?) =>
+                  value.isEmpty
+                      ? Center(
+                          child: Text(
+                            "No notifications yet",
+                            style: Theme.of(context).textTheme.headlineMedium,
                           ),
-                  AsyncLoading() => const Loading(),
-                  AsyncError(:final error, :final stackTrace) => ErrorDialog(
-                    error,
-                    stackTrace,
-                  ),
-                },
-              ),
-            ],
-          ),
-          Align(
-            alignment: .topRight,
-            child: Padding(
-              padding: .all(16),
-              child: M3EToggleButtonGroup(
-                selectedIndex: unreadTypeIndex.value,
-                onSelectedIndexChanged: (index) =>
-                    unreadTypeIndex.value = index ?? unreadTypeIndex.value,
-                actions: options.keys.toList(),
-              ),
+                        )
+                      : SuperListView.builder(
+                          listController: listController.value,
+                          controller: scrollController,
+                          itemCount: value.length,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 12,
+                          ),
+                          reverse: true,
+                          itemBuilder: (context, index) {
+                            final (rowId, roomId) = value[index];
+                            final isHighlighted = rowId == highlightedId.value;
+
+                            return Padding(
+                              padding: .only(top: 8),
+                              child: HighlightWrapper(
+                                InkWell(
+                                  onTap: () async {
+                                    Navigator.of(context).pop();
+                                    await ref.focusRoom(roomId, rowId);
+                                  },
+                                  child: IgnorePointer(
+                                    child: EventRenderer(rowId, roomId: roomId),
+                                  ),
+                                ),
+                                isHighlighted: isHighlighted,
+                              ),
+                            );
+                          },
+                        ),
+                AsyncLoading() => const Loading(),
+                AsyncError(:final error, :final stackTrace) => ErrorDialog(
+                  error,
+                  stackTrace,
+                ),
+              },
+            ),
+          ],
+        ),
+        Align(
+          alignment: .topRight,
+          child: Padding(
+            padding: .all(16),
+            child: M3EToggleButtonGroup(
+              selectedIndex: unreadTypeIndex.value,
+              onSelectedIndexChanged: (index) =>
+                  unreadTypeIndex.value = index ?? unreadTypeIndex.value,
+              actions: options.keys.toList(),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
