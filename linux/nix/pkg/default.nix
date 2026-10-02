@@ -5,6 +5,7 @@
   libass,
   libclang,
   flutter,
+  stdenv,
   src,
   commit ? "dev",
 }:
@@ -54,6 +55,10 @@ flutter.buildFlutterApplication {
     description = "A simple and user-friendly Matrix client";
     mainProgram = "nexus";
     platforms = lib.platforms.unix;
+
+    # https://github.com/NixOS/nixpkgs/blob/c59305bab2065cfecc4944690d9eedbb56f3a9fa/pkgs/development/compilers/flutter/build-support/build-flutter-application.nix#L15
+    broken = stdenv.hostPlatform.isDarwin;
+
     maintainers = with lib.maintainers; [ quadradical ];
   };
 }
