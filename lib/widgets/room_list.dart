@@ -162,7 +162,7 @@ class const RoomList({super.key})
                   selectedIndex: selectedIndex,
                   trailingAtBottom: true,
                   trailing: Padding(
-                    padding: .symmetric(vertical: 16),
+                    padding: .only(top: 8),
                     child: Column(
                       children: [
                         PopupMenuButton(
@@ -192,19 +192,6 @@ class const RoomList({super.key})
                           onPressed: null,
                           icon: Icon(Icons.explore),
                         ),
-                        // IconButton(
-                        //   tooltip: "Open notifications",
-                        //   onPressed: () {
-                        //     if (Navigator.of(context).canPop())
-                        //       Navigator.of(context).pop();
-                        //     Navigator.of(context).push(
-                        //       MaterialPageRoute(
-                        //         builder: (_) => NotificationsPage(),
-                        //       ),
-                        //     );
-                        //   },
-                        //   icon: Icon(Icons.notifications),
-                        // ),
                         IconButton(
                           tooltip: "Open settings",
                           onPressed: () => showDialog(
