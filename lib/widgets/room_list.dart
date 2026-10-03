@@ -310,8 +310,9 @@ class const RoomList({super.key})
                       selectedRoomIdNotifier.set(
                         children[value].metadata?.id, //
                       );
-                      if (Navigator.of(context).canPop())
+                      if (Navigator.of(context).canPop()) {
                         Navigator.of(context).pop();
+                      }
                     },
                   ),
                 ),

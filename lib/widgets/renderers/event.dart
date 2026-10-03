@@ -105,8 +105,9 @@ class const EventRenderer(
                           .new(roomId: roomId, eventId: event.replyTo!),
                         ).future,
                       );
-                      if (replyEvent != null)
+                      if (replyEvent != null) {
                         await jumpToEvent!(replyEvent.rowId);
+                      }
                     },
               isGrouped: isGrouped,
               maxLines: maxLines,
