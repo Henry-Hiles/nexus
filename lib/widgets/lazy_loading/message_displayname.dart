@@ -5,6 +5,7 @@ import "package:nexus/helpers/extensions/get_localpart.dart";
 import "package:nexus/helpers/extensions/show_user_popover.dart";
 import "package:nexus/helpers/extensions/string_to_color.dart";
 import "package:nexus/models/event.dart";
+import "package:nexus/models/content/membership.dart";
 
 class const MessageDisplayname(
   final Event event, {
@@ -16,8 +17,10 @@ class const MessageDisplayname(
   Widget build(BuildContext context, WidgetRef ref) => switch (ref.watch(
     AuthorController.provider(event),
   )) {
-    AsyncData(:final value) || AsyncLoading(:final value?) => InkWell(
-      onTap: clickable
+    AsyncData(:final MembershipContent? value) ||
+    AsyncLoading(:final value) ||
+    AsyncError(:final value) => InkWell(
+      onTap: clickable && value != null
           ? () => context.showUserPopover(
               value,
               event.sender,
@@ -29,7 +32,7 @@ class const MessageDisplayname(
         crossAxisAlignment: .center,
         children: [
           Text(
-            value.displayName ?? event.sender.localpart,
+            value?.displayName ?? event.sender.localpart,
             style:
                 style ?? .new(color: event.sender.colorHash, fontWeight: .bold),
             maxLines: 1,
@@ -45,10 +48,6 @@ class const MessageDisplayname(
             ),
         ],
       ),
-    ),
-    _ => Text(
-      event.sender.localpart,
-      style: .new(color: event.sender.colorHash, fontWeight: .bold),
     ),
   };
 }
