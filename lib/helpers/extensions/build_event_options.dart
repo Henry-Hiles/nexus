@@ -10,6 +10,7 @@ import "package:nexus/controllers/recent_emoji.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/controllers/room_chat.dart";
 import "package:nexus/controllers/via.dart";
+import "package:nexus/helpers/extensions/event_id_is_fake.dart";
 import "package:nexus/models/content/message.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/models/relation_type.dart";
@@ -229,7 +230,7 @@ extension BuildEventOptions on Event {
               .redaction(targetUser: sender, roomId: roomId),
             ),
           ) &&
-          !eventId.startsWith("~"))
+          !eventId.isFake)
         PopupMenuItem(
           onTap: () => showReasonDialog(
             title: "Delete Message",
@@ -246,7 +247,7 @@ extension BuildEventOptions on Event {
           ),
         ),
 
-      if (eventId.startsWith("~"))
+      if (eventId.isFake)
         PopupMenuItem(
           onTap: () => ref.watch(notifier).hideClientSticky(rowId),
           child: ListTile(
