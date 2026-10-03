@@ -269,12 +269,16 @@ class SettingsSectionsController
                     final colorScheme = Theme.of(context).colorScheme;
                     return M3EButton.icon(
                       onPressed: () async {
-                        await ref
-                            .watch(UnifiedPushController.provider.notifier)
+                        final container = ProviderScope.containerOf(context);
+                        Navigator.of(context)
+                            .popUntil((route) => route.isFirst);
+
+                        await container
+                            .read(UnifiedPushController.provider.notifier)
                             .deregister()
                             .onError(showError);
-                        await ref
-                            .watch(ClientController.provider.notifier)
+                        await container
+                            .read(ClientController.provider.notifier)
                             .logout()
                             .onError(showError);
                       },
