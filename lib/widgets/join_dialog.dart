@@ -19,23 +19,25 @@ class const JoinDialog(final WidgetRef ref, {super.key}) extends HookWidget {
 
       showDialog(
         context: context,
-        builder: (context) => switch (ref.watch(
-          RoomSummaryController.provider(
-            .new(
-              roomIdOrAlias: roomIdOrAlias,
-              via: linkInfo?.via ?? const IList.empty(),
+        builder: (context) => Consumer(
+          builder: (context, ref, _) => switch (ref.watch(
+            RoomSummaryController.provider(
+              .new(
+                roomIdOrAlias: roomIdOrAlias,
+                via: linkInfo?.via ?? const IList.empty(),
+              ),
             ),
-          ),
-        )) {
-          AsyncData(:final value) => RoomSummaryDialog(
-            value,
-            via: linkInfo?.via,
-          ),
-          AsyncError _ || AsyncLoading _ => RoomSummaryDialog(
-            .new(roomId: roomAlias.text),
-            via: linkInfo?.via,
-          ),
-        },
+          )) {
+            AsyncData(:final value) => RoomSummaryDialog(
+              value,
+              via: linkInfo?.via,
+            ),
+            AsyncError _ || AsyncLoading _ => RoomSummaryDialog(
+              .new(roomId: roomIdOrAlias),
+              via: linkInfo?.via,
+            ),
+          },
+        ),
       );
     }
 
