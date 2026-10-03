@@ -4,6 +4,7 @@ import "package:navigation_rail_m3e/navigation_rail_m3e.dart";
 import "package:nexus/models/nav_page.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/widgets/divider_widget.dart";
+import "package:nexus/widgets/error_dialog.dart";
 import "package:nexus/widgets/pages/settings.dart";
 import "package:nexus/widgets/join_dialog.dart";
 import "package:nexus/widgets/room_menu.dart";
@@ -43,10 +44,22 @@ class const RoomList({super.key})
     final selectedRoomId = ref.watch(selectedRoomController).requireValue;
     final selectedRoomIdNotifier = ref.watch(selectedRoomController.notifier);
 
-    final spaces = ref.watch(SpacesController.provider);
+    final spacesAsync = ref.watch(SpacesController.provider);
+    final spaces = spacesAsync.value;
+    if (spaces == null) {
+      return switch (spacesAsync) {
+        AsyncError(:final error, :final stackTrace) => ErrorDialog(
+          error,
+          stackTrace,
+        ),
+        _ => const Center(child: CircularProgressIndicator()),
+      };
+    }
+
     final indexOfSelected = spaces.indexWhere(
       (space) => space.id == selectedSpaceId,
     );
+
     final selectedIndex = indexOfSelected == -1 ? 0 : indexOfSelected;
 
     final selectedSpace =

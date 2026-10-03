@@ -7,7 +7,7 @@ import "package:nexus/models/space.dart";
 
 extension FocusRoom on MutationTarget {
   Future<bool> focusRoom(String roomId, [int? eventRowId]) async {
-    final spaces = container.read(SpacesController.provider);
+    final spaces = await container.read(SpacesController.provider.future);
 
     if (spaces.firstWhereOrNull((space) => space.id == roomId) case Space _?) {
       await container

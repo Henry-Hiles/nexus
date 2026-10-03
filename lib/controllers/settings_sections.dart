@@ -93,6 +93,23 @@ class SettingsSectionsController
                     : null,
               ),
             ),
+            .new(
+              title: "All Rooms In Home",
+              description: "Show all rooms in home, instead of just ones that aren't in spaces",
+              icon: Icons.home,
+              builder: (title, description, icon) => SwitchListTile(
+                title: Text(title),
+                subtitle: Text(description),
+                secondary: Icon(icon),
+                value: settings.showAllInHome,
+                onChanged: Platform.isLinux
+                    ? (value) => ref
+                          .watch(SettingsController.provider.notifier)
+                          .set(settings.copyWith(showAllInHome: value))
+                          .onError(showError)
+                    : null,
+              ),
+            ),
           ]),
         ),
       ]),

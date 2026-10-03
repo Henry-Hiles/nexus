@@ -4,15 +4,16 @@ import "package:material_ui/material_ui.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/account_data.dart";
 import "package:nexus/controllers/rooms.dart";
+import "package:nexus/controllers/settings.dart";
 import "package:nexus/controllers/top_level_spaces.dart";
 import "package:nexus/controllers/space_edges.dart";
 import "package:nexus/models/room.dart";
 import "package:nexus/models/space.dart";
 import "package:nexus/models/subspace.dart";
 
-class SpacesController extends Notifier<IList<Space>> {
+class SpacesController extends AsyncNotifier<IList<Space>> {
   @override
-  IList<Space> build() {
+  Future<IList<Space>> build() async {
     final rooms = ref.watch(RoomsController.provider);
     final topLevelSpaceIds = ref.watch(TopLevelSpacesController.provider);
     final spaceEdges = ref.watch(SpaceEdgesController.provider);
@@ -77,10 +78,10 @@ class SpacesController extends Notifier<IList<Space>> {
 
     final spaces = topLevelSpaceIds.map(buildSpace).toIList();
 
-    final usedRoomIds = {
+    final usedRooms = {
       for (final space in spaces) ...[
-        ...space.children.map((r) => r.metadata?.id),
-        ...space.subSpaces.expand((s) => s.children.map((r) => r.metadata?.id)),
+        ...space.children,
+        ...space.subSpaces.expand((s) => s.children),
       ],
     }.nonNulls.toISet();
 
@@ -89,7 +90,9 @@ class SpacesController extends Notifier<IList<Space>> {
     final otherRooms = rooms.entries
         .where(
           (e) =>
-              !usedRoomIds.contains(e.key) &&
+              !usedRooms
+                  .map((element) => element.metadata?.id)
+                  .contains(e.key) &&
               !topLevelSpaceIds.contains(e.key) &&
               !childrenById.containsKey(e.key),
         )
@@ -97,6 +100,15 @@ class SpacesController extends Notifier<IList<Space>> {
         .toIList();
 
     final homeRooms = otherRooms
+        .addAll(
+          await ref.watch(
+                SettingsController.provider.selectAsync(
+                  (data) => data.showAllInHome,
+                ),
+              )
+              ? usedRooms
+              : .empty(),
+        )
         .where((r) => !directMessages.contains(r.metadata?.id))
         .toIList();
 
@@ -143,7 +155,7 @@ class SpacesController extends Notifier<IList<Space>> {
         .toIList();
   }
 
-  static final provider = NotifierProvider<SpacesController, IList<Space>>(
+  static final provider = AsyncNotifierProvider<SpacesController, IList<Space>>(
     SpacesController.new,
   );
 }

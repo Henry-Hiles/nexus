@@ -10,6 +10,7 @@ class const Settings({
   final ThemeMode theme = ThemeMode.system,
   final bool useDynamicTheming = true,
   final bool linuxMobileMode = false,
+  final bool showAllInHome = false,
 }) with _$Settings {
   Map<String, Object?> toJson() => _$SettingsToJson(this);
 
