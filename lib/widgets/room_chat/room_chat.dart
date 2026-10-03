@@ -237,7 +237,10 @@ final class const RoomChat({
                                       .onError(showError),
                           relationType: relationType.value,
                           relatedEvent: relatedEvent.value,
-                          onDismiss: () => relatedEvent.value = null,
+                          onDismiss: () {
+                            relatedEvent.value = null;
+                            composerNode.requestFocus();
+                          },
                         ),
                       ),
                     ),

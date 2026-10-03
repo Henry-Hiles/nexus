@@ -35,7 +35,7 @@ class const Composer(
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final controller = useRef(FlutterTaggerController());
+    final controller = useMemoized(FlutterTaggerController.new);
     final triggerCharacter = useState("");
     final shouldMention = useState(true);
     final query = useState("");
@@ -59,14 +59,33 @@ class const Composer(
             }),
           );
 
-    if (relationType == .edit && controller.value.text.isEmpty) {
-      controller.value.text =
-          relatedEvent?.localContent?.editSource ??
-          switch (relatedEvent?.content) {
-            TextMessageContent(:final body) => body,
-            _ => "",
-          };
-    }
+    final textBefore = useState<String?>(null);
+
+    useEffect(() {
+      if (relationType == .edit && relatedEvent != null) {
+        textBefore.value ??= controller.text;
+
+        final text =
+            relatedEvent.localContent?.editSource ??
+            switch (relatedEvent.content) {
+              TextMessageContent(:final body) => body,
+              _ => "",
+            };
+
+        controller.value = .new(
+          text: text,
+          selection: .collapsed(offset: text.length),
+        );
+      } else if (textBefore.value case final draft?) {
+        controller.value = .new(
+          text: draft,
+          selection: .collapsed(offset: draft.length),
+        );
+        textBefore.value = null;
+      }
+
+      return null;
+    }, [relationType, relatedEvent == null]);
 
     final attachment = ref.watch(AttachmentController.provider(roomId));
 
@@ -76,13 +95,13 @@ class const Composer(
         return;
       }
       onSend(
-        controller.value.formattedText,
+        controller.formattedText,
         shouldMention: shouldMention.value,
-        tags: .new(controller.value.tags),
+        tags: .new(controller.tags),
       );
 
       onDismiss();
-      controller.value.text = "";
+      controller.text = "";
     }
 
     final style = TextStyle(
@@ -143,7 +162,7 @@ class const Composer(
                                 builder: (context) => EmojiPicker(
                                   onSelection: (value) {
                                     Navigator.of(context).pop();
-                                    controller.value.text += value;
+                                    controller.text += value;
                                     node?.requestFocus();
                                   },
                                 ),
@@ -161,7 +180,7 @@ class const Composer(
                                       leading: Icon(Icons.add_a_photo),
                                     ),
                                     onTap: () async => ref
-                                        .watch(
+                                        .read(
                                           AttachmentController.provider(roomId)
                                               .notifier,
                                         )
@@ -180,7 +199,7 @@ class const Composer(
                                     leading: Icon(Icons.add_photo_alternate),
                                   ),
                                   onTap: () async => ref
-                                      .watch(
+                                      .read(
                                         AttachmentController.provider(roomId)
                                             .notifier,
                                       )
@@ -218,11 +237,11 @@ class const Composer(
                                   roomId: roomId,
                                   triggerCharacter: triggerCharacter.value,
                                   addTag: ({required id, required name}) {
-                                    controller.value.addTag(id: id, name: name);
+                                    controller.addTag(id: id, name: name);
                                     node?.requestFocus();
                                   },
                                 ),
-                                controller: controller.value,
+                                controller: controller,
                                 onSearch: (newQuery, newTriggerCharacter) {
                                   triggerCharacter.value = newTriggerCharacter;
                                   query.value = newQuery;
@@ -254,15 +273,13 @@ class const Composer(
                                     minLines: 1,
                                     autofocus:
                                         (Platform.isLinux ||
-                                            Platform.isMacOS ||
-                                            Platform.isWindows)
-                                        ? true
-                                        : false,
+                                        Platform.isMacOS ||
+                                        Platform.isWindows),
                                     decoration: .new(
                                       hintText: "Your message here...",
                                       border: .none,
                                     ),
-                                    controller: controller.value,
+                                    controller: controller,
                                     key: key,
                                     focusNode: node,
                                   ),
