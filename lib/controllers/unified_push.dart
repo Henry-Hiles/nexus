@@ -3,6 +3,7 @@ import "dart:convert";
 import "dart:io";
 
 import "package:flutter/foundation.dart";
+import "package:flutter/services.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:intl/intl.dart";
 import "package:nexus/controllers/key.dart";
@@ -73,7 +74,7 @@ class UnifiedPushController extends AsyncNotifier<bool> {
                       KeyController.provider(KeyController.roomKey).future,
                     ) ==
                     event.roomId)) {
-          if (isInBackground) exit(0);
+          if (isInBackground) SystemNavigator.pop();
           return;
         }
 
@@ -99,7 +100,7 @@ class UnifiedPushController extends AsyncNotifier<bool> {
               },
             );
 
-        if (isInBackground) exit(0);
+        if (isInBackground) SystemNavigator.pop();
       },
       onUnregistered: deregister,
     );
