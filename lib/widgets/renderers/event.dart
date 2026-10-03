@@ -56,11 +56,7 @@ class const EventRenderer(
 
         final edited = event.lastEditRowId == 0
             ? null
-            : ref.watch(
-                RoomsController.provider.select(
-                  (value) => value[roomId]?.events[event.lastEditRowId],
-                ),
-              );
+            : rooms[roomId]?.events[event.lastEditRowId];
 
         return (
           edited == null
