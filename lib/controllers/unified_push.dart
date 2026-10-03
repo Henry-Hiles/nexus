@@ -63,9 +63,13 @@ class UnifiedPushController extends AsyncNotifier<bool> {
             "Failed to decrypt notification. Try toggling off and on UnifiedPush in settings.",
           );
         }
-        final (event, roomMetadata) = await ref
+        final pushResponse = await ref
             .read(ClientController.provider.notifier)
             .handlePush(json.decode(String.fromCharCodes(message.content)));
+
+        if (pushResponse == null) return;
+
+        final (event, roomMetadata) = pushResponse;
 
         if (event.unreadType?.shouldNotify() != true ||
             (!isInBackground &&
