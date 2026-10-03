@@ -122,16 +122,18 @@ class ClientController extends AsyncNotifier<int> {
     }
   }
 
-  Future<(Event, RoomMetadata)> handlePush(Map<String, dynamic> data) async {
+  Future<(Event, RoomMetadata)?> handlePush(Map<String, dynamic> data) async {
     final response = await callGomuksMethod(
       data,
       (handle, data) async => GomuksHandlePush(handle, data),
     );
 
-    return (
-      Event.fromJson(response["event"]),
-      RoomMetadata.fromJson(response["room"]),
-    );
+    return response == null
+        ? null
+        : (
+            Event.fromJson(response["event"]),
+            RoomMetadata.fromJson(response["room"]),
+          );
   }
 
   Future<dynamic> _sendCommand(

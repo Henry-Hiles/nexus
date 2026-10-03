@@ -9,6 +9,7 @@ import "package:m3e_buttons/m3e_buttons.dart";
 import "package:nexus/controllers/account_data.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/client_state.dart";
+import "package:nexus/controllers/init_complete.dart";
 import "package:nexus/controllers/notification.dart";
 import "package:nexus/controllers/settings.dart";
 import "package:nexus/controllers/unified_push.dart";
@@ -277,6 +278,7 @@ class SettingsSectionsController
                             .read(UnifiedPushController.provider.notifier)
                             .deregister()
                             .onError(showError);
+                        container.invalidate(InitCompleteController.provider);
                         await container
                             .read(ClientController.provider.notifier)
                             .logout()
