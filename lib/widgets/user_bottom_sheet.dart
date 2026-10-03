@@ -101,7 +101,7 @@ final class const UserBottomSheet(
               child: AvatarOrHash(
                 member.avatarUrl,
                 member.displayName ?? userId.localpart,
-                height: 200,
+                dimension: 200,
               ),
             ),
 

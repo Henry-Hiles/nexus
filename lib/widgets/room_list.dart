@@ -159,7 +159,7 @@ class const RoomList({super.key})
                               },
                               short: true,
                               icon: AvatarOrHash(
-                                height: 28,
+                                dimension: 28,
                                 space.room?.metadata?.avatar,
                                 fallback: space.icon == null
                                     ? null
@@ -285,7 +285,7 @@ class const RoomList({super.key})
                                     subSpace.room.metadata?.avatar,
                                     subSpace.room.metadata?.name ??
                                         "Unnamed Room",
-                                    height: 16,
+                                    dimension: 16,
                                   ),
                                 Flexible(
                                   child: Text(

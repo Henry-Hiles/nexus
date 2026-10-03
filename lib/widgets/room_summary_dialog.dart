@@ -28,7 +28,7 @@ class const RoomSummaryDialog(
             child: AvatarOrHash(
               summary.avatarUrl,
               "",
-              height: 64,
+              dimension: 64,
               fallback: Icon(Icons.numbers),
             ),
           ),

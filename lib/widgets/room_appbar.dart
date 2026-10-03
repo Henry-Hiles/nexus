@@ -46,7 +46,7 @@ final class const RoomAppbar({
                 : AvatarOrHash(
                     room.metadata?.avatar,
                     room.metadata?.name ?? "Unnamed Room",
-                    height: 24,
+                    dimension: 24,
                     fallback: Icon(Icons.numbers),
                   )
           : DrawerButton(onPressed: onOpenDrawer),

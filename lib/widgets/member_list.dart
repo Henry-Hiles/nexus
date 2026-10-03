@@ -125,7 +125,7 @@ class const MemberList(final String roomId, {super.key})
                                           ),
                                           leading: AvatarOrHash(
                                             avatarUrl,
-                                            height: 36,
+                                            dimension: 36,
                                             displayName ??
                                                 members[index]
                                                     .stateKey!

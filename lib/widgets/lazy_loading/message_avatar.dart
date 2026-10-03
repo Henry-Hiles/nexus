@@ -21,9 +21,9 @@ class const MessageAvatar(
       child: AvatarOrHash(
         value.avatarUrl,
         value.displayName ?? event.sender.localpart,
-        height: height,
+        dimension: height,
       ),
     ),
-    _ => AvatarOrHash(null, event.sender.localpart, height: height),
+    _ => AvatarOrHash(null, event.sender.localpart, dimension: height),
   };
 }

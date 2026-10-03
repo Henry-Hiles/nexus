@@ -7,24 +7,24 @@ final class const AvatarOrHash(
   final Uri? avatar,
   final String title, {
   final Widget? fallback,
-  final double height = 24,
+  final double dimension = 24,
   super.key,
 }) extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final box = ColoredBox(
       color: ColorHash(title).color,
-      child: Center(child: Icon(Icons.person, size: height / 2)),
+      child: Center(child: Icon(Icons.person, size: dimension / 2)),
     );
 
     return SizedBox(
-      width: height,
-      height: height,
+      width: dimension,
+      height: dimension,
       child: Center(
         child: ClipRRect(
-          borderRadius: .all(.circular((height - 8) / 2.5)),
+          borderRadius: .all(.circular((dimension - 8) / 2.5)),
           child: SizedBox.square(
-            dimension: height,
+            dimension: dimension,
             child: avatar == null
                 ? fallback ?? box
                 : Image(
