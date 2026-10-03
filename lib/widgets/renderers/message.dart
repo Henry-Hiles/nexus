@@ -13,6 +13,7 @@ import "package:nexus/widgets/html/html.dart";
 import "package:nexus/widgets/lazy_loading/message_avatar.dart";
 import "package:nexus/widgets/lazy_loading/message_displayname.dart";
 import "package:nexus/widgets/linkified_text.dart";
+import "package:nexus/widgets/loading.dart";
 import "package:nexus/widgets/message_image.dart";
 import "package:nexus/widgets/reaction_row.dart";
 import "package:nexus/widgets/timestamp.dart";
@@ -197,24 +198,32 @@ class const MessageRenderer(
                             onTap: onTapReply,
                             child: Padding(
                               padding: .symmetric(vertical: 8, horizontal: 12),
-                              child: switch (ref.watch(
-                                EventController.provider(
-                                  .new(
-                                    roomId: event.roomId,
-                                    eventId: event.replyTo!,
-                                  ),
+                              child: SizedBox(
+                                height: 32,
+                                child: OverflowBox(
+                                  alignment: .centerLeft,
+                                  minHeight: 0,
+                                  maxHeight: .infinity,
+                                  child: switch (ref.watch(
+                                    EventController.provider(
+                                      .new(
+                                        roomId: event.roomId,
+                                        eventId: event.replyTo!,
+                                      ),
+                                    ),
+                                  )) {
+                                    AsyncData(:final value?) ||
+                                    AsyncLoading(
+                                      :final value?,
+                                    ) => EventPreview(value),
+                                    AsyncError _ => Text(
+                                      "An error occurred while fetching the reply",
+                                      style: errorStyle,
+                                    ),
+                                    _ => Loading(dimension: 12),
+                                  },
                                 ),
-                              )) {
-                                AsyncData(:final value?) ||
-                                AsyncLoading(
-                                  :final value?,
-                                ) => EventPreview(value),
-                                AsyncError _ => Text(
-                                  "An error occurred while fetching the reply",
-                                  style: errorStyle,
-                                ),
-                                _ => Text("Fetching event..."),
-                              },
+                              ),
                             ),
                           ),
                         ),

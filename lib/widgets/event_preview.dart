@@ -18,17 +18,20 @@ class const EventPreview(final Event event, {super.key})
           if (event.content is MessageContent) MessageAvatar(event),
 
           Flexible(
-            child: Wrap(
+            child: Row(
               crossAxisAlignment: .center,
+              mainAxisSize: .min,
               spacing: 8,
-              runSpacing: 2,
               children: [
-                if (event.content is MessageContent) MessageDisplayname(event),
-                EventRenderer(
-                  event.rowId,
-                  roomId: event.roomId,
-                  textOnly: true,
-                  maxLines: 1,
+                if (event.content is MessageContent)
+                  Flexible(child: MessageDisplayname(event)),
+                Flexible(
+                  child: EventRenderer(
+                    event.rowId,
+                    roomId: event.roomId,
+                    textOnly: true,
+                    maxLines: 1,
+                  ),
                 ),
               ],
             ),
