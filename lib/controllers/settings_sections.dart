@@ -271,8 +271,10 @@ class SettingsSectionsController
                     return M3EButton.icon(
                       onPressed: () async {
                         final container = ProviderScope.containerOf(context);
-                        Navigator.of(context)
-                            .popUntil((route) => route.isFirst);
+
+                        final route = ModalRoute.of(context)!;
+                        Navigator.of(context).popUntil((r) => r.isFirst);
+                        await route.completed;
 
                         await container
                             .read(UnifiedPushController.provider.notifier)
