@@ -134,9 +134,9 @@ class const SelectServerPage({super.key}) extends HookConsumerWidget {
               padding: .symmetric(vertical: 8, horizontal: 12),
               children: [
                 Row(
+                  spacing: 12,
                   children: [
                     SvgPicture.asset("assets/bundled/icon.svg", width: 128),
-                    SizedBox(width: 12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: .start,
@@ -144,7 +144,7 @@ class const SelectServerPage({super.key}) extends HookConsumerWidget {
                           Text("Nexus", style: theme.textTheme.displayMedium),
                           Text(
                             "A Simple Matrix Client",
-                            style: theme.textTheme.headlineMedium,
+                            style: theme.textTheme.titleLarge,
                             overflow: .ellipsis,
                           ),
                         ],
