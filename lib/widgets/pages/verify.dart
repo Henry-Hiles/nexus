@@ -41,6 +41,7 @@ class const VerifyPage({super.key}) extends HookConsumerWidget {
         ]),
       ),
       body: AlertDialog(
+        insetPadding: .all(12),
         scrollable: true,
         title: Text("Verify"),
         content: Form(
