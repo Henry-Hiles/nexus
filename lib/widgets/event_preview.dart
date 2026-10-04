@@ -13,16 +13,20 @@ class const EventPreview(final Event event, {super.key})
       padding: .symmetric(vertical: 4),
       child: Row(
         mainAxisSize: .min,
-        spacing: 10,
+        spacing: 8,
         children: [
-          if (event.content is MessageContent) MessageAvatar(event, height: 40),
+          if (event.content is MessageContent) MessageAvatar(event, height: 36),
 
           Flexible(
             child: Column(
               mainAxisAlignment: .center,
               crossAxisAlignment: .start,
               children: [
-                if (event.content is MessageContent) MessageDisplayname(event),
+                if (event.content is MessageContent)
+                  DefaultTextHeightBehavior(
+                    textHeightBehavior: .new(),
+                    child: MessageDisplayname(event),
+                  ),
                 EventRenderer(
                   event.rowId,
                   roomId: event.roomId,
