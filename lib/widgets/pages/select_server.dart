@@ -193,12 +193,13 @@ class const SelectServerPage({super.key}) extends HookConsumerWidget {
                     url: .https("federated.nexus"),
                     iconUrl: "https://federated.nexus/images/icon.png",
                   ),
-                  .new(
-                    name: "Unredacted",
-                    description: "Unredacted is a 501(c)(3) non-profit organization that builds Internet infrastructure and services to help people evade censorship and protect their right to privacy.",
-                    url: .https("unredacted.org", "services/si/matrix"),
-                    iconUrl: "https://unredacted.org/favicon.ico",
-                  ),
+                  // TODO: Add back unredacted when they have MAS, find where new favicon is
+                  // .new(
+                  //   name: "Unredacted",
+                  //   description: "Unredacted is a 501(c)(3) non-profit organization that builds Internet infrastructure and services to help people evade censorship and protect their right to privacy.",
+                  //   url: .https("unredacted.org", "services/si/matrix"),
+                  //   iconUrl: "https://unredacted.org/favicon.ico",
+                  // ),
                 ].map(
                   (homeserver) => Card(
                     child: ListTile(
