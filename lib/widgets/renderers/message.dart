@@ -4,6 +4,7 @@ import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:linkify/linkify.dart";
 import "package:nexus/controllers/client_state.dart";
 import "package:nexus/controllers/event.dart";
+import "package:nexus/helpers/extensions/get_filename.dart";
 import "package:nexus/models/content/encrypted.dart";
 import "package:nexus/models/content/message.dart";
 import "package:nexus/models/content/sticker.dart";
@@ -52,97 +53,95 @@ class const MessageRenderer(
               ),
       // TODO: Handle locations
       // LocationMessageContent(:final body , :final geoUri) =>
-      TextMessageContent(:final body, :final formattedBody, :final format) ||
-      NoticeMessageContent(:final body, :final formattedBody, :final format) ||
-      EmoteMessageContent(:final body, :final formattedBody, :final format) ||
-      ImageMessageContent(:final body, :final formattedBody, :final format) ||
-      VideoMessageContent(:final body, :final formattedBody, :final format) ||
-      AudioMessageContent(:final body, :final formattedBody, :final format) ||
-      FileMessageContent(
-        :final body,
-        :final formattedBody,
-        :final format,
-      ) => Column(
-        crossAxisAlignment: .start,
-        children: [
-          format == .html && !textOnly
-              ? Html(
-                  roomId: event.roomId,
-                  textStyle: textStyle,
-                  formattedBody!.replaceAllMapped(
-                    RegExp(
-                      r"(<a\b[^>]*>.*?<\/a>)|(\bhttps?:\/\/[^\s<]+)",
-                      caseSensitive: false,
-                      dotAll: true,
+      MessageContent content => switch (content) {
+        TextMessageContent(:final body, :final formattedBody, :final format) ||
+        NoticeMessageContent(
+          :final body,
+          :final formattedBody,
+          :final format,
+        ) ||
+        EmoteMessageContent(:final body, :final formattedBody, :final format) ||
+        ImageMessageContent(:final body, :final formattedBody, :final format) ||
+        VideoMessageContent(:final body, :final formattedBody, :final format) ||
+        AudioMessageContent(:final body, :final formattedBody, :final format) ||
+        FileMessageContent(
+          :final body,
+          :final formattedBody,
+          :final format,
+        ) => Column(
+          crossAxisAlignment: .start,
+          children: [
+            format == .html && !textOnly
+                ? Html(
+                    roomId: event.roomId,
+                    textStyle: textStyle,
+                    formattedBody!.replaceAllMapped(
+                      RegExp(
+                        r"(<a\b[^>]*>.*?<\/a>)|(\bhttps?:\/\/[^\s<]+)",
+                        caseSensitive: false,
+                        dotAll: true,
+                      ),
+                      (m) {
+                        // If it's already an <a> tag, leave it unchanged
+                        if (m.group(1) != null) {
+                          return m.group(1)!;
+                        }
+
+                        // Otherwise, wrap the bare URL
+                        final url = m.group(2)!;
+                        return "<a href=\"$url\">$url</a>";
+                      },
                     ),
-                    (m) {
-                      // If it's already an <a> tag, leave it unchanged
-                      if (m.group(1) != null) {
-                        return m.group(1)!;
-                      }
-
-                      // Otherwise, wrap the bare URL
-                      final url = m.group(2)!;
-                      return "<a href=\"$url\">$url</a>";
-                    },
+                  )
+                : LinkifiedText(
+                    body.isEmpty ? content.filename ?? "" : body,
+                    style: textStyle,
+                    maxLines: maxLines,
                   ),
-                )
-              : LinkifiedText(body, style: textStyle, maxLines: maxLines),
 
-          if (!textOnly) ...[
-            if (event.content
-                case ImageMessageContent(:final url) ||
-                    FileMessageContent(:final url) ||
-                    VideoMessageContent(:final url) ||
-                    AudioMessageContent(:final url))
-              ConstrainedBox(
-                constraints: .loose(.square(500)),
-                child: switch (event.content) {
-                  VideoMessageContent(:final info, :final file) => VideoPlayer(
-                    url,
-                    info,
-                    encrypted: file != null,
-                  ),
-                  AudioMessageContent(:final info, :final file) => AudioPlayer(
-                    url,
-                    info,
+            if (!textOnly) ...[
+              if (event.content
+                  case ImageMessageContent(:final url) ||
+                      FileMessageContent(:final url) ||
+                      VideoMessageContent(:final url) ||
+                      AudioMessageContent(:final url))
+                ConstrainedBox(
+                  constraints: .loose(.square(500)),
+                  child: switch (event.content) {
+                    VideoMessageContent(:final info, :final file) =>
+                      VideoPlayer(url, info, encrypted: file != null),
+                    AudioMessageContent(:final info, :final file) =>
+                      AudioPlayer(url, info, encrypted: file != null),
+                    FileMessageContent(:final info, :final filename) =>
+                      FileCard(url, info, filename: filename),
+                    ImageMessageContent(:final info, :final file) =>
+                      MessageImage(url, info: info, encrypted: file != null),
+                    _ => SizedBox.shrink(),
+                  },
+                ),
 
-                    encrypted: file != null,
-                  ),
-                  FileMessageContent(:final info, :final filename) => FileCard(
-                    url,
-                    info,
-                    filename: filename,
-                  ),
-                  ImageMessageContent(:final info, :final file) => MessageImage(
-                    url,
-                    info: info,
-                    encrypted: file != null,
-                  ),
-                  _ => SizedBox.shrink(),
-                },
-              ),
+              if (event.lastEditRowId != 0)
+                Text("(edited)", style: theme.textTheme.labelSmall),
 
-            if (event.lastEditRowId != 0)
-              Text("(edited)", style: theme.textTheme.labelSmall),
-
-            if (linkify(body)
-                    .firstWhereOrNull((element) => element is UrlElement)
-                case final UrlElement link?)
-              if (Uri.tryParse(link.url) case final Uri url?) UrlPreview(url),
+              if (linkify(body)
+                      .firstWhereOrNull((element) => element is UrlElement)
+                  case final UrlElement link?)
+                if (Uri.tryParse(link.url) case final Uri url?) UrlPreview(url),
+            ],
           ],
-        ],
-      ),
-      MessageContent(:final body) =>
-        body == null
-            ? Text("This message is redacted", style: errorStyle)
-            : Wrap(
-                spacing: 8,
-                children: [
-                  Text("Unknown message type:", style: errorStyle),
-                  Text(body),
-                ],
-              ),
+        ),
+        LocationMessageContent(:final String? body) ||
+        UnknownMessageContent(:final body) =>
+          body == null
+              ? Text("This message is redacted", style: errorStyle)
+              : Wrap(
+                  spacing: 8,
+                  children: [
+                    Text("Unknown message type:", style: errorStyle),
+                    Text(body),
+                  ],
+                ),
+      },
       _ => throw Exception("This is impossible"),
     };
 
