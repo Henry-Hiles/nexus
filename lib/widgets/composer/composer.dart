@@ -271,6 +271,7 @@ class const Composer(
                                   child: TextField(
                                     maxLines: 12,
                                     minLines: 1,
+                                    textCapitalization: .sentences,
                                     autofocus:
                                         (Platform.isLinux ||
                                         Platform.isMacOS ||
