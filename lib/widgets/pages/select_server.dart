@@ -161,6 +161,7 @@ class const SelectServerPage({super.key}) extends HookConsumerWidget {
                       child: TextField(
                         textInputAction: .done,
                         autofocus: true,
+                        keyboardType: .url,
                         onSubmitted: (text) => setHomeserver(.tryParse(text)),
                         controller: homeserverUrl,
                         decoration: .new(
