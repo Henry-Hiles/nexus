@@ -106,11 +106,16 @@ final class const RoomChat({
       lastComposerHeight.value = composerSize.value;
 
       if (delta != 0) {
+        final wasAtBottom = scroll.atBottom;
+
         WidgetsBinding.instance.addPostFrameCallback((_) {
           final controller = scroll.scrollController;
           if (!controller.hasClients) return;
 
-          controller.jumpTo(controller.position.pixels - delta);
+          final position = controller.position;
+          controller.jumpTo(
+            wasAtBottom ? position.minScrollExtent : position.pixels - delta,
+          );
         });
       }
 
