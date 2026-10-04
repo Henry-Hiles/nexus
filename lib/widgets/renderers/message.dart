@@ -199,30 +199,25 @@ class const MessageRenderer(
                             child: Padding(
                               padding: .symmetric(vertical: 8, horizontal: 12),
                               child: SizedBox(
-                                height: 32,
-                                child: OverflowBox(
-                                  alignment: .centerLeft,
-                                  minHeight: 0,
-                                  maxHeight: .infinity,
-                                  child: switch (ref.watch(
-                                    EventController.provider(
-                                      .new(
-                                        roomId: event.roomId,
-                                        eventId: event.replyTo!,
-                                      ),
+                                height: 48,
+                                child: switch (ref.watch(
+                                  EventController.provider(
+                                    .new(
+                                      roomId: event.roomId,
+                                      eventId: event.replyTo!,
                                     ),
-                                  )) {
-                                    AsyncData(:final value?) ||
-                                    AsyncLoading(
-                                      :final value?,
-                                    ) => EventPreview(value),
-                                    AsyncError _ => Text(
-                                      "An error occurred while fetching the reply",
-                                      style: errorStyle,
-                                    ),
-                                    _ => Loading(dimension: 12),
-                                  },
-                                ),
+                                  ),
+                                )) {
+                                  AsyncData(:final value?) ||
+                                  AsyncLoading(
+                                    :final value?,
+                                  ) => EventPreview(value),
+                                  AsyncError _ => Text(
+                                    "An error occurred while fetching the reply",
+                                    style: errorStyle,
+                                  ),
+                                  _ => Loading(dimension: 12),
+                                },
                               ),
                             ),
                           ),
