@@ -99,6 +99,24 @@ final class const RoomChat({
       },
     );
 
+    final lastComposerHeight = useRef(composerSize.value);
+
+    useEffect(() {
+      final delta = composerSize.value - lastComposerHeight.value;
+      lastComposerHeight.value = composerSize.value;
+
+      if (delta != 0) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          final controller = scroll.scrollController;
+          if (!controller.hasClients) return;
+
+          controller.jumpTo(controller.position.pixels - delta);
+        });
+      }
+
+      return null;
+    }, [composerSize.value]);
+
     final composerNode = useFocusNode(
       onKeyEvent: (_, event) {
         if (event is KeyDownEvent && event.logicalKey == .escape) {
