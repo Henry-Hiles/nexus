@@ -141,57 +141,60 @@ class const App({super.key}) extends StatelessWidget {
             ),
         home: child,
       ),
-      child: Scaffold(
-        body: Consumer(
-          builder: (_, ref, _) => switch (ref.watch(
-            MultiProviderController.provider(
-              .new([
-                GomuksListenerController.provider,
-                NotificationController.provider,
-                UnifiedPushController.provider,
-                MemberListOpenedController.provider,
-                KeyController.provider(KeyController.roomKey),
-                KeyController.provider(KeyController.spaceKey),
-              ]),
-            ),
-          )) {
-            AsyncData(value: _) || AsyncLoading(value: _?) => Consumer(
-              builder: (_, ref, _) {
-                final clientState = ref.watch(ClientStateController.provider);
-
-                if (clientState == null || !clientState.isInitialized) {
-                  return Loading();
-                }
-
-                if (!clientState.isLoggedIn) {
-                  return SelectServerPage();
-                } else if (!clientState.isVerified) {
-                  return VerifyPage();
-                } else {
-                  return ChatPage();
-                }
-              },
-            ),
-
-            AsyncLoading _ => Scaffold(
-              appBar: Appbar(
-                actions: .new([
-                  IconButton(
-                    onPressed: () => showDialog(
-                      context: context,
-                      builder: (_) => SettingsPage(),
-                    ),
-                    icon: Icon(Icons.settings),
-                  ),
+      child: DefaultTextHeightBehavior(
+        textHeightBehavior: .new(leadingDistribution: .even),
+        child: Scaffold(
+          body: Consumer(
+            builder: (_, ref, _) => switch (ref.watch(
+              MultiProviderController.provider(
+                .new([
+                  GomuksListenerController.provider,
+                  NotificationController.provider,
+                  UnifiedPushController.provider,
+                  MemberListOpenedController.provider,
+                  KeyController.provider(KeyController.roomKey),
+                  KeyController.provider(KeyController.spaceKey),
                 ]),
               ),
-              body: Loading(),
-            ),
-            AsyncError(:final error, :final stackTrace) => ErrorDialog(
-              error,
-              stackTrace,
-            ),
-          },
+            )) {
+              AsyncData(value: _) || AsyncLoading(value: _?) => Consumer(
+                builder: (_, ref, _) {
+                  final clientState = ref.watch(ClientStateController.provider);
+
+                  if (clientState == null || !clientState.isInitialized) {
+                    return Loading();
+                  }
+
+                  if (!clientState.isLoggedIn) {
+                    return SelectServerPage();
+                  } else if (!clientState.isVerified) {
+                    return VerifyPage();
+                  } else {
+                    return ChatPage();
+                  }
+                },
+              ),
+
+              AsyncLoading _ => Scaffold(
+                appBar: Appbar(
+                  actions: .new([
+                    IconButton(
+                      onPressed: () => showDialog(
+                        context: context,
+                        builder: (_) => SettingsPage(),
+                      ),
+                      icon: Icon(Icons.settings),
+                    ),
+                  ]),
+                ),
+                body: Loading(),
+              ),
+              AsyncError(:final error, :final stackTrace) => ErrorDialog(
+                error,
+                stackTrace,
+              ),
+            },
+          ),
         ),
       ),
     ),

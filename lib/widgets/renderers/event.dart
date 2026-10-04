@@ -209,7 +209,7 @@ class const EventRenderer(
     return Column(
       crossAxisAlignment: .start,
       children: [
-        if (child != null) ...[
+        if (child != null)
           if (textOnly)
             child
           else ...[
@@ -299,8 +299,8 @@ class const EventRenderer(
                   ),
                 ),
             ].map((child) => Padding(padding: .only(left: 4), child: child)),
-          ],
-        ] else if (textOnly)
+          ]
+        else if (textOnly)
           Text("Unknown event type", style: errorStyle),
       ],
     );

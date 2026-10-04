@@ -13,9 +13,9 @@ class const EventPreview(final Event event, {super.key})
       padding: .symmetric(vertical: 4),
       child: Row(
         mainAxisSize: .min,
-        spacing: 8,
+        spacing: 10,
         children: [
-          if (event.content is MessageContent) MessageAvatar(event, height: 28),
+          if (event.content is MessageContent) MessageAvatar(event, height: 40),
 
           Flexible(
             child: Column(

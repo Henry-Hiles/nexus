@@ -123,13 +123,16 @@ class const MemberList(final String roomId, {super.key})
                                             members[index].stateKey!,
                                             overflow: .ellipsis,
                                           ),
-                                          leading: AvatarOrHash(
-                                            avatarUrl,
-                                            dimension: 36,
-                                            displayName ??
-                                                members[index]
-                                                    .stateKey!
-                                                    .localpart,
+                                          leading: Transform.translate(
+                                            offset: .new(0, 2),
+                                            child: AvatarOrHash(
+                                              avatarUrl,
+                                              dimension: 40,
+                                              displayName ??
+                                                  members[index]
+                                                      .stateKey!
+                                                      .localpart,
+                                            ),
                                           ),
                                         ),
                                       _ => throw Exception(

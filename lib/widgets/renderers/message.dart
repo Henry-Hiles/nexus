@@ -148,7 +148,7 @@ class const MessageRenderer(
     return Row(
       crossAxisAlignment: .start,
       mainAxisSize: .min,
-      spacing: 8,
+      spacing: 6,
       children: [
         if (!textOnly)
           if (isGrouped)
@@ -157,7 +157,7 @@ class const MessageRenderer(
             MessageAvatar(event, height: 40),
         Flexible(
           child: Column(
-            spacing: 4,
+            spacing: 2,
             crossAxisAlignment: .start,
             children: [
               if (!isGrouped && !textOnly)
