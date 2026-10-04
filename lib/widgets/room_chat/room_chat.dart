@@ -60,7 +60,7 @@ final class const RoomChat({
         appBar: RoomAppbar(
           roomId: this.roomId,
           isDesktop: isDesktop,
-          onOpenDrawer: () => Scaffold.of(context).openDrawer(),
+          onOpenDrawer: Scaffold.of(context).openDrawer,
         ),
         body: nothing,
       );
