@@ -55,6 +55,9 @@ class UnifiedPushController extends AsyncNotifier<bool> {
 
         state = .data(true);
       },
+      onRegistrationFailed: (reason, instance) {
+        throw reason;
+      },
       onMessage: (message, instance) async {
         debugPrint("UP message received for $instance");
         if (message.decrypted == false) {
@@ -146,6 +149,9 @@ class UnifiedPushController extends AsyncNotifier<bool> {
       await UnifiedPush.register(
         instance: deviceId,
         vapid: capabilities.webpush?.vapid,
+      ).timeout(
+        .new(seconds: 15),
+        onTimeout: () => throw Exception("UnifiedPush registration timed out."),
       );
     } catch (_) {
       state = .data(false);
