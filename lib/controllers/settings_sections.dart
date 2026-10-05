@@ -103,12 +103,10 @@ class SettingsSectionsController
                   subtitle: Text(description),
                   secondary: Icon(icon),
                   value: settings.showMinimizeButton,
-                  onChanged: Platform.isLinux
-                      ? (value) => ref
-                            .watch(SettingsController.provider.notifier)
-                            .set(settings.copyWith(showMinimizeButton: value))
-                            .onError(showError)
-                      : null,
+                  onChanged: (value) => ref
+                      .watch(SettingsController.provider.notifier)
+                      .set(settings.copyWith(showMinimizeButton: value))
+                      .onError(showError),
                 ),
               ),
             .new(
