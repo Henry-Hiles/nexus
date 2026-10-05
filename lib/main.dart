@@ -145,7 +145,7 @@ class const App({super.key}) extends StatelessWidget {
         textHeightBehavior: .new(leadingDistribution: .even),
         child: Scaffold(
           body: Consumer(
-            builder: (_, ref, _) => switch (ref.watch(
+            builder: (context, ref, _) => switch (ref.watch(
               MultiProviderController.provider(
                 .new([
                   GomuksListenerController.provider,
