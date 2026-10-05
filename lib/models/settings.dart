@@ -11,6 +11,7 @@ class const Settings({
   final bool useDynamicTheming = true,
   final bool linuxMobileMode = false,
   final bool showAllInHome = false,
+  final bool showMinimizeButton = false,
 }) with _$Settings {
   Map<String, Object?> toJson() => _$SettingsToJson(this);
 

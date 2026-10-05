@@ -51,6 +51,17 @@ final class const Appbar({
         actions: [
           ...actions,
           if (!(Platform.isAndroid || Platform.isIOS)) ...[
+            if (ref
+                    .watch(SettingsController.provider)
+                    .whenOrNull(
+                      data: (settings) => settings.showMinimizeButton,
+                    ) ??
+                false)
+              IconButton(
+                tooltip: "Minimize window",
+                onPressed: windowManager.minimize,
+                icon: const Icon(Icons.minimize),
+              ),
             if (!Platform.isLinux)
               IconButton(
                 tooltip: "Maximize window",
