@@ -23,10 +23,7 @@ class const EventPreview(final Event event, {super.key})
               crossAxisAlignment: .start,
               children: [
                 if (event.content is MessageContent)
-                  DefaultTextHeightBehavior(
-                    textHeightBehavior: .new(),
-                    child: MessageDisplayname(event),
-                  ),
+                  MessageDisplayname(event, shouldWrap: false),
                 EventRenderer(
                   event.rowId,
                   roomId: event.roomId,

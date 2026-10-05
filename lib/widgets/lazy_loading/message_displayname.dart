@@ -11,6 +11,7 @@ class const MessageDisplayname(
   final Event event, {
   final TextStyle? style,
   final bool clickable = true,
+  final bool shouldWrap = true,
   super.key,
 }) extends ConsumerWidget {
   @override
@@ -27,27 +28,34 @@ class const MessageDisplayname(
               roomId: event.roomId,
             )
           : null,
-      child: Wrap(
-        spacing: 4,
-        crossAxisAlignment: .center,
-        children: [
+      child: switch ([
+        Text(
+          value?.displayName ?? event.sender.localpart,
+          style:
+              style ?? .new(color: event.sender.colorHash, fontWeight: .bold),
+          maxLines: 1,
+          overflow: .ellipsis,
+        ),
+        if (event.pmp != null)
           Text(
-            value?.displayName ?? event.sender.localpart,
-            style:
-                style ?? .new(color: event.sender.colorHash, fontWeight: .bold),
+            "(via ${event.sender})",
+            style: Theme.of(context).textTheme.labelSmall
+                ?.copyWith(color: event.sender.colorHash, fontWeight: .bold),
             maxLines: 1,
             overflow: .ellipsis,
           ),
-          if (event.pmp != null)
-            Text(
-              "(via ${event.sender})",
-              style: Theme.of(context).textTheme.labelSmall
-                  ?.copyWith(color: event.sender.colorHash, fontWeight: .bold),
-              maxLines: 1,
-              overflow: .ellipsis,
-            ),
-        ],
-      ),
+      ]) {
+        final children when shouldWrap => Wrap(
+          spacing: 4,
+          crossAxisAlignment: .center,
+          children: children,
+        ),
+        final children => Row(
+          spacing: 4,
+          mainAxisSize: .min,
+          children: [for (final child in children) Flexible(child: child)],
+        ),
+      },
     ),
   };
 }

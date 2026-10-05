@@ -7,8 +7,11 @@ import "package:nexus/models/event.dart";
 import "package:nexus/widgets/lazy_loading/message_displayname.dart";
 import "package:nexus/widgets/renderers/generic_event.dart";
 
-class const MembershipRenderer(final Event event, {super.key})
-    extends StatelessWidget {
+class const MembershipRenderer(
+  final Event event, {
+  final int? maxLines,
+  super.key,
+}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     assert(
@@ -17,34 +20,45 @@ class const MembershipRenderer(final Event event, {super.key})
     );
 
     return switch (event.content) {
-      MembershipContent content => GenericEventRenderer(Icons.people, [
-        InkWell(
-          onTap: () => context.showUserPopover(
-            content,
-            event.stateKey!,
-            roomId: event.roomId,
+      MembershipContent content => GenericEventRenderer(
+        Icons.people,
+        maxLines: maxLines,
+        [
+          WidgetSpan(
+            alignment: .middle,
+            child: InkWell(
+              onTap: () => context.showUserPopover(
+                content,
+                event.stateKey!,
+                roomId: event.roomId,
+              ),
+              child: Text(
+                overflow: .ellipsis,
+                content.displayName ?? event.stateKey!.localpart,
+                maxLines: 1,
+                style: .new(color: event.sender.colorHash, fontWeight: .bold),
+              ),
+            ),
           ),
-          child: Text(
-            overflow: .ellipsis,
-            content.displayName ?? event.stateKey!.localpart,
-            maxLines: 1,
-            style: .new(color: event.sender.colorHash, fontWeight: .bold),
+          TextSpan(
+            text:
+                "${switch (content.status) {
+                  .invite => "was invited to",
+                  .join => "joined",
+                  .leave => event.sender == event.stateKey ? "left" : (event.unsigned["prev_content"]?["membership"] == "ban" ? "was unbanned from" : "was kicked from"),
+                  .ban => "was banned from",
+                  .knock => "asked to join",
+                }} the room${event.sender == event.stateKey ? "" : " by"}",
           ),
-        ),
-        Text(
-          overflow: .ellipsis,
-          maxLines: 1,
-          "${switch (content.status) {
-            .invite => "was invited to",
-            .join => "joined",
-            .leave => event.sender == event.stateKey ? "left" : (event.unsigned["prev_content"]?["membership"] == "ban" ? "was unbanned from" : "was kicked from"),
-            .ban => "was banned from",
-            .knock => "asked to join",
-          }} the room${event.sender == event.stateKey ? "" : " by "}",
-        ),
-        if (event.sender != event.stateKey) MessageDisplayname(event),
-        if (content.reason != null) Text("for \"${content.reason}\""),
-      ]),
+          if (event.sender != event.stateKey)
+            WidgetSpan(
+              alignment: .middle,
+              child: MessageDisplayname(event, shouldWrap: maxLines == null),
+            ),
+          if (content.reason != null)
+            TextSpan(text: "for \"${content.reason}\""),
+        ],
+      ),
       _ => SizedBox.shrink(),
     };
   }
