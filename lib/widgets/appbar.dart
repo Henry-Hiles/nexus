@@ -1,7 +1,6 @@
 import "dart:io";
 
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
-import "package:flutter/services.dart";
 import "package:material_ui/material_ui.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/settings.dart";
@@ -60,7 +59,7 @@ final class const Appbar({
               ),
             IconButton(
               tooltip: "Close window",
-              onPressed: SystemNavigator.pop,
+              onPressed: () => exit(0),
               icon: const Icon(Icons.close),
             ),
           ],

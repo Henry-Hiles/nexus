@@ -2,7 +2,6 @@ import "dart:io";
 
 import "package:dynamic_color/dynamic_color.dart";
 import "package:flutter/foundation.dart";
-import "package:flutter/services.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:material_emoji_picker/material_emoji_picker.dart";
 import "package:media_kit/media_kit.dart";
@@ -80,7 +79,7 @@ void main(List<String> args) async {
         .timeout(Duration(seconds: 5));
 
     await Future.delayed(Duration(seconds: 10));
-    SystemNavigator.pop();
+    exit(0);
   } else {
     if (Platform.isLinux || Platform.isMacOS || Platform.isWindows) {
       await windowManager.ensureInitialized();
