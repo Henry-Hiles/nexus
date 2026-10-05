@@ -35,7 +35,7 @@ class GomuksListenerController extends AsyncNotifier<void> {
           try {
             final muksEventType = command.cast<Utf8>().toDartString();
             debugPrint("Handling $muksEventType...");
-            final decodedMuksEvent = data.toJson();
+            final decodedMuksEvent = data.toJsonAndFree();
 
             switch (muksEventType) {
               case "client_state":

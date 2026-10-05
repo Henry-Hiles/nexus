@@ -108,7 +108,7 @@ class ClientController extends AsyncNotifier<int> {
         () => callback(handle, bufferPointer.ref),
       );
 
-      final json = response.buf.toJson();
+      final json = response.buf.toJsonAndFree();
 
       if (response.command.cast<Utf8>().toDartString() == "error") {
         throw json;

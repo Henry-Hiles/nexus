@@ -1,20 +1,21 @@
 import "dart:convert";
 import "dart:ffi";
 import "dart:typed_data";
+
 import "package:ffi/ffi.dart";
 import "package:nexus/src/third_party/gomuks.g.dart";
 
 extension GomuksOwnedBufferToX on GomuksOwnedBuffer {
-  Uint8List toBytes() {
+  Uint8List toBytesAndFree() {
     try {
       if (base == nullptr || length <= 0) return .new(0);
       return .fromList(base.asTypedList(length));
     } finally {
-      calloc.free(base);
+      GomuksFreeBuffer(this);
     }
   }
 
-  dynamic toJson() => jsonDecode(utf8.decode(toBytes()));
+  dynamic toJsonAndFree() => jsonDecode(utf8.decode(toBytesAndFree()));
 }
 
 extension JsonToGomuksBuffer on Map<String, dynamic> {
