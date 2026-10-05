@@ -7,7 +7,11 @@ import "package:unifiedpush/unifiedpush.dart";
 class UnifiedPushAllowedController extends AsyncNotifier<String?> {
   @override
   Future<String?> build() async {
-    if (!await UnifiedPush.tryUseCurrentOrDefaultDistributor()) {
+    if (!await UnifiedPush.tryUseCurrentOrDefaultDistributor().timeout(
+      .new(seconds: 10),
+      onTimeout: () =>
+          throw Exception("UnifiedPush distributor check timed out."),
+    )) {
       return "No valid distributors found. ${Platform.isLinux
           ? "Try installing KUnifiedPush"
           : Platform.isAndroid

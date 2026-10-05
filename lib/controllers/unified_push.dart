@@ -18,6 +18,8 @@ import "package:unifiedpush_storage_shared_preferences/storage.dart";
 import "package:window_manager/window_manager.dart";
 
 class UnifiedPushController extends AsyncNotifier<bool> {
+  Completer<void>? _endpoint;
+
   @override
   Future<bool> build() async {
     if (!Platform.isLinux && !Platform.isAndroid) return false;
@@ -30,33 +32,45 @@ class UnifiedPushController extends AsyncNotifier<bool> {
         shouldWriteService: false,
       ),
       onNewEndpoint: (endpoint, instance) async {
-        final pushKey = endpoint.pubKeySet!.pubKey;
-        await ref
-            .read(PushKeyController.provider(instance).notifier)
-            .set(pushKey);
+        final task = Future(() async {
+          final pushKey = endpoint.pubKeySet!.pubKey;
+          await ref
+              .read(PushKeyController.provider(instance).notifier)
+              .set(pushKey);
 
-        await ref
-            .read(ClientController.provider.notifier)
-            .registerPusher(
-              .new(
-                appDisplayName: "Nexus",
-                appId: "nexus.federated.nexus",
-                data: .webPush(
-                  url: .parse(endpoint.url),
-                  auth: endpoint.pubKeySet!.auth,
+          await ref
+              .read(ClientController.provider.notifier)
+              .registerPusher(
+                .new(
+                  appDisplayName: "Nexus",
+                  appId: "nexus.federated.nexus",
+                  data: .webPush(
+                    url: .parse(endpoint.url),
+                    auth: endpoint.pubKeySet!.auth,
+                  ),
+                  deviceDisplayName:
+                      "Nexus on ${toBeginningOfSentenceCase(Platform.operatingSystem)}",
+                  kind: .webPush,
+                  lang: "en",
+                  pushKey: pushKey,
                 ),
-                deviceDisplayName:
-                    "Nexus on ${toBeginningOfSentenceCase(Platform.operatingSystem)}",
-                kind: .webPush,
-                lang: "en",
-                pushKey: pushKey,
-              ),
-            );
+              );
 
-        state = .data(true);
+          state = .data(true);
+        });
+
+        if (_endpoint case final completer? when !completer.isCompleted) {
+          completer.complete(task);
+        } else {
+          await task;
+        }
       },
       onRegistrationFailed: (reason, instance) {
-        throw reason;
+        if (_endpoint case final completer? when !completer.isCompleted) {
+          completer.completeError(reason);
+        } else {
+          throw reason;
+        }
       },
       onMessage: (message, instance) async {
         debugPrint("UP message received for $instance");
@@ -111,48 +125,68 @@ class UnifiedPushController extends AsyncNotifier<bool> {
       onUnregistered: deregister,
     );
 
-    ref.listen(
-      ClientStateController.provider.select((value) => value?.deviceId),
-      (_, _) => register(),
-    );
+    if (!registered) return false;
 
-    if (registered) {
-      // Needs to be registered every startup
-      await register();
+    try {
+      return await register();
+    } catch (error, stackTrace) {
+      showError(error, stackTrace);
+      return false;
     }
-
-    return registered;
   }
 
-  Future<void> register() async {
+  Future<bool> register() async {
     state = .loading();
     try {
-      final deviceId = ref.read(
+      final deviceIdCompleter = Completer<String>();
+      final subscription = ref.listen(
         ClientStateController.provider.select((value) => value?.deviceId),
+        (_, next) {
+          if (next != null && !deviceIdCompleter.isCompleted) {
+            deviceIdCompleter.complete(next);
+          }
+        },
+        fireImmediately: true,
       );
-      if (deviceId == null) return;
+      final deviceId = await deviceIdCompleter.future.whenComplete(
+        subscription.close,
+      );
 
-      final capabilities = await ref
-          .read(ClientController.provider.notifier)
-          .getCapabilities();
+      await Future(() async {
+        final capabilities = await ref
+            .read(ClientController.provider.notifier)
+            .getCapabilities();
 
-      if (capabilities.webpush?.vapid == null) {
-        throw UnsupportedError(
-          "Your homeserver does not support MSC4174 (Web Push), and therefore cannot send notifications to Nexus.",
-        );
-      }
+        if (capabilities.webpush?.vapid == null) {
+          throw UnsupportedError(
+            "Your homeserver does not support MSC4174 (Web Push), and therefore cannot send notifications to Nexus.",
+          );
+        }
 
-      if (!await UnifiedPush.tryUseCurrentOrDefaultDistributor()) {
-        throw Exception("No UnifiedPush distributors found.");
-      }
+        if (!await UnifiedPush.tryUseCurrentOrDefaultDistributor()) {
+          throw Exception("No UnifiedPush distributors found.");
+        }
 
-      await UnifiedPush.register(
-        instance: deviceId,
-        vapid: capabilities.webpush?.vapid,
-      ).timeout(
-        .new(seconds: 15),
+        final endpoint = _endpoint = Completer<void>();
+
+        try {
+          await Future.wait([
+            UnifiedPush.register(
+              instance: deviceId,
+              vapid: capabilities.webpush?.vapid,
+            ),
+            endpoint.future,
+          ], eagerError: true);
+        } finally {
+          if (_endpoint == endpoint) _endpoint = null;
+        }
+      }).timeout(
+        .new(seconds: 10),
         onTimeout: () => throw Exception("UnifiedPush registration timed out."),
       );
+
+      state = .data(true);
+      return true;
     } catch (_) {
       state = .data(false);
       rethrow;
