@@ -3,7 +3,7 @@ import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/widgets/appbar.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
-import "package:nexus/widgets/room_menu.dart";
+import "package:nexus/widgets/room_menu_button.dart";
 import "package:nexus/widgets/room_summary_dialog.dart";
 
 final class const RoomAppbar({
@@ -72,21 +72,23 @@ final class const RoomAppbar({
                   ),
               ],
             ),
-      actions: room == null
-          ? .new()
-          : .new([
-              IconButton(
-                onPressed: onOpenPinnedMessagesList?.call,
-                icon: Icon(Icons.push_pin),
-                tooltip: "Open pinned messages",
-              ),
-              IconButton(
-                onPressed: () => onOpenMemberList?.call(context),
-                tooltip: "Open member list",
-                icon: Icon(Icons.people),
-              ),
-              RoomMenu(room),
-            ]),
+      actions: .new(
+        room == null
+            ? []
+            : [
+                IconButton(
+                  onPressed: onOpenPinnedMessagesList?.call,
+                  icon: Icon(Icons.push_pin),
+                  tooltip: "Open pinned messages",
+                ),
+                IconButton(
+                  onPressed: () => onOpenMemberList?.call(context),
+                  tooltip: "Open member list",
+                  icon: Icon(Icons.people),
+                ),
+                RoomMenuButton(room),
+              ],
+      ),
     );
   }
 }

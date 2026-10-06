@@ -5,8 +5,10 @@ import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/via.dart";
 import "package:nexus/models/room.dart";
+import "package:flutter_hooks/flutter_hooks.dart";
+import "package:nexus/main.dart";
 
-final class const RoomMenu(
+final class const RoomMenuButton(
   final Room? room, {
   final IList<Room> children = const IList.empty(),
   super.key,
@@ -47,6 +49,63 @@ final class const RoomMenu(
           PopupMenuItem(
             onTap: () => showDialog(
               context: context,
+              builder: (context) => HookBuilder(
+                builder: (context) {
+                  final userIdController = useTextEditingController();
+                  final text = useValueListenable(userIdController).text.trim();
+                  final valid = RegExp(r"^@[^:\s]+:[^\s]+$").hasMatch(text);
+
+                  void submit() {
+                    if (!valid) return;
+                    Navigator.of(context).pop();
+                    client
+                        .setMembership(
+                          .new(
+                            userId: text,
+                            roomId: room!.metadata!.id,
+                            action: .invite,
+                          ),
+                        )
+                        .onError(showError);
+                  }
+
+                  return AlertDialog(
+                    title: Text("Invite User"),
+                    content: TextField(
+                      controller: userIdController,
+                      autofocus: true,
+                      keyboardType: .emailAddress,
+                      onSubmitted: (_) => submit(),
+                      decoration: .new(
+                        labelText: "User ID",
+                        hintText: "@user:example.com",
+                        errorText: text.isEmpty || valid
+                            ? null
+                            : "Enter a valid user ID",
+                      ),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: Navigator.of(context).pop,
+                        child: Text("Cancel"),
+                      ),
+                      TextButton(
+                        onPressed: valid ? submit : null,
+                        child: Text("Invite"),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+            child: ListTile(
+              leading: Icon(Icons.person_add),
+              title: Text("Invite"),
+            ),
+          ),
+          PopupMenuItem(
+            onTap: () => showDialog(
+              context: context,
               builder: (context) => AlertDialog(
                 title: Text("Leave Room"),
                 content: Text(
@@ -81,54 +140,6 @@ final class const RoomMenu(
             ),
           ),
         ],
-
-        // PopupMenuItem(
-        //   onTap: () => showDialog(
-        //     context: context,
-        //     builder: (context) => HookBuilder(
-        //       builder: (_) {
-        //         final reasonController = useTextEditingController();
-        //         return AlertDialog(
-        //           title: Text("Report"),
-        //           content: Column(
-        //             mainAxisSize: MainAxisSize.min,
-        //             crossAxisAlignment: CrossAxisAlignment.start,
-        //             children: [
-        //               Text(
-        //                 "Report this room to your server administrators, who can take action like banning this room.",
-        //               ),
-
-        //               SizedBox(height: 12),
-        //               FormTextInput(
-        //                 required: false,
-        //                 capitalize: true,
-        //                 controller: reasonController,
-        //                 title: "Reason for report (optional)",
-        //               ),
-        //             ],
-        //           ),
-        //           actions: [
-        //             TextButton(
-        //               onPressed: Navigator.of(context).pop,
-        //               child: Text("Cancel"),
-        //             ),
-        //             TextButton(
-        //               onPressed: () {
-        //                 room.client.reportRoom(room.id, reasonController.text);
-        //                 Navigator.of(context).pop();
-        //               },
-        //               child: Text("Report"),
-        //             ),
-        //           ],
-        //         );
-        //       },
-        //     ),
-        //   ),
-        //   child: ListTile(
-        //     leading: Icon(Icons.report, color: danger),
-        //     title: Text("Report", style: TextStyle(color: danger)),
-        //   ),
-        // ),
       ],
     );
   }

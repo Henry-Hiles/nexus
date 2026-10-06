@@ -10,7 +10,7 @@ import "package:nexus/widgets/divider_widget.dart";
 import "package:nexus/widgets/error_dialog.dart";
 import "package:nexus/widgets/pages/settings.dart";
 import "package:nexus/widgets/join_dialog.dart";
-import "package:nexus/widgets/room_menu.dart";
+import "package:nexus/widgets/room_menu_button.dart";
 import "package:nexus/controllers/key.dart";
 import "package:nexus/controllers/spaces.dart";
 import "package:nexus/models/room.dart";
@@ -232,7 +232,10 @@ class const RoomsPane({super.key}) extends ConsumerWidget {
         title: Text(selectedSpace.title, overflow: .ellipsis),
         backgroundColor: Colors.transparent,
         actions: [
-          RoomMenu(selectedSpace.room, children: selectedSpace.allChildRooms),
+          RoomMenuButton(
+            selectedSpace.room,
+            children: selectedSpace.allChildRooms,
+          ),
         ],
       ),
       body: MaterialUiCompatibilityBridge(

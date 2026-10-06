@@ -10,7 +10,7 @@ class const SetMembershipRequest({
   required final String userId,
   required final String roomId,
   final String? reason,
-  @JsonKey(name: "action") required final MembershipAction action,
+  required final MembershipAction action,
   @JsonKey(name: "msc4293_redact_events") final bool redact = false,
 }) with _$SetMembershipRequest {
   Map<String, Object?> toJson() => _$SetMembershipRequestToJson(this);
