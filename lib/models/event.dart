@@ -102,9 +102,6 @@ class const UnreadType(final int value) with _$UnreadType {
   static const highlight = UnreadType(4);
   static const sound = UnreadType(8);
 
-  bool isNone() => value == 0;
-  bool isNormal() => (value & 1) != 0;
-  bool shouldNotify() => (value & 2) != 0;
-  bool isHighlighted() => (value & 4) != 0;
-  bool playsSound() => (value & 8) != 0;
+  bool has(UnreadType flag) => value & flag.value != 0;
+  UnreadType operator |(UnreadType other) => UnreadType(value | other.value);
 }

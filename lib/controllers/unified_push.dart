@@ -87,7 +87,7 @@ class UnifiedPushController extends AsyncNotifier<bool> {
 
         final (event, roomMetadata) = pushResponse;
 
-        if (event.unreadType?.shouldNotify() != true ||
+        if (event.unreadType?.has(.notify) != true ||
             (!isInBackground &&
                 await windowManager.isFocused().onError((_, _) => true) &&
                 await ref.read(
