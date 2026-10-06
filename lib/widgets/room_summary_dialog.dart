@@ -56,12 +56,10 @@ class const RoomSummaryDialog(
 
         if (summary.topic != null)
           ListTile(
-            isThreeLine: true,
-            subtitle: LinkifiedText(
+            titleAlignment: ListTileTitleAlignment.titleHeight,
+            title: LinkifiedText(
               summary.topic!,
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
+              style: Theme.of(context).textTheme.bodyLarge,
             ),
             leading: Icon(Icons.info),
           ),
