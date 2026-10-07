@@ -1,5 +1,6 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:freezed_annotation/freezed_annotation.dart";
+import "package:nexus/models/invited_room.dart";
 import "package:nexus/models/room.dart";
 import "package:nexus/models/space_edge.dart";
 
@@ -12,6 +13,7 @@ class const SyncData({
   final bool clearState = false,
   final IMap<String, IMap<String, dynamic>> accountData = const IMap.empty(),
   final IMap<String, Room> rooms = const IMap.empty(),
+  final IList<InvitedRoom> invitedRooms = const IList.empty(),
   final ISet<String> leftRooms = const ISet.empty(),
   final IMap<String, IList<SpaceEdge>>? spaceEdges,
   final IList<String>? topLevelSpaces,
