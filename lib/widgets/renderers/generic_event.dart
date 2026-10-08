@@ -24,7 +24,7 @@ class const GenericEventRenderer(
                 ],
               ],
             ),
-            maxLines: maxLines ?? 9007199254740991,
+            maxLines: maxLines ?? 999,
             overflow: .ellipsis,
           ),
         ),
