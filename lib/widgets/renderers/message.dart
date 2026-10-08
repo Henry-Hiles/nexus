@@ -38,7 +38,9 @@ class const MessageRenderer(
     final errorStyle = TextStyle(color: colorScheme.error);
 
     final textStyle = TextStyle(
-      fontSize: event.localContent?.bigEmoji == true ? 32 : null,
+      fontSize: event.localContent?.bigEmoji == true && maxLines != 1
+          ? 32
+          : null,
       fontStyle: event.content is EmoteMessageContent ? .italic : null,
     );
 
