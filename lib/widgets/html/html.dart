@@ -18,147 +18,137 @@ class const Html(
   super.key,
 }) extends ConsumerWidget {
   @override
-  Widget
-  build(BuildContext context, WidgetRef ref)
-  // needed until https://github.com/daohoangson/flutter_widget_from_html/issues/1618 is resolved
-  => MaterialUiCompatibilityBridge(
-    child: HtmlWidget(
-      html,
-      buildAsync: false,
-      textStyle: textStyle,
-      customWidgetBuilder: (element) {
-        if (element.attributes.keys.contains("data-mx-profile-fallback")) {
-          return SizedBox.shrink();
-        }
+  Widget build(BuildContext context, WidgetRef ref) => HtmlWidget(
+    html,
+    buildAsync: false,
+    textStyle: textStyle,
+    customWidgetBuilder: (element) {
+      if (element.attributes.keys.contains("data-mx-profile-fallback")) {
+        return SizedBox.shrink();
+      }
 
-        if (element.attributes.keys.contains("data-mx-spoiler")) {
-          return InlineCustomWidget(child: SpoilerText(element.text));
-        }
+      if (element.attributes.keys.contains("data-mx-spoiler")) {
+        return InlineCustomWidget(child: SpoilerText(element.text));
+      }
 
-        final height =
-            int.tryParse(element.attributes["height"] ?? "") ??
-            (element.attributes.keys.contains("data-mx-emoticon")
-                ? 32
-                : null) ??
-            300;
-        final width = int.tryParse(element.attributes["width"] ?? "");
-        final src = Uri.tryParse(element.attributes["src"] ?? "");
+      final height =
+          int.tryParse(element.attributes["height"] ?? "") ??
+          (element.attributes.keys.contains("data-mx-emoticon") ? 32 : null) ??
+          300;
+      final width = int.tryParse(element.attributes["width"] ?? "");
+      final src = Uri.tryParse(element.attributes["src"] ?? "");
 
-        return switch (element.localName) {
-          "code" =>
-            element.parent?.localName == "pre"
-                ? CodeBlock(
-                    element.text,
-                    lang: element.className.replaceAll("language-", ""),
-                  )
-                : InlineCustomWidget(
-                    child: ClipRRect(
-                      borderRadius: .all(.circular(4)),
-                      child: Container(
-                        padding: .all(8),
-                        color: Theme.of(context)
-                            .colorScheme
-                            .surfaceContainerHighest,
-                        child: SelectableText(
-                          element.text,
-                          style: .new(fontFamily: "bundled-mono"),
-                        ),
+      return switch (element.localName) {
+        "code" =>
+          element.parent?.localName == "pre"
+              ? CodeBlock(
+                  element.text,
+                  lang: element.className.replaceAll("language-", ""),
+                )
+              : InlineCustomWidget(
+                  child: ClipRRect(
+                    borderRadius: .all(.circular(4)),
+                    child: Container(
+                      padding: .all(8),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .surfaceContainerHighest,
+                      child: SelectableText(
+                        element.text,
+                        style: .new(fontFamily: "bundled-mono"),
                       ),
                     ),
                   ),
+                ),
 
-          "blockquote" => Quoted(
-            Html(element.innerHtml, textStyle: textStyle, roomId: roomId),
-          ),
-
-          "a" =>
-            element.attributes["href"]?.linkInfo == null
-                ? null
-                : InlineCustomWidget(
-                    child: MentionChip(element.attributes["href"]!, roomId),
-                  ),
-
-          "img" =>
-            src == null
-                ? SizedBox.shrink()
-                : InlineCustomWidget(
-                    alignment: PlaceholderAlignment.middle,
-                    child: ExpandableImage(
-                      .new(mxc: src),
-                      child: Image(
-                        image: MxcImage(ref, .new(mxc: src)),
-                        errorBuilder: (_, error, _) => Text(
-                          "Image Failed to Load",
-                          style: .new(
-                            color: Theme.of(context).colorScheme.error,
-                          ),
-                        ),
-                        height: height.toDouble(),
-                        width: width?.toDouble(),
-                        loadingBuilder: (_, child, loadingProgress) =>
-                            loadingProgress == null
-                            ? child
-                            : CircularProgressIndicator(),
-                      ),
-                    ),
-                  ),
-
-          // Allowed elements list
-          ("del" ||
-              "h1" ||
-              "h2" ||
-              "h3" ||
-              "h4" ||
-              "h5" ||
-              "h6" ||
-              "p" ||
-              "ul" ||
-              "ol" ||
-              "sup" ||
-              "sub" ||
-              "li" ||
-              "b" ||
-              "i" ||
-              "u" ||
-              "strong" ||
-              "em" ||
-              "s" ||
-              "code" ||
-              "hr" ||
-              "br" ||
-              "div" ||
-              "table" ||
-              "thead" ||
-              "tbody" ||
-              "tr" ||
-              "th" ||
-              "td" ||
-              "caption" ||
-              "pre" ||
-              "span" ||
-              "details" ||
-              "summary") =>
-            null,
-
-          _ => SizedBox.shrink(),
-        };
-      },
-      customStylesBuilder: (element) => {
-        "width": "auto",
-        ...Map.fromEntries(
-          element.attributes
-              .mapTo<MapEntry<String, String>?>(
-                (key, value) => switch (key) {
-                  "data-mx-color" => .new("color", value),
-                  "data-mx-bg-color" => .new("background-color", value),
-                  _ => null,
-                },
-              )
-              .nonNulls,
+        "blockquote" => Quoted(
+          Html(element.innerHtml, textStyle: textStyle, roomId: roomId),
         ),
-      },
-      onTapUrl: (url) =>
-          ref.watch(LaunchHelper.provider).launchUrl(.parse(url)),
-    ),
+
+        "a" =>
+          element.attributes["href"]?.linkInfo == null
+              ? null
+              : InlineCustomWidget(
+                  child: MentionChip(element.attributes["href"]!, roomId),
+                ),
+
+        "img" =>
+          src == null
+              ? SizedBox.shrink()
+              : InlineCustomWidget(
+                  alignment: PlaceholderAlignment.middle,
+                  child: ExpandableImage(
+                    .new(mxc: src),
+                    child: Image(
+                      image: MxcImage(ref, .new(mxc: src)),
+                      errorBuilder: (_, error, _) => Text(
+                        "Image Failed to Load",
+                        style: .new(color: Theme.of(context).colorScheme.error),
+                      ),
+                      height: height.toDouble(),
+                      width: width?.toDouble(),
+                      loadingBuilder: (_, child, loadingProgress) =>
+                          loadingProgress == null
+                          ? child
+                          : CircularProgressIndicator(),
+                    ),
+                  ),
+                ),
+
+        // Allowed elements list
+        ("del" ||
+            "h1" ||
+            "h2" ||
+            "h3" ||
+            "h4" ||
+            "h5" ||
+            "h6" ||
+            "p" ||
+            "ul" ||
+            "ol" ||
+            "sup" ||
+            "sub" ||
+            "li" ||
+            "b" ||
+            "i" ||
+            "u" ||
+            "strong" ||
+            "em" ||
+            "s" ||
+            "code" ||
+            "hr" ||
+            "br" ||
+            "div" ||
+            "table" ||
+            "thead" ||
+            "tbody" ||
+            "tr" ||
+            "th" ||
+            "td" ||
+            "caption" ||
+            "pre" ||
+            "span" ||
+            "details" ||
+            "summary") =>
+          null,
+
+        _ => SizedBox.shrink(),
+      };
+    },
+    customStylesBuilder: (element) => {
+      "width": "auto",
+      ...Map.fromEntries(
+        element.attributes
+            .mapTo<MapEntry<String, String>?>(
+              (key, value) => switch (key) {
+                "data-mx-color" => .new("color", value),
+                "data-mx-bg-color" => .new("background-color", value),
+                _ => null,
+              },
+            )
+            .nonNulls,
+      ),
+    },
+    onTapUrl: (url) => ref.watch(LaunchHelper.provider).launchUrl(.parse(url)),
   );
 }
