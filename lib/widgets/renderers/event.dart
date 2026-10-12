@@ -84,11 +84,11 @@ class const EventRenderer(
     final child = event.redactedBy != null || event.relationType == "m.replace"
         ? null
         : switch (event.content) {
-            Content(:final parseError?) => Row(
+            Content(:final parseError?, :final stackTrace) => Row(
               children: [
                 ErrorDialog(
                   "An error occurred while parsing event ${event.eventId}:\n$parseError",
-                  parseError.stackTrace,
+                  stackTrace,
                 ),
               ],
             ),

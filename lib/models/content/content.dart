@@ -17,11 +17,7 @@ import "package:nexus/models/content/topic.dart";
 import "package:nexus/models/content/sticker.dart";
 import "package:nexus/models/content/history_visibility.dart";
 
-class Content {
-  final Error? parseError;
-
-  const Content({this.parseError});
-
+class const Content({final String? parseError, final StackTrace? stackTrace}) {
   factory Content.fromJson(Map<String, dynamic> json) => const Content();
 
   Map<String, dynamic> toJson() => {};
@@ -35,9 +31,8 @@ class Content {
               .firstWhereOrNull((eventType) => eventType.type == type)
               ?.contentFromJson ??
           Content.fromJson)(json);
-    } catch (error) {
-      if (error is Error) return Content(parseError: error);
-      rethrow;
+    } catch (error, stackTrace) {
+      return Content(parseError: error.toString(), stackTrace: stackTrace);
     }
   }
 }
@@ -65,5 +60,5 @@ enum EventType(
   name("m.room.name", NameContent.fromJson),
   reaction("m.reaction", ReactionContent.fromJson),
   pinnedEvents("m.room.pinned_events", PinnedEventsContent.fromJson),
-  message("m.room.message", MessageContent.fromJson);
+  message("m.room.message", MessageContent.fromJson),
 }

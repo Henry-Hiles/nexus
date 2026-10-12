@@ -58,16 +58,16 @@ class const Event({
         replyTo: replyToFromJson(getContentFromJson(json)),
         pmp: json["content"]?["com.beeper.per_message_profile"] == null
             ? null
-            : Profile.fromJsonWithCatch(
+            : .fromJsonWithCatch(
                 json["content"]?["com.beeper.per_message_profile"],
               ),
-        content: Content.fromEventJson(
+        content: .fromEventJson(
           getContentFromJson(json),
           json["decrypted_type"] ?? json["type"],
         ),
         previousContent: json["unsigned"]?["prev_content"] == null
             ? null
-            : Content.fromEventJson(
+            : .fromEventJson(
                 json["unsigned"]?["prev_content"],
                 json["decrypted_type"] ?? json["type"],
               ),
