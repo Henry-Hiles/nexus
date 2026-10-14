@@ -5,7 +5,7 @@
     self.submodules = true;
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     flake-parts.url = "github:hercules-ci/flake-parts";
-    nix2flatpak.url = "github:Henry-Hiles/nix2flatpak/quad/nexus";
+    nix2flatpak.url = "github:neobrain/nix2flatpak";
   };
 
   outputs =
