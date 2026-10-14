@@ -18,7 +18,7 @@ class ReactionsController(final ReactionsConfig config)
 
     final reactionEvents = eventInfo?.$2.isNotEmpty == true
         ? await ref
-              .watch(ClientController.provider.notifier)
+              .read(ClientController.provider.notifier)
               .getRelatedEvents(
                 .new(
                   roomId: config.roomId,

@@ -15,7 +15,7 @@ class const UrlPreview(final Uri link, {super.key}) extends ConsumerWidget {
           data: (preview) => preview == null
               ? SizedBox.shrink()
               : InkWell(
-                  onTap: () => ref.watch(LaunchHelper.provider).launchUrl(link),
+                  onTap: () => ref.read(LaunchHelper.provider).launchUrl(link),
                   child: Card(
                     margin: .symmetric(vertical: 4),
                     color: Theme.of(context)

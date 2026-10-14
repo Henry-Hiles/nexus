@@ -8,7 +8,7 @@ class AuthUrlController(final Uri homeserver)
     extends AsyncNotifier<OAuthAuthCodeResponse> {
   @override
   Future<OAuthAuthCodeResponse> build() async => ref
-      .watch(ClientController.provider.notifier)
+      .read(ClientController.provider.notifier)
       .getAuthUrl(
         .new(
           homeserverUrl: homeserver,

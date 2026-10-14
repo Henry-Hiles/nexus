@@ -23,7 +23,7 @@ class const VerifyPage({super.key}) extends HookConsumerWidget {
         }
 
         inputError.value = await ref
-            .watch(ClientController.provider.notifier)
+            .read(ClientController.provider.notifier)
             .verify(passphraseController.text);
       } finally {
         isLoading.value = false;

@@ -23,7 +23,7 @@ class AttachmentController(final String roomId)
     );
 
     final content = await ref
-        .watch(ClientController.provider.notifier)
+        .read(ClientController.provider.notifier)
         .uploadMedia(.new(path: file.path, encrypt: isEncrypted));
 
     state = (filename, content);

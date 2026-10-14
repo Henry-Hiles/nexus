@@ -26,6 +26,9 @@ final class const UserBottomSheet(
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
+    final subtitleStyle = textTheme.titleSmall?.copyWith(
+      color: theme.colorScheme.onSurfaceVariant,
+    );
     final client = ref.read(ClientController.provider.notifier);
 
     void showMembershipDialog(MembershipAction action) => showDialog(
@@ -112,13 +115,7 @@ final class const UserBottomSheet(
               style: textTheme.headlineLarge,
               textAlign: .center,
             ),
-            SelectableText(
-              userId,
-              textAlign: .center,
-              style: textTheme.titleSmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
+            SelectableText(userId, textAlign: .center, style: subtitleStyle),
 
             ref
                 .watch(ProfileController.provider(userId))
@@ -151,9 +148,7 @@ final class const UserBottomSheet(
                                   Text(
                                     pronoun.summary,
                                     textAlign: .center,
-                                    style: textTheme.titleSmall?.copyWith(
-                                      color: theme.colorScheme.onSurfaceVariant,
-                                    ),
+                                    style: subtitleStyle,
                                   ),
                                 ],
                               )
@@ -172,9 +167,7 @@ final class const UserBottomSheet(
                             Text(
                               profileResponse.profile.timezone!,
                               textAlign: .center,
-                              style: textTheme.titleSmall?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant,
-                              ),
+                              style: subtitleStyle,
                             ),
                           ],
                         ],
@@ -212,7 +205,6 @@ final class const UserBottomSheet(
                 Padding(
                   padding: .only(top: 4),
                   child: Row(
-                    mainAxisSize: MainAxisSize.max,
                     spacing: 8,
                     children: [
                       if (member.status == .join || member.status == .invite)

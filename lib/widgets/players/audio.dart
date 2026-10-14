@@ -27,7 +27,7 @@ class const AudioPlayer(
       player.platform?.state = player.platform!.state.copyWith(buffering: true);
       scheduleMicrotask(() async {
         final video = await ref
-            .watch(ClientController.provider.notifier)
+            .read(ClientController.provider.notifier)
             .downloadMedia(.new(mxc: uri, encrypted: encrypted));
         await player.open(Media(video.path), play: false);
 

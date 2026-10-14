@@ -11,6 +11,7 @@ import "package:fluttertagger/fluttertagger.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/attachment.dart";
 import "package:nexus/controllers/image_picker.dart";
+import "package:image_picker/image_picker.dart";
 import "package:nexus/controllers/power_level.dart";
 import "package:nexus/models/content/message.dart";
 import "package:nexus/models/relation_type.dart";
@@ -88,6 +89,14 @@ class const Composer(
     }, [relationType, relatedEvent == null]);
 
     final attachment = ref.watch(AttachmentController.provider(roomId));
+
+    Future<void> attach(Future<XFile?> pick) async {
+      if (await pick case final file?) {
+        await ref
+            .read(AttachmentController.provider(roomId).notifier)
+            .add(file);
+      }
+    }
 
     void send() {
       if (controller.value.text.isEmpty && attachment == null ||
@@ -173,53 +182,33 @@ class const Composer(
                               tooltip: "Add media",
                               enabled: attachment == null,
                               itemBuilder: (context) => [
-                                if (Platform.isAndroid || Platform.isIOS)
+                                for (final (source, title, icon) in [
+                                  if (Platform.isAndroid || Platform.isIOS)
+                                    (
+                                      ImageSource.camera,
+                                      "Camera",
+                                      Icons.add_a_photo,
+                                    ),
+                                  (
+                                    ImageSource.gallery,
+                                    "Gallery",
+                                    Icons.add_photo_alternate,
+                                  ),
+                                ])
                                   PopupMenuItem(
                                     child: ListTile(
-                                      title: Text("Camera"),
-                                      leading: Icon(Icons.add_a_photo),
+                                      title: Text(title),
+                                      leading: Icon(icon),
                                     ),
-                                    onTap: () async => ref
-                                        .read(
-                                          AttachmentController.provider(roomId)
-                                              .notifier,
-                                        )
-                                        .add(
-                                          (await ref
-                                              .watch(
-                                                ImagePickerController.provider,
-                                              )
-                                              .pickImage(source: .camera))!,
-                                        )
-                                        .onError(showError),
+                                    onTap: () => attach(
+                                      ref
+                                          .read(ImagePickerController.provider)
+                                          .pickImage(source: source),
+                                    ).onError(showError),
                                   ),
                                 PopupMenuItem(
-                                  child: ListTile(
-                                    title: Text("Gallery"),
-                                    leading: Icon(Icons.add_photo_alternate),
-                                  ),
-                                  onTap: () async => ref
-                                      .read(
-                                        AttachmentController.provider(roomId)
-                                            .notifier,
-                                      )
-                                      .add(
-                                        (await ref
-                                            .watch(
-                                              ImagePickerController.provider,
-                                            )
-                                            .pickImage(source: .gallery))!,
-                                      )
-                                      .onError(showError),
-                                ),
-                                PopupMenuItem(
-                                  onTap: () async => ref
-                                      .watch(
-                                        AttachmentController.provider(roomId)
-                                            .notifier,
-                                      )
-                                      .add((await openFile())!)
-                                      .onError(showError),
+                                  onTap: () =>
+                                      attach(openFile()).onError(showError),
                                   child: ListTile(
                                     title: Text("Files"),
                                     leading: Icon(Icons.attachment),

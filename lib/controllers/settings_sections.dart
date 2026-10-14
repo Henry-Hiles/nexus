@@ -47,7 +47,7 @@ class SettingsSectionsController
                 options: ThemeMode.values,
                 getName: (option) => toBeginningOfSentenceCase(option.name),
                 onChanged: (value) => ref
-                    .watch(SettingsController.provider.notifier)
+                    .read(SettingsController.provider.notifier)
                     .set(settings.copyWith(theme: value))
                     .onError(showError),
               ),
@@ -67,7 +67,7 @@ class SettingsSectionsController
                         Platform.isMacOS ||
                         Platform.isWindows)
                     ? (value) => ref
-                          .watch(SettingsController.provider.notifier)
+                          .read(SettingsController.provider.notifier)
                           .set(settings.copyWith(useDynamicTheming: value))
                           .onError(showError)
                     : null,
@@ -89,7 +89,7 @@ class SettingsSectionsController
                 secondary: Icon(icon),
                 value: settings.showAllInHome,
                 onChanged: (value) => ref
-                    .watch(SettingsController.provider.notifier)
+                    .read(SettingsController.provider.notifier)
                     .set(settings.copyWith(showAllInHome: value))
                     .onError(showError),
               ),
@@ -106,7 +106,7 @@ class SettingsSectionsController
                   secondary: Icon(icon),
                   value: settings.showMinimizeButton,
                   onChanged: (value) => ref
-                      .watch(SettingsController.provider.notifier)
+                      .read(SettingsController.provider.notifier)
                       .set(settings.copyWith(showMinimizeButton: value))
                       .onError(showError),
                 ),
@@ -122,7 +122,7 @@ class SettingsSectionsController
                 value: settings.linuxMobileMode,
                 onChanged: Platform.isLinux
                     ? (value) => ref
-                          .watch(SettingsController.provider.notifier)
+                          .read(SettingsController.provider.notifier)
                           .set(settings.copyWith(linuxMobileMode: value))
                           .onError(showError)
                     : null,
@@ -190,14 +190,14 @@ class SettingsSectionsController
                                   loading.value = true;
                                   if (value != null) {
                                     if (await ref
-                                        .watch(
+                                        .read(
                                           NotificationController
                                               .provider
                                               .notifier,
                                         )
                                         .requestPermissions()) {
                                       await ref
-                                          .watch(
+                                          .read(
                                             UnifiedPushController
                                                 .provider
                                                 .notifier,
@@ -208,7 +208,7 @@ class SettingsSectionsController
                                     }
                                   } else {
                                     await ref
-                                        .watch(
+                                        .read(
                                           UnifiedPushController
                                               .provider
                                               .notifier,
@@ -268,7 +268,7 @@ class SettingsSectionsController
                       onChanged: specVersionsResponse.maybeWhen(
                         data: (_) =>
                             (value) => ref
-                                .watch(ClientController.provider.notifier)
+                                .read(ClientController.provider.notifier)
                                 .setAccountData(
                                   .new(
                                     type: AccountData.invitePermissionConfigKey,

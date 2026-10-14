@@ -11,7 +11,7 @@ class KeyController(final String key) extends AsyncNotifier<String?> {
       ref.watch(SharedPrefsController.provider).getString(key);
 
   Future<void> set(String? value) async {
-    final prefs = ref.watch(SharedPrefsController.provider);
+    final prefs = ref.read(SharedPrefsController.provider);
     state = .data(value);
 
     if (value == null) {

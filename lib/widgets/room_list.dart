@@ -4,6 +4,7 @@ import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:material_ui/material_ui.dart";
 import "package:navigation_rail_m3e/navigation_rail_m3e.dart";
 import "package:nexus/helpers/extensions/get_all_child_rooms.dart";
+import "package:nexus/helpers/extensions/room_destinations.dart";
 import "package:nexus/models/nav_page.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/widgets/divider_widget.dart";
@@ -13,31 +14,10 @@ import "package:nexus/widgets/join_dialog.dart";
 import "package:nexus/widgets/room_menu_button.dart";
 import "package:nexus/controllers/key.dart";
 import "package:nexus/controllers/spaces.dart";
-import "package:nexus/models/room.dart";
 import "package:collection/collection.dart";
-import "package:fast_immutable_collections/fast_immutable_collections.dart";
 
 // Needed for navigation_rail_m3e (#65).
 import "package:flutter/material.dart" as old_mat;
-
-List<NavigationRailM3EDestination> roomDestinations(
-  IList<Room> rooms, {
-  required bool isDm,
-}) => [
-  for (final room in rooms)
-    .new(
-      label: room.metadata?.name ?? "Unnamed Room",
-      badgeCount: switch (room.metadata?.unreadNotifications) {
-        0 || null => room.metadata?.unreadMessages == 0 ? null : 0,
-        int unread => unread,
-      },
-      icon: AvatarOrHash(
-        room.metadata?.avatar,
-        room.metadata?.name ?? "Unnamed Room",
-        fallback: isDm ? null : const Icon(Icons.numbers),
-      ),
-    ),
-];
 
 class const RoomList({super.key}) extends ConsumerWidget implements NavPage {
   @override
@@ -265,13 +245,12 @@ class const RoomsPane({super.key}) extends ConsumerWidget {
                   header: selectedSpace.room == null
                       ? null
                       : const DividerWidget(Text("Rooms")),
-                  destinations: roomDestinations(
-                    selectedSpace.children,
+                  destinations: selectedSpace.children.toDestinations(
                     isDm: isDm,
                   ),
                 ),
-                for (final subSpace in selectedSpace.subSpaces)
-                  .new(
+                ...selectedSpace.subSpaces.map(
+                  (subSpace) => NavigationRailM3ESection(
                     header: DividerWidget(
                       Row(
                         mainAxisSize: .min,
@@ -293,11 +272,9 @@ class const RoomsPane({super.key}) extends ConsumerWidget {
                         ],
                       ),
                     ),
-                    destinations: roomDestinations(
-                      subSpace.children,
-                      isDm: isDm,
-                    ),
+                    destinations: subSpace.children.toDestinations(isDm: isDm),
                   ),
+                ),
               ],
               onDestinationSelected: (value) {
                 ref

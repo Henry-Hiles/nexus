@@ -30,7 +30,7 @@ class const SettingsPage({super.key}) extends ConsumerWidget {
           barHintText: "Search...",
           isFullScreen: categoriesArePages,
           suggestionsBuilder: (suggestionsContext, controller) async {
-            final categories = await ref.watch(
+            final categories = await ref.read(
               SettingsSectionsController.provider.future,
             );
             final query = controller.text.toLowerCase();

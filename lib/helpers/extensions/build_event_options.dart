@@ -34,7 +34,7 @@ extension BuildEventOptions on Event {
     )).notifier;
 
     final isPinned = ref
-        .watch(PinnedIdsController.provider(roomId))
+        .read(PinnedIdsController.provider(roomId))
         .contains(eventId);
 
     void showReasonDialog({
@@ -86,7 +86,7 @@ extension BuildEventOptions on Event {
     }
 
     return .new([
-      if (ref.watch(
+      if (ref.read(
         PowerLevelController.provider(
           .new(eventType: .reaction, roomId: roomId),
         ),
@@ -98,30 +98,33 @@ extension BuildEventOptions on Event {
             child: Row(
               mainAxisAlignment: .center,
               children: [
-                for (final emoji in {
-                  ...ref
-                      .watch(RecentEmojiController.provider)
-                      .map((entry) => entry.emoji),
-                  "👍",
-                  "🤣",
-                  "😭",
-                  "🤔",
-                }.take(3))
-                  IconButton(
-                    icon: Text(emoji),
-                    onPressed: () async {
-                      Navigator.of(context).pop();
-                      await ref
-                          .watch(notifier)
-                          .sendReaction(emoji, this)
-                          .onError(showError);
+                ...{
+                      ...ref
+                          .read(RecentEmojiController.provider)
+                          .map((entry) => entry.emoji),
+                      "👍",
+                      "🤣",
+                      "😭",
+                      "🤔",
+                    }
+                    .take(3)
+                    .map(
+                      (emoji) => IconButton(
+                        icon: Text(emoji),
+                        onPressed: () async {
+                          Navigator.of(context).pop();
+                          await ref
+                              .read(notifier)
+                              .sendReaction(emoji, this)
+                              .onError(showError);
 
-                      await ref
-                          .read(RecentEmojiController.provider.notifier)
-                          .add(emoji)
-                          .onError(showError);
-                    },
-                  ),
+                          await ref
+                              .read(RecentEmojiController.provider.notifier)
+                              .add(emoji)
+                              .onError(showError);
+                        },
+                      ),
+                    ),
                 IconButton(
                   icon: const Icon(Icons.emoji_emotions),
                   onPressed: () {
@@ -135,7 +138,7 @@ extension BuildEventOptions on Event {
                         onSelection: (emoji) {
                           Navigator.of(context).pop();
                           ref
-                              .watch(notifier)
+                              .read(notifier)
                               .sendReaction(emoji, this)
                               .onError(showError);
                         },
@@ -148,7 +151,7 @@ extension BuildEventOptions on Event {
           ),
         ),
 
-      if (ref.watch(
+      if (ref.read(
         PowerLevelController.provider(
           .new(eventType: .message, roomId: roomId),
         ),
@@ -167,7 +170,7 @@ extension BuildEventOptions on Event {
           child: const ListTile(leading: Icon(Icons.edit), title: Text("Edit")),
         ),
 
-      if (ref.watch(
+      if (ref.read(
         PowerLevelController.provider(
           .state(eventType: .pinnedEvents, roomId: roomId),
         ),
@@ -225,7 +228,7 @@ extension BuildEventOptions on Event {
           ),
         ),
 
-      if (ref.watch(
+      if (ref.read(
             PowerLevelController.provider(
               .redaction(targetUser: sender, roomId: roomId),
             ),
@@ -239,7 +242,7 @@ extension BuildEventOptions on Event {
                 "This cannot be reversed.",
             action: "Delete",
             onConfirm: (reason) =>
-                ref.watch(notifier).deleteMessage(this, reason: reason),
+                ref.read(notifier).deleteMessage(this, reason: reason),
           ),
           child: ListTile(
             leading: Icon(Icons.delete, color: danger),
@@ -249,7 +252,7 @@ extension BuildEventOptions on Event {
 
       if (eventId.isFake)
         PopupMenuItem(
-          onTap: () => ref.watch(notifier).hideClientSticky(rowId),
+          onTap: () => ref.read(notifier).hideClientSticky(rowId),
           child: ListTile(
             leading: Icon(Icons.delete, color: danger),
             title: Text("Hide", style: .new(color: danger)),
@@ -260,7 +263,7 @@ extension BuildEventOptions on Event {
         onTap: () => showReasonDialog(
           title: "Report",
           description:
-              "Report this this to your server administrators, "
+              "Report this event to your server administrators, "
               "who can take action like banning this server or room.",
           action: "Report",
           onConfirm: (reason) => ref

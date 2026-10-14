@@ -20,7 +20,7 @@ class UnifiedPushAllowedController extends AsyncNotifier<String?> {
     }
 
     final capabilities = await ref
-        .watch(ClientController.provider.notifier)
+        .read(ClientController.provider.notifier)
         .getCapabilities();
 
     if (capabilities.webpush?.vapid == null) {

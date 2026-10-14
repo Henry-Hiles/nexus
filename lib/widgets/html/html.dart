@@ -149,6 +149,6 @@ class const Html(
             .nonNulls,
       ),
     },
-    onTapUrl: (url) => ref.watch(LaunchHelper.provider).launchUrl(.parse(url)),
+    onTapUrl: (url) => ref.read(LaunchHelper.provider).launchUrl(.parse(url)),
   );
 }

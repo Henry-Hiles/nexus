@@ -79,9 +79,11 @@ class const MemberList(final String roomId, {super.key})
                       )
                     : Expanded(
                         child: CustomScrollView(
-                          slivers: [
-                            for (final MapEntry(key: powerLevel, value: members)
-                                in value) ...[
+                          slivers: value.expand((group) {
+                            final MapEntry(key: powerLevel, value: members) =
+                                group;
+
+                            return [
                               SliverToBoxAdapter(
                                 child: Padding(
                                   padding: .symmetric(horizontal: 16),
@@ -151,8 +153,8 @@ class const MemberList(final String roomId, {super.key})
                                   }
                                 },
                               ),
-                            ],
-                          ],
+                            ];
+                          }).toList(),
                         ),
                       ),
               AsyncLoading _ => Loading(),

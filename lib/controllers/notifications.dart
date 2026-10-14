@@ -55,7 +55,7 @@ class NotificationsController(final NotificationsRequest request)
       final lastNotification = currentNotifications.lastOrNull;
       final lastTs = lastNotification == null
           ? null
-          : ref.watch(
+          : ref.read(
               RoomsController.provider.select(
                 (rooms) => rooms[lastNotification.$2]
                     ?.events[lastNotification.$1]

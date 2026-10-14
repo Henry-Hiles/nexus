@@ -18,7 +18,7 @@ class const SelectServerPage({super.key}) extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
 
-    final launch = ref.watch(LaunchHelper.provider).launchUrl;
+    final launch = ref.read(LaunchHelper.provider).launchUrl;
 
     final isLoading = useState(false);
     final homeserverUrl = useTextEditingController();
@@ -52,7 +52,7 @@ class const SelectServerPage({super.key}) extends HookConsumerWidget {
               AuthUrlController.provider(url).future,
             );
 
-            await ref.watch(LaunchHelper.provider).launchUrl(codeResponse.url);
+            await ref.read(LaunchHelper.provider).launchUrl(codeResponse.url);
 
             AppLinks().uriLinkStream.listen((encodedUri) async {
               final state = encodedUri.queryParameters["state"];
@@ -64,7 +64,7 @@ class const SelectServerPage({super.key}) extends HookConsumerWidget {
 
                 if (code != null) {
                   await ref
-                      .watch(ClientController.provider.notifier)
+                      .read(ClientController.provider.notifier)
                       .exchangeToken(
                         .new(
                           homeserverUrl: url,
@@ -74,7 +74,7 @@ class const SelectServerPage({super.key}) extends HookConsumerWidget {
                             path: "/",
                           ),
                           code: code,
-                          clientId: await ref.watch(
+                          clientId: await ref.read(
                             ClientIdController.provider(url).future,
                           ),
                         ),

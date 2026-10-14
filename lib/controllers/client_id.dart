@@ -4,7 +4,7 @@ import "package:nexus/controllers/client.dart";
 class ClientIdController(final Uri homeserver) extends AsyncNotifier<String> {
   @override
   Future<String> build() => ref
-      .watch(ClientController.provider.notifier)
+      .read(ClientController.provider.notifier)
       .registerClient(
         .new(
           clientName: "Nexus",

@@ -40,28 +40,23 @@ class GomuksListenerController extends AsyncNotifier<void> {
             switch (muksEventType) {
               case "client_state":
                 ref
-                    .watch(ClientStateController.provider.notifier)
+                    .read(ClientStateController.provider.notifier)
                     .set(.fromJson(decodedMuksEvent));
-                break;
               case "sync_status":
                 ref
-                    .watch(SyncStatusController.provider.notifier)
+                    .read(SyncStatusController.provider.notifier)
                     .set(.fromJson(decodedMuksEvent));
-                break;
               case "init_complete":
-                ref.watch(InitCompleteController.provider.notifier).complete();
-                break;
+                ref.read(InitCompleteController.provider.notifier).complete();
               case "send_complete":
                 final event = Event.fromJson(decodedMuksEvent["event"]);
                 ref
-                    .watch(RoomsController.provider.notifier)
+                    .read(RoomsController.provider.notifier)
                     .update(
                       .new({
                         event.roomId: .new(events: .new({event.rowId: event})),
                       }),
                     );
-
-                break;
               case "sync_complete":
                 final syncData = SyncData.fromJson(decodedMuksEvent);
                 final roomProvider = RoomsController.provider;
@@ -73,28 +68,27 @@ class GomuksListenerController extends AsyncNotifier<void> {
                 }
 
                 ref
-                    .watch(roomProvider.notifier)
+                    .read(roomProvider.notifier)
                     .update(syncData.rooms, syncData.leftRooms);
                 ref
-                    .watch(accountDataProvider.notifier)
+                    .read(accountDataProvider.notifier)
                     .update(syncData.accountData);
 
-                if (syncData.topLevelSpaces != null) {
+                if (syncData.topLevelSpaces case final topLevelSpaces?) {
                   ref
-                      .watch(TopLevelSpacesController.provider.notifier)
-                      .set(syncData.topLevelSpaces!);
+                      .read(TopLevelSpacesController.provider.notifier)
+                      .set(topLevelSpaces);
                 }
 
-                if (syncData.spaceEdges != null) {
+                if (syncData.spaceEdges case final spaceEdges?) {
                   ref
-                      .watch(SpaceEdgesController.provider.notifier)
-                      .set(syncData.spaceEdges!);
+                      .read(SpaceEdgesController.provider.notifier)
+                      .set(spaceEdges);
                 }
 
-                // ref
-                //     .watch(SyncStatusController.provider.notifier)
-                //     .set(SyncStatus.fromJson(decodedMuksEvent));
-                break;
+              // ref
+              //     .read(SyncStatusController.provider.notifier)
+              //     .set(SyncStatus.fromJson(decodedMuksEvent));
               default:
                 debugPrint("Unhandled event: $muksEventType");
             }

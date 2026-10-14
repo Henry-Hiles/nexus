@@ -18,7 +18,7 @@ class MembersController(final String roomId)
 
     if (!room.hasFetchedMembers) {
       final fetchedState = await ref
-          .watch(ClientController.provider.notifier)
+          .read(ClientController.provider.notifier)
           .getRoomState(
             GetRoomStateRequest(
               roomId: roomId,

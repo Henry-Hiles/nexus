@@ -33,7 +33,7 @@ final class const RoomMenuButton(
         if (room != null) ...[
           PopupMenuItem(
             onTap: () async {
-              final vias = ref.watch(ViaController.provider(room!));
+              final vias = ref.read(ViaController.provider(room!));
 
               await Clipboard.setData(
                 .new(
@@ -126,8 +126,10 @@ final class const RoomMenuButton(
                               duration: Duration(days: 1),
                             ),
                           );
-                      await client.leaveRoom(room!);
-                      snackbar.close();
+                      await client
+                          .leaveRoom(room!)
+                          .onError(showError)
+                          .whenComplete(snackbar.close);
                     },
                     child: Text("Leave"),
                   ),

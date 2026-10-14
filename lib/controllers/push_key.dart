@@ -13,8 +13,8 @@ class PushKeyController(final String instance) extends AsyncNotifier<String?> {
 
   Future<void> set(String? value) async {
     final provider = KeyController.provider(KeyController.pushKeyKey);
-    final notifier = ref.watch(provider.notifier);
-    final prefs = IMap(json.decode(await ref.watch(provider.future) ?? "{}"));
+    final notifier = ref.read(provider.notifier);
+    final prefs = IMap(json.decode(await ref.read(provider.future) ?? "{}"));
 
     state = .data(value);
     notifier.set(

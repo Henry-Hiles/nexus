@@ -27,7 +27,7 @@ class RecentEmojiController extends Notifier<IList<RecentEmoji>> {
   }
 
   Future<void> add(String emoji) => ref
-      .watch(ClientController.provider.notifier)
+      .read(ClientController.provider.notifier)
       .setAccountData(
         .new(
           type: AccountData.recentEmojiKey,

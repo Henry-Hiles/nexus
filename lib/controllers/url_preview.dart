@@ -11,7 +11,7 @@ class UrlPreviewController(final Uri url)
 
     try {
       return await ref
-          .watch(ClientController.provider.notifier)
+          .read(ClientController.provider.notifier)
           .getUrlPreview(url);
     } catch (error, stackTrace) {
       debugPrintStack(label: error.toString(), stackTrace: stackTrace);

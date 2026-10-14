@@ -19,13 +19,13 @@ class EventController(final GetEventRequest request)
     if (event != null) return event;
 
     final fetchedEvent = await ref
-        .watch(ClientController.provider.notifier)
+        .read(ClientController.provider.notifier)
         .getEvent(request)
         .onError((_, _) => null);
 
     if (fetchedEvent != null) {
       ref
-          .watch(RoomsController.provider.notifier)
+          .read(RoomsController.provider.notifier)
           .update(
             .new({
               request.roomId: .new(

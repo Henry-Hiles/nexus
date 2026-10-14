@@ -26,7 +26,7 @@ class const EmojiPicker({
 
               if (!isFreeText) {
                 await ref
-                    .watch(RecentEmojiController.provider.notifier)
+                    .read(RecentEmojiController.provider.notifier)
                     .add(emoji)
                     .onError(showError);
               }

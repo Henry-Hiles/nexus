@@ -88,7 +88,7 @@ class RoomChatController(final ChatParams info)
   }
 
   Future<void> deleteMessage(Event event, {String? reason}) => ref
-      .watch(ClientController.provider.notifier)
+      .read(ClientController.provider.notifier)
       .redactEvent(
         RedactEventRequest(
           eventId: event.eventId,
@@ -146,7 +146,7 @@ class RoomChatController(final ChatParams info)
       );
 
       if (response.events.isEmpty) {
-        state = .data(state.value);
+        state = .data(chat);
       }
 
       ref
@@ -234,7 +234,7 @@ class RoomChatController(final ChatParams info)
     Content? baseContent;
     final relatedEvent = relatedEventRowId == null
         ? null
-        : ref.watch(
+        : ref.read(
             RoomsController.provider.select(
               (rooms) => rooms[info.roomId]?.events[relatedEventRowId],
             ),
@@ -267,9 +267,7 @@ class RoomChatController(final ChatParams info)
         baseContent: baseContent,
         mentions: Mentions(
           userIds: [
-            if (shouldMention == true &&
-                relatedEvent != null &&
-                relationType == RelationType.reply)
+            if (shouldMention && relatedEvent != null && relationType == .reply)
               relatedEvent.sender,
           ].toIList(),
           room: taggedMessage.contains("@room"),
@@ -307,24 +305,20 @@ class RoomChatController(final ChatParams info)
       ),
     );
 
-    final reactionEvents = allReactionEvents
-        ?.where((event) => event.redactedBy == null)
-        .toIList();
-
-    final reactionEvent = reactionEvents?.firstWhereOrNull(
-      (event) => switch (event.content) {
-        ReactionContent(:final key) =>
-          key == reaction && event.sender == userId,
-        _ => false,
-      },
+    final reactionEvent = allReactionEvents?.firstWhereOrNull(
+      (event) =>
+          event.redactedBy == null &&
+          switch (event.content) {
+            ReactionContent(:final key) =>
+              key == reaction && event.sender == userId,
+            _ => false,
+          },
     );
 
     if (reactionEvent != null) {
-      await ref
-          .watch(ClientController.provider.notifier)
-          .redactEvent(
-            .new(eventId: reactionEvent.eventId, roomId: info.roomId),
-          );
+      await client.redactEvent(
+        .new(eventId: reactionEvent.eventId, roomId: info.roomId),
+      );
     }
   }
 

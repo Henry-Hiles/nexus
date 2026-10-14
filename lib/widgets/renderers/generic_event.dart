@@ -1,3 +1,4 @@
+import "package:collection/collection.dart";
 import "package:material_ui/material_ui.dart";
 
 class const GenericEventRenderer(
@@ -17,12 +18,14 @@ class const GenericEventRenderer(
         Flexible(
           child: Text.rich(
             TextSpan(
-              children: [
-                for (final (index, child) in children.indexed) ...[
-                  if (index > 0) TextSpan(text: " "),
-                  child,
-                ],
-              ],
+              children: children
+                  .expandIndexed(
+                    (index, child) => [
+                      if (index > 0) TextSpan(text: " "),
+                      child,
+                    ],
+                  )
+                  .toList(),
             ),
             maxLines: maxLines ?? 999,
             overflow: .ellipsis,

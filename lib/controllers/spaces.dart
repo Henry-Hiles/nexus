@@ -19,10 +19,10 @@ class SpacesController extends AsyncNotifier<IList<Space>> {
     final spaceEdges = ref.watch(SpaceEdgesController.provider);
     final accountData = ref.watch(AccountDataController.provider);
 
-    final childrenById = {
-      for (final entry in spaceEdges.entries)
-        entry.key: entry.value.map((e) => e.childId).toList(),
-    };
+    final childrenById = spaceEdges.map(
+      (spaceId, edges) =>
+          MapEntry(spaceId, edges.map((edge) => edge.childId).toList()),
+    );
 
     Set<String> collectDescendants(String startId) {
       final visited = <String>{};
@@ -78,21 +78,22 @@ class SpacesController extends AsyncNotifier<IList<Space>> {
 
     final spaces = topLevelSpaceIds.map(buildSpace).toIList();
 
-    final usedRooms = {
-      for (final space in spaces) ...[
-        ...space.children,
-        ...space.subSpaces.expand((s) => s.children),
-      ],
-    }.nonNulls.toISet();
+    final usedRooms = spaces
+        .expand(
+          (space) => [
+            ...space.children,
+            ...space.subSpaces.expand((s) => s.children),
+          ],
+        )
+        .toISet();
+    final usedRoomIds = usedRooms.map((room) => room.metadata?.id).toSet();
 
-    final directMessages = accountData.directMessages.values.flattened;
+    final directMessages = accountData.directMessages.values.flattened.toSet();
 
     final otherRooms = rooms.entries
         .where(
           (e) =>
-              !usedRooms
-                  .map((element) => element.metadata?.id)
-                  .contains(e.key) &&
+              !usedRoomIds.contains(e.key) &&
               !topLevelSpaceIds.contains(e.key) &&
               !childrenById.containsKey(e.key),
         )

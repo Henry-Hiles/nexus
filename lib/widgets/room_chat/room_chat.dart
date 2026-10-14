@@ -271,8 +271,7 @@ final class const RoomChat({
                 ),
               ),
 
-              if (memberListOpened == true && showMembersByDefault)
-                MemberList(roomId),
+              if (memberListOpened && showMembersByDefault) MemberList(roomId),
             ],
           ),
         ),

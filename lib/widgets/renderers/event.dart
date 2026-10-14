@@ -81,6 +81,15 @@ class const EventRenderer(
         event.sender == previousEvent?.sender &&
         event.pmp?.id == previousEvent?.pmp?.id;
 
+    GenericEventRenderer generic(IconData icon, String text) =>
+        .new(icon, maxLines: maxLines, [
+          WidgetSpan(
+            alignment: .middle,
+            child: MessageDisplayname(event, shouldWrap: maxLines == null),
+          ),
+          TextSpan(text: text),
+        ]);
+
     final child = event.redactedBy != null || event.relationType == "m.replace"
         ? null
         : switch (event.content) {
@@ -122,169 +131,67 @@ class const EventRenderer(
               _ => MembershipRenderer(event, maxLines: maxLines),
             },
 
-            AvatarContent() => GenericEventRenderer(
+            AvatarContent() => generic(
               Icons.interests,
-              maxLines: maxLines,
-              [
-                WidgetSpan(
-                  alignment: .middle,
-                  child: MessageDisplayname(
-                    event,
-                    shouldWrap: maxLines == null,
-                  ),
-                ),
-                TextSpan(text: "changed the room avatar"),
-              ],
+              "changed the room avatar",
             ),
-
-            CreateContent() => GenericEventRenderer(
-              Icons.add,
-              maxLines: maxLines,
-              [
-                WidgetSpan(
-                  alignment: .middle,
-                  child: MessageDisplayname(
-                    event,
-                    shouldWrap: maxLines == null,
-                  ),
-                ),
-                TextSpan(text: "created the room"),
-              ],
-            ),
-
-            PowerLevelsContent() => GenericEventRenderer(
+            CreateContent() => generic(Icons.add, "created the room"),
+            PowerLevelsContent() => generic(
               Icons.power,
-              maxLines: maxLines,
-              [
-                WidgetSpan(
-                  alignment: .middle,
-                  child: MessageDisplayname(
-                    event,
-                    shouldWrap: maxLines == null,
-                  ),
-                ),
-                TextSpan(text: "changed the room's power levels"),
-              ],
+              "changed the room's power levels",
             ),
-
-            JoinRulesContent() => GenericEventRenderer(
+            JoinRulesContent() => generic(
               Icons.rule,
-              maxLines: maxLines,
-              [
-                WidgetSpan(
-                  alignment: .middle,
-                  child: MessageDisplayname(
-                    event,
-                    shouldWrap: maxLines == null,
-                  ),
-                ),
-                TextSpan(text: "changed the room's join rules"),
-              ],
+              "changed the room's join rules",
             ),
-
-            TopicContent() => GenericEventRenderer(
+            TopicContent() => generic(
               Icons.description,
-              maxLines: maxLines,
-              [
-                WidgetSpan(
-                  alignment: .middle,
-                  child: MessageDisplayname(
-                    event,
-                    shouldWrap: maxLines == null,
-                  ),
-                ),
-                TextSpan(text: "updated the room topic"),
-              ],
+              "updated the room topic",
             ),
-
-            HistoryVisibilityContent(:final historyVisibility) =>
-              GenericEventRenderer(Icons.history, maxLines: maxLines, [
-                WidgetSpan(
-                  alignment: .middle,
-                  child: MessageDisplayname(
-                    event,
-                    shouldWrap: maxLines == null,
-                  ),
-                ),
-                TextSpan(
-                  text:
-                      "changed the room's history visibility to ${switch (historyVisibility) {
-                        .invited => "since invited",
-                        .joined => "since joined",
-                        .shared => "all history visible (shared)",
-                        .worldReadable => "all history visible (world readable)",
-                      }}",
-                ),
-              ]),
-
-            PinnedEventsContent() => GenericEventRenderer(
+            HistoryVisibilityContent(:final historyVisibility) => generic(
+              Icons.history,
+              "changed the room's history visibility to ${switch (historyVisibility) {
+                .invited => "since invited",
+                .joined => "since joined",
+                .shared => "all history visible (shared)",
+                .worldReadable => "all history visible (world readable)",
+              }}",
+            ),
+            PinnedEventsContent() => generic(
               Icons.push_pin,
-              maxLines: maxLines,
-              [
-                WidgetSpan(
-                  alignment: .middle,
-                  child: MessageDisplayname(
-                    event,
-                    shouldWrap: maxLines == null,
-                  ),
-                ),
-                TextSpan(text: "pinned/unpinned some events"),
-              ],
+              "pinned/unpinned some events",
             ),
-
-            ServerACLContent() => GenericEventRenderer(
+            ServerACLContent() => generic(
               Icons.list,
-              maxLines: maxLines,
-              [
-                WidgetSpan(
-                  alignment: .middle,
-                  child: MessageDisplayname(
-                    event,
-                    shouldWrap: maxLines == null,
-                  ),
-                ),
-                TextSpan(text: "updated the server ban list"),
-              ],
+              "updated the server ban list",
             ),
+            CanonicalAliasContent(:final alias, :final altAliases) => generic(
+              Icons.numbers,
+              switch ([
+                if (event.previousContent case CanonicalAliasContent(
+                  alias: final prevAlias,
+                  altAliases: final prevAltAliases,
+                )) ...[
+                  if (prevAlias != alias)
+                    if (alias == null)
+                      "removed the room's canonical alias"
+                    else
+                      "changed the room's canonical alias to $alias",
 
-            CanonicalAliasContent(:final alias, :final altAliases) =>
-              GenericEventRenderer(Icons.numbers, maxLines: maxLines, [
-                WidgetSpan(
-                  alignment: .middle,
-                  child: MessageDisplayname(
-                    event,
-                    shouldWrap: maxLines == null,
-                  ),
-                ),
-                TextSpan(
-                  text: switch ([
-                    if (event.previousContent case CanonicalAliasContent(
-                      alias: final prevAlias,
-                      altAliases: final prevAltAliases,
-                    )) ...[
-                      if (prevAlias != alias)
-                        if (alias == null)
-                          "removed the room's canonical alias"
-                        else
-                          "changed the room's canonical alias to $alias",
-
-                      if (prevAltAliases
-                              .remove(alias ?? "")
-                              .remove(prevAlias ?? "") !=
-                          altAliases
-                              .remove(alias ?? "")
-                              .remove(prevAlias ?? ""))
-                        "changed the room's aliases",
-                    ] else ...[
-                      if (alias != null) "set the room's canonical alias",
-                      if (altAliases.isNotEmpty) "set the room's aliases",
-                    ],
-                  ]) {
-                    [] => "did something related to room aliases",
-                    List prev => prev.join(" and "),
-                  },
-                ),
-              ]),
+                  if (prevAltAliases
+                          .remove(alias ?? "")
+                          .remove(prevAlias ?? "") !=
+                      altAliases.remove(alias ?? "").remove(prevAlias ?? ""))
+                    "changed the room's aliases",
+                ] else ...[
+                  if (alias != null) "set the room's canonical alias",
+                  if (altAliases.isNotEmpty) "set the room's aliases",
+                ],
+              ]) {
+                [] => "did something related to room aliases",
+                List prev => prev.join(" and "),
+              },
+            ),
             _ => null,
           };
 

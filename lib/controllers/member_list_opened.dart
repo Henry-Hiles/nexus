@@ -10,7 +10,7 @@ class MemberListOpenedController extends AsyncNotifier<bool> {
 
   Future<void> set(bool value) async {
     state = .data(value);
-    await ref.watch(SharedPrefsController.provider).setBool(key, value);
+    await ref.read(SharedPrefsController.provider).setBool(key, value);
   }
 
   static final provider =

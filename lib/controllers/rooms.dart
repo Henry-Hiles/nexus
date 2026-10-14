@@ -48,7 +48,7 @@ class RoomsController extends Notifier<IMap<String, Room>> {
               hasMore: incoming.hasMore,
               clientSticky: incoming.resetClientSticky
                   ? incoming.clientSticky
-                  : (incoming.clientSticky.isEmpty == true
+                  : (incoming.clientSticky.isEmpty
                             ? existing.clientSticky
                             : existing.clientSticky.addAll(
                                 incoming.clientSticky,
@@ -73,9 +73,9 @@ class RoomsController extends Notifier<IMap<String, Room>> {
                   incoming.hasFetchedMembers || existing.hasFetchedMembers,
               hasFetchedState:
                   incoming.hasFetchedState || existing.hasFetchedState,
-              timeline: (incoming.reset
+              timeline: incoming.reset
                   ? incoming.timeline
-                  : existing.timeline.addAll(incoming.timeline)),
+                  : existing.timeline.addAll(incoming.timeline),
               receipts: incoming.receipts.entries.fold(
                 existing.receipts,
                 (receiptAcc, event) => receiptAcc.add(
@@ -88,12 +88,7 @@ class RoomsController extends Notifier<IMap<String, Room>> {
       );
     });
 
-    final prunedList = leftRooms.fold(
-      merged,
-      (acc, roomId) => acc.remove(roomId),
-    );
-
-    state = prunedList;
+    state = leftRooms.fold(merged, (acc, roomId) => acc.remove(roomId));
   }
 
   static final provider = NotifierProvider<RoomsController, IMap<String, Room>>(

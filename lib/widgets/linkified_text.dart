@@ -16,7 +16,7 @@ final class const LinkifiedText(
     style: style,
     options: .new(humanize: false),
     onOpen: (link) =>
-        ref.watch(LaunchHelper.provider).launchUrl(.parse(link.url)),
+        ref.read(LaunchHelper.provider).launchUrl(.parse(link.url)),
     linkStyle: .new(color: Theme.of(context).colorScheme.primary),
     overflow: maxLines == null ? null : .ellipsis,
   );
