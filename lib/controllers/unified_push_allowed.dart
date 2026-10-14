@@ -2,16 +2,16 @@ import "dart:io";
 
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client.dart";
-import "package:unifiedpush/unifiedpush.dart";
+import "package:nexus/controllers/unified_push_distributors.dart";
 
 class UnifiedPushAllowedController extends AsyncNotifier<String?> {
   @override
   Future<String?> build() async {
-    if (!await UnifiedPush.tryUseCurrentOrDefaultDistributor().timeout(
-      .new(seconds: 10),
-      onTimeout: () =>
-          throw Exception("UnifiedPush distributor check timed out."),
-    )) {
+    final distributors = await ref.watch(
+      UnifiedPushDistributorsController.provider.future,
+    );
+
+    if (distributors.isEmpty) {
       return "No valid distributors found. ${Platform.isLinux
           ? "Try installing KUnifiedPush"
           : Platform.isAndroid

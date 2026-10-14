@@ -17,12 +17,12 @@ import "package:unifiedpush/unifiedpush.dart";
 import "package:unifiedpush_storage_shared_preferences/storage.dart";
 import "package:window_manager/window_manager.dart";
 
-class UnifiedPushController extends AsyncNotifier<bool> {
+class UnifiedPushController extends AsyncNotifier<String?> {
   Completer<void>? _endpoint;
 
   @override
-  Future<bool> build() async {
-    if (!Platform.isLinux && !Platform.isAndroid) return false;
+  Future<String?> build() async {
+    if (!Platform.isLinux && !Platform.isAndroid) return null;
 
     final registered = await UnifiedPush.initialize(
       linuxOptions: .new(
@@ -56,7 +56,7 @@ class UnifiedPushController extends AsyncNotifier<bool> {
                 ),
               );
 
-          state = .data(true);
+          state = .data(await UnifiedPush.getDistributor());
         });
 
         if (_endpoint case final completer? when !completer.isCompleted) {
@@ -125,17 +125,25 @@ class UnifiedPushController extends AsyncNotifier<bool> {
       onUnregistered: deregister,
     );
 
-    if (!registered) return false;
+    if (!registered) return null;
 
     try {
       return await register();
     } catch (error, stackTrace) {
       showError(error, stackTrace);
-      return false;
+      return null;
     }
   }
 
-  Future<bool> register() async {
+  /// Registers with [distributor], or the current/default distributor if none
+  /// is given. Returns the distributor that was registered with.
+  Future<String?> register([String? distributor]) async {
+    if (distributor != null &&
+        state.value != null &&
+        state.value != distributor) {
+      await deregister();
+    }
+
     state = .loading();
     try {
       final deviceIdCompleter = Completer<String>();
@@ -163,7 +171,9 @@ class UnifiedPushController extends AsyncNotifier<bool> {
           );
         }
 
-        if (!await UnifiedPush.tryUseCurrentOrDefaultDistributor()) {
+        if (distributor != null) {
+          await UnifiedPush.saveDistributor(distributor);
+        } else if (!await UnifiedPush.tryUseCurrentOrDefaultDistributor()) {
           throw Exception("No UnifiedPush distributors found.");
         }
 
@@ -185,10 +195,11 @@ class UnifiedPushController extends AsyncNotifier<bool> {
         onTimeout: () => throw Exception("UnifiedPush registration timed out."),
       );
 
-      state = .data(true);
-      return true;
+      final current = await UnifiedPush.getDistributor();
+      state = .data(current);
+      return current;
     } catch (_) {
-      state = .data(false);
+      state = .data(null);
       rethrow;
     }
   }
@@ -213,10 +224,10 @@ class UnifiedPushController extends AsyncNotifier<bool> {
     }
 
     await UnifiedPush.unregister(instance ?? clientState!.deviceId!);
-    state = .data(false);
+    state = .data(null);
   }
 
-  static final provider = AsyncNotifierProvider<UnifiedPushController, bool>(
+  static final provider = AsyncNotifierProvider<UnifiedPushController, String?>(
     UnifiedPushController.new,
   );
 }

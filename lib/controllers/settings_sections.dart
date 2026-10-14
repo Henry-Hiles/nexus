@@ -15,6 +15,8 @@ import "package:nexus/controllers/settings.dart";
 import "package:nexus/controllers/unified_push.dart";
 import "package:nexus/controllers/spec_versions.dart";
 import "package:nexus/controllers/unified_push_allowed.dart";
+import "package:nexus/controllers/unified_push_distributors.dart";
+import "package:nexus/helpers/extensions/distributor_name.dart";
 import "package:nexus/models/account_data.dart";
 import "package:nexus/models/settings_category.dart";
 import "package:nexus/main.dart";
@@ -138,7 +140,7 @@ class SettingsSectionsController
             settings: .new([
               .new(
                 title: "Push notifications",
-                description: "Enable push notifications using Web Push",
+                description: "Enable push notifications using Web Push, and choose which UnifiedPush distributor to use.",
                 builder: (title, description, icon) => HookConsumer(
                   builder: (context, ref, _) {
                     final loading = useState(false);
@@ -148,9 +150,14 @@ class SettingsSectionsController
                     final unifiedPushAllowed = ref.watch(
                       UnifiedPushAllowedController.provider,
                     );
+                    final distributors = ref.watch(
+                      UnifiedPushDistributorsController.provider,
+                    );
+                    final current = pusherRegistered.value;
 
-                    return SwitchListTile(
-                      title: Text(title),
+                    return DialogListTile<String?>(
+                      key: ValueKey(current),
+                      title: title,
                       subtitle: Text(
                         unifiedPushAllowed.maybeWhen(
                               data: (data) => data,
@@ -158,11 +165,18 @@ class SettingsSectionsController
                             ) ??
                             description,
                       ),
-                      secondary: Icon(icon),
-                      value: pusherRegistered.maybeWhen(
-                        data: (value) => value,
-                        orElse: () => false,
-                      ),
+                      icon: Icon(icon),
+                      required: false,
+                      initialValue: current,
+                      options: [
+                        null,
+                        ...?distributors.value,
+                        if (current != null &&
+                            distributors.value?.contains(current) != true)
+                          current,
+                      ],
+                      getName: (option) =>
+                          option == null ? "Off" : option.distributorName,
                       onChanged: loading.value
                           ? null
                           : unifiedPushAllowed.maybeWhen(
@@ -171,9 +185,10 @@ class SettingsSectionsController
                             )
                           ? pusherRegistered.maybeWhen(
                               data: (_) => (value) async {
+                                if (value == current) return;
                                 try {
                                   loading.value = true;
-                                  if (value) {
+                                  if (value != null) {
                                     if (await ref
                                         .watch(
                                           NotificationController
@@ -187,7 +202,7 @@ class SettingsSectionsController
                                                 .provider
                                                 .notifier,
                                           )
-                                          .register();
+                                          .register(value);
                                     } else {
                                       // TODO: Handle not granted
                                     }
