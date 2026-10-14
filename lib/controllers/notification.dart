@@ -7,7 +7,7 @@ import "package:nexus/controllers/portal.dart";
 import "package:nexus/main.dart";
 import "package:flutter_local_notifications/flutter_local_notifications.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
-import "package:nexus/widgets/notifications_list.dart";
+import "package:nexus/controllers/notification_request.dart";
 import "package:xdg_desktop_portal/xdg_desktop_portal.dart";
 
 class NotificationController
@@ -34,16 +34,10 @@ class NotificationController
           if (details.payload == null) return;
 
           if (int.tryParse(details.payload!) case final rowId?) {
-            if (navigatorKey.currentContext case final context?) {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => NotificationsList(
-                    highlightedEvent: rowId,
-                    defaultToAllNotifications: true,
-                  ),
-                ),
-              );
-            }
+            navigatorKey.currentState?.popUntil((route) => route.isFirst);
+            ref
+                .read(NotificationRequestController.provider.notifier)
+                .request(rowId);
           }
         },
       );
@@ -58,16 +52,10 @@ class NotificationController
         }
 
         if (int.tryParse(call.arguments) case int rowId) {
-          if (navigatorKey.currentContext case final context?) {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => NotificationsList(
-                  highlightedEvent: rowId,
-                  defaultToAllNotifications: true,
-                ),
-              ),
-            );
-          }
+          navigatorKey.currentState?.popUntil((route) => route.isFirst);
+          ref
+              .read(NotificationRequestController.provider.notifier)
+              .request(rowId);
         }
       });
 

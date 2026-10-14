@@ -61,6 +61,8 @@ When possible, use immutable collections instead of the mutable equivalent. For 
 
 When possible, we prefer not to create global variables or methods. You can usually replace a global variable with a Riverpod controller, and a global method with an extension method.
 
+I'm also not a big fan of private methods or variables, but this is contextual.
+
 ## LLM/AI Assisted Contributions
 
 LLM generated code is NOT allowed. All contributions should be written by humans. Using LLMs for interacting with others, e.g. for Comments, PRs, etc, is also not allowed.

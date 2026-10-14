@@ -4,6 +4,7 @@ import "package:m3e_buttons/m3e_buttons.dart";
 import "package:material_ui/material_ui.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
+import "package:nexus/controllers/notification_request.dart";
 import "package:nexus/controllers/notifications.dart";
 import "package:nexus/helpers/extensions/focus_room.dart";
 import "package:nexus/models/event.dart";
@@ -14,11 +15,9 @@ import "package:nexus/widgets/loading.dart";
 import "package:nexus/widgets/renderers/event.dart";
 import "package:super_sliver_list/super_sliver_list.dart";
 
-class const NotificationsList({
-  final int? highlightedEvent,
-  final bool defaultToAllNotifications = false,
-  super.key,
-}) extends HookConsumerWidget implements NavPage {
+class const NotificationsList({super.key})
+    extends HookConsumerWidget
+    implements NavPage {
   @override
   String get title => "Notifications";
 
@@ -41,9 +40,15 @@ class const NotificationsList({
         icon: Icon(Icons.notifications),
       ): .notify,
     };
-    final unreadTypeIndex = useState(defaultToAllNotifications ? 1 : 0);
+    final allNotificationsIndex = options.values.toList().indexOf(.notify);
 
-    final highlightedId = useState(highlightedEvent);
+    final initialRequest = useMemoized(
+      () => ref.read(NotificationRequestController.provider),
+    );
+    final unreadTypeIndex = useState(
+      initialRequest == null ? 0 : allNotificationsIndex,
+    );
+    final highlightedId = useState(initialRequest);
     final listController = useRef(ListController());
     final scrollController = useScrollController();
 
@@ -54,38 +59,64 @@ class const NotificationsList({
     final notifications = ref.watch(provider);
     final notifier = ref.watch(provider.notifier);
 
+    void consumeRequest() => Future.microtask(
+      ref.read(NotificationRequestController.provider.notifier).consume,
+    );
+
     useEffect(() {
-      if (highlightedId.value == null) return null;
+      if (initialRequest != null) consumeRequest();
+      return null;
+    }, []);
+
+    ref.listen(NotificationRequestController.provider, (_, next) {
+      if (next == null) return;
+      unreadTypeIndex.value = allNotificationsIndex;
+      highlightedId.value = next;
+      consumeRequest();
+    });
+
+    useEffect(() {
+      final target = highlightedId.value;
+      if (target == null) return null;
+
       Timer? timer;
+      var done = false;
 
-      void listener() =>
-          WidgetsBinding.instance.addPostFrameCallback((_) async {
-            if (!listController.value.isAttached) return;
+      void listener() => WidgetsBinding.instance.addPostFrameCallback((
+        _,
+      ) async {
+        if (done || !listController.value.isAttached) return;
 
-            final notifications = await ref.watch(provider.future);
+        final notifications = await ref.read(provider.future);
 
-            final index = notifications.indexWhere(
-              (tuple) => tuple.$1 == highlightedId.value!,
-            );
+        final index = notifications.indexWhere((tuple) => tuple.$1 == target);
 
-            if (index == -1) return;
+        if (done || index == -1) return;
+        done = true;
+        listController.value.removeListener(listener);
 
-            listController.value.animateToItem(
-              index: index,
-              scrollController: scrollController,
-              alignment: 0.5,
-              duration: (_) => .new(milliseconds: 700),
-              curve: (_) => Curves.easeInOut,
-            );
-            timer = Timer(.new(seconds: 1), () {
-              highlightedId.value = null;
-            });
-            listController.value.removeListener(listener);
-          });
+        listController.value.animateToItem(
+          index: index,
+          scrollController: scrollController,
+          alignment: 0.5,
+          duration: (_) => .new(milliseconds: 700),
+          curve: (_) => Curves.easeInOut,
+        );
+        timer = Timer(.new(seconds: 1), () {
+          highlightedId.value = null;
+        });
+      });
 
       listController.value.addListener(listener);
-      return timer?.cancel;
-    }, []);
+      // The list may already be laid out, in which case no change is notified
+      listener();
+
+      return () {
+        done = true;
+        listController.value.removeListener(listener);
+        timer?.cancel();
+      };
+    }, [highlightedId.value]);
 
     useEffect(() {
       Future<void> listener() async {
