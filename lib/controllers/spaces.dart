@@ -8,6 +8,7 @@ import "package:nexus/controllers/settings.dart";
 import "package:nexus/controllers/top_level_spaces.dart";
 import "package:nexus/controllers/space_edges.dart";
 import "package:nexus/models/room.dart";
+import "package:nexus/models/room_metadata.dart";
 import "package:nexus/models/space.dart";
 import "package:nexus/models/subspace.dart";
 
@@ -135,22 +136,32 @@ class SpacesController extends AsyncNotifier<IList<Space>> {
       ...spaces,
     ];
 
+    final roomOrder = await ref.watch(
+      SettingsController.provider.selectAsync((data) => data.roomOrder),
+    );
+
+    // Mentioned -> Unread -> Other
+    int unreadPriority(Room room) => switch (room.metadata) {
+      RoomMetadata(unreadHighlights: > 0) => 0,
+      RoomMetadata(unreadNotifications: > 0) ||
+      RoomMetadata(unreadMessages: > 0) => 1,
+      _ => 2,
+    };
+
     return allSpaces
         .map(
           (space) => space.copyWith(
-            children: .new(
-              space.children
-                  .sortedBy(
-                    (element) =>
-                        element
-                            .metadata
-                            ?.sortingTimestamp
-                            .millisecondsSinceEpoch ??
-                        0,
-                  )
-                  .sortedBy((room) => room.metadata?.unreadMessages ?? 0)
-                  .reversed,
-            ),
+            children: space.children.sort((a, b) {
+              if (roomOrder == .unreadFirst) {
+                final byUnread = unreadPriority(a).compareTo(unreadPriority(b));
+                if (byUnread != 0) return byUnread;
+              }
+
+              // Most recent activity first
+              return (b.metadata?.sortingTimestamp ?? DateTime(0)).compareTo(
+                a.metadata?.sortingTimestamp ?? DateTime(0),
+              );
+            }),
           ),
         )
         .toIList();

@@ -1,5 +1,6 @@
 import "package:material_ui/material_ui.dart";
 import "package:freezed_annotation/freezed_annotation.dart";
+import "package:nexus/models/room_order.dart";
 
 part "settings.freezed.dart";
 part "settings.g.dart";
@@ -12,6 +13,7 @@ class const Settings({
   final bool linuxMobileMode = false,
   final bool showAllInHome = false,
   final bool showMinimizeButton = false,
+  final RoomOrder roomOrder = .unreadFirst,
 }) with _$Settings {
   Map<String, Object?> toJson() => _$SettingsToJson(this);
 

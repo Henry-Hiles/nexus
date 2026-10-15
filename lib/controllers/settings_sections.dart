@@ -18,6 +18,7 @@ import "package:nexus/controllers/unified_push_allowed.dart";
 import "package:nexus/controllers/unified_push_distributors.dart";
 import "package:nexus/helpers/extensions/distributor_name.dart";
 import "package:nexus/models/account_data.dart";
+import "package:nexus/models/room_order.dart";
 import "package:nexus/models/settings_category.dart";
 import "package:nexus/main.dart";
 import "package:nexus/widgets/settings/dialog_list_tile.dart";
@@ -91,6 +92,26 @@ class SettingsSectionsController
                 onChanged: (value) => ref
                     .read(SettingsController.provider.notifier)
                     .set(settings.copyWith(showAllInHome: value))
+                    .onError(showError),
+              ),
+            ),
+            .new(
+              title: "Room Ordering",
+              description: "Sort rooms by recent activity, optionally showing mentioned and unread rooms first.",
+              icon: Icons.sort,
+              builder: (title, description, icon) => DialogListTile<RoomOrder>(
+                icon: Icon(icon),
+                title: title,
+                subtitle: Text(description),
+                initialValue: settings.roomOrder,
+                options: RoomOrder.values,
+                getName: (option) => switch (option) {
+                  .unreadFirst => "Mentioned, then unread",
+                  .recentActivity => "Recent activity only",
+                },
+                onChanged: (value) => ref
+                    .read(SettingsController.provider.notifier)
+                    .set(settings.copyWith(roomOrder: value))
                     .onError(showError),
               ),
             ),
