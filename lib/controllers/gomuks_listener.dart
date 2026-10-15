@@ -1,5 +1,6 @@
 import "dart:async";
 import "dart:ffi";
+import "dart:isolate";
 
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/foundation.dart";
@@ -112,11 +113,19 @@ class GomuksListenerController extends AsyncNotifier<void> {
 
     ref.onDispose(callable.close);
 
-    final errorCode = GomuksStart(handle, callable.nativeFunction);
+    final errorCode = await _start(handle, callable.nativeFunction);
     if (errorCode != 0) {
       throw Exception("GomuksStart returned error code $errorCode");
     }
   }
+
+  static Future<int> _start(
+    int handle,
+    Pointer<
+      NativeFunction<Void Function(Pointer<Char>, Int64, GomuksOwnedBuffer)>
+    >
+    callback,
+  ) => Isolate.run(() => GomuksStart(handle, callback));
 
   static final provider = AsyncNotifierProvider<GomuksListenerController, void>(
     GomuksListenerController.new,
