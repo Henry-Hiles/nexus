@@ -8,7 +8,10 @@ let
       "36.0.0"
     ];
     cmakeVersions = [ "3.22.1" ];
-    platformVersions = [ "36" ];
+    platformVersions = [
+      "34"
+      "36"
+    ];
     abiVersions = [
       "armeabi-v7a"
       "arm64-v8a"

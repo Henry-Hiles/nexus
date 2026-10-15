@@ -18,6 +18,10 @@ import "package:nexus/controllers/power_level.dart";
 import "package:nexus/models/content/message.dart";
 import "package:nexus/models/relation_type.dart";
 import "package:nexus/widgets/composer/overlays/tagger_overlay.dart";
+import "package:nexus/widgets/composer/paste_files_action.dart";
+import "package:pasteboard/pasteboard.dart";
+import "package:path/path.dart";
+import "package:path_provider/path_provider.dart";
 import "package:nexus/widgets/composer/relation_preview.dart";
 import "package:nexus/main.dart";
 
@@ -98,6 +102,46 @@ class const Composer(
             .read(AttachmentController.provider(roomId).notifier)
             .add(file);
       }
+    }
+
+    /// Attaches [bytes] as a file called [filename], e.g. for pasted images.
+    Future<void> attachBytes(Uint8List bytes, String filename) async {
+      // A new directory each time, so files with the same name don't clash
+      final directory = await (await getTemporaryDirectory()).createTemp(
+        "attachment",
+      );
+      final file = await File(join(directory.path, filename))
+          .writeAsBytes(bytes);
+
+      await ref
+          .read(AttachmentController.provider(roomId).notifier)
+          .add(.new(file.path));
+    }
+
+    /// Attaches the first file on the clipboard, or the image on it if there
+    /// are no files. Returns whether there was either, so that text can be
+    /// pasted otherwise.
+    Future<bool> pasteFiles() async {
+      // Only one attachment is supported at a time
+      if (attachment != null) return false;
+
+      // Failing to read the clipboard counts as it being empty, so that text
+      // can still be pasted
+      final files = await Pasteboard.files().onError((_, _) => const []);
+      if (files.firstOrNull case final path?) {
+        ref
+            .read(AttachmentController.provider(roomId).notifier)
+            .add(XFile(path))
+            .onError(showError);
+        return true;
+      }
+
+      if (await Pasteboard.image.onError((_, _) => null) case final image?) {
+        attachBytes(image, "image.png").onError(showError);
+        return true;
+      }
+
+      return false;
     }
 
     void send() {
@@ -257,21 +301,65 @@ class const Composer(
 
                                     return KeyEventResult.ignored;
                                   },
-                                  child: TextField(
-                                    maxLines: 12,
-                                    minLines: 1,
-                                    textCapitalization: .sentences,
-                                    autofocus:
-                                        (Platform.isLinux ||
-                                        Platform.isMacOS ||
-                                        Platform.isWindows),
-                                    decoration: .new(
-                                      hintText: "Your message here...",
-                                      border: .none,
+                                  // Overrides the keyboard shortcut for pasting
+                                  child: Actions(
+                                    actions: {
+                                      PasteTextIntent: PasteFilesAction(
+                                        pasteFiles,
+                                      ),
+                                    },
+                                    child: TextField(
+                                      maxLines: 12,
+                                      minLines: 1,
+                                      textCapitalization: .sentences,
+                                      autofocus:
+                                          (Platform.isLinux ||
+                                          Platform.isMacOS ||
+                                          Platform.isWindows),
+                                      decoration: .new(
+                                        hintText: "Your message here...",
+                                        border: .none,
+                                      ),
+                                      controller: controller,
+                                      key: key,
+                                      focusNode: node,
+                                      // The toolbar's paste button doesn't use the shortcut's action, so replace it too
+                                      contextMenuBuilder: (_, editableText) =>
+                                          AdaptiveTextSelectionToolbar.buttonItems(
+                                            anchors:
+                                                editableText.contextMenuAnchors,
+                                            buttonItems: editableText
+                                                .contextMenuButtonItems
+                                                .map(
+                                                  (item) => item.type == .paste
+                                                      ? item.copyWith(
+                                                          onPressed: () async {
+                                                            editableText
+                                                                .hideToolbar();
+                                                            if (!await pasteFiles()) {
+                                                              item.onPressed
+                                                                  ?.call();
+                                                            }
+                                                          },
+                                                        )
+                                                      : item,
+                                                )
+                                                .toList(),
+                                          ),
+                                      // Images pasted from Android keyboards' clipboards are inserted as content
+                                      contentInsertionConfiguration: .new(
+                                        onContentInserted: (content) {
+                                          if (attachment != null) return;
+
+                                          if (content.data case final data?) {
+                                            attachBytes(
+                                              data,
+                                              "image.${content.mimeType.split("/").last}",
+                                            ).onError(showError);
+                                          }
+                                        },
+                                      ),
                                     ),
-                                    controller: controller,
-                                    key: key,
-                                    focusNode: node,
                                   ),
                                 ),
                               ),
