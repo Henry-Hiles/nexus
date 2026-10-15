@@ -85,10 +85,6 @@ class GomuksListenerController extends AsyncNotifier<void> {
                       .read(SpaceEdgesController.provider.notifier)
                       .set(spaceEdges);
                 }
-
-              // ref
-              //     .read(SyncStatusController.provider.notifier)
-              //     .set(SyncStatus.fromJson(decodedMuksEvent));
               default:
                 debugPrint("Unhandled event: $muksEventType");
             }

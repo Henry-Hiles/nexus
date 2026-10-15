@@ -13,7 +13,9 @@ final class const ErrorDialog(
     return AlertDialog(
       title: Text("An Error Occurred"),
       content: SingleChildScrollView(
-        child: SelectableText("$error\n\n$stackTrace"),
+        child: SelectableText(
+          "$error${stackTrace == null ? "" : "\n\n$stackTrace"}",
+        ),
       ),
       actions: [
         if (provider != null)
