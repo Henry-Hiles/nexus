@@ -5,6 +5,7 @@ import "package:flutter/foundation.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:material_emoji_picker/material_emoji_picker.dart";
 import "package:media_kit/media_kit.dart";
+import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/client_state.dart";
 import "package:nexus/controllers/gomuks_listener.dart";
 import "package:nexus/controllers/key.dart";
@@ -193,6 +194,7 @@ class const App({super.key}) extends StatelessWidget {
               AsyncError(:final error, :final stackTrace) => ErrorDialog(
                 error,
                 stackTrace,
+                provider: ClientController.provider,
               ),
             },
           ),

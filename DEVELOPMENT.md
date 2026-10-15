@@ -65,7 +65,7 @@ When possible, use immutable collections instead of the mutable equivalent. For 
 
 When possible, we prefer not to create global variables or methods. You can usually replace a global variable with a Riverpod controller, and a global method with an extension method.
 
-I'm also not a big fan of private methods or variables, but this is contextual.
+I'm also not a big fan of unneeded private methods or variables, but this is contextual.
 
 ### Modern Dart syntax
 
