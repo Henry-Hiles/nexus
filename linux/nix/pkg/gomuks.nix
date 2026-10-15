@@ -17,7 +17,7 @@ buildGoModule (
 
     src = "${src}/gomuks";
 
-    vendorHash = "sha256-lKiVzlFk0yffT6uUiSqQo/CiyTOfgKqiD+MEMoBvmE8=";
+    vendorHash = "sha256-+0iFK2ribhiNskXgPz7vslncuOgPMB/ZmFSfDOcz6ww=";
 
     buildPhase = ''
       runHook preBuild
