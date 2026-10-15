@@ -13,6 +13,7 @@ import "package:nexus/models/capabilities.dart";
 import "package:nexus/models/content/message.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/models/event_context.dart";
+import "package:nexus/models/mentions_response.dart";
 import "package:nexus/models/gomuks_config.dart";
 import "package:nexus/models/oauth_auth_code_response.dart";
 import "package:nexus/models/open_graph_data.dart";
@@ -214,11 +215,8 @@ class ClientController extends AsyncNotifier<int> {
     return .new(response?.map((event) => .fromJson(event)));
   }
 
-  Future<IList<Event>> getMentions(GetMentionsRequest request) async => .new(
-    // TODO: Handle `related_events`
-    ((await _sendCommand("get_mentions", request.toJson()))["events"] as List)
-        .map((event) => .fromJson(event)),
-  );
+  Future<MentionsResponse> getMentions(GetMentionsRequest request) async =>
+      .fromJson(await _sendCommand("get_mentions", request.toJson()));
 
   Future<Event?> getEvent(GetEventRequest request) async {
     final json = await _sendCommand("get_event", request.toJson());

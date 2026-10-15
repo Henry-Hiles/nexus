@@ -43,9 +43,9 @@ class NotificationsController(final NotificationsRequest request)
       ),
     );
 
-    storeEvents(mentions);
+    storeEvents(mentions.events.addAll(mentions.relatedEvents));
 
-    return .new(mentions.map((event) => (event.rowId, event.roomId)));
+    return .new(mentions.events.map((event) => (event.rowId, event.roomId)));
   }
 
   Future<void> loadOlder() async {
@@ -76,10 +76,12 @@ class NotificationsController(final NotificationsRequest request)
         ),
       );
 
-      storeEvents(newNotifications);
+      storeEvents(
+        newNotifications.events.addAll(newNotifications.relatedEvents),
+      );
 
       return currentNotifications.addAll(
-        newNotifications.map((event) => (event.rowId, event.roomId)),
+        newNotifications.events.map((event) => (event.rowId, event.roomId)),
       );
     });
   }
