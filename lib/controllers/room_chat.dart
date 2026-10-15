@@ -65,14 +65,18 @@ class RoomChatController(final ChatParams info)
         ),
       );
 
-      final events = context.before.add(context.event).addAll(context.after);
+      // `before` is in reverse chronological order
+      final events = context.before.reversed
+          .toIList()
+          .add(context.event)
+          .addAll(context.after);
       ref
           .read(RoomsController.provider.notifier)
           .update(
             .new({
               info.roomId: Room(
                 events: IMap.fromIterable(
-                  events,
+                  events.addAll(context.relatedEvents),
                   keyMapper: (event) => event.rowId,
                 ),
               ),
@@ -185,16 +189,21 @@ class RoomChatController(final ChatParams info)
             .new({
               info.roomId: Room(
                 events: IMap.fromIterable(
-                  paginationResponse.events,
+                  paginationResponse.events.addAll(
+                    paginationResponse.relatedEvents,
+                  ),
                   keyMapper: (event) => event.rowId,
                 ),
               ),
             }),
           );
 
-      final eventRowIds = paginationResponse.events
-          .map((element) => element.rowId)
-          .toIList();
+      final eventRowIds =
+          (direction == .forward
+                  ? paginationResponse.events
+                  : paginationResponse.events.reversed)
+              .map((element) => element.rowId)
+              .toIList();
 
       state = .data(
         .new(
