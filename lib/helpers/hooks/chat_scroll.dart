@@ -127,10 +127,15 @@ final class ChatScroll({
           final isAtBottom = position.extentBefore <= 0;
           if (isAtBottom != atBottom.value) atBottom.value = isAtBottom;
 
+          // contextualEvent updates immediately when jumping, but
+          // controllerData is only for the historical timeline once it loads
+          final isHistorical =
+              contextualEvent.value != null &&
+              controllerData.value?.historicalData != null;
+
           if (position.extentAfter <= loadThreshold) {
             await paginate(.backward);
-          } else if (contextualEvent.value != null &&
-              position.extentBefore <= loadThreshold) {
+          } else if (isHistorical && position.extentBefore <= loadThreshold) {
             await paginate(.forward);
           } else if (position.extentBefore <= 0) {
             await markRead();
@@ -139,7 +144,7 @@ final class ChatScroll({
           if (controllerData.isLoading == false &&
               position.extentBefore <= 0 &&
               controllerData.value?.hasMoreForward == false &&
-              contextualEvent.value != null) {
+              isHistorical) {
             anchorId.value = null;
             contextualEvent.value = null;
           }

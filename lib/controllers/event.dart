@@ -18,26 +18,30 @@ class EventController(final GetEventRequest request)
 
     if (event != null) return event;
 
+    final link = ref.keepAlive();
     final fetchedEvent = await ref
         .read(ClientController.provider.notifier)
         .getEvent(request)
-        .onError((_, _) => null);
+        .onError((_, _) => null)
+        .whenComplete(link.close);
 
     if (fetchedEvent != null) {
-      ref
-          .read(RoomsController.provider.notifier)
-          .update(
-            .new({
-              request.roomId: .new(
-                events: .new({fetchedEvent.rowId: fetchedEvent}),
-              ),
-            }),
-          );
-
-      return fetchedEvent;
+      // Storing the event invalidates this provider, as it watches the room.
+      // If nothing is listening, Riverpod won't rebuild it, and this build's
+      // result would be lost, so store it after returning.
+      final rooms = ref.read(RoomsController.provider.notifier);
+      Future.microtask(
+        () => rooms.update(
+          .new({
+            request.roomId: .new(
+              events: .new({fetchedEvent.rowId: fetchedEvent}),
+            ),
+          }),
+        ),
+      );
     }
 
-    return null;
+    return fetchedEvent;
   }
 
   static final provider = AsyncNotifierProvider.family
