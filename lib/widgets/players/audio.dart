@@ -6,6 +6,7 @@ import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:media_kit/media_kit.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/models/info/audio.dart";
+import "package:nexus/widgets/players/player_controls.dart";
 
 class const AudioPlayer(
   final Uri uri,
@@ -18,47 +19,19 @@ class const AudioPlayer(
     final player = useMemoized(
       () => Player(configuration: .new(bufferSize: 128 * 1024 * 1024)),
     );
-
-    final playing = useState(false);
-    final position = useState(Duration.zero);
-    final duration = useState(Duration.zero);
+    final loaded = useState(false);
 
     useEffect(() {
-      player.platform?.state = player.platform!.state.copyWith(buffering: true);
       scheduleMicrotask(() async {
-        final video = await ref
+        final audio = await ref
             .read(ClientController.provider.notifier)
             .downloadMedia(.new(mxc: uri, encrypted: encrypted));
-        await player.open(Media(video.path), play: false);
-
-        player.stream.playing.listen((value) {
-          playing.value = value;
-        });
-
-        player.stream.position.listen((value) {
-          position.value = value;
-        });
-
-        player.stream.duration.listen((value) {
-          duration.value = value;
-        });
+        await player.open(Media(audio.path), play: false);
+        if (context.mounted) loaded.value = true;
       });
 
       return player.dispose;
     }, []);
-
-    String format(Duration duration) {
-      final minutes = duration.inMinutes
-          .remainder(60)
-          .toString()
-          .padLeft(2, "0");
-      final seconds = duration.inSeconds
-          .remainder(60)
-          .toString()
-          .padLeft(2, "0");
-
-      return "$minutes:$seconds";
-    }
 
     return SizedBox(
       height: 60,
@@ -66,42 +39,7 @@ class const AudioPlayer(
         color: Theme.of(context).colorScheme.surfaceContainer,
         child: Padding(
           padding: .only(left: 8, right: 16),
-          child: Row(
-            children: [
-              if (player.state.buffering)
-                SizedBox.square(
-                  dimension: 24,
-                  child: CircularProgressIndicator(padding: .all(4)),
-                )
-              else
-                IconButton(
-                  onPressed: player.playOrPause,
-                  icon: Icon(
-                    playing.value ? Icons.pause_circle : Icons.play_circle,
-                  ),
-                ),
-              SizedBox(width: 8),
-              Text(
-                format(position.value),
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-              Expanded(
-                child: Slider(
-                  min: 0,
-                  max: duration.value.inMilliseconds <= 0
-                      ? 1
-                      : duration.value.inMilliseconds.toDouble(),
-                  value: position.value.inMilliseconds.toDouble(),
-                  onChanged: (value) =>
-                      player.seek(.new(milliseconds: value.toInt())),
-                ),
-              ),
-              Text(
-                format(duration.value),
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-            ],
-          ),
+          child: PlayerControls(player, loading: !loaded.value),
         ),
       ),
     );
