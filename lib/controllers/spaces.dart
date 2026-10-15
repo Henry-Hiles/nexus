@@ -77,7 +77,10 @@ class SpacesController extends AsyncNotifier<IList<Space>> {
       );
     }
 
-    final spaces = topLevelSpaceIds.map(buildSpace).toIList();
+    final spaces = topLevelSpaceIds
+        .where(rooms.containsKey)
+        .map(buildSpace)
+        .toIList();
 
     final usedRooms = spaces
         .expand(
