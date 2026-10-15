@@ -28,7 +28,7 @@ class const RoomList({super.key}) extends ConsumerWidget implements NavPage {
 
   // TODO: Show unread badge here and on sidebar hamburger
   @override
-  Future<int>? badgeBuilder(WidgetRef ref) => null;
+  int? badgeCount(WidgetRef ref) => null;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

@@ -127,7 +127,7 @@ final class const RoomMenuButton(
                             ),
                           );
                       await client
-                          .leaveRoom(room!)
+                          .leaveRoom(room!.metadata!.id)
                           .onError(showError)
                           .whenComplete(snackbar.close);
                     },

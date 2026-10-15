@@ -9,6 +9,9 @@ part "join_room.g.dart";
 class const JoinRoomRequest({
   required final String roomIdOrAlias,
   final IList<String> via = const IList.empty(),
+
+  /// Set when accepting an invite, so gomuks can mark DMs as such.
+  final bool fromInvite = false,
 }) with _$JoinRoomRequest {
   Map<String, Object?> toJson() => _$JoinRoomRequestToJson(this);
 

@@ -1,11 +1,13 @@
 import "dart:async";
 import "dart:ffi";
 
+import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/foundation.dart";
 import "package:nexus/controllers/account_data.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/client_state.dart";
 import "package:nexus/controllers/init_complete.dart";
+import "package:nexus/controllers/invites.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/controllers/space_edges.dart";
 import "package:nexus/controllers/sync_status.dart";
@@ -61,10 +63,12 @@ class GomuksListenerController extends AsyncNotifier<void> {
                 final syncData = SyncData.fromJson(decodedMuksEvent);
                 final roomProvider = RoomsController.provider;
                 final accountDataProvider = AccountDataController.provider;
+                final invitesProvider = InvitesController.provider;
 
                 if (syncData.clearState) {
                   ref.invalidate(roomProvider);
                   ref.invalidate(accountDataProvider);
+                  ref.invalidate(invitesProvider);
                 }
 
                 ref
@@ -73,6 +77,13 @@ class GomuksListenerController extends AsyncNotifier<void> {
                 ref
                     .read(accountDataProvider.notifier)
                     .update(syncData.accountData);
+                ref
+                    .read(invitesProvider.notifier)
+                    .update(
+                      syncData.invitedRooms,
+                      joinedRooms: syncData.rooms.keys.toISet(),
+                      leftRooms: syncData.leftRooms,
+                    );
 
                 if (syncData.topLevelSpaces case final topLevelSpaces?) {
                   ref

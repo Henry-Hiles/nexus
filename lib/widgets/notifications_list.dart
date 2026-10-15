@@ -24,9 +24,8 @@ class const NotificationsList({super.key})
   @override
   IconData get icon => Icons.notifications;
 
-  // TODO: Show notification badge here
   @override
-  Future<int>? badgeBuilder(WidgetRef ref) => null;
+  Null badgeCount(_) => null;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

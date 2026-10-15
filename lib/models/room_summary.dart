@@ -1,12 +1,14 @@
 import "package:freezed_annotation/freezed_annotation.dart";
 import "package:nexus/models/content/create.dart";
+import "package:nexus/models/content/membership.dart";
 import "package:nexus/models/join_rule.dart";
+import "package:nexus/models/membership_status.dart";
 
 part "room_summary.freezed.dart";
 part "room_summary.g.dart";
 
 @Freezed(toJson: false, fromJson: false)
-@JsonSerializable()
+@JsonSerializable(createToJson: false)
 class const RoomSummary({
   required final String roomId,
   @JsonKey(name: "num_joined_members") final int? joinedMembers,
@@ -17,9 +19,24 @@ class const RoomSummary({
   final String? topic,
   final String? roomVersion,
   @JsonKey(unknownEnumValue: RoomType.room) final RoomType? roomType,
-}) with _$RoomSummary {
-  Map<String, Object?> toJson() => _$RoomSummaryToJson(this);
 
+  /// The encryption algorithm, if the room is encrypted.
+  final String? encryption,
+  final bool? worldReadable,
+
+  /// The current user's membership in the room, if any.
+  @JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue)
+  final MembershipStatus? membership,
+
+  /// Who invited the current user, for invites.
+  @JsonKey(includeFromJson: false) final String? invitedBy,
+
+  /// The inviter's membership, for their display name and avatar.
+  @JsonKey(includeFromJson: false) final MembershipContent? inviterProfile,
+
+  /// Whether this is an invite to a direct message.
+  @JsonKey(includeFromJson: false) final bool isDirect = false,
+}) with _$RoomSummary {
   factory RoomSummary.fromJson(Map<String, Object?> json) =>
       _$RoomSummaryFromJson(json);
 }

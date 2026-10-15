@@ -191,10 +191,8 @@ class ClientController extends AsyncNotifier<int> {
   Future<RoomSummary> getRoomSummary(JoinRoomRequest request) async =>
       .fromJson(await _sendCommand("get_room_summary", request.toJson()));
 
-  Future<void> leaveRoom(Room room) async {
-    if (room.metadata == null) return;
-    await _sendCommand("leave_room", {"room_id": room.metadata!.id});
-  }
+  Future<void> leaveRoom(String roomId) =>
+      _sendCommand("leave_room", {"room_id": roomId});
 
   Future<IList<Event>> getRoomState(GetRoomStateRequest request) async {
     Future<List?> getState(GetRoomStateRequest request) async =>

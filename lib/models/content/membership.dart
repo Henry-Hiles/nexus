@@ -20,6 +20,7 @@ sealed class MembershipContent extends Content with _$MembershipContent {
     @JsonKey(name: "membership") required MembershipStatus status,
     Uri? avatarUrl,
     String? reason,
+    @Default(false) bool isDirect,
   }) = _MembershipContent;
 
   factory MembershipContent.fromJson(Map<String, Object?> json) =>

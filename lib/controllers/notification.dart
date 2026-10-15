@@ -4,6 +4,7 @@ import "dart:io";
 import "package:flutter/services.dart";
 import "package:material_ui/material_ui.dart";
 import "package:nexus/controllers/portal.dart";
+import "package:nexus/controllers/sidebar_page.dart";
 import "package:nexus/main.dart";
 import "package:flutter_local_notifications/flutter_local_notifications.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
@@ -35,6 +36,7 @@ class NotificationController
 
           if (int.tryParse(details.payload!) case final rowId?) {
             navigatorKey.currentState?.popUntil((route) => route.isFirst);
+            ref.read(SidebarPageController.provider.notifier).set(.notifications);
             ref
                 .read(NotificationRequestController.provider.notifier)
                 .request(rowId);
@@ -53,6 +55,7 @@ class NotificationController
 
         if (int.tryParse(call.arguments) case int rowId) {
           navigatorKey.currentState?.popUntil((route) => route.isFirst);
+          ref.read(SidebarPageController.provider.notifier).set(.notifications);
           ref
               .read(NotificationRequestController.provider.notifier)
               .request(rowId);
