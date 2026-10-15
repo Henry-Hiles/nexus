@@ -5,6 +5,7 @@ import "package:material_ui/material_ui.dart";
 import "package:navigation_rail_m3e/navigation_rail_m3e.dart";
 import "package:nexus/helpers/extensions/get_all_child_rooms.dart";
 import "package:nexus/helpers/extensions/room_destinations.dart";
+import "package:nexus/widgets/adaptive_menu_button.dart";
 import "package:nexus/models/nav_page.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/widgets/divider_widget.dart";
@@ -149,7 +150,8 @@ class const SpacesRail({super.key}) extends ConsumerWidget {
                 padding: .only(top: 8),
                 child: Column(
                   children: [
-                    PopupMenuButton(
+                    AdaptiveMenuButton(
+                      tooltip: "Add a room",
                       itemBuilder: (_) => [
                         PopupMenuItem(
                           onTap: () => showDialog(

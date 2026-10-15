@@ -4,6 +4,8 @@ import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:file_selector/file_selector.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/widgets/emoji_picker.dart";
+import "package:nexus/helpers/extensions/show_adaptive_sheet.dart";
+import "package:nexus/widgets/adaptive_menu_button.dart";
 import "package:material_ui/material_ui.dart";
 import "package:flutter/services.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
@@ -165,10 +167,8 @@ class const Composer(
                         )
                         ? [
                             IconButton(
-                              onPressed: () => showModalBottomSheet(
-                                isScrollControlled: true,
-                                context: context,
-                                builder: (context) => EmojiPicker(
+                              onPressed: () => context.showAdaptiveSheet(
+                                (context) => EmojiPicker(
                                   onSelection: (value) {
                                     Navigator.of(context).pop();
                                     controller.text += value;
@@ -178,7 +178,7 @@ class const Composer(
                               ),
                               icon: Icon(Icons.emoji_emotions),
                             ),
-                            PopupMenuButton(
+                            AdaptiveMenuButton(
                               tooltip: "Add media",
                               enabled: attachment == null,
                               itemBuilder: (context) => [

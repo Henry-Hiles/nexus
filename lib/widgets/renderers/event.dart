@@ -6,7 +6,7 @@ import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/event.dart";
 import "package:nexus/controllers/room_chat.dart";
 import "package:nexus/controllers/rooms.dart";
-import "package:nexus/helpers/extensions/show_context_menu.dart";
+import "package:nexus/helpers/extensions/show_adaptive_menu.dart";
 import "package:nexus/helpers/hooks/chat_scroll.dart";
 import "package:nexus/models/content/avatar.dart";
 import "package:nexus/models/content/canonical_alias.dart";
@@ -197,9 +197,9 @@ class const EventRenderer(
 
     final contextMenuCallback = getEventOptions == null
         ? null
-        : (PositionedGestureDetails details) => context.showContextMenu(
+        : (PositionedGestureDetails details) => context.showAdaptiveMenu(
+            getEventOptions!(event).toList(),
             globalPosition: details.globalPosition,
-            children: getEventOptions!(event).toList(),
           );
 
     return Column(
@@ -222,9 +222,9 @@ class const EventRenderer(
                             final topLeft = renderBox.localToGlobal(
                               Offset.zero,
                             );
-                            context.showContextMenu(
+                            context.showAdaptiveMenu(
+                              getEventOptions!(event).toList(),
                               globalPosition: topLeft,
-                              children: getEventOptions!(event).toList(),
                             );
                             return null;
                           },

@@ -4,6 +4,7 @@ import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/init_complete.dart";
 import "package:nexus/controllers/key.dart";
 import "package:nexus/controllers/notification_request.dart";
+import "package:nexus/helpers/extensions/is_desktop.dart";
 import "package:nexus/widgets/appbar.dart";
 import "package:nexus/widgets/sidebar.dart";
 import "package:nexus/widgets/sync_status_banner.dart";
@@ -34,7 +35,7 @@ class const ChatPage({super.key}) extends HookConsumerWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final isDesktop = constraints.maxWidth > 650;
+        final isDesktop = context.isDesktop;
         final showMembersByDefault = constraints.maxWidth > 1000;
         final roomId = ref
             .watch(KeyController.provider(KeyController.roomKey))

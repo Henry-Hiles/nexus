@@ -3,6 +3,7 @@ import "package:material_ui/material_ui.dart";
 import "package:flutter/services.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client.dart";
+import "package:nexus/widgets/adaptive_menu_button.dart";
 import "package:nexus/controllers/via.dart";
 import "package:nexus/models/room.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
@@ -18,7 +19,9 @@ final class const RoomMenuButton(
     final danger = Theme.of(context).colorScheme.error;
     final client = ref.read(ClientController.provider.notifier);
 
-    return PopupMenuButton(
+    return AdaptiveMenuButton(
+      icon: const Icon(Icons.more_vert),
+      tooltip: "Room options",
       itemBuilder: (_) => [
         PopupMenuItem(
           onTap: () async {

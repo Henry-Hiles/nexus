@@ -11,6 +11,8 @@ import "package:nexus/controllers/rooms.dart";
 import "package:nexus/controllers/room_chat.dart";
 import "package:nexus/controllers/via.dart";
 import "package:nexus/helpers/extensions/event_id_is_fake.dart";
+import "package:nexus/helpers/extensions/is_desktop.dart";
+import "package:nexus/helpers/extensions/show_adaptive_sheet.dart";
 import "package:nexus/models/content/message.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/models/relation_type.dart";
@@ -27,6 +29,7 @@ extension BuildEventOptions on Event {
   }) {
     final theme = Theme.of(context);
     final danger = theme.colorScheme.error;
+    final isDesktop = context.isDesktop;
 
     final notifier = RoomChatController.provider((
       roomId: roomId,
@@ -96,7 +99,7 @@ extension BuildEventOptions on Event {
           child: IconTheme(
             data: theme.iconTheme,
             child: Row(
-              mainAxisAlignment: .center,
+              mainAxisAlignment: isDesktop ? .center : .spaceEvenly,
               children: [
                 ...{
                       ...ref
@@ -106,11 +109,15 @@ extension BuildEventOptions on Event {
                       "🤣",
                       "😭",
                       "🤔",
+                      "❤️",
                     }
-                    .take(3)
+                    .take(isDesktop ? 3 : 5)
                     .map(
                       (emoji) => IconButton(
-                        icon: Text(emoji),
+                        icon: Text(
+                          emoji,
+                          style: .new(fontSize: isDesktop ? null : 18),
+                        ),
                         onPressed: () async {
                           Navigator.of(context).pop();
                           await ref
@@ -130,10 +137,8 @@ extension BuildEventOptions on Event {
                   onPressed: () {
                     Navigator.of(context).pop();
 
-                    showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true,
-                      builder: (context) => EmojiPicker(
+                    context.showAdaptiveSheet(
+                      (context) => EmojiPicker(
                         allowFreeText: true,
                         onSelection: (emoji) {
                           Navigator.of(context).pop();
