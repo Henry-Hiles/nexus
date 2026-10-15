@@ -36,7 +36,9 @@ class NotificationController
 
           if (int.tryParse(details.payload!) case final rowId?) {
             navigatorKey.currentState?.popUntil((route) => route.isFirst);
-            ref.read(SidebarPageController.provider.notifier).set(.notifications);
+            ref
+                .read(SidebarPageController.provider.notifier)
+                .set(.notifications);
             ref
                 .read(NotificationRequestController.provider.notifier)
                 .request(rowId);

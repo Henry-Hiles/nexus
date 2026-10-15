@@ -8,13 +8,17 @@ import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/client_state.dart";
 import "package:nexus/controllers/power_level.dart";
 import "package:nexus/controllers/profile.dart";
+import "package:nexus/controllers/rooms.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
+import "package:nexus/helpers/extensions/create_room.dart";
+import "package:nexus/helpers/extensions/show_adaptive_sheet.dart";
 import "package:nexus/helpers/extensions/get_localpart.dart";
 import "package:nexus/models/content/membership.dart";
 import "package:nexus/models/membership_action.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/main.dart";
 import "package:nexus/widgets/expandable_image.dart";
+import "package:nexus/widgets/start_dm_sheet.dart";
 
 final class const UserBottomSheet(
   final MembershipContent member,
@@ -177,13 +181,30 @@ final class const UserBottomSheet(
                 ),
 
             SizedBox(height: 8),
-            if (userId != ref.watch(ClientStateController.provider)?.userId &&
-                roomId != null) ...[
+            if (userId !=
+                ref.watch(ClientStateController.provider)?.userId) ...[
               Row(
                 children: [
                   Expanded(
                     child: M3EButton.icon(
-                      onPressed: null,
+                      onPressed: () async {
+                        final name = member.displayName ?? userId.localpart;
+                        final hasDm = ref
+                            .read(RoomsController.provider)
+                            .values
+                            .any((room) => room.metadata?.dmUserId == userId);
+
+                        if (hasDm) {
+                          context.startDirectMessage(userId, name: name);
+                        } else if (await context.showAdaptiveSheet<bool>(
+                              (_) => StartDmSheet(userId: userId, name: name),
+                            ) !=
+                            true) {
+                          return;
+                        }
+
+                        if (context.mounted) Navigator.of(context).pop();
+                      },
                       shape: .square,
                       style: .tonal,
                       icon: Icon(Icons.message),
@@ -193,15 +214,16 @@ final class const UserBottomSheet(
                 ],
               ),
 
-              if (ref.watch(
-                PowerLevelController.provider(
-                  .membershipAction(
-                    action: .kick,
-                    roomId: roomId!,
-                    targetUser: userId,
-                  ),
-                ),
-              ))
+              if (roomId != null &&
+                  ref.watch(
+                    PowerLevelController.provider(
+                      .membershipAction(
+                        action: .kick,
+                        roomId: roomId!,
+                        targetUser: userId,
+                      ),
+                    ),
+                  ))
                 Padding(
                   padding: .only(top: 4),
                   child: Row(

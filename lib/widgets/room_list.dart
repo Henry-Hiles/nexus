@@ -5,9 +5,12 @@ import "package:material_ui/material_ui.dart";
 import "package:navigation_rail_m3e/navigation_rail_m3e.dart";
 import "package:nexus/helpers/extensions/get_all_child_rooms.dart";
 import "package:nexus/helpers/extensions/room_destinations.dart";
+import "package:nexus/helpers/extensions/show_adaptive_sheet.dart";
 import "package:nexus/widgets/adaptive_menu_button.dart";
 import "package:nexus/models/nav_page.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
+import "package:nexus/widgets/create_room_sheet.dart";
+import "package:nexus/widgets/start_dm_sheet.dart";
 import "package:nexus/widgets/divider_widget.dart";
 import "package:nexus/widgets/error_dialog.dart";
 import "package:nexus/widgets/pages/settings.dart";
@@ -163,11 +166,22 @@ class const SpacesRail({super.key}) extends ConsumerWidget {
                             leading: Icon(Icons.numbers),
                           ),
                         ),
-                        const PopupMenuItem(
-                          onTap: null,
-                          child: ListTile(
-                            title: Text("Create a new room"),
+                        PopupMenuItem(
+                          onTap: () => context.showAdaptiveSheet(
+                            (_) => const CreateRoomSheet(),
+                          ),
+                          child: const ListTile(
+                            title: Text("Create a new room (or space)"),
                             leading: Icon(Icons.add),
+                          ),
+                        ),
+                        PopupMenuItem(
+                          onTap: () => context.showAdaptiveSheet(
+                            (_) => const StartDmSheet(),
+                          ),
+                          child: const ListTile(
+                            title: Text("Start a direct message"),
+                            leading: Icon(Icons.person_add),
                           ),
                         ),
                       ],

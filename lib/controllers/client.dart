@@ -20,6 +20,7 @@ import "package:nexus/models/oauth_auth_code_response.dart";
 import "package:nexus/models/open_graph_data.dart";
 import "package:nexus/models/paginate.dart";
 import "package:nexus/models/paginate_manual.dart";
+import "package:nexus/models/requests/create_room.dart";
 import "package:nexus/models/requests/deregister_pusher.dart";
 import "package:nexus/models/requests/download_media.dart";
 import "package:nexus/models/requests/get_event.dart";
@@ -189,6 +190,9 @@ class ClientController extends AsyncNotifier<int> {
 
   Future<String> joinRoom(JoinRoomRequest request) async =>
       (await _sendCommand("join_room", request.toJson()))["room_id"];
+
+  Future<String> createRoom(CreateRoomRequest request) async =>
+      (await _sendCommand("create_room", request.toJson()))["room_id"];
 
   Future<RoomSummary> getRoomSummary(JoinRoomRequest request) async =>
       .fromJson(await _sendCommand("get_room_summary", request.toJson()));
