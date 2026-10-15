@@ -3,8 +3,10 @@ import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/widgets/appbar.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
+import "package:nexus/widgets/count_badge.dart";
 import "package:nexus/widgets/room_menu_button.dart";
 import "package:nexus/widgets/room_summary_dialog.dart";
+import "package:nexus/widgets/sidebar.dart";
 
 final class const RoomAppbar({
   required final String? roomId,
@@ -49,7 +51,14 @@ final class const RoomAppbar({
                     dimension: 24,
                     fallback: Icon(Icons.numbers),
                   )
-          : DrawerButton(onPressed: onOpenDrawer),
+          : IconButton(
+              onPressed: onOpenDrawer,
+              tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
+              icon: CountBadge(
+                Sidebar.totalBadgeCount(ref),
+                child: const DrawerButtonIcon(),
+              ),
+            ),
       scrolledUnderElevation: 0,
       title: room == null
           ? null

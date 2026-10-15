@@ -9,6 +9,7 @@ extension SchemeToTheme on ColorScheme {
     ).textTheme;
     return .from(colorScheme: this).copyWith(
       cardTheme: .new(color: primaryContainer),
+      badgeTheme: .new(backgroundColor: primary, textColor: onPrimary),
       popupMenuTheme: .new(
         shape: RoundedRectangleBorder(borderRadius: .circular(16)),
         color: surfaceContainerHigh,

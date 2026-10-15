@@ -5,5 +5,6 @@ abstract class const NavPage({super.key}) extends Widget {
   String get title;
   IconData get icon;
 
+  /// Null hides the badge, and 0 shows a dot.
   int? badgeCount(WidgetRef ref) => null;
 }

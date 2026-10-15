@@ -13,6 +13,7 @@ import "package:nexus/widgets/pages/settings.dart";
 import "package:nexus/widgets/join_dialog.dart";
 import "package:nexus/widgets/room_menu_button.dart";
 import "package:nexus/controllers/key.dart";
+import "package:nexus/controllers/rooms.dart";
 import "package:nexus/controllers/spaces.dart";
 import "package:collection/collection.dart";
 
@@ -26,9 +27,26 @@ class const RoomList({super.key}) extends ConsumerWidget implements NavPage {
   @override
   IconData get icon => Icons.list;
 
-  // TODO: Show unread badge here and on sidebar hamburger
   @override
-  int? badgeCount(WidgetRef ref) => null;
+  int? badgeCount(WidgetRef ref) {
+    final (notifications, hasUnread) = ref.watch(
+      RoomsController.provider.select(
+        (rooms) => rooms.values.fold(
+          (0, false),
+          (total, room) => (
+            total.$1 + (room.metadata?.unreadNotifications ?? 0),
+            total.$2 || (room.metadata?.unreadMessages ?? 0) > 0,
+          ),
+        ),
+      ),
+    );
+
+    return notifications > 0
+        ? notifications
+        : hasUnread
+        ? 0
+        : null;
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
