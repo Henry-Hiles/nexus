@@ -33,7 +33,7 @@ class const SyncStatusBanner({super.key}) extends ConsumerWidget {
     };
 
     final details = status == null
-        ? null
+        ? []
         : [
             ?status.error,
             if (status.errorCount > 0) "Failed attempts: ${status.errorCount}.",
@@ -49,7 +49,7 @@ class const SyncStatusBanner({super.key}) extends ConsumerWidget {
           : Material(
               color: banner.background,
               child: InkWell(
-                onTap: details == null
+                onTap: details.isEmpty
                     ? null
                     : () => showDialog(
                         context: context,
@@ -73,7 +73,7 @@ class const SyncStatusBanner({super.key}) extends ConsumerWidget {
                           ),
                         ),
                       ),
-                      if (details != null)
+                      if (details.isNotEmpty)
                         Icon(Icons.info_outline, color: banner.foreground),
                     ],
                   ),
