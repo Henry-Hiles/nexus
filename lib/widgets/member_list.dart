@@ -104,36 +104,45 @@ class const MemberList(final String roomId, {super.key})
                                 itemBuilder: (context, index) =>
                                     switch (members[index].content) {
                                       MembershipContent(
-                                        :final avatarUrl,
-                                        :final displayName,
-                                      ) =>
-                                        ListTile(
-                                          title: Text(
-                                            displayName ??
-                                                members[index]
-                                                    .stateKey!
-                                                    .localpart,
-                                            overflow: .ellipsis,
-                                            style: .new(
-                                              color: members[index]
-                                                  .stateKey!
-                                                  .colorHash,
-                                              fontWeight: .bold,
-                                            ),
-                                          ),
-                                          subtitle: Text(
-                                            members[index].stateKey!,
-                                            overflow: .ellipsis,
-                                          ),
-                                          leading: Transform.translate(
-                                            offset: .new(0, 2),
-                                            child: AvatarOrHash(
-                                              avatarUrl,
-                                              dimension: 40,
+                                            :final avatarUrl,
+                                            :final displayName,
+                                          ) &&
+                                          final content =>
+                                        Builder(
+                                          builder: (context) => ListTile(
+                                            onTap: () =>
+                                                context.showUserPopover(
+                                                  content,
+                                                  members[index].stateKey!,
+                                                  roomId: roomId,
+                                                ),
+                                            title: Text(
                                               displayName ??
                                                   members[index]
                                                       .stateKey!
                                                       .localpart,
+                                              overflow: .ellipsis,
+                                              style: .new(
+                                                color: members[index]
+                                                    .stateKey!
+                                                    .colorHash,
+                                                fontWeight: .bold,
+                                              ),
+                                            ),
+                                            subtitle: Text(
+                                              members[index].stateKey!,
+                                              overflow: .ellipsis,
+                                            ),
+                                            leading: Transform.translate(
+                                              offset: .new(0, 2),
+                                              child: AvatarOrHash(
+                                                avatarUrl,
+                                                dimension: 40,
+                                                displayName ??
+                                                    members[index]
+                                                        .stateKey!
+                                                        .localpart,
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -141,17 +150,6 @@ class const MemberList(final String roomId, {super.key})
                                         "Member content was not MembershipContent",
                                       ),
                                     },
-                                onTap: (index) {
-                                  final member = members[index];
-                                  if (member.content
-                                      case MembershipContent content) {
-                                    context.showUserPopover(
-                                      content,
-                                      member.stateKey!,
-                                      roomId: roomId,
-                                    );
-                                  }
-                                },
                               ),
                             ];
                           }).toList(),

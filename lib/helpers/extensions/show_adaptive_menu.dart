@@ -1,4 +1,5 @@
 import "package:material_ui/material_ui.dart";
+import "package:nexus/helpers/extensions/global_rect.dart";
 import "package:nexus/helpers/extensions/is_desktop.dart";
 
 extension ShowAdaptiveMenu on BuildContext {
@@ -38,11 +39,7 @@ extension ShowAdaptiveMenu on BuildContext {
     final overlay = Overlay.of(this).context.findRenderObject() as RenderBox;
     final anchor = switch (globalPosition) {
       final position? => position & Size.zero,
-      null => switch (findRenderObject()) {
-        final RenderBox box =>
-          box.localToGlobal(.zero, ancestor: overlay) & box.size,
-        _ => Rect.zero,
-      },
+      null => globalRect,
     };
 
     await showMenu(
