@@ -8,7 +8,9 @@ import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/client_id.dart";
 import "package:nexus/helpers/launch_helper.dart";
 import "package:nexus/main.dart";
+import "package:nexus/models/gomuks_exception.dart";
 import "package:nexus/models/homeserver.dart";
+import "package:nexus/models/oauth_auth_code_response.dart";
 import "package:nexus/widgets/pages/settings.dart";
 import "package:nexus/widgets/appbar.dart";
 import "package:nexus/widgets/divider_text.dart";
@@ -48,9 +50,26 @@ class const SelectServerPage({super.key}) extends HookConsumerWidget {
 
         if (context.mounted) {
           Future<void> tryLogin(Uri url) async {
-            final codeResponse = await ref.watch(
-              AuthUrlController.provider(url).future,
-            );
+            final OAuthAuthCodeResponse codeResponse;
+            try {
+              codeResponse = await ref.watch(
+                AuthUrlController.provider(url).future,
+              );
+            } on GomuksException catch (error) {
+              if (error.errorCode != "M_UNRECOGNIZED") rethrow;
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      "${url.host} doesn't support OAuth login, which Nexus requires. Try a different homeserver, or ask your homeserver's admin to enable OAuth.",
+                      style: .new(color: theme.colorScheme.onErrorContainer),
+                    ),
+                    backgroundColor: theme.colorScheme.errorContainer,
+                  ),
+                );
+              }
+              return;
+            }
 
             await ref.read(LaunchHelper.provider).launchUrl(codeResponse.url);
 

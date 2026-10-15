@@ -15,6 +15,7 @@ import "package:nexus/models/event.dart";
 import "package:nexus/models/event_context.dart";
 import "package:nexus/models/mentions_response.dart";
 import "package:nexus/models/gomuks_config.dart";
+import "package:nexus/models/gomuks_exception.dart";
 import "package:nexus/models/oauth_auth_code_response.dart";
 import "package:nexus/models/open_graph_data.dart";
 import "package:nexus/models/paginate.dart";
@@ -112,7 +113,7 @@ class ClientController extends AsyncNotifier<int> {
       final json = response.buf.toJsonAndFree();
 
       if (response.command.cast<Utf8>().toDartString() == "error") {
-        throw json;
+        throw GomuksException(json.toString());
       }
 
       return json;
