@@ -51,34 +51,59 @@ class const PlayerControls(
         ? 1.0
         : duration.inMilliseconds.toDouble();
 
-    return Row(
-      children: [
-        if (loading || buffering)
-          SizedBox.square(
+    final playButton = loading || buffering
+        ? SizedBox.square(
             dimension: 48,
             child: CircularProgressIndicator(padding: .all(12), color: color),
           )
-        else
-          IconButton(
+        : IconButton(
             onPressed: player.playOrPause,
             color: color,
             tooltip: playing ? "Pause" : "Play",
             icon: Icon(playing ? Icons.pause_circle : Icons.play_circle),
-          ),
-        SizedBox(width: 8),
-        Text(format(position), style: textStyle),
-        Expanded(
-          child: Slider(
-            max: max,
-            value: min(position.inMilliseconds.toDouble(), max),
-            onChanged: loading
-                ? null
-                : (value) => player.seek(.new(milliseconds: value.toInt())),
-          ),
-        ),
-        Text(format(duration), style: textStyle),
-        ...actions,
-      ],
+          );
+
+    Slider slider({EdgeInsetsGeometry? padding}) => Slider(
+      padding: padding,
+      max: max,
+      value: min(position.inMilliseconds.toDouble(), max),
+      onChanged: loading
+          ? null
+          : (value) => player.seek(.new(milliseconds: value.toInt())),
+    );
+
+    return LayoutBuilder(
+      builder: (context, constraints) => constraints.maxWidth < 300
+          ? Column(
+              mainAxisSize: .min,
+              children: [
+                slider(padding: const .symmetric(horizontal: 12)),
+                Row(
+                  children: [
+                    playButton,
+                    Expanded(
+                      child: Text(
+                        "${format(position)} / ${format(duration)}",
+                        style: textStyle,
+                        maxLines: 1,
+                        overflow: .ellipsis,
+                      ),
+                    ),
+                    ...actions,
+                  ],
+                ),
+              ],
+            )
+          : Row(
+              children: [
+                playButton,
+                SizedBox(width: 8),
+                Text(format(position), style: textStyle),
+                Expanded(child: slider()),
+                Text(format(duration), style: textStyle),
+                ...actions,
+              ],
+            ),
     );
   }
 }
