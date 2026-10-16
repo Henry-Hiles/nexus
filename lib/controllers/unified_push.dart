@@ -5,7 +5,7 @@ import "dart:io";
 import "package:flutter/foundation.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:intl/intl.dart";
-import "package:nexus/controllers/key.dart";
+import "package:nexus/controllers/selected_room.dart";
 import "package:nexus/controllers/notification.dart";
 import "package:nexus/controllers/push_key.dart";
 import "package:nexus/main.dart";
@@ -90,10 +90,7 @@ class UnifiedPushController extends AsyncNotifier<String?> {
         if (event.unreadType?.has(.notify) != true ||
             (!isInBackground &&
                 await windowManager.isFocused().onError((_, _) => true) &&
-                await ref.read(
-                      KeyController.provider(KeyController.roomKey).future,
-                    ) ==
-                    event.roomId)) {
+                ref.read(SelectedRoomController.provider) == event.roomId)) {
           if (isInBackground) exit(0);
           return;
         }

@@ -25,6 +25,7 @@ class RoomChatController(final ChatParams info)
   @override
   Future<RoomChat?> build() async {
     final client = ref.read(ClientController.provider.notifier);
+
     final room = ref.read(
       RoomsController.provider.select((rooms) => rooms[info.roomId]),
     );

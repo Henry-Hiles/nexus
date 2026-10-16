@@ -22,9 +22,10 @@ import "package:nexus/widgets/room_summary_sheet.dart";
 import "package:nexus/widgets/room_menu_button.dart";
 import "package:nexus/widgets/space_hierarchy_sheet.dart";
 import "package:nexus/controllers/key.dart";
+import "package:nexus/controllers/selected_room.dart";
+import "package:nexus/controllers/selected_space.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/controllers/spaces.dart";
-import "package:collection/collection.dart";
 
 // Needed for navigation_rail_m3e (#65).
 import "package:flutter/material.dart" as old_mat;
@@ -217,23 +218,8 @@ class const SpacesRail({super.key}) extends ConsumerWidget {
 class const RoomsPane({super.key}) extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final selectedSpaceId = ref.watch(
-      KeyController.provider(KeyController.spaceKey)
-          .select((async) => async.requireValue),
-    );
-    final selectedRoomId = ref.watch(
-      KeyController.provider(KeyController.roomKey)
-          .select((async) => async.requireValue),
-    );
-    final selectedSpace = ref.watch(
-      SpacesController.provider.select((async) {
-        final spaces = async.requireValue;
-        return spaces.firstWhereOrNull(
-              (space) => space.id == selectedSpaceId,
-            ) ??
-            spaces.first;
-      }),
-    );
+    final selectedRoomId = ref.watch(SelectedRoomController.provider);
+    final selectedSpace = ref.watch(SelectedSpaceController.provider)!;
     final isDm = selectedSpace.id == "dms";
     final spaceMetadata = selectedSpace.room?.metadata;
 

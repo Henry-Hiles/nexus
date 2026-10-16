@@ -2,7 +2,7 @@ import "package:flutter_hooks/flutter_hooks.dart";
 import "package:material_ui/material_ui.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/init_complete.dart";
-import "package:nexus/controllers/key.dart";
+import "package:nexus/controllers/selected_room.dart";
 import "package:nexus/controllers/notification_request.dart";
 import "package:nexus/helpers/extensions/is_desktop.dart";
 import "package:nexus/widgets/appbar.dart";
@@ -37,9 +37,7 @@ class const ChatPage({super.key}) extends HookConsumerWidget {
       builder: (context, constraints) {
         final isDesktop = context.isDesktop;
         final showMembersByDefault = constraints.maxWidth > 1000;
-        final roomId = ref
-            .watch(KeyController.provider(KeyController.roomKey))
-            .requireValue;
+        final roomId = ref.watch(SelectedRoomController.provider);
 
         return SafeArea(
           child: Scaffold(
