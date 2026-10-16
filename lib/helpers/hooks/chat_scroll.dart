@@ -1,3 +1,5 @@
+import "dart:async";
+
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
@@ -26,6 +28,12 @@ final class ChatScroll({
     final anchorId = useState<int?>(null);
     final atBottom = useState(true);
     final pendingJump = useState<int?>(null);
+    final pendingJumpDone = useRef<Completer<void>?>(null);
+    void finishPendingJump() {
+      pendingJumpDone.value?.complete();
+      pendingJumpDone.value = null;
+    }
+
     final scrollController = useScrollController();
     final centerKey = useMemoized(GlobalKey.new);
 
@@ -52,7 +60,7 @@ final class ChatScroll({
       pendingJump.value = null;
 
       WidgetsBinding.instance.addPostFrameCallback((_) async {
-        if (!scrollController.hasClients) return;
+        if (!scrollController.hasClients) return finishPendingJump();
 
         final position = scrollController.position;
         scrollController.jumpTo(
@@ -71,6 +79,7 @@ final class ChatScroll({
             curve: Curves.easeInOut,
           );
         }
+        finishPendingJump();
       });
 
       return null;
@@ -185,6 +194,8 @@ final class ChatScroll({
           return;
         }
 
+        finishPendingJump();
+        final done = pendingJumpDone.value = Completer();
         pendingJump.value = rowId;
         if (controllerData.value?.timeline.contains(rowId) ?? false) {
           anchorId.value = rowId;
@@ -192,8 +203,10 @@ final class ChatScroll({
           anchorId.value = null;
           contextualEvent.value = rowId;
         }
+        await done.future;
       },
       jumpToBottom: () async {
+        finishPendingJump();
         if (contextualEvent.value != null) {
           anchorId.value = null;
           contextualEvent.value = null;
