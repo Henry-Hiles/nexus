@@ -1,5 +1,6 @@
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:material_ui/material_ui.dart";
+import "package:nexus/helpers/extensions/get_localpart.dart";
 import "package:nexus/helpers/extensions/create_room.dart";
 import "package:nexus/widgets/sheet_layout.dart";
 
@@ -12,7 +13,7 @@ class const StartDmSheet({final String? userId, final String? name, super.key})
     final userIdController = useTextEditingController();
     final text = useValueListenable(userIdController).text.trim();
     final target = userId ?? text;
-    final valid = RegExp(r"^@[^:\s]+:[^\s]+$").hasMatch(target);
+    final valid = target.isValidUserId;
     final encrypted = useState(true);
     final reasonController = useTextEditingController();
 

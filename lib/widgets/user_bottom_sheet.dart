@@ -36,7 +36,7 @@ final class const UserBottomSheet(
     );
     final client = ref.read(ClientController.provider.notifier);
 
-    void showMembershipDialog(MembershipAction action) =>
+    void showMembershipSheet(MembershipAction action) =>
         context.showAdaptiveSheet(
           (context) => HookBuilder(
             builder: (context) {
@@ -229,7 +229,7 @@ final class const UserBottomSheet(
                     children: [
                       if (member.status == .join || member.status == .invite)
                         M3EButton.icon(
-                          onPressed: () => showMembershipDialog(.kick),
+                          onPressed: () => showMembershipSheet(.kick),
                           shape: .square,
                           icon: Icon(Icons.sports_martial_arts),
                           label: Text("Kick"),
@@ -244,7 +244,7 @@ final class const UserBottomSheet(
                         ),
 
                       M3EButton.icon(
-                        onPressed: () => showMembershipDialog(.ban),
+                        onPressed: () => showMembershipSheet(.ban),
                         shape: .square,
                         icon: Icon(Icons.gavel),
                         label: Text("Ban"),

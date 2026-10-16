@@ -1,4 +1,5 @@
 import "package:material_ui/material_ui.dart";
+import "package:nexus/helpers/extensions/show_error_snack_bar.dart";
 
 extension WithProgressSnackbar on BuildContext {
   /// Shows [progress] in a snackbar while [action] runs, and shows any error
@@ -10,8 +11,6 @@ extension WithProgressSnackbar on BuildContext {
     Future<T> Function() action,
   ) async {
     final messenger = ScaffoldMessenger.of(this);
-    final colorScheme = Theme.of(this).colorScheme;
-
     final snackbar = messenger.showSnackBar(
       .new(content: Text(progress), duration: const .new(days: 1)),
     );
@@ -19,15 +18,7 @@ extension WithProgressSnackbar on BuildContext {
     try {
       return await action();
     } catch (error) {
-      messenger.showSnackBar(
-        .new(
-          backgroundColor: colorScheme.errorContainer,
-          content: Text(
-            error.toString(),
-            style: .new(color: colorScheme.onErrorContainer),
-          ),
-        ),
-      );
+      messenger.showErrorSnackBar(error.toString());
 
       return null;
     } finally {

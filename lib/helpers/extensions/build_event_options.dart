@@ -41,7 +41,7 @@ extension BuildEventOptions on Event {
         .read(PinnedIdsController.provider(roomId))
         .contains(eventId);
 
-    void showReasonDialog({
+    void showReasonSheet({
       required String title,
       required String description,
       required String action,
@@ -235,7 +235,7 @@ extension BuildEventOptions on Event {
           ) &&
           !eventId.isFake)
         PopupMenuItem(
-          onTap: () => showReasonDialog(
+          onTap: () => showReasonSheet(
             title: "Delete Message",
             description:
                 "Are you sure you want to delete this message? "
@@ -260,7 +260,7 @@ extension BuildEventOptions on Event {
         ),
 
       PopupMenuItem(
-        onTap: () => showReasonDialog(
+        onTap: () => showReasonSheet(
           title: "Report",
           description:
               "Report this event to your server administrators, "

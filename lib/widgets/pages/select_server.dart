@@ -6,6 +6,7 @@ import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/auth_url.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/client_id.dart";
+import "package:nexus/helpers/extensions/show_error_snack_bar.dart";
 import "package:nexus/helpers/launch_helper.dart";
 import "package:nexus/main.dart";
 import "package:nexus/models/gomuks_exception.dart";
@@ -27,14 +28,8 @@ class const SelectServerPage({super.key}) extends HookConsumerWidget {
 
     Future<void> setHomeserver(Uri? newHomeserver) async {
       if (newHomeserver == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              "Failed to parse homeserver URL. Are you sure you typed it correctly?",
-              style: .new(color: theme.colorScheme.onErrorContainer),
-            ),
-            backgroundColor: theme.colorScheme.errorContainer,
-          ),
+        ScaffoldMessenger.of(context).showErrorSnackBar(
+          "Failed to parse homeserver URL. Are you sure you typed it correctly?",
         );
       }
       isLoading.value = true;
@@ -58,14 +53,8 @@ class const SelectServerPage({super.key}) extends HookConsumerWidget {
             } on GomuksException catch (error) {
               if (error.errorCode != "M_UNRECOGNIZED") rethrow;
               if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      "${url.host} doesn't support OAuth login, which Nexus requires. Try a different homeserver, or ask your homeserver's admin to enable OAuth.",
-                      style: .new(color: theme.colorScheme.onErrorContainer),
-                    ),
-                    backgroundColor: theme.colorScheme.errorContainer,
-                  ),
+                ScaffoldMessenger.of(context).showErrorSnackBar(
+                  "${url.host} doesn't support OAuth login, which Nexus requires. Try a different homeserver, or ask your homeserver's admin to enable OAuth.",
                 );
               }
               return;
@@ -109,18 +98,11 @@ class const SelectServerPage({super.key}) extends HookConsumerWidget {
           }
 
           if (newUrl == null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  "Homeserver verification failed.",
-                  style: .new(color: theme.colorScheme.onErrorContainer),
-                ),
-                action: SnackBarAction(
-                  onPressed: () => tryLogin(newHomeserver!).onError(showError),
-                  label: "Attempt log in anyways",
-                  textColor: theme.colorScheme.onErrorContainer,
-                ),
-                backgroundColor: theme.colorScheme.errorContainer,
+            ScaffoldMessenger.of(context).showErrorSnackBar(
+              "Homeserver verification failed.",
+              action: (
+                label: "Attempt log in anyways",
+                onPressed: () => tryLogin(newHomeserver!).onError(showError),
               ),
             );
           } else {

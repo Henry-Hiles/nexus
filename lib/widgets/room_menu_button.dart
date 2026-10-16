@@ -1,5 +1,7 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:material_ui/material_ui.dart";
+import "package:nexus/helpers/extensions/get_localpart.dart";
+import "package:nexus/helpers/extensions/with_progress_snackbar.dart";
 import "package:nexus/helpers/extensions/show_adaptive_sheet.dart";
 import "package:nexus/widgets/sheet_layout.dart";
 import "package:flutter/services.dart";
@@ -58,7 +60,7 @@ final class const RoomMenuButton(
                   final userIdController = useTextEditingController();
                   final reasonController = useTextEditingController();
                   final text = useValueListenable(userIdController).text.trim();
-                  final valid = RegExp(r"^@[^:\s]+:[^\s]+$").hasMatch(text);
+                  final valid = text.isValidUserId;
 
                   void submit() {
                     if (!valid) return;
@@ -130,19 +132,12 @@ final class const RoomMenuButton(
                     child: Text("Cancel"),
                   ),
                   TextButton(
-                    onPressed: () async {
+                    onPressed: () {
+                      context.withProgressSnackbar(
+                        "Leaving room...",
+                        () => client.leaveRoom(room!.metadata!.id),
+                      );
                       Navigator.of(context).pop();
-                      final snackbar = ScaffoldMessenger.of(context)
-                          .showSnackBar(
-                            .new(
-                              content: Text("Leaving room..."),
-                              duration: Duration(days: 1),
-                            ),
-                          );
-                      await client
-                          .leaveRoom(room!.metadata!.id)
-                          .onError(showError)
-                          .whenComplete(snackbar.close);
                     },
                     child: Text("Leave"),
                   ),

@@ -7,7 +7,7 @@ import "package:m3e_card_list/m3e_card_list.dart";
 import "package:navigation_rail_m3e/navigation_rail_m3e.dart";
 import "package:nexus/controllers/settings_sections.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
-import "package:nexus/helpers/extensions/show_about_dialog.dart";
+import "package:nexus/helpers/extensions/show_about_sheet.dart";
 import "package:nexus/widgets/pages/settings_category.dart";
 import "package:nexus/widgets/divider_text.dart";
 import "package:nexus/widgets/highlight_wrapper.dart";
@@ -106,7 +106,7 @@ class const SettingsPage({super.key}) extends ConsumerWidget {
             actionsPadding: .symmetric(horizontal: 12),
             actions: [
               IconButton(
-                onPressed: () => context.showAboutDialog(ref),
+                onPressed: () => context.showAboutSheet(ref),
                 icon: Icon(Icons.info_outline),
               ),
             ],

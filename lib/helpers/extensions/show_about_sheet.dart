@@ -7,8 +7,8 @@ import "package:m3e_card_list/m3e_card_list.dart";
 import "package:nexus/helpers/launch_helper.dart";
 import "package:package_info_plus/package_info_plus.dart";
 
-extension ShowAboutDialog on BuildContext {
-  Future<void> showAboutDialog(WidgetRef ref) async {
+extension ShowAboutSheet on BuildContext {
+  Future<void> showAboutSheet(WidgetRef ref) async {
     final packageInfo = await PackageInfo.fromPlatform();
 
     if (mounted) {
