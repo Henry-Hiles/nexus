@@ -284,75 +284,81 @@ class const RoomsPane({super.key}) extends ConsumerWidget {
                   ),
                 ],
               ),
-              child: NavigationRailM3E(
-                fab: selectedSpace.room == null
-                    ? null
-                    : .new(
-                        icon: const Icon(Icons.explore),
-                        label: "Browse space",
-                        tooltip: "Browse and join rooms in this space",
-                        onPressed: () => context.showAdaptiveSheet(
-                          (_) => SpaceHierarchySheet(selectedSpace.id),
+              child: Padding(
+                padding: const .only(top: 4),
+                child: NavigationRailM3E(
+                  fab: selectedSpace.room == null
+                      ? null
+                      : .new(
+                          icon: const Icon(Icons.explore),
+                          label: "Browse space",
+                          tooltip: "Browse and join rooms in this space",
+                          onPressed: () => context.showAdaptiveSheet(
+                            (_) => SpaceHierarchySheet(selectedSpace.id),
+                          ),
                         ),
-                      ),
-                expandedWidth: double.infinity,
-                scrollable: true,
-                background: Colors.transparent,
-                type: .alwaysExpand,
-                selectedIndex: max(
-                  0,
-                  selectedSpace.allChildRooms.indexWhere(
-                    (room) => room.metadata?.id == selectedRoomId,
-                  ),
-                ),
-                sections: [
-                  .new(
-                    header: selectedSpace.room == null
-                        ? null
-                        : const DividerWidget(Text("Rooms")),
-                    destinations: selectedSpace.children.toDestinations(
-                      isDm: isDm,
+                  expandedWidth: double.infinity,
+                  scrollable: true,
+                  background: Colors.transparent,
+                  type: .alwaysExpand,
+                  selectedIndex: max(
+                    0,
+                    selectedSpace.allChildRooms.indexWhere(
+                      (room) => room.metadata?.id == selectedRoomId,
                     ),
                   ),
-                  ...selectedSpace.subSpaces.map(
-                    (subSpace) => NavigationRailM3ESection(
-                      header: DividerWidget(
-                        Row(
-                          mainAxisSize: .min,
-                          spacing: 8,
-                          children: [
-                            if (subSpace.room.metadata?.avatar != null)
-                              AvatarOrHash(
-                                subSpace.room.metadata?.avatar,
-                                subSpace.room.metadata?.name ?? "Unnamed Room",
-                                dimension: 16,
-                              ),
-                            Flexible(
-                              child: Text(
-                                subSpace.room.metadata?.name ?? "Unnamed Space",
-                                maxLines: 1,
-                                overflow: .ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      destinations: subSpace.children.toDestinations(
+                  sections: [
+                    .new(
+                      header: selectedSpace.room == null
+                          ? null
+                          : const DividerWidget(Text("Rooms")),
+                      destinations: selectedSpace.children.toDestinations(
                         isDm: isDm,
                       ),
                     ),
-                  ),
-                ],
-                onDestinationSelected: (value) {
-                  ref
-                      .read(
-                        KeyController.provider(KeyController.roomKey).notifier,
-                      )
-                      .set(selectedSpace.allChildRooms[value].metadata?.id);
-                  if (Navigator.of(context).canPop()) {
-                    Navigator.of(context).pop();
-                  }
-                },
+                    ...selectedSpace.subSpaces.map(
+                      (subSpace) => NavigationRailM3ESection(
+                        header: DividerWidget(
+                          Row(
+                            mainAxisSize: .min,
+                            spacing: 8,
+                            children: [
+                              if (subSpace.room.metadata?.avatar != null)
+                                AvatarOrHash(
+                                  subSpace.room.metadata?.avatar,
+                                  subSpace.room.metadata?.name ??
+                                      "Unnamed Room",
+                                  dimension: 16,
+                                ),
+                              Flexible(
+                                child: Text(
+                                  subSpace.room.metadata?.name ??
+                                      "Unnamed Space",
+                                  maxLines: 1,
+                                  overflow: .ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        destinations: subSpace.children.toDestinations(
+                          isDm: isDm,
+                        ),
+                      ),
+                    ),
+                  ],
+                  onDestinationSelected: (value) {
+                    ref
+                        .read(
+                          KeyController.provider(KeyController.roomKey)
+                              .notifier,
+                        )
+                        .set(selectedSpace.allChildRooms[value].metadata?.id);
+                    if (Navigator.of(context).canPop()) {
+                      Navigator.of(context).pop();
+                    }
+                  },
+                ),
               ),
             );
           },
