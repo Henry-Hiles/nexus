@@ -55,18 +55,21 @@ final class const RoomMenuButton(
               builder: (context) => HookBuilder(
                 builder: (context) {
                   final userIdController = useTextEditingController();
+                  final reasonController = useTextEditingController();
                   final text = useValueListenable(userIdController).text.trim();
                   final valid = RegExp(r"^@[^:\s]+:[^\s]+$").hasMatch(text);
 
                   void submit() {
                     if (!valid) return;
                     Navigator.of(context).pop();
+                    final reason = reasonController.text.trim();
                     client
                         .setMembership(
                           .new(
                             userId: text,
                             roomId: room!.metadata!.id,
                             action: .invite,
+                            reason: reason.isEmpty ? null : reason,
                           ),
                         )
                         .onError(showError);
@@ -74,18 +77,32 @@ final class const RoomMenuButton(
 
                   return AlertDialog(
                     title: Text("Invite User"),
-                    content: TextField(
-                      controller: userIdController,
-                      autofocus: true,
-                      keyboardType: .emailAddress,
-                      onSubmitted: (_) => submit(),
-                      decoration: .new(
-                        labelText: "User ID",
-                        hintText: "@user:example.com",
-                        errorText: text.isEmpty || valid
-                            ? null
-                            : "Enter a valid user ID",
-                      ),
+                    content: Column(
+                      mainAxisSize: .min,
+                      spacing: 12,
+                      children: [
+                        TextField(
+                          controller: userIdController,
+                          autofocus: true,
+                          keyboardType: .emailAddress,
+                          onSubmitted: (_) => submit(),
+                          decoration: .new(
+                            labelText: "User ID",
+                            hintText: "@user:example.com",
+                            errorText: text.isEmpty || valid
+                                ? null
+                                : "Enter a valid user ID",
+                          ),
+                        ),
+                        TextField(
+                          controller: reasonController,
+                          textCapitalization: .sentences,
+                          onSubmitted: (_) => submit(),
+                          decoration: const .new(
+                            labelText: "Invite reason (optional)",
+                          ),
+                        ),
+                      ],
                     ),
                     actions: [
                       TextButton(

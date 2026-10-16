@@ -61,6 +61,13 @@ class const RoomSummaryDialog(
               ),
               subtitle: SelectableText(invitedBy),
             ),
+          if (summary.inviteReason case final reason?)
+            ListTile(
+              titleAlignment: ListTileTitleAlignment.titleHeight,
+              leading: const Icon(Icons.format_quote),
+              title: const Text("Invite reason"),
+              subtitle: SelectableText(reason),
+            ),
           // Invite state never includes the member count
           if (summary.joinedMembers != null || !isInvite)
             ListTile(
@@ -70,23 +77,23 @@ class const RoomSummaryDialog(
               leading: Icon(Icons.people),
             ),
           ListTile(
-            title: SelectableText(summary.canonicalAlias ?? summary.roomId),
+            title: Text(
+              summary.canonicalAlias == null ? "Room ID" : "Canonical Alias",
+            ),
+            subtitle: SelectableText(summary.canonicalAlias ?? summary.roomId),
             leading: Icon(Icons.numbers),
           ),
           if (summary.topic != null)
             ListTile(
-              titleAlignment: ListTileTitleAlignment.titleHeight,
-              title: LinkifiedText(
-                summary.topic!,
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
+              title: Text("Topic"),
+              subtitle: LinkifiedText(summary.topic!),
               leading: Icon(Icons.info),
             ),
           if (summary.encryption != null)
             ListTile(title: Text("Encrypted"), leading: Icon(Icons.lock)),
           if (summary.worldReadable == true)
             ListTile(
-              title: Text("Anyone can read the history"),
+              title: Text("Anyone can read room history"),
               leading: Icon(Icons.public),
             ),
         ],

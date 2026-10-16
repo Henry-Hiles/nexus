@@ -124,7 +124,6 @@ class const InviteCard(final RoomSummary invite, {super.key})
           [
             if (inviterName != null)
               "${invite.isDirect ? "Direct message from" : "Invited by"} $inviterName",
-            ?invite.topic,
           ].join("\n"),
           maxLines: 2,
           overflow: .ellipsis,

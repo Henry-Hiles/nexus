@@ -31,6 +31,9 @@ class const RoomSummary({
   /// Who invited the current user, for invites.
   @JsonKey(includeFromJson: false) final String? invitedBy,
 
+  /// The reason given for the invite, if any.
+  @JsonKey(includeFromJson: false) final String? inviteReason,
+
   /// The inviter's membership, for their display name and avatar.
   @JsonKey(includeFromJson: false) final MembershipContent? inviterProfile,
 

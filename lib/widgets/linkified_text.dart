@@ -10,14 +10,17 @@ final class const LinkifiedText(
   super.key,
 }) extends ConsumerWidget {
   @override
-  Widget build(BuildContext context, WidgetRef ref) => Linkify(
-    text: text,
-    maxLines: maxLines,
-    style: style,
-    options: .new(humanize: false),
-    onOpen: (link) =>
-        ref.read(LaunchHelper.provider).launchUrl(.parse(link.url)),
-    linkStyle: .new(color: Theme.of(context).colorScheme.primary),
-    overflow: maxLines == null ? null : .ellipsis,
-  );
+  Widget build(BuildContext context, WidgetRef ref) =>
+      MaterialUiCompatibilityBridge(
+        child: Linkify(
+          text: text,
+          maxLines: maxLines,
+          style: style,
+          options: .new(humanize: false),
+          onOpen: (link) =>
+              ref.read(LaunchHelper.provider).launchUrl(.parse(link.url)),
+          linkStyle: .new(color: Theme.of(context).colorScheme.primary),
+          overflow: maxLines == null ? null : .ellipsis,
+        ),
+      );
 }

@@ -59,8 +59,13 @@ class InvitesController extends Notifier<IList<RoomSummary>> {
             summary.copyWith(
               worldReadable: historyVisibility == .worldReadable,
             ),
-          MembershipContent(:final isDirect) when event.stateKey == userId =>
-            summary.copyWith(invitedBy: event.sender, isDirect: isDirect),
+          MembershipContent(:final isDirect, :final reason)
+              when event.stateKey == userId =>
+            summary.copyWith(
+              invitedBy: event.sender,
+              inviteReason: reason,
+              isDirect: isDirect,
+            ),
           _ => summary,
         },
       );
