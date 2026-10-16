@@ -5,6 +5,7 @@ import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:media_kit/media_kit.dart";
 import "package:nexus/controllers/client.dart";
+import "package:nexus/helpers/extensions/save_attachment.dart";
 import "package:nexus/models/info/audio.dart";
 import "package:nexus/widgets/players/player_controls.dart";
 
@@ -12,6 +13,7 @@ class const AudioPlayer(
   final Uri uri,
   final AudioInfo? info, {
   final bool encrypted = false,
+  final String? filename,
   super.key,
 }) extends HookConsumerWidget {
   @override
@@ -38,8 +40,24 @@ class const AudioPlayer(
       child: Card(
         color: Theme.of(context).colorScheme.surfaceContainer,
         child: Padding(
-          padding: .only(left: 8, right: 16),
-          child: PlayerControls(player, loading: !loaded.value),
+          padding: .symmetric(horizontal: 8),
+          child: PlayerControls(
+            player,
+            loading: !loaded.value,
+            actions: .new([
+              SizedBox(width: 4),
+              IconButton(
+                onPressed: () => context.saveAttachment(
+                  ref,
+                  uri,
+                  encrypted: encrypted,
+                  filename: filename,
+                ),
+                tooltip: "Download",
+                icon: Icon(Icons.download),
+              ),
+            ]),
+          ),
         ),
       ),
     );

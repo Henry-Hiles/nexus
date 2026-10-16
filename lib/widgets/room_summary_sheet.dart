@@ -30,6 +30,7 @@ class const RoomSummarySheet(
           if (summary.avatarUrl != null)
             ExpandableImage(
               summary.avatarUrl == null ? null : .new(mxc: summary.avatarUrl!),
+              downloadFilename: name,
               child: AvatarOrHash(
                 summary.avatarUrl,
                 "",

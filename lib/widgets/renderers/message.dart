@@ -110,14 +110,53 @@ class const MessageRenderer(
                 ConstrainedBox(
                   constraints: .loose(.square(500)),
                   child: switch (event.content) {
-                    VideoMessageContent(:final info, :final file) =>
-                      VideoPlayer(url, info, encrypted: file != null),
-                    AudioMessageContent(:final info, :final file) =>
-                      AudioPlayer(url, info, encrypted: file != null),
-                    FileMessageContent(:final info, :final filename) =>
-                      FileCard(url, info, filename: filename),
-                    ImageMessageContent(:final info, :final file) =>
-                      MessageImage(url, info: info, encrypted: file != null),
+                    VideoMessageContent(
+                      :final info,
+                      :final file,
+                      :final filename,
+                      :final body,
+                    ) =>
+                      VideoPlayer(
+                        url,
+                        info,
+                        encrypted: file != null,
+                        filename: filename ?? body,
+                      ),
+                    AudioMessageContent(
+                      :final info,
+                      :final file,
+                      :final filename,
+                      :final body,
+                    ) =>
+                      AudioPlayer(
+                        url,
+                        info,
+                        encrypted: file != null,
+                        filename: filename ?? body,
+                      ),
+                    FileMessageContent(
+                      :final info,
+                      :final filename,
+                      :final file,
+                    ) =>
+                      FileCard(
+                        url,
+                        info,
+                        filename: filename,
+                        encrypted: file != null,
+                      ),
+                    ImageMessageContent(
+                      :final info,
+                      :final file,
+                      :final filename,
+                      :final body,
+                    ) =>
+                      MessageImage(
+                        url,
+                        info: info,
+                        encrypted: file != null,
+                        filename: filename ?? body,
+                      ),
                     _ => SizedBox.shrink(),
                   },
                 ),

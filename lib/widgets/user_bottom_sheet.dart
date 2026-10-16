@@ -103,6 +103,7 @@ final class const UserBottomSheet(
 
             ExpandableImage(
               member.avatarUrl == null ? null : .new(mxc: member.avatarUrl!),
+              downloadFilename: member.displayName ?? userId.localpart,
               child: AvatarOrHash(
                 member.avatarUrl,
                 member.displayName ?? userId.localpart,

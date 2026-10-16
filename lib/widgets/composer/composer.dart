@@ -1,7 +1,6 @@
 import "dart:io";
 
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
-import "package:file_selector/file_selector.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/widgets/emoji_picker.dart";
 import "package:nexus/helpers/extensions/show_adaptive_sheet.dart";
@@ -13,6 +12,7 @@ import "package:fluttertagger/fluttertagger.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/attachment.dart";
 import "package:nexus/controllers/image_picker.dart";
+import "package:nexus/helpers/file_dialog_helper.dart";
 import "package:image_picker/image_picker.dart";
 import "package:nexus/controllers/power_level.dart";
 import "package:nexus/models/content/message.dart";
@@ -245,14 +245,24 @@ class const Composer(
                                       leading: Icon(icon),
                                     ),
                                     onTap: () => attach(
-                                      ref
-                                          .read(ImagePickerController.provider)
-                                          .pickImage(source: source),
+                                      source == .gallery
+                                          ? ref
+                                                .read(FileDialogHelper.provider)
+                                                .pickFile(images: true)
+                                          : ref
+                                                .read(
+                                                  ImagePickerController
+                                                      .provider,
+                                                )
+                                                .pickImage(source: source),
                                     ).onError(showError),
                                   ),
                                 PopupMenuItem(
-                                  onTap: () =>
-                                      attach(openFile()).onError(showError),
+                                  onTap: () => attach(
+                                    ref
+                                        .read(FileDialogHelper.provider)
+                                        .pickFile(),
+                                  ).onError(showError),
                                   child: ListTile(
                                     title: Text("Files"),
                                     leading: Icon(Icons.attachment),

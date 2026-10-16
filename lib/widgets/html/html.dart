@@ -79,6 +79,7 @@ class const Html(
                   alignment: PlaceholderAlignment.middle,
                   child: ExpandableImage(
                     .new(mxc: src),
+                    downloadFilename: src.pathSegments.last,
                     child: Image(
                       image: MxcImage(ref, .new(mxc: src)),
                       errorBuilder: (_, error, _) => Text(

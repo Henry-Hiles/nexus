@@ -11,6 +11,7 @@ final class const MessageImage(
   final Uri url, {
   final i.ImageInfo? info,
   required final bool encrypted,
+  final String? filename,
   super.key,
 }) extends ConsumerWidget {
   @override
@@ -18,6 +19,7 @@ final class const MessageImage(
     final request = DownloadMediaRequest(mxc: url, encrypted: encrypted);
     return ExpandableImage(
       request,
+      downloadFilename: filename,
       child: ClipRRect(
         borderRadius: .all(.circular(8)),
         child: AspectRatio(

@@ -236,6 +236,8 @@ class const SpaceHierarchySheet(final String spaceId, {super.key})
                   if (space?.avatarUrl case final avatarUrl?)
                     ExpandableImage(
                       .new(mxc: avatarUrl),
+                      downloadFilename:
+                          space?.name ?? space?.canonicalAlias ?? spaceId,
                       child: AvatarOrHash(avatarUrl, "", dimension: 32),
                     ),
                   Expanded(

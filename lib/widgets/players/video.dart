@@ -3,6 +3,7 @@ import "dart:async";
 import "package:material_ui/material_ui.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/client.dart";
+import "package:nexus/helpers/extensions/save_attachment.dart";
 import "package:nexus/models/info/video.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:media_kit/media_kit.dart";
@@ -13,6 +14,7 @@ class const VideoPlayer(
   final Uri uri,
   final VideoInfo? info, {
   final bool encrypted = false,
+  final String? filename,
   super.key,
 }) extends HookConsumerWidget {
   @override
@@ -59,6 +61,24 @@ class const VideoPlayer(
                         child: GestureDetector(
                           behavior: .opaque,
                           onTap: loaded.value ? player.playOrPause : null,
+                        ),
+                      ),
+                      Positioned(
+                        top: 4,
+                        right: 4,
+                        child: IconButton(
+                          onPressed: () => context.saveAttachment(
+                            ref,
+                            uri,
+                            encrypted: encrypted,
+                            filename: filename,
+                          ),
+                          color: Colors.white,
+                          style: IconButton.styleFrom(
+                            backgroundColor: Colors.black38,
+                          ),
+                          tooltip: "Download",
+                          icon: Icon(Icons.download),
                         ),
                       ),
                       Positioned(
