@@ -38,14 +38,14 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
     - [x] Reading, showing unread
         - [x] Mark as read button on rooms and spaces
     - [ ] Searching
-    - [ ] Creating (Rooms, Spaces, and DMs)
+    - [x] Creating (Rooms, Spaces, and DMs)
     - [x] Joining
         - [x] Parse vias
         - [x] Using a text/uri/link
             - [x] Plain text
             - [x] `matrix:` Uri
             - [x] Matrix.to link
-        - [ ] From space
+        - [x] From space
         - [ ] From directory
     - [x] Leaving
     - [x] Subspaces
