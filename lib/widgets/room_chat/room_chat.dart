@@ -143,7 +143,7 @@ final class const RoomChat({
       highlightedEvent.value = rowId;
 
       await scroll.jumpToEvent(rowId);
-      await Future.delayed(.new(milliseconds: 700), () {
+      await Future.delayed(Durations.extralong1, () {
         if (highlightedEvent.value == rowId) {
           highlightedEvent.value = null;
         }
@@ -240,7 +240,7 @@ final class const RoomChat({
                               ignoring: scroll.atBottom,
                               child: AnimatedOpacity(
                                 opacity: scroll.atBottom ? 0 : 1,
-                                duration: const Duration(milliseconds: 200),
+                                duration: Durations.short4,
                                 child: FloatingActionButton.small(
                                   onPressed: scroll.jumpToBottom,
                                   child: const Icon(Icons.keyboard_arrow_down),

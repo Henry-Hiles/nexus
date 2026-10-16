@@ -13,7 +13,7 @@ final class const HighlightWrapper(
       color: isHighlighted
           ? Theme.of(context).colorScheme.onSurface.withAlpha(50)
           : Colors.transparent,
-      duration: .new(milliseconds: 250),
+      duration: Durations.medium1,
       child: Material(color: Colors.transparent, child: child),
     ),
   );

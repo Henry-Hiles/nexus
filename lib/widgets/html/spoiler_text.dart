@@ -9,7 +9,7 @@ class const SpoilerText(final String text, {super.key}) extends HookWidget {
     return InkWell(
       onTap: () => revealed.value = !revealed.value,
       child: AnimatedContainer(
-        duration: const .new(milliseconds: 100),
+        duration: Durations.short2,
         padding: const .symmetric(horizontal: 4, vertical: 2),
         decoration: BoxDecoration(
           color: revealed.value ? Colors.transparent : Colors.blueGrey,

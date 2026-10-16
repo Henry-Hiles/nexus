@@ -53,7 +53,7 @@ class const ResetEncryptionSheet({
                     final recoveryKey = await ref
                         .read(ClientController.provider.notifier)
                         .generateRecoveryKey(
-                          passphrase: usePassphrase.value ? passphrase : "",
+                          usePassphrase.value ? passphrase : "",
                         );
                     if (!context.mounted) return;
 

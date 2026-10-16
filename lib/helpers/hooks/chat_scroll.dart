@@ -67,7 +67,7 @@ final class ChatScroll({
           await Scrollable.ensureVisible(
             context!,
             alignment: 0.5,
-            duration: const .new(milliseconds: 700),
+            duration: Durations.extralong1,
             curve: Curves.easeInOut,
           );
         }
@@ -179,7 +179,7 @@ final class ChatScroll({
           await Scrollable.ensureVisible(
             context,
             alignment: 0.5,
-            duration: const .new(milliseconds: 700),
+            duration: Durations.extralong1,
             curve: Curves.easeInOut,
           );
           return;
@@ -203,7 +203,7 @@ final class ChatScroll({
 
         await scrollController.animateTo(
           scrollController.position.minScrollExtent,
-          duration: const .new(milliseconds: 700),
+          duration: Durations.extralong1,
           curve: Curves.easeInOut,
         );
       },

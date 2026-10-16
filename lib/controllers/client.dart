@@ -191,10 +191,9 @@ class ClientController extends AsyncNotifier<int> {
     }
   }
 
-  Future<RecoveryKey> generateRecoveryKey({String passphrase = ""}) async =>
-      .fromJson(
-        await _sendCommand("generate_recovery_key", {"passphrase": passphrase}),
-      );
+  Future<RecoveryKey> generateRecoveryKey(String passphrase) async => .fromJson(
+    await _sendCommand("generate_recovery_key", {"passphrase": passphrase}),
+  );
 
   Future<void> resetEncryption(RecoveryKey key) =>
       _sendCommand("reset_encryption", key.toJson());

@@ -31,10 +31,10 @@ class const SettingsCategoryPage(
           index: initialHighlight!,
           scrollController: scrollController,
           alignment: 0.5,
-          duration: (_) => .new(milliseconds: 700),
+          duration: (_) => Durations.extralong1,
           curve: (_) => Curves.easeInOut,
         );
-        timer = Timer(.new(seconds: 1), () {
+        timer = Timer(Durations.extralong4, () {
           highlight.value = null;
         });
         listController.value.removeListener(listener);

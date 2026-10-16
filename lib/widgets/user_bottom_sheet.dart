@@ -233,13 +233,9 @@ final class const UserBottomSheet(
                           shape: .square,
                           icon: Icon(Icons.sports_martial_arts),
                           label: Text("Kick"),
-                          decoration: .new(
-                            backgroundColor: WidgetStatePropertyAll(
-                              theme.colorScheme.error,
-                            ),
-                            foregroundColor: WidgetStatePropertyAll(
-                              theme.colorScheme.onError,
-                            ),
+                          decoration: .styleFrom(
+                            backgroundColor: theme.colorScheme.error,
+                            foregroundColor: theme.colorScheme.onError,
                           ),
                         ),
 
@@ -248,13 +244,9 @@ final class const UserBottomSheet(
                         shape: .square,
                         icon: Icon(Icons.gavel),
                         label: Text("Ban"),
-                        decoration: .new(
-                          backgroundColor: WidgetStatePropertyAll(
-                            theme.colorScheme.errorContainer,
-                          ),
-                          foregroundColor: WidgetStatePropertyAll(
-                            theme.colorScheme.onErrorContainer,
-                          ),
+                        decoration: .styleFrom(
+                          backgroundColor: theme.colorScheme.errorContainer,
+                          foregroundColor: theme.colorScheme.onErrorContainer,
                         ),
                       ),
                     ].map((e) => Expanded(child: e)).toList(),

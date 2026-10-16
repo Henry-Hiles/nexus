@@ -81,11 +81,11 @@ class const SettingsPage({super.key}) extends ConsumerWidget {
                       index: match.$1.$2,
                       scrollController: scrollController,
                       alignment: 0.5,
-                      duration: (_) => .new(milliseconds: 700),
+                      duration: (_) => Durations.extralong1,
                       curve: (_) => Curves.easeInOut,
                     );
                     highlightedMatch.value = match.$1;
-                    await Future.delayed(.new(seconds: 1), () {
+                    await Future.delayed(Durations.extralong4, () {
                       if (highlightedMatch.value == match.$1) {
                         highlightedMatch.value = null;
                       }

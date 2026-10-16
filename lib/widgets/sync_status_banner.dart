@@ -42,7 +42,7 @@ class const SyncStatusBanner({super.key}) extends ConsumerWidget {
           ];
 
     return AnimatedSize(
-      duration: const .new(milliseconds: 200),
+      duration: Durations.short4,
       alignment: .topCenter,
       child: banner == null
           ? const SizedBox(width: double.infinity)
