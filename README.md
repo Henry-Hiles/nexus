@@ -119,7 +119,11 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
 
 ## Try it out
 
-If you want to try out Nexus, grab one of the following artifacts from CI:
+If you want to try out Nexus, download the [latest release](https://git.federated.nexus/Nexus/nexus/releases/latest).
+
+### Nightly Builds
+
+For the newest changes, grab one of the following nightly artifacts, built by CI from the latest commit on `main`.
 
 - [Android APK](https://nightly.link/Henry-Hiles/nexus/workflows/android/main/APK.zip)
 - [Unsigned iOS IPA](https://nightly.link/Henry-Hiles/nexus/workflows/ios/main/Nexus.ipa.zip)
@@ -128,7 +132,7 @@ If you want to try out Nexus, grab one of the following artifacts from CI:
 
 Or, use one of the below methods:
 
-### Flatpak
+### Nightly Flatpak Repo
 
 Make sure Flatpak is set up on your system, then run:
 
@@ -147,6 +151,12 @@ nexus = {
   url = "git+https://git.federated.nexus/Nexus/nexus";
   inputs.nixpkgs.follows = "nixpkgs";
 };
+```
+
+This tracks the latest commit on `main`. To stay on a release instead, pin the input to its tag:
+
+```nix
+url = "git+https://git.federated.nexus/Nexus/nexus?ref=refs/tags/v1.0.0-alpha1";
 ```
 
 Then import the module and enable it in your NixOS configuration:
