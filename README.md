@@ -159,7 +159,7 @@ Development instructions can be found in [DEVELOPMENT.md](./DEVELOPMENT.md).
 
 Join the [Nexus Client Matrix room](https://matrix.to/#/#nexus:federated.nexus) for questions or help with developing or using Nexus Client.
 
-# Credits
+## Credits
 
 Thank you Hylke Bons (https://planetpeanut.studio) for making the amazing icon for Nexus!
 Thank you Tulir Asokan for making [Gomuks](https://github.com/gomuks/gomuks), and helping us integrate it into Nexus!
