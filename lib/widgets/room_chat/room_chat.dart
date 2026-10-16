@@ -7,6 +7,8 @@ import "package:measure_size/measure_size.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/client_state.dart";
 import "package:nexus/controllers/member_list_opened.dart";
+import "package:nexus/controllers/power_level.dart";
+import "package:nexus/controllers/settings.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/controllers/room_chat.dart";
 import "package:nexus/helpers/hooks/chat_scroll.dart";
@@ -171,18 +173,29 @@ final class const RoomChat({
       return null;
     }, [jumpRowId]);
 
+    void onRelation(int rowId, RelationType type) {
+      relatedEvent.value = rowId;
+      relationType.value = type;
+      composerNode.requestFocus();
+    }
+
     IList<PopupMenuEntry> getEventOptions(Event event) =>
         event.buildEventOptions(
           context: context,
           ref: ref,
           roomId: roomId,
           userId: userId,
-          onRelation: (rowId, type) {
-            relatedEvent.value = rowId;
-            relationType.value = type;
-            composerNode.requestFocus();
-          },
+          onRelation: onRelation,
         );
+
+    final swipeToReply = ref.watch(
+      SettingsController.provider.select(
+        (settings) => settings.value?.swipeToReply ?? false,
+      ),
+    );
+    final canReply = ref.watch(
+      PowerLevelController.provider(.new(eventType: .message, roomId: roomId)),
+    );
 
     return Scaffold(
       endDrawer: PinnedEventsDrawer(
@@ -224,6 +237,9 @@ final class const RoomChat({
                                   roomId: roomId,
                                   jumpToEvent: jumpToEvent,
                                   getEventOptions: getEventOptions,
+                                  onSwipe: swipeToReply && canReply
+                                      ? (rowId) => onRelation(rowId, .reply)
+                                      : null,
                                   highlightedEvent: highlightedEvent.value,
                                   composerHeight: composerSize.value,
                                 ),

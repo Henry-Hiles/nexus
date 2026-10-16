@@ -117,6 +117,21 @@ class SettingsSectionsController
                     .onError(showError),
               ),
             ),
+            .new(
+              title: "Swipe To Reply",
+              description: "Swipe a message to the right to reply to it.",
+              icon: Icons.swipe_right,
+              builder: (title, description, icon) => SwitchListTile(
+                title: Text(title),
+                subtitle: Text(description),
+                secondary: Icon(icon),
+                value: settings.swipeToReply,
+                onChanged: (value) => ref
+                    .read(SettingsController.provider.notifier)
+                    .set(settings.copyWith(swipeToReply: value))
+                    .onError(showError),
+              ),
+            ),
             if (!Platform.isAndroid && !Platform.isIOS)
               .new(
                 title: "Show Minimize Button",

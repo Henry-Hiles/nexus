@@ -29,6 +29,7 @@ import "package:nexus/widgets/renderers/message.dart";
 import "package:nexus/widgets/reaction_row.dart";
 import "package:nexus/widgets/renderers/membership.dart";
 import "package:nexus/widgets/renderers/generic_event.dart";
+import "package:nexus/widgets/swipe_to_reply.dart";
 import "package:nexus/widgets/timestamp.dart";
 
 class const EventRenderer(
@@ -39,6 +40,9 @@ class const EventRenderer(
   final int? maxLines,
   final JumpToEvent? jumpToEvent,
   final IList<PopupMenuEntry> Function(Event event)? getEventOptions,
+
+  /// If set, events can be swiped, calling this
+  final VoidCallback? onSwipe,
   super.key,
 }) extends HookConsumerWidget {
   @override
@@ -239,18 +243,21 @@ class const EventRenderer(
                   child: GestureDetector(
                     onSecondaryTapUp: contextMenuCallback,
                     onLongPressStart: contextMenuCallback,
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 8)
-                          .copyWith(top: isGrouped ? 0 : 8),
-                      child: Wrap(
-                        verticalDirection: .up,
-                        spacing: 6,
-                        crossAxisAlignment: .center,
-                        children: [
-                          child,
-                          if (child is! MessageRenderer)
-                            Timestamp(event.timestamp),
-                        ],
+                    child: SwipeToReply(
+                      onSwipe: onSwipe,
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 8)
+                            .copyWith(top: isGrouped ? 0 : 8),
+                        child: Wrap(
+                          verticalDirection: .up,
+                          spacing: 6,
+                          crossAxisAlignment: .center,
+                          children: [
+                            child,
+                            if (child is! MessageRenderer)
+                              Timestamp(event.timestamp),
+                          ],
+                        ),
                       ),
                     ),
                   ),

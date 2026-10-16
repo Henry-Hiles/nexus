@@ -13,6 +13,7 @@ class const ChatTimeline({
   required final IList<PopupMenuEntry> Function(Event) getEventOptions,
   required final int? highlightedEvent,
   required final double composerHeight,
+  final void Function(int rowId)? onSwipe,
   super.key,
 }) extends StatelessWidget {
   Widget eventRow(
@@ -26,6 +27,7 @@ class const ChatTimeline({
       roomId: roomId,
       jumpToEvent: jumpToEvent,
       getEventOptions: getEventOptions,
+      onSwipe: onSwipe == null ? null : () => onSwipe!(eventRowId),
     ),
     key: key,
     isHighlighted: highlightedEvent == eventRowId,
