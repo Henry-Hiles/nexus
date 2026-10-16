@@ -43,7 +43,6 @@ class const MentionChip(final String content, final String? roomId, {super.key})
               if (data case MembershipContent membership) {
                 context.showUserPopover(membership, mention, roomId: roomId);
               } else if (data case RoomSummary summary) {
-                // TODO: This is an extra call that isn't truly needed, get rid of it
                 final eventRowId = linkInfo?.eventId == null
                     ? null
                     : await ref

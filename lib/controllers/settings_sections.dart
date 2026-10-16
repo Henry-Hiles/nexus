@@ -226,8 +226,6 @@ class SettingsSectionsController
                                                 .notifier,
                                           )
                                           .register(value);
-                                    } else {
-                                      // TODO: Handle not granted
                                     }
                                   } else {
                                     await ref

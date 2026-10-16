@@ -13,8 +13,6 @@ class const RegisterPusherRequest({
   required final String deviceDisplayName,
   required final PusherKind kind,
   required final String lang,
-
-  /// TODO: What does this do?
   final String? profileTag,
 
   @JsonKey(name: "pushkey") required final String pushKey,
