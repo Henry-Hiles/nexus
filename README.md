@@ -1,8 +1,5 @@
 # Nexus Client
 
-> [!WARNING]
-> Nexus Client is still in development, and doesn't support everything needed for daily use.
-
 ## Description
 
 A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
@@ -12,110 +9,6 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
 |                                                                                  Dark Mode                                                                                   |                                    Light Mode                                    |
 | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------: |
 | ![Screenshot of Nexus Client in dark mode, showing users talking, with a sidebar showing rooms and spaces, and another sidebar showing members](./assets/screenshotDark.png) | ![The same screenshot as above, but in light mode](./assets/screenshotLight.png) |
-
-## Progress
-
-- [x] Platform Support
-    - [x] Linux
-        - [x] Notifications through UnifiedPush
-    - [x] Windows
-        - [ ] Background notifications
-    - [x] Android
-        - [x] Notifications through UnifiedPush
-        - [x] Notifications through FCM
-    - [x] MacOS
-        - [x] Unsigned .ipa
-        - [ ] App Store
-        - [ ] Background notifications
-    - [x] iOS
-        - [x] Unsigned .ipa
-        - [ ] App Store
-        - [ ] Background notifications
-    - [ ] Web (may not be possible)
-- [x] Login (via OAuth)
-- [x] Rooms / Spaces
-    - [x] Displaying and choosing
-    - [x] Reading, showing unread
-        - [x] Mark as read button on rooms and spaces
-    - [ ] Searching
-    - [x] Creating (Rooms, Spaces, and DMs)
-    - [x] Joining
-        - [x] Parse vias
-        - [x] Using a text/uri/link
-            - [x] Plain text
-            - [x] `matrix:` Uri
-            - [x] Matrix.to link
-        - [x] From space
-        - [ ] From directory
-    - [x] Leaving
-    - [x] Subspaces
-- [x] Messages
-    - [x] Encryption
-        - [x] Restoring crypto identity from a recovery passphrase/key
-    - [x] Sending
-        - [x] Plain text
-        - [x] HTML/Markdown
-        - [x] Replies
-            - [x] Choose ping on/off
-        - [x] Per message profiles
-        - [x] Attachments
-        - [ ] Commands with [MSC4391](https://github.com/matrix-org/matrix-spec-proposals/pull/4391)
-        - [x] Tags
-            - [x] Users
-            - [x] Rooms
-            - [x] Emojis
-        - [ ] Custom emojis/stickers
-        - [ ] GIFs using Gomuks' GIF proxies
-    - [x] Receiving
-        - [x] Plain text
-        - [x] Per message profiles
-        - [x] HTML
-        - [x] URL Previews
-        - [x] Replies
-            - [x] Viewing
-            - [x] Jump to original message
-        - [x] Edits
-        - [x] Attachments
-            - [x] Unencrypted
-            - [x] Encrypted
-            - [x] Blurhashing
-            - [ ] Downloading attachments
-            - [x] Opening attachments in their own view
-        - [ ] Polls
-        - [x] Mentions
-            - [x] Users
-                - [x] Clickable
-            - [x] Rooms
-                - [x] Clickable
-                - [x] Matrix URIs
-                - [x] Matrix.to links
-            - [x] Events
-        - [x] Custom emojis/stickers
-        - [x] History loading
-    - [x] Editing
-    - [x] Deleting
-- [x] Reactions
-- [x] Pins
-    - [x] Displaying
-    - [x] Pinning/Unpinning
-- [ ] Threads
-- [x] Profile popouts
-    - [x] Working actions
-- [x] Copy link to:
-    - [x] Room
-    - [x] Space
-    - [x] Message
-- [ ] Reporting
-    - [x] Events
-    - [ ] Rooms
-- [x] Member list
-    - [x] Sort by power level
-    - [ ] Colors based off of power level
-- [x] Notifications using UnifiedPush ([#35](https://git.federated.nexus/Nexus/nexus/issues/35))
-- [x] Notifications page
-- [ ] Group calls using [MSC4195](https://github.com/matrix-org/matrix-spec-proposals/pull/4195)
-- [x] Invites
-- [x] Settings
 
 ## Try it out
 
