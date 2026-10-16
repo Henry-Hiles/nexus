@@ -28,6 +28,7 @@ import "package:nexus/models/requests/get_event_context.dart";
 import "package:nexus/models/requests/get_mentions.dart";
 import "package:nexus/models/requests/get_related_events.dart";
 import "package:nexus/models/requests/get_room_state.dart";
+import "package:nexus/models/requests/get_space_hierarchy.dart";
 import "package:nexus/models/requests/join_room.dart";
 import "package:nexus/models/profile_response.dart";
 import "package:nexus/models/requests/oauth/exchange_token.dart";
@@ -47,6 +48,7 @@ import "package:nexus/models/requests/upload_media.dart";
 import "package:nexus/models/room.dart";
 import "package:nexus/models/room_metadata.dart";
 import "package:nexus/models/room_summary.dart";
+import "package:nexus/models/space_hierarchy.dart";
 import "package:nexus/models/spec_versions_response.dart";
 import "package:nexus/src/third_party/gomuks.g.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
@@ -193,6 +195,11 @@ class ClientController extends AsyncNotifier<int> {
 
   Future<String> createRoom(CreateRoomRequest request) async =>
       (await _sendCommand("create_room", request.toJson()))["room_id"];
+
+  Future<SpaceHierarchy> getSpaceHierarchy(
+    GetSpaceHierarchyRequest request,
+  ) async =>
+      .fromJson(await _sendCommand("get_space_hierarchy", request.toJson()));
 
   Future<RoomSummary> getRoomSummary(JoinRoomRequest request) async =>
       .fromJson(await _sendCommand("get_room_summary", request.toJson()));

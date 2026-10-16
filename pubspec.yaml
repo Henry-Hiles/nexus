@@ -22,6 +22,14 @@ environment:
     sdk: 3.13.3
 
 dependency_overrides:
+    m3e_design:
+        git:
+            url: https://github.com/Henry-Hiles/material_3_expressive
+            path: packages/m3e_design
+    fab_m3e:
+        git:
+            url: https://github.com/Henry-Hiles/material_3_expressive
+            path: packages/fab_m3e
     dynamic_color: 2.1.0
     unifiedpush_linux:
         git:
@@ -79,6 +87,7 @@ dependencies:
     media_kit_libs_video: 1.0.7
     measure_size: 5.0.2
     m3e_buttons: 1.0.3
+    m3e_design: 0.2.1
     navigation_rail_m3e:
         git:
             url: https://github.com/Henry-Hiles/material_3_expressive

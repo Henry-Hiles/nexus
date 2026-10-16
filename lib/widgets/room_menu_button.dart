@@ -1,7 +1,7 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:material_ui/material_ui.dart";
 import "package:nexus/helpers/extensions/get_localpart.dart";
-import "package:nexus/helpers/extensions/with_progress_snackbar.dart";
+import "package:nexus/helpers/extensions/show_leave_room_sheet.dart";
 import "package:nexus/helpers/extensions/show_adaptive_sheet.dart";
 import "package:nexus/widgets/sheet_layout.dart";
 import "package:flutter/services.dart";
@@ -123,31 +123,9 @@ final class const RoomMenuButton(
             ),
           ),
           PopupMenuItem(
-            onTap: () => context.showAdaptiveSheet(
-              (context) => SheetLayout(
-                title: Text("Leave Room"),
-                actions: [
-                  TextButton(
-                    onPressed: Navigator.of(context).pop,
-                    child: Text("Cancel"),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      context.withProgressSnackbar(
-                        "Leaving room...",
-                        () => client.leaveRoom(room!.metadata!.id),
-                      );
-                      Navigator.of(context).pop();
-                    },
-                    child: Text("Leave"),
-                  ),
-                ],
-                children: [
-                  Text(
-                    "Are you sure you want to leave \"${room!.metadata?.name ?? "Unnamed Room"}\"?",
-                  ),
-                ],
-              ),
+            onTap: () => context.showLeaveRoomSheet(
+              room!.metadata!.id,
+              name: room!.metadata?.name ?? "Unnamed Room",
             ),
             child: ListTile(
               leading: Icon(Icons.logout, color: danger),

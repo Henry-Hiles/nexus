@@ -314,12 +314,13 @@ packages:
     source: hosted
     version: "2.1.0"
   fab_m3e:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
-      name: fab_m3e
-      sha256: e4f5abfa3c8c092005449d56dcac45b85e2dbe9c32789d672c5ed71428e43b59
-      url: "https://pub.dev"
-    source: hosted
+      path: "packages/fab_m3e"
+      ref: HEAD
+      resolved-ref: "35ff1cea8e1a23523428710b27fc5d190ee81e96"
+      url: "https://github.com/Henry-Hiles/material_3_expressive"
+    source: git
     version: "0.1.1"
   fake_async:
     dependency: transitive
@@ -863,12 +864,13 @@ packages:
     source: hosted
     version: "1.0.0"
   m3e_design:
-    dependency: transitive
+    dependency: "direct main"
     description:
-      name: m3e_design
-      sha256: "15ff0ef4c43553d855c5e866a9aee8231d44919fe2bb354b1259337bdfd659b4"
-      url: "https://pub.dev"
-    source: hosted
+      path: "packages/m3e_design"
+      ref: HEAD
+      resolved-ref: "35ff1cea8e1a23523428710b27fc5d190ee81e96"
+      url: "https://github.com/Henry-Hiles/material_3_expressive"
+    source: git
     version: "0.2.1"
   matcher:
     dependency: transitive
@@ -1011,7 +1013,7 @@ packages:
     description:
       path: "packages/navigation_rail_m3e"
       ref: HEAD
-      resolved-ref: da860a413d5cf78b9c9c967215250bcdbfe5191d
+      resolved-ref: "35ff1cea8e1a23523428710b27fc5d190ee81e96"
       url: "https://github.com/Henry-Hiles/material_3_expressive"
     source: git
     version: "0.3.5"

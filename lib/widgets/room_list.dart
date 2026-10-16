@@ -2,6 +2,7 @@ import "dart:math";
 
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:material_ui/material_ui.dart";
+import "package:m3e_design/m3e_design.dart";
 import "package:navigation_rail_m3e/navigation_rail_m3e.dart";
 import "package:nexus/helpers/extensions/get_all_child_rooms.dart";
 import "package:nexus/helpers/extensions/room_destinations.dart";
@@ -16,6 +17,7 @@ import "package:nexus/widgets/error_dialog.dart";
 import "package:nexus/widgets/pages/settings.dart";
 import "package:nexus/widgets/join_sheet.dart";
 import "package:nexus/widgets/room_menu_button.dart";
+import "package:nexus/widgets/space_hierarchy_sheet.dart";
 import "package:nexus/controllers/key.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/controllers/spaces.dart";
@@ -252,74 +254,97 @@ class const RoomsPane({super.key}) extends ConsumerWidget {
       ),
       body: MaterialUiCompatibilityBridge(
         child: Builder(
-          builder: (context) => old_mat.Theme(
-            data: old_mat.Theme.of(context).copyWith(
-              extensions: [
-                NavigationRailM3ETheme(
-                  itemExpandedHeight: 48,
-                  iconLabelGap: 16,
-                ),
-              ],
-            ),
-            child: NavigationRailM3E(
-              expandedWidth: double.infinity,
-              scrollable: true,
-              background: Colors.transparent,
-              type: .alwaysExpand,
-              selectedIndex: max(
-                0,
-                selectedSpace.allChildRooms.indexWhere(
-                  (room) => room.metadata?.id == selectedRoomId,
-                ),
+          builder: (context) {
+            final theme = old_mat.Theme.of(context);
+            return old_mat.Theme(
+              data: theme.copyWith(
+                extensions: [
+                  NavigationRailM3ETheme(
+                    itemExpandedHeight: 48,
+                    iconLabelGap: 16,
+                    sectionHeaderSpacingTop: 0,
+                  ),
+                  // Otherwise the FAB label falls back to Roboto
+                  M3ETheme.defaults(theme.colorScheme).copyWith(
+                    typography: .defaultFor(
+                      theme.brightness,
+                      baseOverride: theme.textTheme,
+                    ),
+                  ),
+                ],
               ),
-              sections: [
-                .new(
-                  header: selectedSpace.room == null
-                      ? null
-                      : const DividerWidget(Text("Rooms")),
-                  destinations: selectedSpace.children.toDestinations(
-                    isDm: isDm,
+              child: NavigationRailM3E(
+                fab: selectedSpace.room == null
+                    ? null
+                    : .new(
+                        icon: const Icon(Icons.explore),
+                        label: "Browse space",
+                        tooltip: "Browse and join rooms in this space",
+                        onPressed: () => context.showAdaptiveSheet(
+                          (_) => SpaceHierarchySheet(selectedSpace.id),
+                        ),
+                      ),
+                expandedWidth: double.infinity,
+                scrollable: true,
+                background: Colors.transparent,
+                type: .alwaysExpand,
+                selectedIndex: max(
+                  0,
+                  selectedSpace.allChildRooms.indexWhere(
+                    (room) => room.metadata?.id == selectedRoomId,
                   ),
                 ),
-                ...selectedSpace.subSpaces.map(
-                  (subSpace) => NavigationRailM3ESection(
-                    header: DividerWidget(
-                      Row(
-                        mainAxisSize: .min,
-                        spacing: 8,
-                        children: [
-                          if (subSpace.room.metadata?.avatar != null)
-                            AvatarOrHash(
-                              subSpace.room.metadata?.avatar,
-                              subSpace.room.metadata?.name ?? "Unnamed Room",
-                              dimension: 16,
+                sections: [
+                  .new(
+                    header: selectedSpace.room == null
+                        ? null
+                        : const DividerWidget(Text("Rooms")),
+                    destinations: selectedSpace.children.toDestinations(
+                      isDm: isDm,
+                    ),
+                  ),
+                  ...selectedSpace.subSpaces.map(
+                    (subSpace) => NavigationRailM3ESection(
+                      header: DividerWidget(
+                        Row(
+                          mainAxisSize: .min,
+                          spacing: 8,
+                          children: [
+                            if (subSpace.room.metadata?.avatar != null)
+                              AvatarOrHash(
+                                subSpace.room.metadata?.avatar,
+                                subSpace.room.metadata?.name ?? "Unnamed Room",
+                                dimension: 16,
+                              ),
+                            Flexible(
+                              child: Text(
+                                subSpace.room.metadata?.name ?? "Unnamed Space",
+                                maxLines: 1,
+                                overflow: .ellipsis,
+                              ),
                             ),
-                          Flexible(
-                            child: Text(
-                              subSpace.room.metadata?.name ?? "Unnamed Space",
-                              maxLines: 1,
-                              overflow: .ellipsis,
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
+                      ),
+                      destinations: subSpace.children.toDestinations(
+                        isDm: isDm,
                       ),
                     ),
-                    destinations: subSpace.children.toDestinations(isDm: isDm),
                   ),
-                ),
-              ],
-              onDestinationSelected: (value) {
-                ref
-                    .read(
-                      KeyController.provider(KeyController.roomKey).notifier,
-                    )
-                    .set(selectedSpace.allChildRooms[value].metadata?.id);
-                if (Navigator.of(context).canPop()) {
-                  Navigator.of(context).pop();
-                }
-              },
-            ),
-          ),
+                ],
+                onDestinationSelected: (value) {
+                  ref
+                      .read(
+                        KeyController.provider(KeyController.roomKey).notifier,
+                      )
+                      .set(selectedSpace.allChildRooms[value].metadata?.id);
+                  if (Navigator.of(context).canPop()) {
+                    Navigator.of(context).pop();
+                  }
+                },
+              ),
+            );
+          },
         ),
       ),
     );
