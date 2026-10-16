@@ -13,6 +13,9 @@ final class const Appbar({
   final double? scrolledUnderElevation,
   final IList<Widget> actions = const .empty(),
   final VoidCallback? onTap,
+
+  /// Whether to show the minimize, maximize and close buttons on desktop.
+  final bool windowControls = true,
   super.key,
 }) extends ConsumerWidget implements PreferredSizeWidget {
   @override
@@ -50,7 +53,7 @@ final class const Appbar({
         flexibleSpace: GestureDetector(onDoubleTap: maximize),
         actions: [
           ...actions,
-          if (!(Platform.isAndroid || Platform.isIOS)) ...[
+          if (windowControls && !(Platform.isAndroid || Platform.isIOS)) ...[
             if (ref
                     .watch(SettingsController.provider)
                     .whenOrNull(

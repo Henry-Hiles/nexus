@@ -9,6 +9,8 @@ import "package:nexus/helpers/extensions/room_destinations.dart";
 import "package:nexus/helpers/extensions/show_adaptive_sheet.dart";
 import "package:nexus/widgets/adaptive_menu_button.dart";
 import "package:nexus/models/nav_page.dart";
+import "package:nexus/widgets/appbar.dart";
+import "package:nexus/widgets/room_title.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/widgets/create_room_sheet.dart";
 import "package:nexus/widgets/start_dm_sheet.dart";
@@ -16,6 +18,7 @@ import "package:nexus/widgets/divider_widget.dart";
 import "package:nexus/widgets/error_dialog.dart";
 import "package:nexus/widgets/pages/settings.dart";
 import "package:nexus/widgets/join_sheet.dart";
+import "package:nexus/widgets/room_summary_sheet.dart";
 import "package:nexus/widgets/room_menu_button.dart";
 import "package:nexus/widgets/space_hierarchy_sheet.dart";
 import "package:nexus/controllers/key.dart";
@@ -232,25 +235,33 @@ class const RoomsPane({super.key}) extends ConsumerWidget {
       }),
     );
     final isDm = selectedSpace.id == "dms";
+    final spaceMetadata = selectedSpace.room?.metadata;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
-      appBar: AppBar(
+      appBar: Appbar(
+        // Home and DMs aren't real spaces, so they don't have a summary.
+        onTap: spaceMetadata == null
+            ? null
+            : () => context.showAdaptiveSheet(
+                (_) => RoomSummarySheet(.fromMetadata(spaceMetadata)),
+              ),
+        windowControls: false,
         leading: AvatarOrHash(
-          selectedSpace.room?.metadata?.avatar,
+          spaceMetadata?.avatar,
           fallback: selectedSpace.icon == null
               ? null
               : Icon(selectedSpace.icon),
           selectedSpace.title,
         ),
-        title: Text(selectedSpace.title, overflow: .ellipsis),
+        title: RoomTitle(selectedSpace.title, topic: spaceMetadata?.topic),
         backgroundColor: Colors.transparent,
-        actions: [
+        actions: .new([
           RoomMenuButton(
             selectedSpace.room,
             children: selectedSpace.allChildRooms,
           ),
-        ],
+        ]),
       ),
       body: MaterialUiCompatibilityBridge(
         child: Builder(

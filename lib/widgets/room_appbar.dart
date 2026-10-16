@@ -7,6 +7,7 @@ import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/widgets/count_badge.dart";
 import "package:nexus/widgets/room_menu_button.dart";
 import "package:nexus/widgets/room_summary_sheet.dart";
+import "package:nexus/widgets/room_title.dart";
 import "package:nexus/widgets/sidebar.dart";
 
 final class const RoomAppbar({
@@ -30,17 +31,7 @@ final class const RoomAppbar({
       onTap: room?.metadata == null
           ? null
           : () => context.showAdaptiveSheet(
-              (context) => RoomSummarySheet(
-                .new(
-                  roomId: room!.metadata!.id,
-                  joinedMembers:
-                      room.metadata!.lazyLoadSummary?.joinedMemberCount,
-                  avatarUrl: room.metadata?.avatar,
-                  canonicalAlias: room.metadata?.canonicalAlias,
-                  name: room.metadata?.name,
-                  topic: room.metadata?.topic,
-                ),
-              ),
+              (context) => RoomSummarySheet(.fromMetadata(room!.metadata!)),
             ),
       leading: isDesktop
           ? room == null
@@ -62,24 +53,9 @@ final class const RoomAppbar({
       scrolledUnderElevation: 0,
       title: room == null
           ? null
-          : Column(
-              crossAxisAlignment: .start,
-              children: [
-                Text(
-                  room.metadata?.name ?? "Unnamed Room",
-                  overflow: .ellipsis,
-                  maxLines: 1,
-                ),
-                if (room.metadata?.topic?.isNotEmpty == true)
-                  Text(
-                    room.metadata!.topic!,
-                    maxLines: 1,
-                    overflow: .ellipsis,
-                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-              ],
+          : RoomTitle(
+              room.metadata?.name ?? "Unnamed Room",
+              topic: room.metadata?.topic,
             ),
       actions: .new(
         room == null

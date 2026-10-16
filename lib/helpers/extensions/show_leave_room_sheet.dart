@@ -18,9 +18,8 @@ extension ShowLeaveRoomSheet on BuildContext {
             ),
             TextButton(
               onPressed: () {
-                final client = ProviderScope.containerOf(
-                  context,
-                ).read(ClientController.provider.notifier);
+                final client = ProviderScope.containerOf(context)
+                    .read(ClientController.provider.notifier);
                 context.withProgressSnackbar(
                   "Leaving $name...",
                   () => client.leaveRoom(roomId),

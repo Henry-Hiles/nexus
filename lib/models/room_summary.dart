@@ -3,6 +3,7 @@ import "package:nexus/models/content/create.dart";
 import "package:nexus/models/content/membership.dart";
 import "package:nexus/models/join_rule.dart";
 import "package:nexus/models/membership_status.dart";
+import "package:nexus/models/room_metadata.dart";
 
 part "room_summary.freezed.dart";
 part "room_summary.g.dart";
@@ -40,6 +41,16 @@ class const RoomSummary({
   /// Whether this is an invite to a direct message.
   @JsonKey(includeFromJson: false) final bool isDirect = false,
 }) with _$RoomSummary {
+  /// A summary of a room the user is in, from its synced metadata.
+  factory RoomSummary.fromMetadata(RoomMetadata metadata) => .new(
+    roomId: metadata.id,
+    joinedMembers: metadata.lazyLoadSummary?.joinedMemberCount,
+    avatarUrl: metadata.avatar,
+    canonicalAlias: metadata.canonicalAlias,
+    name: metadata.name,
+    topic: metadata.topic,
+  );
+
   factory RoomSummary.fromJson(Map<String, Object?> json) =>
       _$RoomSummaryFromJson(json);
 }
