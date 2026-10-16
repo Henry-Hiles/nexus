@@ -22,6 +22,8 @@ import "package:nexus/models/room_order.dart";
 import "package:nexus/models/settings_category.dart";
 import "package:nexus/main.dart";
 import "package:nexus/widgets/settings/dialog_list_tile.dart";
+import "package:nexus/widgets/reset_encryption_sheet.dart";
+import "package:nexus/helpers/extensions/show_adaptive_sheet.dart";
 
 class SettingsSectionsController
     extends AsyncNotifier<IMap<String, IList<SettingsCategory>>> {
@@ -312,6 +314,21 @@ class SettingsSectionsController
             title: "Other",
             icon: Icons.key,
             settings: .new([
+              .new(
+                title: "Reset Encryption Identity",
+                description: "Replace your encryption identity and recovery key with new ones, if you've lost your recovery key or your encryption is broken.",
+                builder: (title, description, icon) => Builder(
+                  builder: (context) => M3EButton.icon(
+                    onPressed: () => context.showAdaptiveSheet(
+                      (_) => const ResetEncryptionSheet(),
+                    ),
+                    label: Text(title),
+                    icon: Icon(icon),
+                    tooltip: description,
+                  ),
+                ),
+                icon: Icons.key_off,
+              ),
               .new(
                 title: "Log Out",
                 description:

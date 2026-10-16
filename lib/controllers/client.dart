@@ -31,6 +31,7 @@ import "package:nexus/models/requests/get_room_state.dart";
 import "package:nexus/models/requests/get_space_hierarchy.dart";
 import "package:nexus/models/requests/join_room.dart";
 import "package:nexus/models/profile_response.dart";
+import "package:nexus/models/recovery_key.dart";
 import "package:nexus/models/requests/oauth/exchange_token.dart";
 import "package:nexus/models/requests/oauth/get_auth_url.dart";
 import "package:nexus/models/requests/oauth/register_client.dart";
@@ -188,6 +189,33 @@ class ClientController extends AsyncNotifier<int> {
     } catch (error) {
       return error.toString();
     }
+  }
+
+  Future<RecoveryKey> generateRecoveryKey({String passphrase = ""}) async =>
+      .fromJson(
+        await _sendCommand("generate_recovery_key", {"passphrase": passphrase}),
+      );
+
+  Future<void> resetEncryption(RecoveryKey key) =>
+      _sendCommand("reset_encryption", key.toJson());
+
+  Future<Uri?> getCrossSigningResetUrl(Uri homeserver) async {
+    const action = "org.matrix.cross_signing_reset";
+    final oauth = (await _sendCommand("get_login_flows", {
+      "homeserver_url": homeserver.toString(),
+    }))["oauth"];
+
+    if (oauth?["account_management_uri"] case final String uri
+        when (oauth["account_management_actions_supported"] as List?)?.contains(
+              action,
+            ) ??
+            false) {
+      final parsed = Uri.parse(uri);
+      return parsed.replace(
+        queryParameters: {...parsed.queryParameters, "action": action},
+      );
+    }
+    return null;
   }
 
   Future<String> joinRoom(JoinRoomRequest request) async =>
