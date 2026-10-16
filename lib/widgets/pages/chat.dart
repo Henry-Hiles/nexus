@@ -39,38 +39,44 @@ class const ChatPage({super.key}) extends HookConsumerWidget {
         final showMembersByDefault = constraints.maxWidth > 1000;
         final roomId = ref.watch(SelectedRoomController.provider);
 
-        return SafeArea(
-          child: Scaffold(
-            key: scaffoldKey,
-            appBar: initComplete ? null : Appbar(),
-            body: initComplete
-                ? Row(
-                    children: [
-                      if (isDesktop) Sidebar(),
-                      Expanded(
-                        child: RoomChat(
-                          key: ValueKey(roomId),
-                          roomId: roomId,
-                          isDesktop: isDesktop,
-                          showMembersByDefault: showMembersByDefault,
-                        ),
-                      ),
-                    ],
-                  )
-                : Column(
-                    children: [
-                      const SyncStatusBanner(),
-                      Expanded(
-                        child: Center(
-                          child: Column(
-                            mainAxisSize: .min,
-                            children: [Loading(), Text("Syncing...")],
+        return PopScope(
+          canPop: false,
+          onPopInvokedWithResult: (didPop, _) {
+            if (!didPop) scaffoldKey.currentState?.openDrawer();
+          },
+          child: SafeArea(
+            child: Scaffold(
+              key: scaffoldKey,
+              appBar: initComplete ? null : Appbar(),
+              body: initComplete
+                  ? Row(
+                      children: [
+                        if (isDesktop) Sidebar(),
+                        Expanded(
+                          child: RoomChat(
+                            key: ValueKey(roomId),
+                            roomId: roomId,
+                            isDesktop: isDesktop,
+                            showMembersByDefault: showMembersByDefault,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-            drawer: isDesktop || !initComplete ? null : Sidebar(),
+                      ],
+                    )
+                  : Column(
+                      children: [
+                        const SyncStatusBanner(),
+                        Expanded(
+                          child: Center(
+                            child: Column(
+                              mainAxisSize: .min,
+                              children: [Loading(), Text("Syncing...")],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+              drawer: isDesktop || !initComplete ? null : Sidebar(),
+            ),
           ),
         );
       },
