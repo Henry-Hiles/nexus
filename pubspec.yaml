@@ -22,6 +22,8 @@ environment:
     sdk: 3.13.3
 
 dependency_overrides:
+    path_provider_android: 2.2.23 # Pinned to avoid JNI
+    dynamic_color: 2.1.0
     m3e_design:
         git:
             url: https://github.com/Henry-Hiles/material_3_expressive
@@ -30,7 +32,6 @@ dependency_overrides:
         git:
             url: https://github.com/Henry-Hiles/material_3_expressive
             path: packages/fab_m3e
-    dynamic_color: 2.1.0
     unifiedpush_linux:
         git:
             url: https://codeberg.org/Henry-Hiles/flutter-connector
@@ -41,7 +42,6 @@ dependency_overrides:
             url: https://codeberg.org/Henry-Hiles/flutter-connector
             ref: quad/feat/should-write-service-option
             path: unifiedpush_platform_interface
-    path_provider_android: 2.2.23 # Pinned to avoid JNI
     linkify:
         git:
             url: https://github.com/appelladev/linkify
