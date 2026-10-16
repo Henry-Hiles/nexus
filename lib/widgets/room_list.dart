@@ -191,7 +191,7 @@ class const SpacesRail({super.key}) extends ConsumerWidget {
                       icon: const Icon(Icons.add),
                     ),
                     const IconButton(
-                      tooltip: "Explore other rooms",
+                      tooltip: "Explore other rooms (Not yet implemented)",
                       onPressed: null,
                       icon: Icon(Icons.explore),
                     ),
