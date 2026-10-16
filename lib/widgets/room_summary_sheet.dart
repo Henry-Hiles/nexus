@@ -1,6 +1,7 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:material_ui/material_ui.dart";
+import "package:nexus/widgets/sheet_layout.dart";
 import "package:nexus/controllers/invites.dart";
 import "package:nexus/helpers/extensions/get_localpart.dart";
 import "package:nexus/helpers/extensions/join_room.dart";
@@ -10,7 +11,7 @@ import "package:nexus/widgets/expandable_image.dart";
 import "package:nexus/widgets/linkified_text.dart";
 import "package:nexus/models/room_summary.dart";
 
-class const RoomSummaryDialog(
+class const RoomSummarySheet(
   final RoomSummary summary, {
   final IList<String>? via,
   super.key,
@@ -21,10 +22,7 @@ class const RoomSummaryDialog(
     final isInvite = summary.membership == .invite;
     final colorScheme = Theme.of(context).colorScheme;
 
-    return AlertDialog(
-      constraints: .loose(.fromWidth(400)),
-      scrollable: true,
-      contentPadding: EdgeInsets.all(24).copyWith(top: 8),
+    return SheetLayout(
       title: Row(
         spacing: 12,
         mainAxisSize: .min,
@@ -46,56 +44,6 @@ class const RoomSummaryDialog(
               maxLines: 3,
             ),
           ),
-        ],
-      ),
-      content: Column(
-        children: [
-          if (summary.invitedBy case final invitedBy?)
-            ListTile(
-              leading: AvatarOrHash(
-                summary.inviterProfile?.avatarUrl,
-                summary.inviterProfile?.displayName ?? invitedBy.localpart,
-              ),
-              title: Text(
-                "${summary.isDirect ? "Direct message from" : "Invited by"} ${summary.inviterProfile?.displayName ?? invitedBy.localpart}",
-              ),
-              subtitle: SelectableText(invitedBy),
-            ),
-          if (summary.inviteReason case final reason?)
-            ListTile(
-              titleAlignment: ListTileTitleAlignment.titleHeight,
-              leading: const Icon(Icons.format_quote),
-              title: const Text("Invite reason"),
-              subtitle: SelectableText(reason),
-            ),
-          // Invite state never includes the member count
-          if (summary.joinedMembers != null || !isInvite)
-            ListTile(
-              title: Text(
-                "${summary.joinedMembers ?? "Unknown number of"} members",
-              ),
-              leading: Icon(Icons.people),
-            ),
-          ListTile(
-            title: Text(
-              summary.canonicalAlias == null ? "Room ID" : "Canonical Alias",
-            ),
-            subtitle: SelectableText(summary.canonicalAlias ?? summary.roomId),
-            leading: Icon(Icons.numbers),
-          ),
-          if (summary.topic != null)
-            ListTile(
-              title: Text("Topic"),
-              subtitle: LinkifiedText(summary.topic!),
-              leading: Icon(Icons.info),
-            ),
-          if (summary.encryption != null)
-            ListTile(title: Text("Encrypted"), leading: Icon(Icons.lock)),
-          if (summary.worldReadable == true)
-            ListTile(
-              title: Text("Anyone can read room history"),
-              leading: Icon(Icons.public),
-            ),
         ],
       ),
       actions: [
@@ -145,6 +93,60 @@ class const RoomSummaryDialog(
             },
             child: Text("Join"),
           ),
+      ],
+      children: [
+        Column(
+          children: [
+            if (summary.invitedBy case final invitedBy?)
+              ListTile(
+                leading: AvatarOrHash(
+                  summary.inviterProfile?.avatarUrl,
+                  summary.inviterProfile?.displayName ?? invitedBy.localpart,
+                ),
+                title: Text(
+                  "${summary.isDirect ? "Direct message from" : "Invited by"} ${summary.inviterProfile?.displayName ?? invitedBy.localpart}",
+                ),
+                subtitle: SelectableText(invitedBy),
+              ),
+            if (summary.inviteReason case final reason?)
+              ListTile(
+                titleAlignment: ListTileTitleAlignment.titleHeight,
+                leading: const Icon(Icons.format_quote),
+                title: const Text("Invite reason"),
+                subtitle: SelectableText(reason),
+              ),
+            // Invite state never includes the member count
+            if (summary.joinedMembers != null || !isInvite)
+              ListTile(
+                title: Text(
+                  "${summary.joinedMembers ?? "Unknown number of"} members",
+                ),
+                leading: Icon(Icons.people),
+              ),
+            ListTile(
+              title: Text(
+                summary.canonicalAlias == null ? "Room ID" : "Canonical Alias",
+              ),
+              subtitle: SelectableText(
+                summary.canonicalAlias ?? summary.roomId,
+              ),
+              leading: Icon(Icons.numbers),
+            ),
+            if (summary.topic != null)
+              ListTile(
+                title: Text("Topic"),
+                subtitle: LinkifiedText(summary.topic!),
+                leading: Icon(Icons.info),
+              ),
+            if (summary.encryption != null)
+              ListTile(title: Text("Encrypted"), leading: Icon(Icons.lock)),
+            if (summary.worldReadable == true)
+              ListTile(
+                title: Text("Anyone can read room history"),
+                leading: Icon(Icons.public),
+              ),
+          ],
+        ),
       ],
     );
   }

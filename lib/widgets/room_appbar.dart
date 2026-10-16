@@ -1,11 +1,12 @@
 import "package:material_ui/material_ui.dart";
+import "package:nexus/helpers/extensions/show_adaptive_sheet.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/widgets/appbar.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/widgets/count_badge.dart";
 import "package:nexus/widgets/room_menu_button.dart";
-import "package:nexus/widgets/room_summary_dialog.dart";
+import "package:nexus/widgets/room_summary_sheet.dart";
 import "package:nexus/widgets/sidebar.dart";
 
 final class const RoomAppbar({
@@ -28,9 +29,8 @@ final class const RoomAppbar({
     return Appbar(
       onTap: room?.metadata == null
           ? null
-          : () => showDialog(
-              context: context,
-              builder: (context) => RoomSummaryDialog(
+          : () => context.showAdaptiveSheet(
+              (context) => RoomSummarySheet(
                 .new(
                   roomId: room!.metadata!.id,
                   joinedMembers:

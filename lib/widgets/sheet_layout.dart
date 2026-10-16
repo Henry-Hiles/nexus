@@ -1,7 +1,7 @@
 import "package:material_ui/material_ui.dart";
 
 class const SheetLayout({
-  required final Widget title,
+  final Widget? title,
   required final List<Widget> children,
   required final List<Widget> actions,
   super.key,
@@ -16,10 +16,11 @@ class const SheetLayout({
         crossAxisAlignment: .stretch,
         spacing: 12,
         children: [
-          DefaultTextStyle(
-            style: Theme.of(context).textTheme.headlineSmall!,
-            child: title,
-          ),
+          if (title case final title?)
+            DefaultTextStyle(
+              style: Theme.of(context).textTheme.headlineSmall!,
+              child: title,
+            ),
           ...children,
           Row(mainAxisAlignment: .end, spacing: 8, children: actions),
         ],

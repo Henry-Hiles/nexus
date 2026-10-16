@@ -1,5 +1,6 @@
 import "package:collection/collection.dart";
 import "package:material_ui/material_ui.dart";
+import "package:nexus/widgets/sheet_layout.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:intl/intl.dart";
@@ -35,54 +36,51 @@ final class const UserBottomSheet(
     );
     final client = ref.read(ClientController.provider.notifier);
 
-    void showMembershipDialog(MembershipAction action) => showDialog(
-      context: context,
-      builder: (context) => HookBuilder(
-        builder: (context) {
-          final actionReasonController = useTextEditingController();
-          return AlertDialog(
-            title: Text("${toBeginningOfSentenceCase(action.name)} $userId"),
-            content: Column(
-              mainAxisSize: .min,
-              crossAxisAlignment: .start,
-              children: [
-                Text("Are you sure you want to ${action.name} $userId?"),
-                SizedBox(height: 12),
-                TextField(
-                  textCapitalization: .sentences,
-                  controller: actionReasonController,
-                  decoration: .new(
-                    labelText: "Reason for ${action.name} (optional)",
-                  ),
+    void showMembershipDialog(MembershipAction action) =>
+        context.showAdaptiveSheet(
+          (context) => HookBuilder(
+            builder: (context) {
+              final actionReasonController = useTextEditingController();
+              return SheetLayout(
+                title: Text(
+                  "${toBeginningOfSentenceCase(action.name)} $userId",
                 ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: Navigator.of(context).pop,
-                child: Text("Cancel"),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  client
-                      .setMembership(
-                        .new(
-                          userId: userId,
-                          roomId: roomId!,
-                          action: action,
-                          reason: actionReasonController.text,
-                        ),
-                      )
-                      .onError(showError);
-                },
-                child: Text(toBeginningOfSentenceCase(action.name)),
-              ),
-            ],
-          );
-        },
-      ),
-    );
+                actions: [
+                  TextButton(
+                    onPressed: Navigator.of(context).pop,
+                    child: Text("Cancel"),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      client
+                          .setMembership(
+                            .new(
+                              userId: userId,
+                              roomId: roomId!,
+                              action: action,
+                              reason: actionReasonController.text,
+                            ),
+                          )
+                          .onError(showError);
+                    },
+                    child: Text(toBeginningOfSentenceCase(action.name)),
+                  ),
+                ],
+                children: [
+                  Text("Are you sure you want to ${action.name} $userId?"),
+                  TextField(
+                    textCapitalization: .sentences,
+                    controller: actionReasonController,
+                    decoration: .new(
+                      labelText: "Reason for ${action.name} (optional)",
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        );
 
     return SingleChildScrollView(
       child: Padding(

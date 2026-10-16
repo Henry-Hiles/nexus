@@ -1,5 +1,6 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:material_ui/material_ui.dart";
+import "package:nexus/widgets/sheet_layout.dart";
 import "package:flutter/services.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
@@ -46,27 +47,13 @@ extension BuildEventOptions on Event {
       required String action,
       required Future<void> Function(String reason) onConfirm,
     }) {
-      showDialog(
-        context: context,
-        builder: (context) => HookBuilder(
+      context.showAdaptiveSheet(
+        (context) => HookBuilder(
           builder: (context) {
             final reasonController = useTextEditingController();
 
-            return AlertDialog(
+            return SheetLayout(
               title: Text(title),
-              content: Column(
-                mainAxisSize: .min,
-                crossAxisAlignment: .start,
-                children: [
-                  Text(description),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: reasonController,
-                    textCapitalization: .sentences,
-                    decoration: .new(labelText: "Reason (optional)"),
-                  ),
-                ],
-              ),
               actions: [
                 TextButton(
                   onPressed: Navigator.of(context).pop,
@@ -80,6 +67,14 @@ extension BuildEventOptions on Event {
                     onConfirm(reason).onError(showError);
                   },
                   child: Text(action),
+                ),
+              ],
+              children: [
+                Text(description),
+                TextField(
+                  controller: reasonController,
+                  textCapitalization: .sentences,
+                  decoration: .new(labelText: "Reason (optional)"),
                 ),
               ],
             );

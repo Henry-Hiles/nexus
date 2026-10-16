@@ -1,6 +1,8 @@
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:material_ui/material_ui.dart";
+import "package:nexus/helpers/extensions/show_adaptive_sheet.dart";
+import "package:nexus/widgets/sheet_layout.dart";
 import "package:nexus/controllers/invites.dart";
 import "package:nexus/helpers/extensions/get_localpart.dart";
 import "package:nexus/main.dart";
@@ -8,7 +10,7 @@ import "package:nexus/models/content/create.dart";
 import "package:nexus/models/nav_page.dart";
 import "package:nexus/models/room_summary.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
-import "package:nexus/widgets/room_summary_dialog.dart";
+import "package:nexus/widgets/room_summary_sheet.dart";
 
 class const InvitesList({super.key})
     extends HookConsumerWidget
@@ -33,13 +35,9 @@ class const InvitesList({super.key})
     final decliningAll = useState(false);
 
     Future<void> declineAll() async {
-      final confirmed = await showDialog<bool>(
-        context: context,
-        builder: (context) => AlertDialog(
+      final confirmed = await context.showAdaptiveSheet<bool>(
+        (context) => SheetLayout(
           title: const Text("Decline All Invites"),
-          content: Text(
-            "Are you sure you want to decline all ${invites.length} invites?",
-          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
@@ -48,6 +46,11 @@ class const InvitesList({super.key})
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
               child: const Text("Decline All"),
+            ),
+          ],
+          children: [
+            Text(
+              "Are you sure you want to decline all ${invites.length} invites?",
             ),
           ],
         ),
@@ -103,10 +106,7 @@ class const InviteCard(final RoomSummary invite, {super.key})
     return Card(
       clipBehavior: .antiAlias,
       child: ListTile(
-        onTap: () => showDialog(
-          context: context,
-          builder: (_) => RoomSummaryDialog(invite),
-        ),
+        onTap: () => context.showAdaptiveSheet((_) => RoomSummarySheet(invite)),
         leading: AvatarOrHash(
           invite.avatarUrl,
           name,

@@ -1,6 +1,7 @@
 import "package:material_ui/material_ui.dart";
+import "package:nexus/helpers/extensions/show_adaptive_sheet.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
-import "package:nexus/widgets/settings/radio_dialog.dart";
+import "package:nexus/widgets/settings/radio_sheet.dart";
 
 final class const DialogListTile<T>({
   required final T? initialValue,
@@ -26,9 +27,8 @@ final class const DialogListTile<T>({
       ),
       child: ListTile(
         enabled: onChanged != null,
-        onTap: () => showDialog(
-          context: context,
-          builder: (context) => RadioDialog<T>(
+        onTap: () => context.showAdaptiveSheet(
+          (context) => RadioSheet<T>(
             title: title,
             getName: getName,
             onChanged: onChanged == null

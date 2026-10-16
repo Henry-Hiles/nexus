@@ -1,4 +1,5 @@
 import "package:material_ui/material_ui.dart";
+import "package:nexus/helpers/extensions/show_adaptive_sheet.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/event.dart";
 import "package:nexus/controllers/room_summary.dart";
@@ -8,7 +9,7 @@ import "package:nexus/helpers/extensions/get_link_info.dart";
 import "package:nexus/helpers/extensions/show_user_popover.dart";
 import "package:nexus/models/content/membership.dart";
 import "package:nexus/models/room_summary.dart";
-import "package:nexus/widgets/room_summary_dialog.dart";
+import "package:nexus/widgets/room_summary_sheet.dart";
 
 class const MentionChip(final String content, final String? roomId, {super.key})
     extends ConsumerWidget {
@@ -58,10 +59,9 @@ class const MentionChip(final String content, final String? roomId, {super.key})
 
                 if (!await ref.focusRoom(summary.roomId, eventRowId) &&
                     context.mounted) {
-                  showDialog(
-                    context: context,
-                    builder: (context) => Consumer(
-                      builder: (context, ref, _) => RoomSummaryDialog(
+                  context.showAdaptiveSheet(
+                    (context) => Consumer(
+                      builder: (context, ref, _) => RoomSummarySheet(
                         ref
                                 .watch(
                                   RoomSummaryController.provider(

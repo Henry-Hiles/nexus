@@ -1,11 +1,13 @@
 import "package:material_ui/material_ui.dart";
+import "package:nexus/helpers/extensions/show_adaptive_sheet.dart";
+import "package:nexus/widgets/sheet_layout.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/room_summary.dart";
 import "package:nexus/helpers/extensions/get_link_info.dart";
-import "package:nexus/widgets/room_summary_dialog.dart";
+import "package:nexus/widgets/room_summary_sheet.dart";
 
-class const JoinDialog(final WidgetRef ref, {super.key}) extends HookWidget {
+class const JoinSheet(final WidgetRef ref, {super.key}) extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final roomAlias = useTextEditingController();
@@ -17,16 +19,15 @@ class const JoinDialog(final WidgetRef ref, {super.key}) extends HookWidget {
       final via = linkInfo?.via ?? const .empty();
       final roomIdOrAlias = linkInfo?.identifier ?? roomAlias.text;
 
-      showDialog(
-        context: context,
-        builder: (context) => Consumer(
+      context.showAdaptiveSheet(
+        (context) => Consumer(
           builder: (context, ref, _) => switch (ref.watch(
             RoomSummaryController.provider(
               .new(roomIdOrAlias: roomIdOrAlias, via: via),
             ),
           )) {
-            AsyncData(:final value) => RoomSummaryDialog(value, via: via),
-            AsyncError _ || AsyncLoading _ => RoomSummaryDialog(
+            AsyncData(:final value) => RoomSummarySheet(value, via: via),
+            AsyncError _ || AsyncLoading _ => RoomSummarySheet(
               .new(roomId: roomIdOrAlias),
               via: via,
             ),
@@ -35,24 +36,26 @@ class const JoinDialog(final WidgetRef ref, {super.key}) extends HookWidget {
       );
     }
 
-    return AlertDialog(
+    return SheetLayout(
       title: Text("Join a Room"),
-      content: Column(
-        mainAxisSize: .min,
-        crossAxisAlignment: .start,
-        children: [
-          Text("Enter the room alias, Matrix URI, or Matrix.to link."),
-          SizedBox(height: 12),
-          TextField(
-            controller: roomAlias,
-            decoration: .new(hintText: "#room:server.name"),
-            onEditingComplete: onJoin,
-          ),
-        ],
-      ),
       actions: [
         TextButton(onPressed: Navigator.of(context).pop, child: Text("Cancel")),
         TextButton(onPressed: onJoin, child: Text("Join")),
+      ],
+      children: [
+        Column(
+          mainAxisSize: .min,
+          crossAxisAlignment: .start,
+          children: [
+            Text("Enter the room alias, Matrix URI, or Matrix.to link."),
+            SizedBox(height: 12),
+            TextField(
+              controller: roomAlias,
+              decoration: .new(hintText: "#room:server.name"),
+              onEditingComplete: onJoin,
+            ),
+          ],
+        ),
       ],
     );
   }

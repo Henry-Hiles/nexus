@@ -14,7 +14,7 @@ import "package:nexus/widgets/start_dm_sheet.dart";
 import "package:nexus/widgets/divider_widget.dart";
 import "package:nexus/widgets/error_dialog.dart";
 import "package:nexus/widgets/pages/settings.dart";
-import "package:nexus/widgets/join_dialog.dart";
+import "package:nexus/widgets/join_sheet.dart";
 import "package:nexus/widgets/room_menu_button.dart";
 import "package:nexus/controllers/key.dart";
 import "package:nexus/controllers/rooms.dart";
@@ -157,10 +157,8 @@ class const SpacesRail({super.key}) extends ConsumerWidget {
                       tooltip: "Add a room",
                       itemBuilder: (_) => [
                         PopupMenuItem(
-                          onTap: () => showDialog(
-                            context: context,
-                            builder: (_) => JoinDialog(ref),
-                          ),
+                          onTap: () =>
+                              context.showAdaptiveSheet((_) => JoinSheet(ref)),
                           child: const ListTile(
                             title: Text("Join an existing room (or space)"),
                             leading: Icon(Icons.numbers),

@@ -1,4 +1,6 @@
 import "package:material_ui/material_ui.dart";
+import "package:nexus/helpers/extensions/show_adaptive_sheet.dart";
+import "package:nexus/widgets/sheet_layout.dart";
 import "package:flutter_svg/flutter_svg.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:m3e_card_list/m3e_card_list.dart";
@@ -10,64 +12,8 @@ extension ShowAboutDialog on BuildContext {
     final packageInfo = await PackageInfo.fromPlatform();
 
     if (mounted) {
-      showDialog(
-        context: this,
-        builder: (context) => AlertDialog(
-          content: Column(
-            mainAxisSize: .min,
-            spacing: 16,
-            children: [
-              Row(
-                spacing: 12,
-                children: [
-                  SvgPicture.asset("assets/bundled/icon.svg", width: 64),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: .start,
-                      children: [
-                        Wrap(
-                          crossAxisAlignment: .center,
-                          spacing: 4,
-                          children: [
-                            Text(
-                              "Nexus",
-                              style: Theme.of(context).textTheme.headlineMedium,
-                            ),
-                            Text(
-                              "(${packageInfo.version}+${const String.fromEnvironment("GIT_COMMIT", defaultValue: "dev")})",
-                            ),
-                          ],
-                        ),
-
-                        Text(
-                          "A simple and user-friendly Matrix client",
-                          overflow: .ellipsis,
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              M3ECardColumn(
-                onTap: (index) =>
-                    ref.read(LaunchHelper.provider).launchUrl(switch (index) {
-                      0 => .https("git.federated.nexus", "nexus/nexus"),
-                      _ => .https("liberapay.com", "QuadRadical"),
-                    }),
-                children: [
-                  ListTile(
-                    leading: Icon(Icons.commit),
-                    title: Text("Source Code"),
-                  ),
-                  ListTile(
-                    leading: Icon(Icons.favorite, color: Colors.pinkAccent),
-                    title: Text("Donate"),
-                  ),
-                ],
-              ),
-            ],
-          ),
+      showAdaptiveSheet(
+        (context) => SheetLayout(
           actions: [
             TextButton(
               onPressed: () => showLicensePage(context: context),
@@ -76,6 +22,65 @@ extension ShowAboutDialog on BuildContext {
             TextButton(
               onPressed: Navigator.of(context).pop,
               child: Text("Close"),
+            ),
+          ],
+          children: [
+            Column(
+              mainAxisSize: .min,
+              spacing: 16,
+              children: [
+                Row(
+                  spacing: 12,
+                  children: [
+                    SvgPicture.asset("assets/bundled/icon.svg", width: 64),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: .start,
+                        children: [
+                          Wrap(
+                            crossAxisAlignment: .center,
+                            spacing: 4,
+                            children: [
+                              Text(
+                                "Nexus",
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headlineMedium,
+                              ),
+                              Text(
+                                "(${packageInfo.version}+${const String.fromEnvironment("GIT_COMMIT", defaultValue: "dev")})",
+                              ),
+                            ],
+                          ),
+
+                          Text(
+                            "A simple and user-friendly Matrix client",
+                            overflow: .ellipsis,
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                M3ECardColumn(
+                  onTap: (index) =>
+                      ref.read(LaunchHelper.provider).launchUrl(switch (index) {
+                        0 => .https("git.federated.nexus", "nexus/nexus"),
+                        _ => .https("liberapay.com", "QuadRadical"),
+                      }),
+                  children: [
+                    ListTile(
+                      leading: Icon(Icons.commit),
+                      title: Text("Source Code"),
+                    ),
+                    ListTile(
+                      leading: Icon(Icons.favorite, color: Colors.pinkAccent),
+                      title: Text("Donate"),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ],
         ),

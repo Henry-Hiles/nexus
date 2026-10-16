@@ -1,5 +1,7 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:material_ui/material_ui.dart";
+import "package:nexus/helpers/extensions/show_adaptive_sheet.dart";
+import "package:nexus/widgets/sheet_layout.dart";
 import "package:flutter/services.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client.dart";
@@ -50,9 +52,8 @@ final class const RoomMenuButton(
             ),
           ),
           PopupMenuItem(
-            onTap: () => showDialog(
-              context: context,
-              builder: (context) => HookBuilder(
+            onTap: () => context.showAdaptiveSheet(
+              (context) => HookBuilder(
                 builder: (context) {
                   final userIdController = useTextEditingController();
                   final reasonController = useTextEditingController();
@@ -75,35 +76,8 @@ final class const RoomMenuButton(
                         .onError(showError);
                   }
 
-                  return AlertDialog(
+                  return SheetLayout(
                     title: Text("Invite User"),
-                    content: Column(
-                      mainAxisSize: .min,
-                      spacing: 12,
-                      children: [
-                        TextField(
-                          controller: userIdController,
-                          autofocus: true,
-                          keyboardType: .emailAddress,
-                          onSubmitted: (_) => submit(),
-                          decoration: .new(
-                            labelText: "User ID",
-                            hintText: "@user:example.com",
-                            errorText: text.isEmpty || valid
-                                ? null
-                                : "Enter a valid user ID",
-                          ),
-                        ),
-                        TextField(
-                          controller: reasonController,
-                          textCapitalization: .sentences,
-                          onSubmitted: (_) => submit(),
-                          decoration: const .new(
-                            labelText: "Invite reason (optional)",
-                          ),
-                        ),
-                      ],
-                    ),
                     actions: [
                       TextButton(
                         onPressed: Navigator.of(context).pop,
@@ -112,6 +86,29 @@ final class const RoomMenuButton(
                       TextButton(
                         onPressed: valid ? submit : null,
                         child: Text("Invite"),
+                      ),
+                    ],
+                    children: [
+                      TextField(
+                        controller: userIdController,
+                        autofocus: true,
+                        keyboardType: .emailAddress,
+                        onSubmitted: (_) => submit(),
+                        decoration: .new(
+                          labelText: "User ID",
+                          hintText: "@user:example.com",
+                          errorText: text.isEmpty || valid
+                              ? null
+                              : "Enter a valid user ID",
+                        ),
+                      ),
+                      TextField(
+                        controller: reasonController,
+                        textCapitalization: .sentences,
+                        onSubmitted: (_) => submit(),
+                        decoration: const .new(
+                          labelText: "Invite reason (optional)",
+                        ),
                       ),
                     ],
                   );
@@ -124,13 +121,9 @@ final class const RoomMenuButton(
             ),
           ),
           PopupMenuItem(
-            onTap: () => showDialog(
-              context: context,
-              builder: (context) => AlertDialog(
+            onTap: () => context.showAdaptiveSheet(
+              (context) => SheetLayout(
                 title: Text("Leave Room"),
-                content: Text(
-                  "Are you sure you want to leave \"${room!.metadata?.name ?? "Unnamed Room"}\"?",
-                ),
                 actions: [
                   TextButton(
                     onPressed: Navigator.of(context).pop,
@@ -152,6 +145,11 @@ final class const RoomMenuButton(
                           .whenComplete(snackbar.close);
                     },
                     child: Text("Leave"),
+                  ),
+                ],
+                children: [
+                  Text(
+                    "Are you sure you want to leave \"${room!.metadata?.name ?? "Unnamed Room"}\"?",
                   ),
                 ],
               ),
