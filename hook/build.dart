@@ -122,7 +122,7 @@ Future<void> main(List<String> args) => build(args, (input, output) async {
       "sqlite_fts5",
       "goolm",
       // goheif/dav1d is not supported on Android or iOS, would need to be fixed upstream
-      if (targetOS == OS.android || targetOS == OS.iOS) "noheic",
+      "noheic",
     ].join(",");
 
     final archiveFile = targetOS == OS.iOS
