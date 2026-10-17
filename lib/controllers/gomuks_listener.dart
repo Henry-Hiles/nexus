@@ -17,6 +17,7 @@ import "package:nexus/helpers/extensions/gomuks_buffer.dart";
 import "package:nexus/main.dart";
 import "package:ffi/ffi.dart";
 import "package:nexus/models/event.dart";
+import "package:nexus/models/events_decrypted.dart";
 import "package:nexus/models/sync_data.dart";
 import "package:nexus/src/third_party/gomuks.g.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
@@ -58,6 +59,29 @@ class GomuksListenerController extends AsyncNotifier<void> {
                     .update(
                       .new({
                         event.roomId: .new(events: .new({event.rowId: event})),
+                      }),
+                    );
+              case "events_decrypted":
+                final decrypted = EventsDecrypted.fromJson(decodedMuksEvent);
+                final metadata = ref
+                    .read(RoomsController.provider)[decrypted.roomId]
+                    ?.metadata;
+
+                ref
+                    .read(RoomsController.provider.notifier)
+                    .update(
+                      .new({
+                        decrypted.roomId: .new(
+                          events: decrypted.events,
+                          metadata: metadata?.copyWith(
+                            previewEventRowID:
+                                decrypted.previewEventRowID ??
+                                metadata.previewEventRowID,
+                            sortingTimestamp:
+                                decrypted.sortingTimestamp ??
+                                metadata.sortingTimestamp,
+                          ),
+                        ),
                       }),
                     );
               case "sync_complete":
