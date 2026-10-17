@@ -17,23 +17,6 @@ subprojects {
 }
 
 subprojects {
-    if (name == "flutter_avif_android") {
-        tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-            exclude("**/FlutterAvifPlugin.kt")
-        }
-        afterEvaluate {
-            extensions.configure<com.android.build.api.dsl.LibraryExtension> {
-                compileSdk = 36
-                compileOptions {
-                    sourceCompatibility = JavaVersion.VERSION_21
-                    targetCompatibility = JavaVersion.VERSION_21
-                }
-            }
-        }
-    }
-}
-
-subprojects {
     project.evaluationDependsOn(":app")
 }
 

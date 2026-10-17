@@ -34,6 +34,8 @@ flutter.buildFlutterApplication {
 
   autoPubspecLock = src + "/pubspec.lock";
 
+  customSourceBuilders.avif_native = callPackage ./avif_native.nix { };
+
   gitHashes = {
     linkify = "sha256-TpMD6+0zyY6i9l+6d8ErnVufmepCv362rCtnbOht/z4=";
     fab_m3e = "sha256-5V9m6yY0jimx2gh7lQHYg4HDKQ4Wrl0ATmBhw5DkQMI=";

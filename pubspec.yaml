@@ -109,7 +109,7 @@ dependencies:
     pasteboard: 0.5.0
     flutter_file_dialog: 3.3.3
     mime: 2.1.0
-    flutter_avif: 3.1.0
+    avif_native: 0.1.1
 dev_dependencies:
     build_runner: 2.16.2
     flutter_lints: 6.0.0
@@ -133,3 +133,8 @@ flutter_launcher_icons:
     macos:
         generate: true
         image_path: assets/mobile.png
+
+hooks:
+    user_defines:
+        avif_native:
+            features: decode
