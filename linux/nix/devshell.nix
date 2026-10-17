@@ -9,6 +9,7 @@ let
     ];
     cmakeVersions = [ "3.22.1" ];
     platformVersions = [
+      "31"
       "34"
       "36"
     ];
@@ -47,7 +48,17 @@ pkgs.mkShell {
 
     GRADLE_OPTS = "-Dorg.gradle.project.android.aapt2FromMavenOverride=${ANDROID_HOME}/build-tools/36.0.0/aapt2";
   }
-  // lib.optionalAttrs pkgs.stdenv.isLinux {
-    LD_LIBRARY_PATH = "./build/native_assets/linux:${lib.makeLibraryPath [ pkgs.zlib ]}";
-  };
+  // lib.optionalAttrs pkgs.stdenv.isLinux (
+    let
+      arch = if pkgs.stdenv.hostPlatform.isAarch64 then "arm64" else "x64";
+    in
+    {
+      LD_LIBRARY_PATH = lib.concatStringsSep ":" [
+        "./build/native_assets/linux"
+        "./build/linux/${arch}/debug/bundle/lib"
+        "./build/linux/${arch}/release/bundle/lib"
+        (lib.makeLibraryPath [ pkgs.zlib ])
+      ];
+    }
+  );
 }
