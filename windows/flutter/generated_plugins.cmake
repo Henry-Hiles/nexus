@@ -11,6 +11,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   pasteboard
   screen_retriever_windows
   url_launcher_windows
+  webcrypto
   window_manager
 )
 
