@@ -53,6 +53,12 @@ class const ReactionRow(final Event event, {super.key}) extends ConsumerWidget {
                                         ref,
                                         .new(mxc: Uri.parse(reaction)),
                                       ),
+                                      errorBuilder: (context, _, _) => Icon(
+                                        Icons.broken_image,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .error,
+                                      ),
                                     )
                                   : Text(reaction, overflow: .ellipsis),
                             ),
