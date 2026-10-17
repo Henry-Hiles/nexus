@@ -5,6 +5,7 @@ import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/client_state.dart";
 import "package:nexus/helpers/extensions/show_adaptive_sheet.dart";
 import "package:nexus/main.dart";
+import "package:nexus/models/client_state.dart";
 import "package:nexus/widgets/recovery_key_sheet.dart";
 import "package:nexus/widgets/sheet_layout.dart";
 
@@ -16,11 +17,12 @@ class const ResetEncryptionSheet({
 }) extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isReset = ref.watch(
+    final verificationState = ref.watch(
       ClientStateController.provider.select(
-        (state) => state?.verificationState.hasCrossSigning ?? false,
+        (state) => state?.verificationState,
       ),
     );
+    final isReset = verificationState?.hasCrossSigning ?? false;
 
     final usePassphrase = useState(false);
     final passphraseController = useTextEditingController();
@@ -95,6 +97,13 @@ class const ResetEncryptionSheet({
         ),
       ],
       children: [
+        if (verificationState case VerificationState(
+          hasCrossSigning: true,
+          hasSecretStorage: false,
+        ))
+          const Text(
+            "Your account has an encryption identity, but no recovery key. If you're still signed in on another client, you can set up a recovery key there instead, then restart Nexus and use it to verify. Otherwise, continue with the reset:",
+          ),
         Text(
           isReset
               ? "This replaces your encryption identity with a new one. Your other sessions will need to be verified again, and any messages you can't currently decrypt may become unreadable."
