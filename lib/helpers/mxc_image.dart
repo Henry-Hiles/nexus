@@ -33,7 +33,7 @@ class MxcImage(final WidgetRef ref, final DownloadMediaRequest request)
       return AvifCodecAdapter(codec);
     }
 
-    return decode(await ui.ImmutableBuffer.fromUint8List(bytes));
+    return decode(await .fromUint8List(bytes));
   }
 
   @override
