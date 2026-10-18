@@ -31,6 +31,7 @@ import "package:nexus/models/requests/get_room_state.dart";
 import "package:nexus/models/requests/get_space_hierarchy.dart";
 import "package:nexus/models/requests/join_room.dart";
 import "package:nexus/models/profile_response.dart";
+import "package:nexus/models/push_notification.dart";
 import "package:nexus/models/recovery_key.dart";
 import "package:nexus/models/requests/oauth/exchange_token.dart";
 import "package:nexus/models/requests/oauth/get_auth_url.dart";
@@ -47,7 +48,6 @@ import "package:nexus/models/requests/set_membership.dart";
 import "package:nexus/models/requests/set_state.dart";
 import "package:nexus/models/requests/upload_media.dart";
 import "package:nexus/models/room.dart";
-import "package:nexus/models/room_metadata.dart";
 import "package:nexus/models/room_summary.dart";
 import "package:nexus/models/space_hierarchy.dart";
 import "package:nexus/models/spec_versions_response.dart";
@@ -128,18 +128,15 @@ class ClientController extends AsyncNotifier<int> {
     }
   }
 
-  Future<(Event, RoomMetadata)?> handlePush(Map<String, dynamic> data) async {
+  Future<PushNotification?> handlePush(Map<String, dynamic> data) async {
     final response = await callGomuksMethod(
       data,
       (handle, data) async => GomuksHandlePush(handle, data),
     );
 
-    return response == null
+    return response?["notification"] == null
         ? null
-        : (
-            Event.fromJson(response["event"]),
-            RoomMetadata.fromJson(response["room"]),
-          );
+        : .fromJson(response["notification"]);
   }
 
   Future<dynamic> _sendCommand(

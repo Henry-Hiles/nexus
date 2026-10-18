@@ -1,4 +1,5 @@
 import "dart:async";
+import "dart:convert";
 import "dart:io";
 
 import "package:flutter/services.dart";
@@ -109,18 +110,32 @@ class NotificationController
     String? body,
     File? icon,
     String? payload,
+    String? senderName,
+    File? senderAvatar,
+    String? selfName,
+    bool isGroup = false,
+    bool sound = true,
+    DateTime? timestamp,
   }) async {
     debugPrint("Sending notification for $id");
 
+    // In DMs the title is already the sender, so only prefix in groups
+    final prefix = isGroup ? senderName : null;
+
     if (Platform.isLinux) {
-      final portal = await ref.watch(PortalController.provider.future);
+      final portal = await ref.read(PortalController.provider.future);
+      const escape = HtmlEscape(HtmlEscapeMode.element);
 
       await portal.notification.addNotification(
         id.toString(),
         title: title,
-        body: body,
+        body: prefix == null || body == null ? body : "$prefix: $body",
+        markupBody: prefix == null || body == null
+            ? null
+            : "<b>${escape.convert(prefix)}</b>: ${escape.convert(body)}",
         defaultAction: "app.event",
         defaultActionTarget: payload,
+        sound: sound ? null : const XdgNotificationSoundSilent(),
         category: XdgNotificationCategory.imReceived,
         priority: .normal,
         buttons: [
@@ -133,25 +148,57 @@ class NotificationController
         ],
       );
     } else {
+      final controller = await future;
+
+      // Append to the conversation already shown under this id, if any
+      final existingStyle = Platform.isAndroid
+          ? await controller
+                .resolvePlatformSpecificImplementation<
+                  AndroidFlutterLocalNotificationsPlugin
+                >()
+                ?.getActiveNotificationMessagingStyle(id: id)
+                .onError((_, _) => null)
+          : null;
+
+      final darwin = DarwinNotificationDetails(presentSound: sound);
       final notificationDetails = NotificationDetails(
         android: .new(
           "messages",
           "Messages",
+          silent: !sound,
           largeIcon: icon == null ? null : FilePathAndroidBitmap(icon.path),
+          styleInformation: senderName == null || body == null
+              ? null
+              : MessagingStyleInformation(
+                  .new(name: selfName ?? "You"),
+                  conversationTitle: isGroup ? title : null,
+                  groupConversation: isGroup,
+                  messages: [
+                    ...?existingStyle?.messages,
+                    .new(
+                      body,
+                      timestamp ?? .now(),
+                      .new(
+                        name: senderName,
+                        icon: senderAvatar == null
+                            ? null
+                            : BitmapFilePathAndroidIcon(senderAvatar.path),
+                      ),
+                    ),
+                  ],
+                ),
         ),
         // TODO: See if icons can be added to iOS, macOS, and Windows
         // notifications (#68)
-        iOS: .new(),
-        macOS: .new(),
-        windows: .new(),
+        iOS: darwin,
+        macOS: darwin,
+        windows: .new(audio: sound ? null : .silent()),
       );
-
-      final controller = await future;
 
       await controller.show(
         id: id,
         title: title,
-        body: body,
+        body: prefix == null || body == null ? body : "$prefix: $body",
         notificationDetails: notificationDetails,
         payload: payload,
       );

@@ -11,8 +11,6 @@ import "package:nexus/controllers/push_key.dart";
 import "package:nexus/main.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/client_state.dart";
-import "package:nexus/models/content/message.dart";
-import "package:nexus/models/content/sticker.dart";
 import "package:unifiedpush/unifiedpush.dart";
 import "package:unifiedpush_storage_shared_preferences/storage.dart";
 import "package:window_manager/window_manager.dart";
@@ -79,42 +77,56 @@ class UnifiedPushController extends AsyncNotifier<String?> {
             "Failed to decrypt notification. Try toggling off and on UnifiedPush in settings.",
           );
         }
-        final pushResponse = await ref
+        final notification = await ref
             .read(ClientController.provider.notifier)
             .handlePush(json.decode(String.fromCharCodes(message.content)));
 
-        if (pushResponse == null) return;
-
-        final (event, roomMetadata) = pushResponse;
-
-        if (event.unreadType?.has(.notify) != true ||
+        if (notification == null ||
             (!isInBackground &&
                 await windowManager.isFocused().onError((_, _) => true) &&
-                ref.read(SelectedRoomController.provider) == event.roomId)) {
+                ref.read(SelectedRoomController.provider) ==
+                    notification.roomId)) {
           if (isInBackground) exit(0);
           return;
         }
 
-        final icon = roomMetadata.avatar == null
+        final client = ref.read(ClientController.provider.notifier);
+
+        final icon = notification.roomAvatar == null
             ? null
-            : await ref
-                  .read(ClientController.provider.notifier)
-                  .downloadMedia(
-                    .new(mxc: roomMetadata.avatar!, isAvatar: true),
-                  );
+            : await client.downloadMedia(
+                .new(mxc: notification.roomAvatar!, isAvatar: true),
+              );
+
+        final pmp = notification.perMessageProfile;
+        final senderAvatarUrl = pmp?.avatar ?? notification.sender.avatar;
+        // Only Android can show the sender's avatar
+        final senderAvatar = senderAvatarUrl == null || !Platform.isAndroid
+            ? null
+            : await client.downloadMedia(
+                .new(mxc: senderAvatarUrl, isAvatar: true),
+              );
 
         await ref
             .read(NotificationController.provider.notifier)
             .send(
-              id: event.eventId.hashCode & 0x7fffffff,
-              title: roomMetadata.name ?? "New Event",
+              // Android stacks messages into one conversation per room
+              id:
+                  (Platform.isAndroid
+                          ? notification.roomId
+                          : notification.eventId)
+                      .hashCode &
+                  0x7fffffff,
+              title: notification.roomName,
               icon: icon,
-              payload: event.rowId.toString(),
-              body: switch (event.content) {
-                MessageContent(:final body?) ||
-                StickerContent(:final body) => body,
-                _ => null,
-              },
+              payload: notification.eventRowId.toString(),
+              body: notification.text,
+              senderName: pmp?.name ?? notification.sender.name,
+              senderAvatar: senderAvatar,
+              selfName: notification.self.name,
+              isGroup: !notification.isDm,
+              sound: notification.sound,
+              timestamp: notification.timestamp,
             );
 
         if (isInBackground) exit(0);
