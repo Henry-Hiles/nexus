@@ -104,6 +104,42 @@ class NotificationController
     return true;
   }
 
+  /// Whether notifications can currently be shown, without prompting
+  Future<bool> permissionsGranted() async {
+    if (Platform.isLinux) {
+      return true;
+    }
+
+    final controller = await future;
+
+    if (Platform.isIOS) {
+      return (await controller
+                  .resolvePlatformSpecificImplementation<
+                    IOSFlutterLocalNotificationsPlugin
+                  >()
+                  ?.checkPermissions())
+              ?.isEnabled ??
+          true;
+    } else if (Platform.isMacOS) {
+      return (await controller
+                  .resolvePlatformSpecificImplementation<
+                    MacOSFlutterLocalNotificationsPlugin
+                  >()
+                  ?.checkPermissions())
+              ?.isEnabled ??
+          true;
+    } else if (Platform.isAndroid) {
+      return await controller
+              .resolvePlatformSpecificImplementation<
+                AndroidFlutterLocalNotificationsPlugin
+              >()
+              ?.areNotificationsEnabled() ??
+          true;
+    }
+
+    return true;
+  }
+
   Future<void> send({
     required int id,
     required String title,

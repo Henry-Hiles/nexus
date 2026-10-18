@@ -143,6 +143,19 @@ class GomuksListenerController extends AsyncNotifier<void> {
     }
   }
 
+  /// Waits for gomuks to report the client's device ID
+  Future<String> deviceId() {
+    final completer = Completer<String>();
+    final subscription = ref.listen(
+      ClientStateController.provider.select((value) => value?.deviceId),
+      (_, next) {
+        if (next != null && !completer.isCompleted) completer.complete(next);
+      },
+      fireImmediately: true,
+    );
+    return completer.future.whenComplete(subscription.close);
+  }
+
   static Future<int> _start(
     int handle,
     Pointer<

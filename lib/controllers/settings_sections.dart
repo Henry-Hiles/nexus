@@ -46,7 +46,7 @@ class SettingsSectionsController
                 icon: Icon(icon),
                 title: title,
                 subtitle: Text(description),
-                initialValue: settings.theme,
+                value: settings.theme,
                 options: ThemeMode.values,
                 getName: (option) => toBeginningOfSentenceCase(option.name),
                 onChanged: (value) => ref
@@ -105,7 +105,7 @@ class SettingsSectionsController
                 icon: Icon(icon),
                 title: title,
                 subtitle: Text(description),
-                initialValue: settings.roomOrder,
+                value: settings.roomOrder,
                 options: RoomOrder.values,
                 getName: (option) => switch (option) {
                   .unreadFirst => "Mentioned, then unread",
@@ -194,7 +194,6 @@ class SettingsSectionsController
                     final current = pusherRegistered.value;
 
                     return DialogListTile<String?>(
-                      key: ValueKey(current),
                       title: title,
                       subtitle: Text(
                         unifiedPushAllowed.maybeWhen(
@@ -204,8 +203,7 @@ class SettingsSectionsController
                             description,
                       ),
                       icon: Icon(icon),
-                      required: false,
-                      initialValue: current,
+                      value: current,
                       options: [
                         null,
                         ...?distributors.value,
@@ -227,21 +225,32 @@ class SettingsSectionsController
                                 try {
                                   loading.value = true;
                                   if (value != null) {
-                                    if (await ref
+                                    final messenger = ScaffoldMessenger.of(
+                                      context,
+                                    );
+                                    if (!await ref
                                         .read(
                                           NotificationController
                                               .provider
                                               .notifier,
                                         )
                                         .requestPermissions()) {
-                                      await ref
-                                          .read(
-                                            UnifiedPushController
-                                                .provider
-                                                .notifier,
-                                          )
-                                          .register(value);
+                                      messenger.showSnackBar(
+                                        .new(
+                                          content: Text(
+                                            "Notifications are disabled. Enable them for Nexus in your system settings.",
+                                          ),
+                                        ),
+                                      );
+                                      return;
                                     }
+                                    await ref
+                                        .read(
+                                          UnifiedPushController
+                                              .provider
+                                              .notifier,
+                                        )
+                                        .register(value);
                                   } else {
                                     await ref
                                         .read(
@@ -283,7 +292,7 @@ class SettingsSectionsController
                       icon: Icon(icon),
                       title: title,
                       subtitle: Text(description),
-                      initialValue: ref
+                      value: ref
                           .watch(AccountDataController.provider)
                           .invitePermissionConfig
                           .defaultAction,

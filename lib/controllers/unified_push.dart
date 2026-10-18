@@ -10,7 +10,7 @@ import "package:nexus/controllers/notification.dart";
 import "package:nexus/controllers/push_key.dart";
 import "package:nexus/main.dart";
 import "package:nexus/controllers/client.dart";
-import "package:nexus/controllers/client_state.dart";
+import "package:nexus/controllers/gomuks_listener.dart";
 import "package:unifiedpush/unifiedpush.dart";
 import "package:unifiedpush_storage_shared_preferences/storage.dart";
 import "package:window_manager/window_manager.dart";
@@ -72,6 +72,11 @@ class UnifiedPushController extends AsyncNotifier<String?> {
       },
       onMessage: (message, instance) async {
         debugPrint("UP message received for $instance");
+        if (await deregisterIfDisabled(instance)) {
+          if (isInBackground) exit(0);
+          return;
+        }
+
         if (message.decrypted == false) {
           throw Exception(
             "Failed to decrypt notification. Try toggling off and on UnifiedPush in settings.",
@@ -135,9 +140,11 @@ class UnifiedPushController extends AsyncNotifier<String?> {
       onUnregistered: deregister,
     );
 
-    if (!registered) return null;
+    if (!registered || isInBackground) return null;
 
     try {
+      if (await deregisterIfDisabled()) return null;
+
       return await register();
     } catch (error, stackTrace) {
       showError(error, stackTrace);
@@ -156,19 +163,9 @@ class UnifiedPushController extends AsyncNotifier<String?> {
 
     state = .loading();
     try {
-      final deviceIdCompleter = Completer<String>();
-      final subscription = ref.listen(
-        ClientStateController.provider.select((value) => value?.deviceId),
-        (_, next) {
-          if (next != null && !deviceIdCompleter.isCompleted) {
-            deviceIdCompleter.complete(next);
-          }
-        },
-        fireImmediately: true,
-      );
-      final deviceId = await deviceIdCompleter.future.whenComplete(
-        subscription.close,
-      );
+      final deviceId = await ref
+          .read(GomuksListenerController.provider.notifier)
+          .deviceId();
 
       await Future(() async {
         final capabilities = await ref
@@ -214,12 +211,27 @@ class UnifiedPushController extends AsyncNotifier<String?> {
     }
   }
 
-  Future<void> deregister([String? instance]) async {
-    final clientState = ref.read(ClientStateController.provider);
+  Future<bool> deregisterIfDisabled([String? notificationInstance]) async {
+    if (await ref
+        .read(NotificationController.provider.notifier)
+        .permissionsGranted()) {
+      return false;
+    }
 
-    final keyProvider = PushKeyController.provider(
-      instance ?? clientState!.deviceId!,
-    );
+    final instance =
+        notificationInstance ??
+        await ref.read(GomuksListenerController.provider.notifier).deviceId();
+    final key = await ref.read(PushKeyController.provider(instance).future);
+    if (key != null) await deregister(instance);
+    return true;
+  }
+
+  Future<void> deregister([String? instance]) async {
+    instance ??= await ref
+        .read(GomuksListenerController.provider.notifier)
+        .deviceId();
+
+    final keyProvider = PushKeyController.provider(instance);
     final key = await ref.read(keyProvider.future);
 
     if (key != null) {
@@ -233,7 +245,7 @@ class UnifiedPushController extends AsyncNotifier<String?> {
       );
     }
 
-    await UnifiedPush.unregister(instance ?? clientState!.deviceId!);
+    await UnifiedPush.unregister(instance);
     state = .data(null);
   }
 
