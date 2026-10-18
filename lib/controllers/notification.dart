@@ -116,6 +116,7 @@ class NotificationController
     bool isGroup = false,
     bool sound = true,
     DateTime? timestamp,
+    String? threadId,
   }) async {
     debugPrint("Sending notification for $id");
 
@@ -160,7 +161,10 @@ class NotificationController
                 .onError((_, _) => null)
           : null;
 
-      final darwin = DarwinNotificationDetails(presentSound: sound);
+      final darwin = DarwinNotificationDetails(
+        presentSound: sound,
+        threadIdentifier: threadId,
+      );
       final notificationDetails = NotificationDetails(
         android: .new(
           "messages",
@@ -188,11 +192,15 @@ class NotificationController
                   ],
                 ),
         ),
-        // TODO: See if icons can be added to iOS, macOS, and Windows
-        // notifications (#68)
         iOS: darwin,
         macOS: darwin,
-        windows: .new(audio: sound ? null : .silent()),
+        windows: .new(
+          audio: sound ? null : .silent(),
+          timestamp: timestamp,
+          header: threadId == null
+              ? null
+              : .new(id: threadId, title: title, arguments: payload ?? ""),
+        ),
       );
 
       await controller.show(

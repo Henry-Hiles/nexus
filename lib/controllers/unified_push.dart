@@ -127,6 +127,7 @@ class UnifiedPushController extends AsyncNotifier<String?> {
               isGroup: !notification.isDm,
               sound: notification.sound,
               timestamp: notification.timestamp,
+              threadId: notification.roomId,
             );
 
         if (isInBackground) exit(0);
