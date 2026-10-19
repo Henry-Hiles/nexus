@@ -4,7 +4,7 @@ extension SchemeToTheme on ColorScheme {
   ThemeData get theme {
     final textTheme = ThemeData(
       fontFamily: "bundled-sans",
-      fontFamilyFallback: ["emoji", "bundled-emoji"],
+      fontFamilyFallback: ["emoji"],
       brightness: brightness,
     ).textTheme;
     return .from(colorScheme: this).copyWith(
