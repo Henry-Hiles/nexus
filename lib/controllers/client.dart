@@ -95,6 +95,11 @@ class ClientController extends AsyncNotifier<int> {
       }
     });
 
+    if (!ref.mounted) {
+      GomuksDestroy(handle);
+      return Completer<int>().future;
+    }
+
     ref.onDispose(() => GomuksDestroy(handle));
 
     return handle;

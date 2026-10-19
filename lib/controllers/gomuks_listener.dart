@@ -1,10 +1,12 @@
 import "dart:async";
 import "dart:ffi";
+import "dart:io";
 import "dart:isolate";
 
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/foundation.dart";
 import "package:nexus/controllers/account_data.dart";
+import "package:nexus/controllers/app_paused.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/client_state.dart";
 import "package:nexus/controllers/init_complete.dart";
@@ -140,6 +142,20 @@ class GomuksListenerController extends AsyncNotifier<void> {
     final errorCode = await _start(handle, callable.nativeFunction);
     if (errorCode != 0) {
       throw Exception("GomuksStart returned error code $errorCode");
+    }
+
+    if (!ref.mounted) return;
+
+    if (Platform.isAndroid || Platform.isIOS) {
+      // Mobile OSes block network access for backgrounded apps, so pause
+      // syncing instead of letting it fail.
+      ref.listen(AppPausedController.provider, (_, paused) {
+        if (paused) {
+          GomuksPauseSync(handle);
+        } else {
+          GomuksResumeSync(handle);
+        }
+      }, fireImmediately: true);
     }
   }
 
