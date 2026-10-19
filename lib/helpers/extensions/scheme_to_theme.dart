@@ -4,7 +4,7 @@ extension SchemeToTheme on ColorScheme {
   ThemeData get theme {
     final textTheme = ThemeData(
       fontFamily: "bundled-sans",
-      fontFamilyFallback: ["bundled-emoji"],
+      fontFamilyFallback: ["emoji", "bundled-emoji"],
       brightness: brightness,
     ).textTheme;
     return .from(colorScheme: this).copyWith(
@@ -29,7 +29,7 @@ extension SchemeToTheme on ColorScheme {
           borderRadius: .circular(8),
         ),
       ),
-      iconButtonTheme: .new(variant: StyleVariant.material3Expressive),
+      iconButtonTheme: .new(variant: .material3Expressive),
       textTheme: textTheme,
       inputDecorationTheme: const InputDecorationTheme(
         border: OutlineInputBorder(),
