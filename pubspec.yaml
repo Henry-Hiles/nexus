@@ -22,6 +22,15 @@ environment:
 dependency_overrides:
     path_provider_android: 2.2.23 # Pinned to avoid JNI
     dynamic_color: 2.1.0
+    code_assets: 2.1.0 # webcrypto requires ^1.0.0, but works with 2.x
+    webcrypto:
+        git:
+            url: https://github.com/google/webcrypto.dart
+            ref: da6648cf87309af4271e312c447e0356f8fda5d1 # Uses build hooks, unreleased
+    native_toolchain_cmake:
+        git:
+            url: https://github.com/Henry-Hiles/native_toolchain_cmake
+            ref: quad/fix/native-aarch64 # Fixes native aarch64 linux builds
     m3e_design:
         git:
             url: https://github.com/Henry-Hiles/material_3_expressive
@@ -115,8 +124,6 @@ dev_dependencies:
     riverpod_lint: 3.1.9
     flutter_launcher_icons: 0.14.4
     json_serializable: 6.14.1
-    # Transitive dep but needed for commands
-    webcrypto: 0.6.0
 
 flutter_launcher_icons:
     image_path: assets/icon.png
