@@ -122,17 +122,21 @@ class UnifiedPushController extends AsyncNotifier<String?> {
                           : notification.eventId)
                       .hashCode &
                   0x7fffffff,
-              title: notification.roomName,
-              icon: icon,
-              payload: notification.eventRowId.toString(),
-              body: notification.text,
-              senderName: pmp?.name ?? notification.sender.name,
-              senderAvatar: senderAvatar,
-              selfName: notification.self.name,
-              isGroup: !notification.isDm,
-              sound: notification.sound,
-              timestamp: notification.timestamp,
               threadId: notification.roomId,
+              title: notification.roomName,
+              body: notification.text,
+              payload: notification.eventRowId.toString(),
+              timestamp: notification.timestamp,
+              icon: icon,
+              sound: notification.sound,
+              message: (
+                sender: pmp == null
+                    ? notification.sender
+                    : pmp.copyWith(id: "${notification.sender.id}/${pmp.id}"),
+                self: notification.self,
+                senderAvatar: senderAvatar,
+                isDm: notification.isDm,
+              ),
             );
 
         if (isInBackground) exit(0);

@@ -10,7 +10,15 @@ import "package:nexus/main.dart";
 import "package:flutter_local_notifications/flutter_local_notifications.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/notification_request.dart";
+import "package:nexus/models/push_notification.dart";
 import "package:xdg_desktop_portal/xdg_desktop_portal.dart";
+
+typedef NotificationMessage = ({
+  NotificationUser sender,
+  NotificationUser self,
+  File? senderAvatar,
+  bool isDm,
+});
 
 class NotificationController
     extends AsyncNotifier<FlutterLocalNotificationsPlugin> {
@@ -140,24 +148,24 @@ class NotificationController
     return true;
   }
 
+  /// Passing [message] shows it as a chat message in the conversation for
+  /// [threadId], naming the sender in group chats.
   Future<void> send({
     required int id,
     required String title,
-    String? body,
-    File? icon,
+    required String body,
     String? payload,
-    String? senderName,
-    File? senderAvatar,
-    String? selfName,
-    bool isGroup = false,
-    bool sound = true,
-    DateTime? timestamp,
     String? threadId,
+    DateTime? timestamp,
+    File? icon,
+    bool sound = true,
+    NotificationMessage? message,
   }) async {
     debugPrint("Sending notification for $id");
 
-    // In DMs the title is already the sender, so only prefix in groups
-    final prefix = isGroup ? senderName : null;
+    // In DMs the title is already the sender
+    final sender = message == null || message.isDm ? null : message.sender;
+    final prefixedBody = sender == null ? body : "${sender.name}: $body";
 
     if (Platform.isLinux) {
       final portal = await ref.read(PortalController.provider.future);
@@ -166,14 +174,14 @@ class NotificationController
       await portal.notification.addNotification(
         id.toString(),
         title: title,
-        body: prefix == null || body == null ? body : "$prefix: $body",
-        markupBody: prefix == null || body == null
+        body: prefixedBody,
+        markupBody: sender == null
             ? null
-            : "<b>${escape.convert(prefix)}</b>: ${escape.convert(body)}",
+            : "<b>${escape.convert(sender.name)}</b>: ${escape.convert(body)}",
         defaultAction: "app.event",
         defaultActionTarget: payload,
         sound: sound ? null : const XdgNotificationSoundSilent(),
-        category: XdgNotificationCategory.imReceived,
+        category: message == null ? null : XdgNotificationCategory.imReceived,
         priority: .normal,
         buttons: [
           // TODO: Impl when notif daemons actualy support imReplyWithText
@@ -184,50 +192,74 @@ class NotificationController
           // ),
         ],
       );
-    } else {
-      final controller = await future;
+      return;
+    }
 
-      // Append to the conversation already shown under this id, if any
-      final existingStyle = Platform.isAndroid
-          ? await controller
-                .resolvePlatformSpecificImplementation<
-                  AndroidFlutterLocalNotificationsPlugin
-                >()
-                ?.getActiveNotificationMessagingStyle(id: id)
-                .onError((_, _) => null)
-          : null;
+    final controller = await future;
 
-      final darwin = DarwinNotificationDetails(
-        presentSound: sound,
-        threadIdentifier: threadId,
-      );
-      final notificationDetails = NotificationDetails(
-        android: .new(
-          "messages",
-          "Messages",
-          silent: !sound,
-          largeIcon: icon == null ? null : FilePathAndroidBitmap(icon.path),
-          styleInformation: senderName == null || body == null
-              ? null
-              : MessagingStyleInformation(
-                  .new(name: selfName ?? "You"),
-                  conversationTitle: isGroup ? title : null,
-                  groupConversation: isGroup,
+    // Append to the conversation already shown under this id, if any
+    final existingStyle = Platform.isAndroid && message != null
+        ? await controller
+              .resolvePlatformSpecificImplementation<
+                AndroidFlutterLocalNotificationsPlugin
+              >()
+              ?.getActiveNotificationMessagingStyle(id: id)
+              .onError((_, _) => null)
+        : null;
+
+    final darwin = DarwinNotificationDetails(
+      presentSound: sound,
+      threadIdentifier: threadId,
+    );
+
+    await controller.show(
+      id: id,
+      title: title,
+      body: prefixedBody,
+      payload: payload,
+      notificationDetails: .new(
+        android: message == null
+            ? .new(
+                "general",
+                "General",
+                silent: !sound,
+                when: timestamp?.millisecondsSinceEpoch,
+                largeIcon: icon == null
+                    ? null
+                    : FilePathAndroidBitmap(icon.path),
+                styleInformation: BigTextStyleInformation(body),
+              )
+            : .new(
+                "messages",
+                "Messages",
+                silent: !sound,
+                when: timestamp?.millisecondsSinceEpoch,
+                category: .message,
+                largeIcon: icon == null
+                    ? null
+                    : FilePathAndroidBitmap(icon.path),
+                styleInformation: MessagingStyleInformation(
+                  .new(key: message.self.id, name: message.self.name),
+                  conversationTitle: message.isDm ? null : title,
+                  groupConversation: !message.isDm,
                   messages: [
                     ...?existingStyle?.messages,
                     .new(
                       body,
                       timestamp ?? .now(),
                       .new(
-                        name: senderName,
-                        icon: senderAvatar == null
+                        key: message.sender.id,
+                        name: message.sender.name,
+                        icon: message.senderAvatar == null
                             ? null
-                            : BitmapFilePathAndroidIcon(senderAvatar.path),
+                            : BitmapFilePathAndroidIcon(
+                                message.senderAvatar!.path,
+                              ),
                       ),
                     ),
                   ],
                 ),
-        ),
+              ),
         iOS: darwin,
         macOS: darwin,
         windows: .new(
@@ -237,16 +269,8 @@ class NotificationController
               ? null
               : .new(id: threadId, title: title, arguments: payload ?? ""),
         ),
-      );
-
-      await controller.show(
-        id: id,
-        title: title,
-        body: prefix == null || body == null ? body : "$prefix: $body",
-        notificationDetails: notificationDetails,
-        payload: payload,
-      );
-    }
+      ),
+    );
   }
 
   static final provider =
