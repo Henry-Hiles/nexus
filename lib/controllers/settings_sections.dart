@@ -166,6 +166,21 @@ class SettingsSectionsController
                     : null,
               ),
             ),
+            .new(
+              title: "Hide Membership Events",
+              description: "Hides membership events (invites, joins, leaves, bans & knocks) from appearing in conversations.",
+              icon: Icons.person_off,
+              builder: (title, description, icon) => SwitchListTile(
+                title: Text(title),
+                subtitle: Text(description),
+                secondary: Icon(icon),
+                value: settings.hideMembershipEvents,
+                onChanged: (value) => ref
+                    .read(SettingsController.provider.notifier)
+                    .set(settings.copyWith(hideMembershipEvents: value))
+                    .onError(showError),
+              ),
+            ),
           ]),
         ),
       ]),

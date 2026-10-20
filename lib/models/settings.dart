@@ -14,6 +14,7 @@ class const Settings({
   final bool showAllInHome = false,
   final bool showMinimizeButton = false,
   final bool swipeToReply = false,
+  final bool hideMembershipEvents = false,
   final RoomOrder roomOrder = .unreadFirst,
 }) with _$Settings {
   Map<String, Object?> toJson() => _$SettingsToJson(this);

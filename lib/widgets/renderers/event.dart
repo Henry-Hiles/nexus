@@ -6,6 +6,7 @@ import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/event.dart";
 import "package:nexus/controllers/room_chat.dart";
 import "package:nexus/controllers/rooms.dart";
+import "package:nexus/controllers/settings.dart";
 import "package:nexus/helpers/extensions/show_adaptive_menu.dart";
 import "package:nexus/helpers/hooks/chat_scroll.dart";
 import "package:nexus/models/content/avatar.dart";
@@ -77,6 +78,17 @@ class const EventRenderer(
     );
 
     if (event == null) return SizedBox.shrink();
+
+    final hideMembershipEvents = (ref
+        .watch(SettingsController.provider)
+        .maybeWhen(
+          orElse: () => false,
+          data: (settings) => settings.hideMembershipEvents,
+        ));
+
+    if (event.content is MembershipContent && hideMembershipEvents) {
+      return SizedBox.shrink();
+    }
 
     final isGrouped =
         previousEvent?.content is MessageContent &&
