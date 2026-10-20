@@ -5,7 +5,6 @@ publish_to: none
 
 flutter:
     fonts:
-        - family: bundled-emoji
         - family: bundled-sans
           fonts:
               - asset: assets/fonts/Inter.ttf
