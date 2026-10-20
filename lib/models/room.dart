@@ -14,15 +14,15 @@ class const Room({
 
   /// [timeline] is an IMap of timelineRowId to eventRowId
   @JsonKey(fromJson: Room.timelineTupleJsonToIMap)
-  final IMap<int, int?> timeline = const IMap.empty(),
+  final IMap<int, int?> timeline = const .empty(),
 
   /// [clientSticky] is an ISet of eventRowId
   @JsonKey(includeFromJson: false, includeToJson: false)
-  final ISet<int> clientSticky = const ISet.empty(),
+  final ISet<int> clientSticky = const .empty(),
 
   /// [events] is an IMap of eventRowId to event
   @JsonKey(fromJson: Room.eventsJsonToIMap)
-  final IMap<int, Event> events = const IMap.empty(),
+  final IMap<int, Event> events = const .empty(),
 
   final bool reset = false,
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -34,9 +34,9 @@ class const Room({
   @JsonKey(includeFromJson: false, includeToJson: false)
   final bool hasFetchedMembers = false,
 
-  final IMap<String, IMap<String, int>> state = const IMap.empty(),
+  final IMap<String, IMap<String, int>> state = const .empty(),
 
-  final IMap<String, IList<ReadReceipt>> receipts = const IMap.empty(),
+  final IMap<String, IList<ReadReceipt>> receipts = const .empty(),
   final bool dismissNotifications = false,
   final bool hasMore = true,
 

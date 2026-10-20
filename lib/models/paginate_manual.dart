@@ -9,7 +9,7 @@ part "paginate_manual.g.dart";
 @JsonSerializable()
 class const PaginateManual({
   required final IList<Event> events,
-  final IList<Event> relatedEvents = const IList.empty(),
+  final IList<Event> relatedEvents = const .empty(),
   required final String? nextBatch,
 }) with _$PaginateManual {
   Map<String, Object?> toJson() => _$PaginateManualToJson(this);

@@ -11,10 +11,10 @@ part "sync_data.g.dart";
 @JsonSerializable(createToJson: false)
 class const SyncData({
   final bool clearState = false,
-  final IMap<String, IMap<String, dynamic>> accountData = const IMap.empty(),
-  final IMap<String, Room> rooms = const IMap.empty(),
-  final ISet<String> leftRooms = const ISet.empty(),
-  final IList<InvitedRoom> invitedRooms = const IList.empty(),
+  final IMap<String, IMap<String, dynamic>> accountData = const .empty(),
+  final IMap<String, Room> rooms = const .empty(),
+  final ISet<String> leftRooms = const .empty(),
+  final IList<InvitedRoom> invitedRooms = const .empty(),
   final IMap<String, IList<SpaceEdge>>? spaceEdges,
   final IList<String>? topLevelSpaces,
 }) with _$SyncData {

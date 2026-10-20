@@ -12,7 +12,7 @@ class const AccountData({
       const InvitePermissionConfig(),
 
   @JsonKey(name: AccountData.directKey)
-  final IMap<String, IList<String>> directMessages = const IMap.empty(),
+  final IMap<String, IList<String>> directMessages = const .empty(),
 
   @JsonKey(name: AccountData.recentEmojiKey)
   final RecentEmojiData recentEmoji = const RecentEmojiData(),
@@ -30,7 +30,7 @@ class const AccountData({
 @Freezed(toJson: false, fromJson: false)
 @JsonSerializable()
 class const RecentEmojiData({
-  final IList<RecentEmoji> recentEmoji = const IList.empty(),
+  final IList<RecentEmoji> recentEmoji = const .empty(),
 }) with _$RecentEmojiData {
   Map<String, Object?> toJson() => _$RecentEmojiDataToJson(this);
 

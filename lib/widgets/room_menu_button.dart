@@ -15,7 +15,7 @@ import "package:nexus/main.dart";
 
 final class const RoomMenuButton(
   final Room? room, {
-  final IList<Room> children = const IList.empty(),
+  final IList<Room> children = const .empty(),
   super.key,
 }) extends ConsumerWidget {
   @override

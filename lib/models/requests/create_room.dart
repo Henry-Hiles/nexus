@@ -13,10 +13,10 @@ class const CreateRoomRequest({
   final String? roomAliasName,
   final String? name,
   final String? topic,
-  final IList<String> invite = const IList.empty(),
+  final IList<String> invite = const .empty(),
   @JsonKey(name: "uk.timedout.msc4491.invite_reason")
   final String? inviteReason,
-  final IList<InitialStateEvent> initialState = const IList.empty(),
+  final IList<InitialStateEvent> initialState = const .empty(),
   final RoomPreset? preset,
   final bool isDirect = false,
   final IMap<String, dynamic>? creationContent,

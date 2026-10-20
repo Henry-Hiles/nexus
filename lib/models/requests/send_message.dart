@@ -25,7 +25,7 @@ class const SendMessageRequest({
 @JsonSerializable()
 class const Mentions({
   final bool room = false,
-  final IList<String> userIds = const IList.empty(),
+  final IList<String> userIds = const .empty(),
 }) with _$Mentions {
   Map<String, Object?> toJson() => _$MentionsToJson(this);
 

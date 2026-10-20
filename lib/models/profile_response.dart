@@ -40,7 +40,7 @@ class const Profile({
   final String? timezone,
 
   @JsonKey(readValue: Profile.readPronouns, name: "m.pronouns")
-  final IList<Pronoun> pronouns = const IList.empty(),
+  final IList<Pronoun> pronouns = const .empty(),
 }) with _$Profile {
   Map<String, Object?> toJson() => _$ProfileToJson(this);
 

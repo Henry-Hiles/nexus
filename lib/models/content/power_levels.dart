@@ -28,7 +28,7 @@ sealed class PowerLevelsContent extends Content with _$PowerLevelsContent {
 @JsonSerializable()
 class const Notifications({
   final int room = 50,
-  final IMap<String, int> other = const IMap.empty(),
+  final IMap<String, int> other = const .empty(),
 }) with _$Notifications {
   Map<String, Object?> toJson() => _$NotificationsToJson(this);
 

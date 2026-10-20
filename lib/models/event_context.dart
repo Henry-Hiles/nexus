@@ -13,7 +13,7 @@ class const EventContext({
   required final IList<Event> after,
   required final String start,
   required final String end,
-  final IList<Event> relatedEvents = const IList.empty(),
+  final IList<Event> relatedEvents = const .empty(),
 }) with _$EventContext {
   Map<String, Object?> toJson() => _$EventContextToJson(this);
 
