@@ -25,8 +25,8 @@ dependency_overrides:
     code_assets: 2.1.0 # webcrypto requires ^1.0.0, but works with 2.x
     webcrypto:
         git:
-            url: https://github.com/google/webcrypto.dart
-            ref: da6648cf87309af4271e312c447e0356f8fda5d1 # Uses build hooks, unreleased
+            url: https://github.com/DavidClaudeAI/webcrypto.dart
+            ref: fix/apple-x86_64-fiat-asm-upstream # Uses build hooks and fixes macOS x86_64, unreleased
     native_toolchain_cmake:
         git:
             url: https://github.com/Henry-Hiles/native_toolchain_cmake

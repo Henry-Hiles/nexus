@@ -1749,9 +1749,9 @@ packages:
     dependency: "direct overridden"
     description:
       path: "."
-      ref: da6648cf87309af4271e312c447e0356f8fda5d1
-      resolved-ref: da6648cf87309af4271e312c447e0356f8fda5d1
-      url: "https://github.com/google/webcrypto.dart"
+      ref: "fix/apple-x86_64-fiat-asm-upstream"
+      resolved-ref: e50fcce3d0c30627b11ffc74eb964b1073d42620
+      url: "https://github.com/DavidClaudeAI/webcrypto.dart"
     source: git
     version: "0.6.2-wip"
   webpush_encryption:
