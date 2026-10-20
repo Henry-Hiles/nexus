@@ -19,6 +19,6 @@ extension ShowAdaptiveSheet on BuildContext {
           context: this,
           isScrollControlled: true,
           constraints: .new(maxHeight: MediaQuery.sizeOf(this).height - 80),
-          builder: builder,
+          builder: (context) => SafeArea(child: builder(context)),
         );
 }
