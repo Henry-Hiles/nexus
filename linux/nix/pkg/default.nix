@@ -12,7 +12,7 @@
 
 flutter.buildFlutterApplication {
   pname = "nexus";
-  version = "1.0.0-alpha4";
+  version = "1.0.0-alpha5";
   inherit src;
 
   preBuild = ''
