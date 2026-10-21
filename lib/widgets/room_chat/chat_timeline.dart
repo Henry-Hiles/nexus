@@ -13,6 +13,9 @@ class const ChatTimeline({
   required final IList<PopupMenuEntry> Function(Event) getEventOptions,
   required final int? highlightedEvent,
   required final double composerHeight,
+
+  /// The typing indicator's height, or zero while it's hidden.
+  required final double typingIndicatorHeight,
   final void Function(int rowId)? onSwipe,
   super.key,
 }) extends StatelessWidget {
@@ -40,7 +43,22 @@ class const ChatTimeline({
     keyboardDismissBehavior: .onDrag,
     controller: scroll.scrollController,
     slivers: [
-      SliverToBoxAdapter(child: SizedBox(height: composerHeight)),
+      SliverToBoxAdapter(
+        child: Column(
+          children: [
+            // Makes room for the typing indicator, with a small gap above it,
+            // so it doesn't cover messages
+            AnimatedContainer(
+              duration: Durations.medium2,
+              curve: Curves.easeInOutCubicEmphasized,
+              height: typingIndicatorHeight == 0
+                  ? 0
+                  : typingIndicatorHeight + 4,
+            ),
+            SizedBox(height: composerHeight),
+          ],
+        ),
+      ),
 
       SuperSliverList.builder(
         itemCount: scroll.liveRows.length,

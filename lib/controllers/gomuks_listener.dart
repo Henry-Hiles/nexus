@@ -15,6 +15,7 @@ import "package:nexus/controllers/rooms.dart";
 import "package:nexus/controllers/space_edges.dart";
 import "package:nexus/controllers/sync_status.dart";
 import "package:nexus/controllers/top_level_spaces.dart";
+import "package:nexus/controllers/typing.dart";
 import "package:nexus/helpers/extensions/gomuks_buffer.dart";
 import "package:nexus/main.dart";
 import "package:ffi/ffi.dart";
@@ -63,6 +64,10 @@ class GomuksListenerController extends AsyncNotifier<void> {
                         event.roomId: .new(events: .new({event.rowId: event})),
                       }),
                     );
+              case "typing":
+                ref
+                    .read(TypingController.provider.notifier)
+                    .set(.fromJson(decodedMuksEvent));
               case "events_decrypted":
                 final decrypted = EventsDecrypted.fromJson(decodedMuksEvent);
                 final metadata = ref
@@ -96,6 +101,7 @@ class GomuksListenerController extends AsyncNotifier<void> {
                   ref.invalidate(roomProvider);
                   ref.invalidate(accountDataProvider);
                   ref.invalidate(invitesProvider);
+                  ref.invalidate(TypingController.provider);
                 }
 
                 ref
@@ -153,6 +159,7 @@ class GomuksListenerController extends AsyncNotifier<void> {
         if (paused) {
           GomuksPauseSync(handle);
         } else {
+          ref.invalidate(TypingController.provider);
           GomuksResumeSync(handle);
         }
       }, fireImmediately: true);

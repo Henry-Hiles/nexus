@@ -20,6 +20,7 @@ import "package:nexus/helpers/extensions/distributor_name.dart";
 import "package:nexus/models/account_data.dart";
 import "package:nexus/models/room_order.dart";
 import "package:nexus/models/settings_category.dart";
+import "package:nexus/models/typing_indicators.dart";
 import "package:nexus/main.dart";
 import "package:nexus/widgets/settings/dialog_list_tile.dart";
 import "package:nexus/widgets/reset_encryption_sheet.dart";
@@ -180,6 +181,34 @@ class SettingsSectionsController
                     .set(settings.copyWith(hideMembershipEvents: value))
                     .onError(showError),
               ),
+            ),
+          ]),
+        ),
+        .new(
+          title: "Privacy",
+          icon: Icons.privacy_tip,
+          settings: .new([
+            .new(
+              title: "Typing Indicators",
+              description: "Show when others are typing, and let others see when you're typing.",
+              icon: Icons.keyboard,
+              builder: (title, description, icon) =>
+                  DialogListTile<TypingIndicators>(
+                    icon: Icon(icon),
+                    title: title,
+                    subtitle: Text(description),
+                    value: settings.typingIndicators,
+                    options: TypingIndicators.values,
+                    getName: (option) => switch (option) {
+                      .showAndSend => "Show and send",
+                      .show => "Only show",
+                      .neither => "Neither",
+                    },
+                    onChanged: (value) => ref
+                        .read(SettingsController.provider.notifier)
+                        .set(settings.copyWith(typingIndicators: value))
+                        .onError(showError),
+                  ),
             ),
           ]),
         ),

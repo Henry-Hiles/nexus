@@ -11,6 +11,8 @@ import "package:flutter_hooks/flutter_hooks.dart";
 import "package:fluttertagger/fluttertagger.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/attachment.dart";
+import "package:nexus/controllers/client.dart";
+import "package:nexus/controllers/settings.dart";
 import "package:nexus/controllers/image_picker.dart";
 import "package:nexus/helpers/file_dialog_helper.dart";
 import "package:image_picker/image_picker.dart";
@@ -93,6 +95,44 @@ class const Composer(
 
       return null;
     }, [relationType, relatedEvent == null]);
+
+    final sinceTypingSent = useMemoized(Stopwatch.new);
+
+    useEffect(() {
+      final client = ref.read(ClientController.provider.notifier);
+
+      void stopTyping() {
+        if (!sinceTypingSent.isRunning) return;
+        sinceTypingSent
+          ..stop()
+          ..reset();
+        client.setTyping(roomId, .zero).ignore();
+      }
+
+      void onChanged() {
+        final shouldSend =
+            ref.read(SettingsController.provider).value?.typingIndicators ==
+            .showAndSend;
+
+        if (!shouldSend || controller.text.isEmpty) return stopTyping();
+
+        if (sinceTypingSent.isRunning &&
+            sinceTypingSent.elapsed < const .new(seconds: 5)) {
+          return;
+        }
+
+        sinceTypingSent
+          ..reset()
+          ..start();
+        client.setTyping(roomId, const .new(seconds: 10)).ignore();
+      }
+
+      controller.addListener(onChanged);
+      return () {
+        controller.removeListener(onChanged);
+        stopTyping();
+      };
+    }, [roomId]);
 
     final attachment = ref.watch(AttachmentController.provider(roomId));
 

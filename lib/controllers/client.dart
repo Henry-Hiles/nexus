@@ -320,6 +320,11 @@ class ClientController extends AsyncNotifier<int> {
 
   Future<void> logout() => _sendCommand("logout");
 
+  Future<void> setTyping(String roomId, Duration timeout) => _sendCommand(
+    "set_typing",
+    {"room_id": roomId, "timeout": timeout.inMilliseconds},
+  );
+
   Future<void> markRead(Room room) async {
     if (room.timeline.isEmpty || room.metadata == null) return;
     final eventRowId = room.timeline[room.timeline.keys.reduce(max)];

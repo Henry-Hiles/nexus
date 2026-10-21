@@ -15,6 +15,7 @@ import "package:nexus/helpers/hooks/chat_scroll.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/models/relation_type.dart";
 import "package:nexus/widgets/composer/composer.dart";
+import "package:nexus/widgets/composer/typing_indicator.dart";
 import "package:nexus/widgets/error_dialog.dart";
 import "package:nexus/widgets/loading.dart";
 import "package:nexus/widgets/pinned_events_drawer.dart";
@@ -46,6 +47,7 @@ final class const RoomChat({
     final highlightedEvent = useState<int?>(null);
 
     final composerSize = useState<double>(64);
+    final typingIndicatorSize = useState<double>(0);
 
     final userId = ref.watch(ClientStateController.provider)?.userId;
     final memberListOpened = ref
@@ -252,6 +254,8 @@ final class const RoomChat({
                                           : null,
                                       highlightedEvent: highlightedEvent.value,
                                       composerHeight: composerSize.value,
+                                      typingIndicatorHeight:
+                                          typingIndicatorSize.value,
                                     ),
                                     AsyncLoading _ => Loading(),
                                     AsyncError(
@@ -260,6 +264,17 @@ final class const RoomChat({
                                     ) =>
                                       ErrorDialog(error, stackTrace),
                                   },
+                                ),
+                              ),
+                              Positioned(
+                                bottom: composerSize.value,
+                                left: 12,
+                                // To give space for jump to bottom button
+                                right: 72,
+                                child: MeasureSize(
+                                  onChange: (size) =>
+                                      typingIndicatorSize.value = size.height,
+                                  child: TypingIndicator(roomId),
                                 ),
                               ),
                               Positioned(

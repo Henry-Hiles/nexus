@@ -1,6 +1,7 @@
 import "package:material_ui/material_ui.dart";
 import "package:freezed_annotation/freezed_annotation.dart";
 import "package:nexus/models/room_order.dart";
+import "package:nexus/models/typing_indicators.dart";
 
 part "settings.freezed.dart";
 part "settings.g.dart";
@@ -16,6 +17,7 @@ class const Settings({
   final bool swipeToReply = false,
   final bool hideMembershipEvents = false,
   final RoomOrder roomOrder = .unreadFirst,
+  final TypingIndicators typingIndicators = .showAndSend,
 }) with _$Settings {
   Map<String, Object?> toJson() => _$SettingsToJson(this);
 
