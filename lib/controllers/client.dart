@@ -222,6 +222,9 @@ class ClientController extends AsyncNotifier<int> {
   Future<String> joinRoom(JoinRoomRequest request) async =>
       (await _sendCommand("join_room", request.toJson()))["room_id"];
 
+  Future<String> knockRoom(JoinRoomRequest request) async =>
+      (await _sendCommand("knock_room", request.toJson()))["room_id"];
+
   Future<String> createRoom(CreateRoomRequest request) async =>
       (await _sendCommand("create_room", request.toJson()))["room_id"];
 

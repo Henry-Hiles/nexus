@@ -40,4 +40,29 @@ extension JoinRoom on BuildContext {
 
     return roomId;
   }
+
+  /// Knocks on a room, success and errors in snackbars.
+  /// Returns the room's ID, or null if knocking failed.
+  Future<String?> knockRoom(
+    JoinRoomRequest request, {
+    required String name,
+  }) async {
+    final container = ProviderScope.containerOf(this);
+    final messenger = ScaffoldMessenger.of(this);
+
+    final roomId = await withProgressSnackbar(
+      "Knocking on $name...",
+      () =>
+          container.read(ClientController.provider.notifier).knockRoom(request),
+    );
+    if (roomId == null) return null;
+
+    messenger.showSnackBar(
+      .new(
+        content: Text("Knocked on $name. Wait for a moderator to let you in."),
+      ),
+    );
+
+    return roomId;
+  }
 }

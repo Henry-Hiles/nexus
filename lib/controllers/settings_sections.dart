@@ -168,7 +168,7 @@ class SettingsSectionsController
             ),
             .new(
               title: "Hide Membership Events",
-              description: "Hides membership events (invites, joins, leaves, bans & knocks) from appearing in conversations.",
+              description: "Hides membership events (invites, joins, leaves & bans) from appearing in conversations. Knocks are still shown.",
               icon: Icons.person_off,
               builder: (title, description, icon) => SwitchListTile(
                 title: Text(title),

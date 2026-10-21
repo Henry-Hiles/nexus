@@ -21,12 +21,8 @@ class const MessageDisplayname(
     AsyncData(:final MembershipContent? value) ||
     AsyncLoading(:final value) ||
     AsyncError(:final value) => InkWell(
-      onTap: clickable && value != null
-          ? () => context.showUserPopover(
-              value,
-              event.sender,
-              roomId: event.roomId,
-            )
+      onTap: clickable
+          ? () => context.showUserPopover(event.sender, roomId: event.roomId)
           : null,
       child: switch ([
         Text(

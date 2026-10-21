@@ -9,6 +9,7 @@ part "join_room.g.dart";
 class const JoinRoomRequest({
   required final String roomIdOrAlias,
   final IList<String> via = const .empty(),
+  final String? reason,
 
   /// Set when accepting an invite, so gomuks can mark DMs as such.
   final bool fromInvite = false,

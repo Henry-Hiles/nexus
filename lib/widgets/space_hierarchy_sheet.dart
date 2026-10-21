@@ -14,6 +14,7 @@ import "package:nexus/models/content/create.dart";
 import "package:nexus/models/space_hierarchy.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/widgets/expandable_image.dart";
+import "package:nexus/widgets/knock_sheet.dart";
 import "package:nexus/widgets/loading.dart";
 import "package:nexus/widgets/room_summary_sheet.dart";
 import "package:nexus/widgets/sheet_layout.dart";
@@ -46,6 +47,14 @@ class const SpaceHierarchySheet(final String spaceId, {super.key})
               foregroundColor: Theme.of(context).colorScheme.error,
             ),
             child: const Text("Leave"),
+          )
+        : room.summary.mustKnock(joinedIds)
+        ? TextButton(
+            onPressed: () => context.showAdaptiveSheet(
+              (_) =>
+                  KnockSheet(room.summary.roomId, name: name, via: child.via),
+            ),
+            child: const Text("Knock"),
           )
         : TextButton(
             onPressed: () => context.joinRoom(

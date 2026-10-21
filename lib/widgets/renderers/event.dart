@@ -86,7 +86,12 @@ class const EventRenderer(
           data: (settings) => settings.hideMembershipEvents,
         ));
 
-    if (event.content is MembershipContent && hideMembershipEvents) {
+    // Knocks and their outcomes stay visible, as moderators need to act on them
+    if (hideMembershipEvents &&
+        event.content is MembershipContent &&
+        ![event.content, event.previousContent].any(
+          (content) => content is MembershipContent && content.status == .knock,
+        )) {
       return SizedBox.shrink();
     }
 

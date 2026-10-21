@@ -19,6 +19,11 @@ class const MembershipRenderer(
       "Make sure to only pass membership events to MembershipRenderer",
     );
 
+    final previous = switch (event.previousContent) {
+      MembershipContent(:final status) => status,
+      _ => null,
+    };
+
     return switch (event.content) {
       MembershipContent content => GenericEventRenderer(
         Icons.people,
@@ -28,7 +33,6 @@ class const MembershipRenderer(
             alignment: .middle,
             child: InkWell(
               onTap: () => context.showUserPopover(
-                content,
                 event.stateKey!,
                 roomId: event.roomId,
               ),
@@ -43,9 +47,10 @@ class const MembershipRenderer(
           TextSpan(
             text:
                 "${switch (content.status) {
-                  .invite => "was invited to",
+                  .invite => previous == .knock ? "was accepted into" : "was invited to",
                   .join => "joined",
-                  .leave => event.sender == event.stateKey ? "left" : (event.unsigned["prev_content"]?["membership"] == "ban" ? "was unbanned from" : "was kicked from"),
+                  .leave when previous == .knock => event.sender == event.stateKey ? "retracted their knock on" : "had their knock denied in",
+                  .leave => event.sender == event.stateKey ? "left" : (previous == .ban ? "was unbanned from" : "was kicked from"),
                   .ban => "was banned from",
                   .knock => "asked to join",
                 }} the room${event.sender == event.stateKey ? "" : " by"}",

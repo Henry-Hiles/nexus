@@ -40,8 +40,8 @@ class const MentionChip(final String content, final String? roomId, {super.key})
         ? SizedBox.shrink()
         : InkWell(
             onTap: () async {
-              if (data case MembershipContent membership) {
-                context.showUserPopover(membership, mention, roomId: roomId);
+              if (data is MembershipContent) {
+                context.showUserPopover(mention, roomId: roomId);
               } else if (data case RoomSummary summary) {
                 final eventRowId = linkInfo?.eventId == null
                     ? null

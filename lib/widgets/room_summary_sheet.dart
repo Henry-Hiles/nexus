@@ -2,12 +2,16 @@ import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:material_ui/material_ui.dart";
 import "package:nexus/widgets/sheet_layout.dart";
+import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/invites.dart";
+import "package:nexus/controllers/rooms.dart";
 import "package:nexus/helpers/extensions/get_localpart.dart";
 import "package:nexus/helpers/extensions/join_room.dart";
+import "package:nexus/helpers/extensions/show_adaptive_sheet.dart";
 import "package:nexus/main.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/widgets/expandable_image.dart";
+import "package:nexus/widgets/knock_sheet.dart";
 import "package:nexus/widgets/linkified_text.dart";
 import "package:nexus/models/room_summary.dart";
 
@@ -15,11 +19,17 @@ class const RoomSummarySheet(
   final RoomSummary summary, {
   final IList<String>? via,
   super.key,
-}) extends StatelessWidget {
+}) extends ConsumerWidget {
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final name = summary.name ?? summary.canonicalAlias ?? summary.roomId;
     final isInvite = summary.membership == .invite;
+    final isKnocking = summary.membership == .knock;
+    final mustKnock = summary.mustKnock(
+      ref.watch(
+        RoomsController.provider.select((rooms) => rooms.keys.toISet()),
+      ),
+    );
     final colorScheme = Theme.of(context).colorScheme;
 
     return SheetLayout(
@@ -83,7 +93,35 @@ class const RoomSummarySheet(
             },
             child: Text("Accept"),
           ),
-        ] else if (via != null)
+        ] else if (isKnocking)
+          TextButton(
+            onPressed: () {
+              final container = ProviderScope.containerOf(context);
+              Navigator.of(context).pop();
+
+              container
+                  .read(ClientController.provider.notifier)
+                  .leaveRoom(summary.roomId)
+                  .onError(showError);
+            },
+            style: TextButton.styleFrom(foregroundColor: colorScheme.error),
+            child: Text("Retract knock"),
+          )
+        else if (via != null && mustKnock)
+          TextButton(
+            onPressed: () async {
+              if (await context.showAdaptiveSheet<bool>(
+                        (_) =>
+                            KnockSheet(summary.roomId, name: name, via: via!),
+                      ) ==
+                      true &&
+                  context.mounted) {
+                Navigator.of(context).pop();
+              }
+            },
+            child: Text("Knock"),
+          )
+        else if (via != null)
           TextButton(
             onPressed: () {
               context.joinRoom(
@@ -138,6 +176,17 @@ class const RoomSummarySheet(
                 title: Text("Topic"),
                 subtitle: LinkifiedText(summary.topic!),
                 leading: Icon(Icons.info),
+              ),
+            if (isKnocking)
+              ListTile(
+                title: Text("You've knocked"),
+                subtitle: Text("Waiting for a moderator to let you in"),
+                leading: Icon(Icons.hourglass_top),
+              )
+            else if (mustKnock)
+              ListTile(
+                title: Text("Knock to join"),
+                leading: Icon(Icons.door_front_door),
               ),
             if (summary.encryption != null)
               ListTile(title: Text("Encrypted"), leading: Icon(Icons.lock)),

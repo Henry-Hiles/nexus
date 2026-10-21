@@ -1,3 +1,4 @@
+import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:freezed_annotation/freezed_annotation.dart";
 import "package:nexus/models/content/create.dart";
 import "package:nexus/models/content/membership.dart";
@@ -14,6 +15,9 @@ class const RoomSummary({
   required final String roomId,
   @JsonKey(name: "num_joined_members") final int? joinedMembers,
   final JoinRule? joinRule,
+
+  /// Rooms whose members may join without an invite, for restricted rooms.
+  final IList<String> allowedRoomIds = const .empty(),
   final String? name,
   final Uri? avatarUrl,
   final String? canonicalAlias,
@@ -41,6 +45,14 @@ class const RoomSummary({
   /// Whether this is an invite to a direct message.
   @JsonKey(includeFromJson: false) final bool isDirect = false,
 }) with _$RoomSummary {
+  /// Whether the user has to knock rather than join, given the rooms they've
+  /// joined. Restricted knock rooms can be joined directly from an allowed room.
+  bool mustKnock(ISet<String> joinedRooms) => switch (joinRule) {
+    .knock => true,
+    .knockRestricted => !allowedRoomIds.any(joinedRooms.contains),
+    _ => false,
+  };
+
   /// A summary of a room the user is in, from its synced metadata.
   factory RoomSummary.fromMetadata(RoomMetadata metadata) => .new(
     roomId: metadata.id,

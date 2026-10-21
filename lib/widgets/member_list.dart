@@ -25,6 +25,7 @@ class const MemberList(final String roomId, {super.key})
     final options = <String, MembershipStatus>{
       "Joined": .join,
       "Invited": .invite,
+      "Knocked": .knock,
       "Banned": .ban,
     };
     final status = options.values.toIList()[statusIndex.value];
@@ -104,15 +105,13 @@ class const MemberList(final String roomId, {super.key})
                                 itemBuilder: (context, index) =>
                                     switch (members[index].content) {
                                       MembershipContent(
-                                            :final avatarUrl,
-                                            :final displayName,
-                                          ) &&
-                                          final content =>
+                                        :final avatarUrl,
+                                        :final displayName,
+                                      ) =>
                                         Builder(
                                           builder: (context) => ListTile(
                                             onTap: () =>
                                                 context.showUserPopover(
-                                                  content,
                                                   members[index].stateKey!,
                                                   roomId: roomId,
                                                 ),
