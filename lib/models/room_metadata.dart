@@ -1,4 +1,5 @@
 import "package:freezed_annotation/freezed_annotation.dart";
+import "package:nexus/models/content/encryption.dart";
 import "package:nexus/models/epoch_date_time_converter.dart";
 import "package:nexus/models/lazy_load_summary.dart";
 
@@ -15,6 +16,8 @@ class const RoomMetadata({
   final String? topic,
   final String? canonicalAlias,
   final LazyLoadSummary? lazyLoadSummary,
+
+  final EncryptionContent? encryptionEvent,
   required final bool hasMemberList,
   @JsonKey(name: "preview_event_rowid") required final int previewEventRowID,
   @EpochDateTimeConverter() required final DateTime sortingTimestamp,

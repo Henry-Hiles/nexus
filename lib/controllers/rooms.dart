@@ -33,6 +33,26 @@ class RoomsController extends Notifier<IMap<String, Room>> {
     .new(),
   );
 
+  /// Adds events to their rooms, without changing the rooms' timelines.
+  void storeEvents(Iterable<Event> events) => update(
+    .new(
+      events
+          .groupListsBy((event) => event.roomId)
+          .map(
+            (roomId, roomEvents) => .new(
+              roomId,
+              Room(
+                // ignore: unused_result - I am using it you donkey
+                events: .fromIterable(
+                  roomEvents,
+                  keyMapper: (event) => event.rowId,
+                ),
+              ),
+            ),
+          ),
+    ),
+  );
+
   void update(
     IMap<String, Room> rooms, [
     ISet<String> leftRooms = const .empty(),

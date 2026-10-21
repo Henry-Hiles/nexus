@@ -20,6 +20,7 @@ import "package:nexus/widgets/loading.dart";
 import "package:nexus/widgets/pinned_events_drawer.dart";
 import "package:nexus/widgets/member_list.dart";
 import "package:nexus/widgets/room_appbar.dart";
+import "package:nexus/widgets/search_drawer.dart";
 import "package:nexus/widgets/sync_status_banner.dart";
 import "package:nexus/main.dart";
 import "package:nexus/widgets/room_chat/chat_timeline.dart";
@@ -198,115 +199,132 @@ final class const RoomChat({
     );
 
     return Scaffold(
-      endDrawer: PinnedEventsDrawer(
+      endDrawer: SearchDrawer(
         roomId,
         getEventOptions: getEventOptions,
         jumpToEvent: jumpToEvent,
       ),
       body: Builder(
-        builder: (middleContext) => Scaffold(
-          endDrawer: showMembersByDefault ? null : MemberList(roomId),
-          appBar: RoomAppbar(
-            roomId: roomId,
-            isDesktop: isDesktop,
-            onOpenDrawer: Scaffold.of(context).openDrawer,
-            onOpenMemberList: (thisContext) {
-              ref
-                  .read(MemberListOpenedController.provider.notifier)
-                  .set(!memberListOpened);
-              Scaffold.of(thisContext).openEndDrawer();
-            },
-            onOpenPinnedMessagesList: Scaffold.of(middleContext).openEndDrawer,
+        builder: (searchContext) => Scaffold(
+          endDrawer: PinnedEventsDrawer(
+            roomId,
+            getEventOptions: getEventOptions,
+            jumpToEvent: jumpToEvent,
           ),
-          body: Column(
-            children: [
-              const SyncStatusBanner(),
-              Expanded(
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Stack(
-                        children: [
-                          Positioned.fill(
-                            child: Padding(
-                              padding: .symmetric(horizontal: 4),
-                              child: switch (controllerData) {
-                                AsyncLoading(value: _?) ||
-                                AsyncData(value: _) => ChatTimeline(
-                                  scroll: scroll,
-                                  roomId: roomId,
-                                  jumpToEvent: jumpToEvent,
-                                  getEventOptions: getEventOptions,
-                                  onSwipe: swipeToReply && canReply
-                                      ? (rowId) => onRelation(rowId, .reply)
-                                      : null,
-                                  highlightedEvent: highlightedEvent.value,
-                                  composerHeight: composerSize.value,
-                                ),
-                                AsyncLoading _ => Loading(),
-                                AsyncError(:final error, :final stackTrace) =>
-                                  ErrorDialog(error, stackTrace),
-                              },
-                            ),
-                          ),
-                          Positioned(
-                            right: 16,
-                            bottom: composerSize.value,
-                            child: IgnorePointer(
-                              ignoring: scroll.atBottom,
-                              child: AnimatedOpacity(
-                                opacity: scroll.atBottom ? 0 : 1,
-                                duration: Durations.short4,
-                                child: FloatingActionButton.small(
-                                  onPressed: scroll.jumpToBottom,
-                                  child: const Icon(Icons.keyboard_arrow_down),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            bottom: 0,
-                            left: 0,
-                            right: 0,
-                            child: MeasureSize(
-                              onChange: (size) =>
-                                  composerSize.value = size.height,
-                              child: Composer(
-                                roomId,
-                                node: composerNode,
-                                onSend:
-                                    (
-                                      text, {
-                                      required shouldMention,
-                                      required tags,
-                                    }) => notifier
-                                        .send(
-                                          text,
-                                          tags: tags,
-                                          relationType: relationType.value,
-                                          shouldMention: shouldMention,
-                                          relatedEventRowId: relatedEvent.value,
-                                        )
-                                        .onError(showError),
-                                relationType: relationType.value,
-                                relatedEvent: relatedEvent.value,
-                                onDismiss: () {
-                                  relatedEvent.value = null;
-                                  composerNode.requestFocus();
-                                },
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    if (memberListOpened && showMembersByDefault)
-                      MemberList(roomId),
-                  ],
-                ),
+          body: Builder(
+            builder: (middleContext) => Scaffold(
+              endDrawer: showMembersByDefault ? null : MemberList(roomId),
+              appBar: RoomAppbar(
+                roomId: roomId,
+                isDesktop: isDesktop,
+                onOpenDrawer: Scaffold.of(context).openDrawer,
+                onOpenMemberList: (thisContext) {
+                  ref
+                      .read(MemberListOpenedController.provider.notifier)
+                      .set(!memberListOpened);
+                  Scaffold.of(thisContext).openEndDrawer();
+                },
+                onOpenPinnedMessagesList: Scaffold.of(middleContext)
+                    .openEndDrawer,
+                onOpenSearch: Scaffold.of(searchContext).openEndDrawer,
               ),
-            ],
+              body: Column(
+                children: [
+                  const SyncStatusBanner(),
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Stack(
+                            children: [
+                              Positioned.fill(
+                                child: Padding(
+                                  padding: .symmetric(horizontal: 4),
+                                  child: switch (controllerData) {
+                                    AsyncLoading(value: _?) ||
+                                    AsyncData(value: _) => ChatTimeline(
+                                      scroll: scroll,
+                                      roomId: roomId,
+                                      jumpToEvent: jumpToEvent,
+                                      getEventOptions: getEventOptions,
+                                      onSwipe: swipeToReply && canReply
+                                          ? (rowId) => onRelation(rowId, .reply)
+                                          : null,
+                                      highlightedEvent: highlightedEvent.value,
+                                      composerHeight: composerSize.value,
+                                    ),
+                                    AsyncLoading _ => Loading(),
+                                    AsyncError(
+                                      :final error,
+                                      :final stackTrace,
+                                    ) =>
+                                      ErrorDialog(error, stackTrace),
+                                  },
+                                ),
+                              ),
+                              Positioned(
+                                right: 16,
+                                bottom: composerSize.value,
+                                child: IgnorePointer(
+                                  ignoring: scroll.atBottom,
+                                  child: AnimatedOpacity(
+                                    opacity: scroll.atBottom ? 0 : 1,
+                                    duration: Durations.short4,
+                                    child: FloatingActionButton.small(
+                                      onPressed: scroll.jumpToBottom,
+                                      child: const Icon(
+                                        Icons.keyboard_arrow_down,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Positioned(
+                                bottom: 0,
+                                left: 0,
+                                right: 0,
+                                child: MeasureSize(
+                                  onChange: (size) =>
+                                      composerSize.value = size.height,
+                                  child: Composer(
+                                    roomId,
+                                    node: composerNode,
+                                    onSend:
+                                        (
+                                          text, {
+                                          required shouldMention,
+                                          required tags,
+                                        }) => notifier
+                                            .send(
+                                              text,
+                                              tags: tags,
+                                              relationType: relationType.value,
+                                              shouldMention: shouldMention,
+                                              relatedEventRowId:
+                                                  relatedEvent.value,
+                                            )
+                                            .onError(showError),
+                                    relationType: relationType.value,
+                                    relatedEvent: relatedEvent.value,
+                                    onDismiss: () {
+                                      relatedEvent.value = null;
+                                      composerNode.requestFocus();
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        if (memberListOpened && showMembersByDefault)
+                          MemberList(roomId),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       ),

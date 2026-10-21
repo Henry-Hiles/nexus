@@ -16,6 +16,7 @@ final class const RoomAppbar({
   required final void Function() onOpenDrawer,
   final void Function(BuildContext context)? onOpenMemberList,
   final void Function()? onOpenPinnedMessagesList,
+  final void Function()? onOpenSearch,
   super.key,
 }) extends ConsumerWidget implements PreferredSizeWidget {
   @override
@@ -61,6 +62,11 @@ final class const RoomAppbar({
         room == null
             ? []
             : [
+                IconButton(
+                  onPressed: onOpenSearch?.call,
+                  icon: Icon(Icons.search),
+                  tooltip: "Search this room",
+                ),
                 IconButton(
                   onPressed: onOpenPinnedMessagesList?.call,
                   icon: Icon(Icons.push_pin),

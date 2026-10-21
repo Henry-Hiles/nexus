@@ -1,4 +1,3 @@
-import "package:collection/collection.dart";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client.dart";
@@ -9,26 +8,6 @@ typedef NotificationsRequest = (UnreadType? unreadType, String? roomId);
 
 class NotificationsController(final NotificationsRequest request)
     extends AsyncNotifier<IList<(int, String)>> {
-  void storeEvents(Iterable<Event> events) => ref
-      .read(RoomsController.provider.notifier)
-      .update(
-        .new(
-          events
-              .groupListsBy((event) => event.roomId)
-              .map(
-                (roomId, roomEvents) => .new(
-                  roomId,
-                  .new(
-                    events: IMap.fromIterable(
-                      roomEvents,
-                      keyMapper: (event) => event.rowId,
-                    ),
-                  ),
-                ),
-              ),
-        ),
-      );
-
   @override
   Future<IList<(int, String)>> build() async {
     final client = ref.read(ClientController.provider.notifier);
@@ -43,7 +22,9 @@ class NotificationsController(final NotificationsRequest request)
       ),
     );
 
-    storeEvents(mentions.events.addAll(mentions.relatedEvents));
+    ref
+        .read(RoomsController.provider.notifier)
+        .storeEvents(mentions.events.addAll(mentions.relatedEvents));
 
     return .new(mentions.events.map((event) => (event.rowId, event.roomId)));
   }
@@ -76,9 +57,11 @@ class NotificationsController(final NotificationsRequest request)
         ),
       );
 
-      storeEvents(
-        newNotifications.events.addAll(newNotifications.relatedEvents),
-      );
+      ref
+          .read(RoomsController.provider.notifier)
+          .storeEvents(
+            newNotifications.events.addAll(newNotifications.relatedEvents),
+          );
 
       return currentNotifications.addAll(
         newNotifications.events.map((event) => (event.rowId, event.roomId)),

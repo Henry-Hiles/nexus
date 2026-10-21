@@ -41,6 +41,7 @@ import "package:nexus/models/requests/paginate_manual.dart";
 import "package:nexus/models/requests/redact_event.dart";
 import "package:nexus/models/requests/register_pusher.dart";
 import "package:nexus/models/requests/report.dart";
+import "package:nexus/models/requests/search.dart";
 import "package:nexus/models/requests/send_event.dart";
 import "package:nexus/models/requests/send_message.dart";
 import "package:nexus/models/requests/set_account_data.dart";
@@ -275,6 +276,12 @@ class ClientController extends AsyncNotifier<int> {
 
   Future<PaginateManual> paginateManual(PaginateManualRequest request) async =>
       .fromJson(await _sendCommand("paginate_manual", request.toJson()));
+
+  Future<PaginateManual> searchLocal(SearchRequest request) async =>
+      .fromJson(await _sendCommand("search_local", request.toJson()));
+
+  Future<PaginateManual> searchServer(SearchRequest request) async =>
+      .fromJson(await _sendCommand("search_server", request.toJson()));
 
   Future<EventContext> getEventContext(GetEventContextRequest request) async =>
       .fromJson(await _sendCommand("get_event_context", request.toJson()));
