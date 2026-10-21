@@ -266,11 +266,12 @@ final class const RoomChat({
                                   },
                                 ),
                               ),
-                              Positioned(
+                              AnimatedPositioned(
+                                duration: Durations.short4,
                                 bottom: composerSize.value,
                                 left: 12,
-                                // To give space for jump to bottom button
-                                right: 72,
+                                // Leaves room for the jump to bottom button when it's shown
+                                right: scroll.atBottom ? 12 : 72,
                                 child: MeasureSize(
                                   onChange: (size) =>
                                       typingIndicatorSize.value = size.height,
