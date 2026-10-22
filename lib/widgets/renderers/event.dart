@@ -7,27 +7,26 @@ import "package:nexus/controllers/event.dart";
 import "package:nexus/controllers/room_chat.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/controllers/settings.dart";
+import "package:nexus/helpers/extensions/is_shown_as_message.dart";
 import "package:nexus/helpers/extensions/show_adaptive_menu.dart";
 import "package:nexus/helpers/hooks/chat_scroll.dart";
 import "package:nexus/models/content/avatar.dart";
 import "package:nexus/models/content/canonical_alias.dart";
 import "package:nexus/models/content/content.dart";
 import "package:nexus/models/content/create.dart";
-import "package:nexus/models/content/encrypted.dart";
 import "package:nexus/models/content/history_visibility.dart";
 import "package:nexus/models/content/join_rules.dart";
 import "package:nexus/models/content/membership.dart";
-import "package:nexus/models/content/message.dart";
 import "package:nexus/models/content/pinned_events.dart";
 import "package:nexus/models/content/power_levels.dart";
 import "package:nexus/models/content/server_acl.dart";
-import "package:nexus/models/content/sticker.dart";
 import "package:nexus/models/content/topic.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/widgets/error_dialog.dart";
 import "package:nexus/widgets/lazy_loading/message_displayname.dart";
 import "package:nexus/widgets/renderers/message.dart";
 import "package:nexus/widgets/reaction_row.dart";
+import "package:nexus/widgets/read_receipts_row.dart";
 import "package:nexus/widgets/renderers/membership.dart";
 import "package:nexus/widgets/renderers/generic_event.dart";
 import "package:nexus/widgets/swipe_to_reply.dart";
@@ -44,6 +43,10 @@ class const EventRenderer(
 
   /// If set, events can be swiped, calling this
   final VoidCallback? onSwipe,
+
+  /// If set, shows who in this chat has read up to this event, e.g. in the
+  /// timeline.
+  final ChatParams? readReceiptsChat,
   super.key,
 }) extends HookConsumerWidget {
   @override
@@ -96,9 +99,7 @@ class const EventRenderer(
     }
 
     final isGrouped =
-        previousEvent?.content is MessageContent &&
-        previousEvent?.redactedBy == null &&
-        previousEvent?.relationType != "m.replace" &&
+        (previousEvent?.isShownAsMessage ?? false) &&
         event.sender == previousEvent?.sender &&
         event.pmp?.id == previousEvent?.pmp?.id;
 
@@ -111,7 +112,26 @@ class const EventRenderer(
           TextSpan(text: text),
         ]);
 
-    final child = event.redactedBy != null || event.relationType == "m.replace"
+    final child = event.isShownAsMessage
+        ? MessageRenderer(
+            event,
+            onTapReply: jumpToEvent == null
+                ? null
+                : () async {
+                    final replyEvent = await ref.read(
+                      EventController.provider(
+                        .new(roomId: roomId, eventId: event.replyTo!),
+                      ).future,
+                    );
+                    if (replyEvent != null) {
+                      await jumpToEvent!(replyEvent.rowId);
+                    }
+                  },
+            isGrouped: isGrouped,
+            maxLines: maxLines,
+            textOnly: textOnly,
+          )
+        : event.redactedBy != null || event.relationType == "m.replace"
         ? null
         : switch (event.content) {
             Content(:final parseError?, :final stackTrace) => Row(
@@ -121,27 +141,6 @@ class const EventRenderer(
                   stackTrace,
                 ),
               ],
-            ),
-
-            MessageContent() ||
-            EncryptedContent() ||
-            StickerContent() => MessageRenderer(
-              event,
-              onTapReply: jumpToEvent == null
-                  ? null
-                  : () async {
-                      final replyEvent = await ref.read(
-                        EventController.provider(
-                          .new(roomId: roomId, eventId: event.replyTo!),
-                        ).future,
-                      );
-                      if (replyEvent != null) {
-                        await jumpToEvent!(replyEvent.rowId);
-                      }
-                    },
-              isGrouped: isGrouped,
-              maxLines: maxLines,
-              textOnly: textOnly,
             ),
 
             MembershipContent content => switch (event.previousContent) {
@@ -284,6 +283,10 @@ class const EventRenderer(
 
             ...[
               if (child is! MessageRenderer) ReactionRow(event),
+
+              // Outside the message itself, so it doesn't move when swiped
+              if (readReceiptsChat case final chat? when event.isShownAsMessage)
+                ReadReceiptsRow(event.eventId, chat: chat),
 
               if (event.sendError != null && event.sendError != "not sent")
                 Padding(

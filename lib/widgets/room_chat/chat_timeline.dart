@@ -1,5 +1,6 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:material_ui/material_ui.dart";
+import "package:nexus/controllers/room_chat.dart";
 import "package:nexus/helpers/hooks/chat_scroll.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/widgets/renderers/event.dart";
@@ -7,7 +8,7 @@ import "package:nexus/widgets/highlight_wrapper.dart";
 import "package:super_sliver_list/super_sliver_list.dart";
 
 class const ChatTimeline({
-  required final String roomId,
+  required final ChatParams chat,
   required final ChatScroll scroll,
   required final JumpToEvent jumpToEvent,
   required final IList<PopupMenuEntry> Function(Event) getEventOptions,
@@ -27,10 +28,11 @@ class const ChatTimeline({
     EventRenderer(
       eventRowId,
       previousEventRowId: previousEventRowId,
-      roomId: roomId,
+      roomId: chat.roomId,
       jumpToEvent: jumpToEvent,
       getEventOptions: getEventOptions,
       onSwipe: onSwipe == null ? null : () => onSwipe!(eventRowId),
+      readReceiptsChat: chat,
     ),
     key: key,
     isHighlighted: highlightedEvent == eventRowId,

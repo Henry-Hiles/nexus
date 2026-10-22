@@ -85,10 +85,11 @@ final class const RoomChat({
       ),
     );
 
-    final controllerProvider = RoomChatController.provider((
+    final ChatParams chat = (
       roomId: roomId,
       contextualEvent: contextualEvent.value,
-    ));
+    );
+    final controllerProvider = RoomChatController.provider(chat);
     final notifier = ref.watch(controllerProvider.notifier);
 
     final client = ref.read(ClientController.provider.notifier);
@@ -246,7 +247,7 @@ final class const RoomChat({
                                     AsyncLoading(value: _?) ||
                                     AsyncData(value: _) => ChatTimeline(
                                       scroll: scroll,
-                                      roomId: roomId,
+                                      chat: chat,
                                       jumpToEvent: jumpToEvent,
                                       getEventOptions: getEventOptions,
                                       onSwipe: swipeToReply && canReply

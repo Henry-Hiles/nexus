@@ -13,6 +13,11 @@ class const ReadReceipt({
   required final String eventId,
   @EpochDateTimeConverter() required final DateTime timestamp,
 }) with _$ReadReceipt {
+  String get thread => switch (threadId) {
+    final threadId? when threadId.isNotEmpty => threadId,
+    _ => "main",
+  };
+
   Map<String, Object?> toJson() => _$ReadReceiptToJson(this);
 
   factory ReadReceipt.fromJson(Map<String, Object?> json) =>

@@ -1,7 +1,7 @@
 import "package:material_ui/material_ui.dart";
 import "package:freezed_annotation/freezed_annotation.dart";
 import "package:nexus/models/room_order.dart";
-import "package:nexus/models/typing_indicators.dart";
+import "package:nexus/models/show_and_send.dart";
 
 part "settings.freezed.dart";
 part "settings.g.dart";
@@ -17,7 +17,11 @@ class const Settings({
   final bool swipeToReply = false,
   final bool hideMembershipEvents = false,
   final RoomOrder roomOrder = .unreadFirst,
-  final TypingIndicators typingIndicators = .showAndSend,
+  final ShowAndSend typingIndicators = .showAndSend,
+
+  /// When not sending, read receipts are still sent privately, so that the
+  /// user's other devices know what has been read.
+  final ShowAndSend readReceipts = .showAndSend,
 }) with _$Settings {
   Map<String, Object?> toJson() => _$SettingsToJson(this);
 

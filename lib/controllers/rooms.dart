@@ -2,6 +2,7 @@ import "package:collection/collection.dart";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/models/event.dart";
+import "package:nexus/models/read_receipt.dart";
 import "package:nexus/models/room.dart";
 
 class RoomsController extends Notifier<IMap<String, Room>> {
@@ -32,6 +33,26 @@ class RoomsController extends Notifier<IMap<String, Room>> {
     }),
     .new(),
   );
+
+  static IMap<String, IList<ReadReceipt>> mergeReceipts(
+    IMap<String, IList<ReadReceipt>> existing,
+    IMap<String, IList<ReadReceipt>> incoming,
+  ) => incoming.isEmpty
+      ? existing
+      : existing.values.flattened
+            .followedBy(incoming.values.flattened)
+            .groupListsBy((receipt) => (receipt.userId, receipt.thread))
+            .values
+            .map(
+              (receipts) => receipts.reduce(
+                (newest, receipt) => newest.timestamp.isAfter(receipt.timestamp)
+                    ? newest
+                    : receipt,
+              ),
+            )
+            .groupListsBy((receipt) => receipt.eventId)
+            .map((eventId, receipts) => MapEntry(eventId, receipts.toIList()))
+            .toIMap();
 
   /// Adds events to their rooms, without changing the rooms' timelines.
   void storeEvents(Iterable<Event> events) => update(
@@ -96,15 +117,11 @@ class RoomsController extends Notifier<IMap<String, Room>> {
               timeline: incoming.reset
                   ? incoming.timeline
                   : existing.timeline.addAll(incoming.timeline),
-              receipts: incoming.receipts.entries.fold(
-                existing.receipts,
-                (receiptAcc, event) => receiptAcc.add(
-                  event.key,
-                  (receiptAcc[event.key] ?? .new()).addAll(event.value),
-                ),
-              ),
+              receipts: mergeReceipts(existing.receipts, incoming.receipts),
             ) ??
-            incoming,
+            incoming.copyWith(
+              receipts: mergeReceipts(const .empty(), incoming.receipts),
+            ),
       );
     });
 

@@ -19,8 +19,9 @@ import "package:nexus/controllers/unified_push_distributors.dart";
 import "package:nexus/helpers/extensions/distributor_name.dart";
 import "package:nexus/models/account_data.dart";
 import "package:nexus/models/room_order.dart";
+import "package:nexus/models/settings.dart";
 import "package:nexus/models/settings_category.dart";
-import "package:nexus/models/typing_indicators.dart";
+import "package:nexus/models/show_and_send.dart";
 import "package:nexus/main.dart";
 import "package:nexus/widgets/settings/dialog_list_tile.dart";
 import "package:nexus/widgets/reset_encryption_sheet.dart";
@@ -31,6 +32,30 @@ class SettingsSectionsController
   @override
   Future<IMap<String, IList<SettingsCategory>>> build() async {
     final settings = await ref.watch(SettingsController.provider.future);
+
+    /// A tile for a [ShowAndSend] setting, saving the settings from [update].
+    Widget showAndSendTile(
+      String title,
+      String description,
+      IconData icon, {
+      required ShowAndSend value,
+      required Settings Function(ShowAndSend value) update,
+    }) => DialogListTile<ShowAndSend>(
+      icon: Icon(icon),
+      title: title,
+      subtitle: Text(description),
+      value: value,
+      options: ShowAndSend.values,
+      getName: (option) => switch (option) {
+        .showAndSend => "Show and send",
+        .show => "Only show",
+        .neither => "Neither",
+      },
+      onChanged: (value) => ref
+          .read(SettingsController.provider.notifier)
+          .set(update(value))
+          .onError(showError),
+    );
 
     return .new({
       "General": .new([
@@ -192,23 +217,25 @@ class SettingsSectionsController
               title: "Typing Indicators",
               description: "Show when others are typing, and let others see when you're typing.",
               icon: Icons.keyboard,
-              builder: (title, description, icon) =>
-                  DialogListTile<TypingIndicators>(
-                    icon: Icon(icon),
-                    title: title,
-                    subtitle: Text(description),
-                    value: settings.typingIndicators,
-                    options: TypingIndicators.values,
-                    getName: (option) => switch (option) {
-                      .showAndSend => "Show and send",
-                      .show => "Only show",
-                      .neither => "Neither",
-                    },
-                    onChanged: (value) => ref
-                        .read(SettingsController.provider.notifier)
-                        .set(settings.copyWith(typingIndicators: value))
-                        .onError(showError),
-                  ),
+              builder: (title, description, icon) => showAndSendTile(
+                title,
+                description,
+                icon,
+                value: settings.typingIndicators,
+                update: (value) => settings.copyWith(typingIndicators: value),
+              ),
+            ),
+            .new(
+              title: "Read Receipts",
+              description: "Show how far others have read, and let others see what you've read. When not sent, read receipts are still sent privately, so your other devices know what you've read.",
+              icon: Icons.done_all,
+              builder: (title, description, icon) => showAndSendTile(
+                title,
+                description,
+                icon,
+                value: settings.readReceipts,
+                update: (value) => settings.copyWith(readReceipts: value),
+              ),
             ),
           ]),
         ),

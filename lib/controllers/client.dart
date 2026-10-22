@@ -8,6 +8,7 @@ import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:ffi/ffi.dart";
 import "package:flutter/cupertino.dart";
 import "package:intl/intl.dart";
+import "package:nexus/controllers/settings.dart";
 import "package:nexus/helpers/extensions/gomuks_buffer.dart";
 import "package:nexus/models/capabilities.dart";
 import "package:nexus/models/content/message.dart";
@@ -344,9 +345,14 @@ class ClientController extends AsyncNotifier<int> {
 
     if (event == null) return;
 
+    // Private until settings have loaded, in case the user turned sending off
+    final sendPublic =
+        ref.read(SettingsController.provider).value?.readReceipts ==
+        .showAndSend;
+
     await _sendCommand("mark_read", {
       "room_id": room.metadata!.id,
-      "receipt_type": "m.read",
+      "receipt_type": sendPublic ? "m.read" : "m.read.private",
       "event_id": event.eventId,
     });
   }

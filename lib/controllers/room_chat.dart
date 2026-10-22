@@ -156,6 +156,7 @@ class RoomChatController(final ChatParams info)
                   valueMapper: (event) => event,
                 ),
                 hasMore: response.hasMore,
+                receipts: response.receipts,
                 timeline: IMap.fromIterable(
                   response.events,
                   keyMapper: (event) => event.timelineRowId,
