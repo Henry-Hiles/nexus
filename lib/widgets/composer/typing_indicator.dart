@@ -4,6 +4,7 @@ import "package:material_ui/material_ui.dart";
 import "package:nexus/controllers/room_typing.dart";
 import "package:nexus/controllers/user.dart";
 import "package:nexus/helpers/extensions/get_localpart.dart";
+import "package:nexus/helpers/extensions/show_user_popover.dart";
 import "package:nexus/widgets/bouncing_dots.dart";
 
 class const TypingIndicator(final String roomId, {super.key})
@@ -19,20 +20,28 @@ class const TypingIndicator(final String roomId, {super.key})
       ...typing
           .take(named)
           .map(
-            (typingUserId) => TextSpan(
-              text:
-                  ref
-                      .watch(
-                        UserController.provider(
-                          .new(roomId: roomId, userId: typingUserId),
-                        ),
-                      )
-                      .value
-                      ?.displayName ??
-                  typingUserId.localpart,
-              style: TextStyle(
-                fontWeight: .bold,
-                color: theme.colorScheme.onSurface,
+            (typingUserId) => WidgetSpan(
+              alignment: .baseline,
+              baseline: .alphabetic,
+              child: Builder(
+                builder: (context) => InkWell(
+                  onTap: () =>
+                      context.showUserPopover(typingUserId, roomId: roomId),
+                  child: Text(
+                    ref
+                            .watch(
+                              UserController.provider(
+                                .new(roomId: roomId, userId: typingUserId),
+                              ),
+                            )
+                            .value
+                            ?.displayName ??
+                        typingUserId.localpart,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: .bold,
+                    ),
+                  ),
+                ),
               ),
             ),
           ),
