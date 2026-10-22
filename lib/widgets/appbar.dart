@@ -23,6 +23,8 @@ final class const Appbar({
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isDesktop = !(Platform.isAndroid || Platform.isIOS);
+
     void maximize() {
       final window = WindowManager.instance.getCurrent();
       if (window == null) return;
@@ -38,7 +40,7 @@ final class const Appbar({
       onPanStart: ref
           .watch(SettingsController.provider)
           .whenOrNull(
-            data: (settings) => settings.linuxMobileMode
+            data: (settings) => !isDesktop || settings.linuxMobileMode
                 ? null
                 : (_) => WindowManager.instance.getCurrent()?.startDragging(),
           ),
@@ -51,10 +53,12 @@ final class const Appbar({
           onTap: onTap,
           child: IgnorePointer(child: title),
         ),
-        flexibleSpace: GestureDetector(onDoubleTap: maximize),
+        flexibleSpace: GestureDetector(
+          onDoubleTap: isDesktop ? maximize : null,
+        ),
         actions: [
           ...actions,
-          if (windowControls && !(Platform.isAndroid || Platform.isIOS)) ...[
+          if (windowControls && isDesktop) ...[
             if (ref
                     .watch(SettingsController.provider)
                     .whenOrNull(
