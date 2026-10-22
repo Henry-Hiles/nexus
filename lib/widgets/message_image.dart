@@ -26,7 +26,7 @@ final class const MessageImage(
           aspectRatio: (info?.width ?? 1) / (info?.height ?? 1),
           child: Image(
             image: MxcImage(ref, request),
-            width: info?.width,
+            width: info?.width?.toDouble(),
             fit: BoxFit.fitWidth,
             loadingBuilder: (_, child, loadingProgress) =>
                 loadingProgress == null
@@ -40,7 +40,7 @@ final class const MessageImage(
                               child: BlurHash(hash: blurHash),
                             )
                           : SizedBox(
-                              width: info!.width,
+                              width: info!.width!.toDouble(),
                               child: BlurHash(hash: blurHash),
                             ),
                     _ => Loading(),

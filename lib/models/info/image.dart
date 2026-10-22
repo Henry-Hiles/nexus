@@ -6,8 +6,8 @@ part "image.g.dart";
 @Freezed(toJson: false, fromJson: false)
 @JsonSerializable()
 class const ImageInfo({
-  @JsonKey(name: "h") final double? height,
-  @JsonKey(name: "w") final double? width,
+  @JsonKey(name: "h") final int? height,
+  @JsonKey(name: "w") final int? width,
   @JsonKey(name: "mimetype") final String? mimeType,
   @JsonKey(name: "xyz.amorgan.blurhash") final String? blurHash,
   final int? size,

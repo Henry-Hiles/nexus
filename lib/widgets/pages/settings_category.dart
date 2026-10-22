@@ -4,13 +4,19 @@ import "package:collection/collection.dart";
 import "package:material_ui/material_ui.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
-import "package:nexus/controllers/settings_sections.dart";
+import "package:hooks_riverpod/misc.dart";
+import "package:fast_immutable_collections/fast_immutable_collections.dart";
+import "package:nexus/models/settings_category.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
 import "package:nexus/widgets/highlight_wrapper.dart";
 import "package:super_sliver_list/super_sliver_list.dart";
 
 class const SettingsCategoryPage(
   final int index, {
+  required final ProviderListenable<
+    AsyncValue<IMap<String, IList<SettingsCategory>>>
+  >
+  sectionsProvider,
   final int? initialHighlight,
   super.key,
 }) extends HookConsumerWidget {
@@ -45,7 +51,7 @@ class const SettingsCategoryPage(
     }, []);
 
     return ref
-        .watch(SettingsSectionsController.provider)
+        .watch(sectionsProvider)
         .betterWhen(
           data: (sections) => Scaffold(
             appBar: AppBar(

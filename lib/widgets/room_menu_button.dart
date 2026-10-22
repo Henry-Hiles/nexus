@@ -7,7 +7,9 @@ import "package:nexus/widgets/sheet_layout.dart";
 import "package:flutter/services.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client.dart";
+import "package:nexus/controllers/room_settings_sections.dart";
 import "package:nexus/widgets/adaptive_menu_button.dart";
+import "package:nexus/widgets/settings/settings_layout.dart";
 import "package:nexus/controllers/via.dart";
 import "package:nexus/models/room.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
@@ -120,6 +122,21 @@ final class const RoomMenuButton(
             child: ListTile(
               leading: Icon(Icons.person_add),
               title: Text("Invite"),
+            ),
+          ),
+          PopupMenuItem(
+            onTap: () => showDialog(
+              context: context,
+              builder: (_) => SettingsLayout(
+                title: "Room Settings",
+                sectionsProvider: RoomSettingsSectionsController.provider(
+                  room!.metadata!.id,
+                ),
+              ),
+            ),
+            child: ListTile(
+              leading: Icon(Icons.settings),
+              title: Text("Settings"),
             ),
           ),
           PopupMenuItem(
