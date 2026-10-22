@@ -155,11 +155,6 @@ static void my_application_activate(
   }
 #endif
 
-  gtk_widget_set_size_request(
-      GTK_WIDGET(window),
-      250,
-      -1);
-
   if (use_header_bar) {
     GtkHeaderBar* header_bar =
         GTK_HEADER_BAR(

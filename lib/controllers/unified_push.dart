@@ -88,7 +88,7 @@ class UnifiedPushController extends AsyncNotifier<String?> {
 
         if (notification == null ||
             (!isInBackground &&
-                await windowManager.isFocused().onError((_, _) => true) &&
+                (WindowManager.instance.getCurrent()?.isFocused ?? true) &&
                 ref.read(SelectedRoomController.provider) ==
                     notification.roomId)) {
           if (isInBackground) exit(0);

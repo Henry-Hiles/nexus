@@ -3,6 +3,8 @@
   callPackage,
   mpv-unwrapped,
   libass,
+  libxext,
+  libxfixes,
   libclang,
   flutter,
   stdenv,
@@ -25,9 +27,14 @@ flutter.buildFlutterApplication {
     "--dart-define=GIT_COMMIT=${commit}"
   ];
 
+  nativeBuildInputs = [ (callPackage ./hook_pkg_config.nix { }) ];
+
   buildInputs = [
     mpv-unwrapped
     libass
+    # nativeapi includes XInput2.h, which needs these, but xi.pc only lists them privately
+    libxext
+    libxfixes
   ];
 
   env.LIBCLANG_PATH = lib.makeLibraryPath [ libclang ];
@@ -42,9 +49,10 @@ flutter.buildFlutterApplication {
     m3e_design = "sha256-5V9m6yY0jimx2gh7lQHYg4HDKQ4Wrl0ATmBhw5DkQMI=";
     native_toolchain_cmake = "sha256-/drnHZebmTnsCnHgC1xmlAe+U4PSrjw5Sm9axicuTrY=";
     navigation_rail_m3e = "sha256-5V9m6yY0jimx2gh7lQHYg4HDKQ4Wrl0ATmBhw5DkQMI=";
-    unifiedpush_linux = "sha256-aIF/8oabSuuZo7K6qr4r7UBmf57qgoGAXyJ40fdntuQ=";
-    unifiedpush_platform_interface = "sha256-aIF/8oabSuuZo7K6qr4r7UBmf57qgoGAXyJ40fdntuQ=";
+    unifiedpush_linux = "sha256-KQKyBPL2ORK9O89C4K3RHGve/lvFaU1vIjSDnj6+bj4=";
+    unifiedpush_platform_interface = "sha256-KQKyBPL2ORK9O89C4K3RHGve/lvFaU1vIjSDnj6+bj4=";
     webcrypto = "sha256-HW0NukbddwOYd9iVUFA3L8iy1qggnyOBgcbMj0MTYss=";
+    window_manager = "sha256-xUd5hG+/V6F+m0ZUL/3XGPACFG/zqI5JM6IaMVvLgx4=";
     xdg_desktop_portal = "sha256-8GgiXHGv+wy6hJgj/rZxbymMitNVmdDLAnedZm9STSc=";
   };
 

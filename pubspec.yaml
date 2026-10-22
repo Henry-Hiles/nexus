@@ -41,17 +41,20 @@ dependency_overrides:
     unifiedpush_linux:
         git:
             url: https://codeberg.org/Henry-Hiles/flutter-connector
-            ref: quad/feat/should-write-service-option
+            ref: quad/nexus
             path: unifiedpush_linux
     unifiedpush_platform_interface:
         git:
             url: https://codeberg.org/Henry-Hiles/flutter-connector
-            ref: quad/feat/should-write-service-option
+            ref: quad/nexus
             path: unifiedpush_platform_interface
     linkify:
         git:
             url: https://github.com/appelladev/linkify
             ref: fix/consecutive-periods-loose-url
+    window_manager:
+        git:
+            url: https://github.com/leanflutter/window_manager
 
 dependencies:
     flutter:

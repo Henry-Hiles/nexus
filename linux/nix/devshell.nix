@@ -36,7 +36,13 @@ pkgs.mkShell {
       })
       android.platform-tools
     ]
-    ++ lib.optional pkgs.stdenv.isLinux wayland;
+    ++ lib.optionals pkgs.stdenv.isLinux [
+      wayland
+      # nativeapi includes XInput2.h, which needs these, but xi.pc only lists them privately
+      libxext
+      libxfixes
+      (callPackage ./pkg/hook_pkg_config.nix { })
+    ];
 
   env = rec {
     LIBCLANG_PATH = lib.makeLibraryPath [ pkgs.libclang ];

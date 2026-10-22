@@ -23,14 +23,15 @@ final class const Appbar({
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    Future<void> maximize() async {
-      final isMaximized = await windowManager.isMaximized();
+    void maximize() {
+      final window = WindowManager.instance.getCurrent();
+      if (window == null) return;
 
-      if (isMaximized) {
-        return windowManager.unmaximize();
+      if (window.isMaximized) {
+        return window.unmaximize();
       }
 
-      return windowManager.maximize();
+      return window.maximize();
     }
 
     return GestureDetector(
@@ -39,7 +40,7 @@ final class const Appbar({
           .whenOrNull(
             data: (settings) => settings.linuxMobileMode
                 ? null
-                : (_) => windowManager.startDragging(),
+                : (_) => WindowManager.instance.getCurrent()?.startDragging(),
           ),
       child: AppBar(
         leading: leading == null ? null : InkWell(onTap: onTap, child: leading),
@@ -62,7 +63,8 @@ final class const Appbar({
                 false)
               IconButton(
                 tooltip: "Minimize window",
-                onPressed: windowManager.minimize,
+                onPressed: () =>
+                    WindowManager.instance.getCurrent()?.minimize(),
                 icon: const Icon(Icons.minimize),
               ),
             if (!Platform.isLinux)

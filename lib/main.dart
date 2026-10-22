@@ -83,14 +83,10 @@ void main(List<String> args) async {
     exit(0);
   } else {
     if (Platform.isLinux || Platform.isMacOS || Platform.isWindows) {
-      await windowManager.ensureInitialized();
-      await windowManager.waitUntilReadyToShow(
-        WindowOptions(
-          titleBarStyle: TitleBarStyle.hidden,
-          windowButtonVisibility: false,
-        ),
-      );
-      await windowManager.setMinimumSize(Size.square(500));
+      WindowManager.instance.getCurrent()
+        ?..titleBarStyle = .hidden
+        ..isWindowControlButtonsVisible = false
+        ..minimumSize = Size.square(500).toNative();
     }
 
     runApp(
