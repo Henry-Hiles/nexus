@@ -8,6 +8,7 @@ import "package:intl/intl.dart";
 import "package:m3e_buttons/m3e_buttons.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/client_state.dart";
+import "package:nexus/controllers/mutual_rooms.dart";
 import "package:nexus/controllers/power_level.dart";
 import "package:nexus/controllers/profile.dart";
 import "package:nexus/controllers/rooms.dart";
@@ -18,6 +19,7 @@ import "package:nexus/helpers/extensions/show_adaptive_sheet.dart";
 import "package:nexus/helpers/extensions/get_localpart.dart";
 import "package:nexus/widgets/error_dialog.dart";
 import "package:nexus/widgets/loading.dart";
+import "package:nexus/widgets/mutual_rooms_sheet.dart";
 import "package:nexus/models/membership_action.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/main.dart";
@@ -141,9 +143,6 @@ final class const UserBottomSheet(
                     loading: () => Text(""),
                     data: (profileResponse) => Column(
                       children: [
-                        if (profileResponse.profile.timezone == null &&
-                            profileResponse.profile.pronouns.isEmpty)
-                          Text(""),
                         Wrap(
                           crossAxisAlignment: .center,
                           alignment: .center,
@@ -194,6 +193,26 @@ final class const UserBottomSheet(
                       ],
                     ),
                   ),
+
+              if (userId != ref.watch(ClientStateController.provider)?.userId)
+                switch (ref.watch(MutualRoomsController.provider(userId))) {
+                  AsyncData(value: final roomIds) => switch (ref.watch(
+                    RoomsController.provider.select(
+                      (rooms) => roomIds.where(rooms.containsKey).length,
+                    ),
+                  )) {
+                    0 => SizedBox.shrink(),
+                    final count => TextButton(
+                      onPressed: () => context.showAdaptiveSheet(
+                        (_) => MutualRoomsSheet(userId),
+                      ),
+                      child: Text(
+                        "$count mutual ${Intl.plural(count, one: "room", other: "rooms")}",
+                      ),
+                    ),
+                  },
+                  _ => SizedBox.shrink(),
+                },
 
               SizedBox(height: 8),
               if (userId !=

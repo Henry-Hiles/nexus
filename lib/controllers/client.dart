@@ -371,6 +371,12 @@ class ClientController extends AsyncNotifier<int> {
   Future<void> exchangeToken(OAuthExchangeTokenRequest request) async =>
       await _sendCommand("oauth_exchange_token", request.toJson());
 
+  Future<IList<String>> getMutualRooms(String userId) async => IList(
+    ((await _sendCommand("get_mutual_rooms", {"user_id": userId}))["joined"]
+            as List?)
+        ?.cast<String>(),
+  );
+
   Future<SpecVersionsResponse> getSpecVersions() async =>
       .fromJson(await _sendCommand("get_versions"));
 

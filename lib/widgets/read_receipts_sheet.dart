@@ -38,7 +38,6 @@ class const ReadReceiptsSheet(
               final name = member?.displayName ?? receipt.userId.localpart;
 
               return ListTile(
-                contentPadding: .zero,
                 leading: AvatarOrHash(member?.avatarUrl, name, dimension: 40),
                 title: Text(name, overflow: .ellipsis),
                 subtitle: Text(receipt.userId, overflow: .ellipsis),
