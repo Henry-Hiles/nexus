@@ -28,6 +28,7 @@ class const AudioPlayer(
         final audio = await ref
             .read(ClientController.provider.notifier)
             .downloadMedia(.new(mxc: uri, encrypted: encrypted));
+        if (!context.mounted) return;
         await player.open(Media(audio.path), play: false);
         if (context.mounted) loaded.value = true;
       });
