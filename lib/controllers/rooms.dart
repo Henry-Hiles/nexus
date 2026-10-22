@@ -1,3 +1,5 @@
+import "dart:async";
+
 import "package:collection/collection.dart";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
@@ -126,6 +128,31 @@ class RoomsController extends Notifier<IMap<String, Room>> {
     });
 
     state = leftRooms.fold(merged, (acc, roomId) => acc.remove(roomId));
+  }
+
+  /// Waits for a sent state event to become the room's state, which happens
+  /// once it comes down sync. Gives up after a while, e.g. if another event
+  /// replaced it first.
+  Future<void> awaitState(
+    String roomId,
+    String type,
+    String eventId, {
+    String stateKey = "",
+  }) {
+    bool arrived(IMap<String, Room> rooms) =>
+        switch (rooms[roomId]?.state[type]?[stateKey]) {
+          final rowId? => rooms[roomId]?.events[rowId]?.eventId == eventId,
+          null => false,
+        };
+    if (arrived(state)) return .value();
+
+    final completer = Completer<void>();
+    final removeListener = listenSelf((_, rooms) {
+      if (arrived(rooms) && !completer.isCompleted) completer.complete();
+    });
+    return completer.future
+        .timeout(const .new(seconds: 10), onTimeout: () {})
+        .whenComplete(removeListener);
   }
 
   static final provider = NotifierProvider<RoomsController, IMap<String, Room>>(

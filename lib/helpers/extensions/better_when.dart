@@ -8,10 +8,12 @@ extension BetterWhen<T> on AsyncValue<T> {
     required Widget Function(T value) data,
     Widget Function() loading = Loading.new,
     bool skipLoadingOnRefresh = false,
+    bool skipLoadingOnReload = false,
   }) => when(
     data: data,
     error: (error, stackTrace) => ErrorDialog(error, stackTrace),
     loading: loading,
     skipLoadingOnRefresh: skipLoadingOnRefresh,
+    skipLoadingOnReload: skipLoadingOnReload,
   );
 }

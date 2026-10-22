@@ -9,7 +9,7 @@ sealed class CanonicalAliasContent extends Content
     with _$CanonicalAliasContent {
   CanonicalAliasContent._();
   factory CanonicalAliasContent({
-    String? alias,
+    @JsonKey(includeIfNull: false) String? alias,
     @Default(ISet.empty()) ISet<String> altAliases,
   }) = _CanonicalAliasContent;
 

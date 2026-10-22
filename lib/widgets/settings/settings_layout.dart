@@ -120,6 +120,7 @@ class const SettingsLayout({
           body: ref
               .watch(sectionsProvider)
               .betterWhen(
+                skipLoadingOnReload: true,
                 data: (sections) => categoriesArePages
                     ? CustomScrollView(
                         slivers: [

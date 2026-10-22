@@ -12,7 +12,8 @@ final class const RadioSheet<T>({
 }) extends HookWidget {
   @override
   Widget build(BuildContext context) {
-    final mutValue = useState<T?>(null);
+    // Wrapped, so a null option can be chosen, rather than counting as nothing being chosen yet
+    final chosen = useState<(T,)?>(null);
     return SheetLayout(
       title: Text(title),
       actions: [
@@ -20,7 +21,7 @@ final class const RadioSheet<T>({
         if (onChanged != null)
           TextButton(
             onPressed: () {
-              if (mutValue.value != null) onChanged!(mutValue.value as T);
+              if (chosen.value case (final picked,)) onChanged!(picked);
               Navigator.of(context).pop();
             },
             child: Text("OK"),
@@ -28,8 +29,11 @@ final class const RadioSheet<T>({
       ],
       children: [
         RadioGroup<T>(
-          groupValue: mutValue.value ?? value,
-          onChanged: (value) => mutValue.value = value ?? mutValue.value,
+          groupValue: switch (chosen.value) {
+            (final picked,) => picked,
+            null => value,
+          },
+          onChanged: (value) => chosen.value = (value as T,),
 
           child: Column(
             mainAxisSize: MainAxisSize.min,

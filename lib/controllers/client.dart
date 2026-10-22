@@ -377,6 +377,28 @@ class ClientController extends AsyncNotifier<int> {
         ?.cast<String>(),
   );
 
+  Future<IList<String>> getLocalAliases(String roomId) async => IList(
+    ((await _sendCommand("get_local_aliases", {"room_id": roomId}))["aliases"]
+            as List?)
+        ?.cast<String>(),
+  );
+
+  Future<void> createAlias(String roomId, String alias) =>
+      _sendCommand("create_alias", {"room_id": roomId, "alias": alias});
+
+  Future<void> deleteAlias(String alias) =>
+      _sendCommand("delete_alias", {"alias": alias});
+
+  /// The room [alias] points to, or null if it doesn't exist.
+  Future<String?> resolveAlias(String alias) async {
+    try {
+      return (await _sendCommand("resolve_alias", {"alias": alias}))["room_id"];
+    } on GomuksException catch (error) {
+      if (error.statusCode == 404) return null;
+      rethrow;
+    }
+  }
+
   Future<SpecVersionsResponse> getSpecVersions() async =>
       .fromJson(await _sendCommand("get_versions"));
 

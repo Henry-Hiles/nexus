@@ -53,6 +53,7 @@ class const SettingsCategoryPage(
     return ref
         .watch(sectionsProvider)
         .betterWhen(
+          skipLoadingOnReload: true,
           data: (sections) => Scaffold(
             appBar: AppBar(
               title: Text(sections.values.flattenedToList[index].title),

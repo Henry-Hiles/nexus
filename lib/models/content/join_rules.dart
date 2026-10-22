@@ -10,7 +10,7 @@ sealed class JoinRulesContent extends Content with _$JoinRulesContent {
   JoinRulesContent._();
   factory JoinRulesContent({
     required JoinRule joinRule,
-    @Default(IList.empty()) IList<AllowCondition> allow,
+    @Default(ISet.empty()) ISet<AllowCondition> allow,
   }) = _JoinRulesContent;
 
   factory JoinRulesContent.fromJson(Map<String, Object?> json) =>
