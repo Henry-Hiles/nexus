@@ -202,6 +202,7 @@ final class const RoomChat({
     );
 
     return Scaffold(
+      endDrawerEnableOpenDragGesture: false,
       endDrawer: SearchDrawer(
         roomId,
         getEventOptions: getEventOptions,
@@ -209,6 +210,7 @@ final class const RoomChat({
       ),
       body: Builder(
         builder: (searchContext) => Scaffold(
+          endDrawerEnableOpenDragGesture: false,
           endDrawer: PinnedEventsDrawer(
             roomId,
             getEventOptions: getEventOptions,
