@@ -111,10 +111,21 @@ class const App({super.key}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) => DynamicColorBuilder(
     builder: (lightDynamic, darkDynamic) => Consumer(
-      builder: (context, ref, child) => MaterialApp(
-        navigatorKey: navigatorKey,
-        debugShowCheckedModeBanner: false,
-        theme:
+      builder: (context, ref, child) {
+        // Flutter turns off mobile behaviour like swiping drawers open on desktop platforms, so Linux mobile pretends to be Android
+        ThemeData forPlatform(ThemeData theme) =>
+            ref.watch(
+              SettingsController.provider.select(
+                (settings) => settings.value?.linuxMobileMode ?? false,
+              ),
+            )
+            ? theme.copyWith(platform: .android)
+            : theme;
+
+        return MaterialApp(
+          navigatorKey: navigatorKey,
+          debugShowCheckedModeBanner: false,
+          theme: forPlatform(
             (ref
                         .watch(SettingsController.provider)
                         .maybeWhen(
@@ -124,7 +135,8 @@ class const App({super.key}) extends StatelessWidget {
                         ) ??
                     ThemeData.light().colorScheme)
                 .theme,
-        darkTheme:
+          ),
+          darkTheme: forPlatform(
             (ref
                         .watch(SettingsController.provider)
                         .maybeWhen(
@@ -134,14 +146,16 @@ class const App({super.key}) extends StatelessWidget {
                         ) ??
                     ThemeData.dark().colorScheme)
                 .theme,
-        themeMode: ref
-            .watch(SettingsController.provider)
-            .maybeWhen(
-              data: (settings) => settings.theme,
-              orElse: () => ThemeMode.system,
-            ),
-        home: child,
-      ),
+          ),
+          themeMode: ref
+              .watch(SettingsController.provider)
+              .maybeWhen(
+                data: (settings) => settings.theme,
+                orElse: () => ThemeMode.system,
+              ),
+          home: child,
+        );
+      },
       child: DefaultTextHeightBehavior(
         textHeightBehavior: .new(leadingDistribution: .even),
         child: Scaffold(

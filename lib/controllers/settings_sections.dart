@@ -177,7 +177,7 @@ class SettingsSectionsController
               ),
             .new(
               title: "Linux Mobile Mode",
-              description: "Enables some fixes for Linux mobile, e.g. disabling dragging appbar for moving window.",
+              description: "Enables some fixes for Linux mobile, e.g. disabling dragging appbar for moving window, and swiping drawers open.",
               icon: Icons.construction,
               builder: (title, description, icon) => SwitchListTile(
                 title: Text(title),
