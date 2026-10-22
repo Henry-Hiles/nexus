@@ -1,34 +1,17 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/members_by_status.dart";
-import "package:nexus/controllers/room_creators.dart";
-import "package:nexus/controllers/rooms.dart";
+import "package:nexus/controllers/room_power_levels.dart";
 import "package:nexus/models/configs/members_by_status.dart";
-import "package:nexus/models/content/content.dart";
-import "package:nexus/models/content/power_levels.dart";
 import "package:nexus/models/event.dart";
 
 class MembersGroupedController(final MembersByStatusConfig config)
     extends AsyncNotifier<IList<MapEntry<int?, ISet<Event>>>> {
   @override
   Future<IList<MapEntry<int?, ISet<Event>>>> build() async {
-    final room = ref.watch(
-      RoomsController.provider.select((value) => value[config.roomId]),
+    final powerLevels = ref.watch(
+      RoomPowerLevelsController.provider(config.roomId),
     );
-
-    final roomCreators = room == null
-        ? null
-        : ref.watch((RoomCreatorsController.provider(room)));
-
-    final powerLevelsRowId = room?.state[EventType.powerLevels.type]?[""];
-    final powerLevelsEvent = powerLevelsRowId == null
-        ? null
-        : room?.events[powerLevelsRowId];
-
-    final content = switch (powerLevelsEvent?.content) {
-      PowerLevelsContent content => content,
-      _ => PowerLevelsContent(),
-    };
 
     final members = await ref.watch(
       MembersByStatusController.provider(config).future,
@@ -36,9 +19,9 @@ class MembersGroupedController(final MembersByStatusConfig config)
 
     return members
         .fold<IMap<int?, ISet<Event>>>(.new(), (result, event) {
-          final groupKey = roomCreators?.contains(event.stateKey!) == true
+          final groupKey = powerLevels.creators.contains(event.stateKey!)
               ? null
-              : content.users[event.stateKey!] ?? content.usersDefault;
+              : powerLevels.levelOf(event.stateKey!).toInt();
 
           return result.update(
             groupKey,

@@ -7,6 +7,7 @@ import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/main.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
+import "package:nexus/widgets/settings/search_chooser.dart";
 import "package:nexus/widgets/sheet_layout.dart";
 
 /// Chooses the rooms whose members can join [roomId] without an invite.
@@ -25,7 +26,6 @@ class const AllowedRoomsSheet({
     final error = useState<String?>(null);
     final resolving = useState(false);
     final controller = useTextEditingController();
-    final query = useValueListenable(controller).text.trim().toLowerCase();
     final rooms = ref.watch(
       RoomsController.provider.select(
         (rooms) => IMap.fromEntries(
@@ -43,16 +43,6 @@ class const AllowedRoomsSheet({
     );
 
     String nameOf(String id) => rooms[id]?.name ?? id;
-    Widget avatarOf(String id) => AvatarOrHash(
-      rooms[id]?.avatar,
-      nameOf(id),
-      fallback: Icon(Icons.numbers),
-    );
-    String? subtitleOf(String id) => parentSpaces.contains(id)
-        ? "Parent space"
-        : rooms[id]?.name == null
-        ? null
-        : id;
 
     final suggestions = parentSpaces
         .addAll(
@@ -62,15 +52,7 @@ class const AllowedRoomsSheet({
               .map((entry) => entry.key),
         )
         .where((id) => id != roomId)
-        .toISet();
-    final shown = suggestions
-        .where(
-          (id) =>
-              !chosen.value.contains(id) &&
-              (nameOf(id).toLowerCase().contains(query) ||
-                  id.toLowerCase().contains(query)),
-        )
-        .toISet();
+        .toIList();
 
     void add(String id) {
       if (id == roomId) {
@@ -116,93 +98,39 @@ class const AllowedRoomsSheet({
       ],
       children: [
         Text("Members of these rooms can join without an invite."),
-        if (chosen.value.isEmpty)
-          Text("None, so only invited users can join")
-        else
-          Column(
-            children: chosen.value
-                .map(
-                  (id) => ListTile(
-                    leading: avatarOf(id),
-                    title: Text(nameOf(id), overflow: .ellipsis),
-                    subtitle: switch (subtitleOf(id)) {
-                      final subtitle? => Text(subtitle, overflow: .ellipsis),
-                      null => null,
-                    },
-                    trailing: IconButton(
-                      tooltip: "Remove room",
-                      icon: Icon(Icons.delete),
-                      onPressed: () => chosen.value = chosen.value.remove(id),
-                    ),
-                  ),
-                )
-                .toList(),
-          ),
-        TextField(
+        SearchChooser(
           controller: controller,
-          enabled: !resolving.value,
-          onChanged: (_) => error.value = null,
-          onSubmitted: (text) {
-            final trimmed = text.trim();
-            if (trimmed.isEmpty) return;
-
-            if (trimmed.startsWith(RegExp("[!#]"))) {
-              addRoom(trimmed).onError(showError);
-            } else if (shown.firstOrNull case final id?) {
-              add(id);
+          chosen: chosen.value,
+          options: suggestions,
+          nameOf: nameOf,
+          avatarOf: (id) => AvatarOrHash(
+            rooms[id]?.avatar,
+            nameOf(id),
+            fallback: Icon(Icons.numbers),
+          ),
+          subtitleOf: (id) => parentSpaces.contains(id)
+              ? "Parent space"
+              : rooms[id]?.name == null
+              ? null
+              : id,
+          onAdded: add,
+          onRemoved: (id) => chosen.value = chosen.value.remove(id),
+          onSubmitted: (text, topMatch) {
+            if (text.startsWith(RegExp("[!#]"))) {
+              addRoom(text).onError(showError);
+            } else if (topMatch != null) {
+              add(topMatch);
             } else {
               error.value = "Enter a room ID or alias";
             }
           },
-          decoration: .new(
-            labelText: "Add room",
-            hintText: "Search, or enter a room ID or alias",
-            errorText: error.value,
-            suffixIcon: resolving.value
-                ? Padding(
-                    padding: .all(12),
-                    child: SizedBox.square(
-                      dimension: 24,
-                      child: CircularProgressIndicator(),
-                    ),
-                  )
-                : null,
-          ),
-        ),
-        AnimatedSize(
-          duration: Durations.short2,
-          alignment: .topCenter,
-          child: shown.isEmpty
-              ? SizedBox(width: .infinity)
-              : Material(
-                  elevation: 4,
-                  borderRadius: .circular(12),
-                  clipBehavior: .antiAlias,
-                  child: ConstrainedBox(
-                    constraints: const .new(maxHeight: 240),
-                    child: ListView.builder(
-                      padding: .zero,
-                      shrinkWrap: true,
-                      itemExtent: 72,
-                      itemCount: shown.length,
-                      itemBuilder: (context, index) {
-                        final id = shown[index];
-                        return ListTile(
-                          leading: avatarOf(id),
-                          title: Text(nameOf(id), overflow: .ellipsis),
-                          subtitle: switch (subtitleOf(id)) {
-                            final subtitle? => Text(
-                              subtitle,
-                              overflow: .ellipsis,
-                            ),
-                            null => null,
-                          },
-                          onTap: () => add(id),
-                        );
-                      },
-                    ),
-                  ),
-                ),
+          onChanged: (_) => error.value = null,
+          label: "Add room",
+          hint: "Search, or enter a room ID or alias",
+          removeTooltip: "Remove room",
+          emptyText: "None, so only invited users can join",
+          error: error.value,
+          loading: resolving.value,
         ),
       ],
     );

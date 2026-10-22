@@ -10,7 +10,7 @@ sealed class PowerLevelsContent extends Content with _$PowerLevelsContent {
   factory PowerLevelsContent({
     @Default(IMap.empty()) IMap<String, int> events,
     @Default(IMap.empty()) IMap<String, int> users,
-    Notifications? notifications,
+    @JsonKey(includeIfNull: false) Notifications? notifications,
     @Default(50) int ban,
     @Default(0) int eventsDefault,
     @Default(0) int invite,

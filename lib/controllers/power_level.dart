@@ -1,10 +1,8 @@
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client_state.dart";
-import "package:nexus/controllers/room_creators.dart";
-import "package:nexus/controllers/rooms.dart";
+import "package:nexus/controllers/room_power_levels.dart";
 import "package:nexus/models/configs/power_level.dart";
 import "package:nexus/models/content/content.dart";
-import "package:nexus/models/content/power_levels.dart";
 
 class PowerLevelController(final PowerLevelConfig config)
     extends Notifier<bool> {
@@ -17,31 +15,17 @@ class PowerLevelController(final PowerLevelConfig config)
       );
     }
 
-    final room = ref.watch(
-      RoomsController.provider.select((value) => value[config.roomId]),
+    final powerLevels = ref.watch(
+      RoomPowerLevelsController.provider(config.roomId),
     );
-
-    final roomCreators = room == null
-        ? null
-        : ref.watch(RoomCreatorsController.provider(room));
-
-    final eventRowId = room?.state[EventType.powerLevels.type]?[""];
-
-    final event = eventRowId == null ? null : room?.events[eventRowId];
-    final content = event?.content is PowerLevelsContent
-        ? event!.content
-        : PowerLevelsContent();
+    final content = powerLevels.content;
 
     final user = ref.watch(
       ClientStateController.provider.select((value) => value?.userId),
     );
-    if (user == null || content is! PowerLevelsContent) return false;
+    if (user == null) return false;
 
-    double powerLevelOf(String userId) => roomCreators?.contains(userId) == true
-        ? double.infinity
-        : (content.users[userId] ?? content.usersDefault).toDouble();
-
-    final userLevel = powerLevelOf(user);
+    final userLevel = powerLevels.levelOf(user);
 
     return switch (config) {
       EventPowerLevelConfig(:final eventType) =>
@@ -52,10 +36,12 @@ class PowerLevelController(final PowerLevelConfig config)
           .invite => userLevel >= content.invite,
 
           .kick =>
-            userLevel >= content.kick && userLevel > powerLevelOf(targetUser),
+            userLevel >= content.kick &&
+                userLevel > powerLevels.levelOf(targetUser),
 
           .ban =>
-            userLevel >= content.ban && userLevel > powerLevelOf(targetUser),
+            userLevel >= content.ban &&
+                userLevel > powerLevels.levelOf(targetUser),
 
           .unban => userLevel >= content.ban,
         },
