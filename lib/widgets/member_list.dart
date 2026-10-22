@@ -37,7 +37,7 @@ class const MemberList(final String roomId, {super.key})
         body: Column(
           children: [
             Padding(
-              padding: .symmetric(vertical: 8),
+              padding: .all(8),
               child: M3EToggleButtonGroup(
                 selectedIndex: statusIndex.value,
                 onSelectedIndexChanged: (index) =>
