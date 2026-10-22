@@ -19,19 +19,21 @@ extension GomuksOwnedBufferToX on GomuksOwnedBuffer {
 }
 
 extension JsonToGomuksBuffer on Map<String, dynamic> {
+  GomuksOwnedBuffer toGomuksOwnedBuffer() {
+    final bytes = utf8.encode(json.encode(this));
+    final buffer = GomuksAllocBuffer(bytes.length);
+    buffer.base.asTypedList(bytes.length).setAll(0, bytes);
+    return buffer;
+  }
+
   Pointer<GomuksBorrowedBuffer> toGomuksBufferPtr() {
-    final jsonString = json.encode(this);
-    final bytes = utf8.encode(jsonString);
+    final bytes = utf8.encode(json.encode(this));
 
     final dataPtr = calloc<Uint8>(bytes.length);
     dataPtr.asTypedList(bytes.length).setAll(0, bytes);
 
-    final ptr = calloc<GomuksBorrowedBuffer>();
-
-    ptr.ref
-      ..base = dataPtr
-      ..length = bytes.length;
-
-    return ptr;
+    return calloc<GomuksBorrowedBuffer>()
+      ..ref.base = dataPtr
+      ..ref.length = bytes.length;
   }
 }

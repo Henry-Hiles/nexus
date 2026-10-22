@@ -106,39 +106,50 @@ class ClientController extends AsyncNotifier<int> {
     return handle;
   }
 
+  /// Calls gomuks with [data] as JSON, returning its decoded response.
   Future<dynamic> callGomuksMethod(
     Map<String, dynamic> data,
-    FutureOr<GomuksResponse> Function(int handle, GomuksBorrowedBuffer data)
-    callback,
+    void Function(
+      int handle,
+      GomuksOwnedBuffer data,
+      Pointer<NativeFunction<Void Function(GomuksResponse)>> callback,
+    )
+    call,
   ) async {
-    final bufferPointer = data.toGomuksBufferPtr();
+    final handle = await future;
+    final buffer = data.toGomuksOwnedBuffer();
+
+    final completer = Completer<dynamic>();
+    late final NativeCallable<Void Function(GomuksResponse)> callable;
+    callable = .listener((GomuksResponse response) {
+      callable.close();
+      try {
+        final json = response.buf.toJsonAndFree();
+
+        if (response.command.cast<Utf8>().toDartString() == "error") {
+          throw GomuksException(json.toString());
+        }
+
+        completer.complete(json);
+      } catch (error, stackTrace) {
+        completer.completeError(error, stackTrace);
+      }
+    });
 
     try {
-      final handle = await future;
-
-      final response = await Isolate.run(
-        () => callback(handle, bufferPointer.ref),
-      );
-
-      final json = response.buf.toJsonAndFree();
-
-      if (response.command.cast<Utf8>().toDartString() == "error") {
-        throw GomuksException(json.toString());
-      }
-
-      return json;
-    } finally {
-      calloc
-        ..free(bufferPointer.ref.base)
-        ..free(bufferPointer);
+      call(handle, buffer, callable.nativeFunction);
+    } catch (_) {
+      // gomuks never got the call, so it won't respond or free the buffer
+      callable.close();
+      GomuksFreeBuffer(buffer);
+      rethrow;
     }
+
+    return completer.future;
   }
 
   Future<PushNotification?> handlePush(Map<String, dynamic> data) async {
-    final response = await callGomuksMethod(
-      data,
-      (handle, data) async => GomuksHandlePush(handle, data),
-    );
+    final response = await callGomuksMethod(data, GomuksHandlePushAsync);
 
     return response?["notification"] == null
         ? null
@@ -148,11 +159,12 @@ class ClientController extends AsyncNotifier<int> {
   Future<dynamic> _sendCommand(
     String command, [
     Map<String, dynamic> data = const {},
-  ]) => callGomuksMethod(data, (handle, data) {
+  ]) => callGomuksMethod(data, (handle, data, callback) {
     final commandPointer = command.toNativeUtf8().cast<Char>();
     try {
-      return GomuksSubmitCommand(handle, commandPointer, data);
+      GomuksSubmitCommandAsync(handle, commandPointer, data, callback);
     } finally {
+      // gomuks copies the command name before returning
       calloc.free(commandPointer);
     }
   });
