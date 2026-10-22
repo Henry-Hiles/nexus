@@ -21,6 +21,8 @@ sealed class JoinRulesContent extends Content with _$JoinRulesContent {
 @JsonSerializable()
 class const AllowCondition({
   final String? roomId,
+
+  @JsonKey(unknownEnumValue: AllowConditionType.unknown)
   required final AllowConditionType type,
 }) with _$AllowCondition {
   Map<String, Object?> toJson() => _$AllowConditionToJson(this);
@@ -32,4 +34,5 @@ class const AllowCondition({
 enum AllowConditionType {
   @JsonValue("m.room_membership")
   membership,
+  unknown,
 }

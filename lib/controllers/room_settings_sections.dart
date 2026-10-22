@@ -384,6 +384,8 @@ class RoomSettingsSectionsController(final String roomId)
                       )) {
                         (null, 0) => description,
                         (final alias?, 0) => alias,
+                        (final alias?, 1) =>
+                          "$alias and ${canonicalAlias.altAliases.first}",
                         (final alias?, final others) =>
                           "$alias and $others more",
                         (null, _) => canonicalAlias.altAliases.join(", "),
