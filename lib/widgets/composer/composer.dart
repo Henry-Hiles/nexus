@@ -17,7 +17,11 @@ import "package:nexus/controllers/image_picker.dart";
 import "package:nexus/helpers/file_dialog_helper.dart";
 import "package:image_picker/image_picker.dart";
 import "package:nexus/controllers/power_level.dart";
+import "package:nexus/controllers/image_packs.dart";
+import "package:nexus/models/content/image_pack.dart";
 import "package:nexus/models/content/message.dart";
+import "package:nexus/models/image_pack.dart";
+import "package:nexus/widgets/sticker_picker.dart";
 import "package:nexus/models/relation_type.dart";
 import "package:nexus/widgets/composer/overlays/tagger_overlay.dart";
 import "package:nexus/widgets/composer/paste_files_action.dart";
@@ -38,6 +42,8 @@ class const Composer(
     required IList<Tag> tags,
   })
   onSend,
+  required final Future<void> Function(String shortcode, PackImage image)
+  onSendSticker,
   final FocusNode? node,
   super.key,
 }) extends HookConsumerWidget {
@@ -48,6 +54,17 @@ class const Composer(
     final triggerCharacter = useState("");
     final shouldMention = useState(true);
     final query = useState("");
+    final canSendStickers =
+        ref.watch(
+          PowerLevelController.provider(
+            .new(eventType: .sticker, roomId: roomId),
+          ),
+        ) &&
+        (ref
+                .watch(ImagePacksController.provider(roomId))
+                .value
+                ?.any((pack) => pack.stickers.isNotEmpty) ??
+            false);
     final relatedEvent = this.relatedEvent == null
         ? null
         : ref.watch(
@@ -253,9 +270,27 @@ class const Composer(
                             IconButton(
                               onPressed: () => context.showAdaptiveSheet(
                                 (context) => EmojiPicker(
-                                  onSelection: (value) {
+                                  roomId: roomId,
+                                  onSelection: (value, {shortcode}) {
                                     Navigator.of(context).pop();
-                                    controller.text += value;
+                                    if (shortcode == null) {
+                                      controller.text += value;
+                                    } else {
+                                      final text = "${controller.text}:";
+                                      controller.value = .new(
+                                        text: text,
+                                        selection: .collapsed(
+                                          offset: text.length,
+                                        ),
+                                      );
+                                      controller.addTag(
+                                        id: ImagePack.emojiMarkdown(
+                                          shortcode,
+                                          value,
+                                        ),
+                                        name: shortcode,
+                                      );
+                                    }
                                     node?.requestFocus();
                                   },
                                 ),
@@ -308,6 +343,22 @@ class const Composer(
                                     leading: Icon(Icons.attachment),
                                   ),
                                 ),
+                                if (canSendStickers)
+                                  PopupMenuItem(
+                                    onTap: () => context.showAdaptiveSheet(
+                                      (context) => StickerPicker(
+                                        roomId: roomId,
+                                        onSelection: (shortcode, image) {
+                                          Navigator.of(context).pop();
+                                          onSendSticker(shortcode, image);
+                                        },
+                                      ),
+                                    ),
+                                    child: ListTile(
+                                      title: Text("Sticker"),
+                                      leading: Icon(Icons.sticky_note_2),
+                                    ),
+                                  ),
                               ],
                               icon: Icon(Icons.add),
                             ),
@@ -315,6 +366,9 @@ class const Composer(
                             Expanded(
                               child: FlutterTagger(
                                 triggerStrategy: .eager,
+                                // Characters that continue a search, for
+                                // e.g. :+1, :custom_emoji or @user.name
+                                searchRegex: .new(r"^[\w.+-]*$"),
                                 overlay: TaggerOverlay(
                                   query.value,
                                   roomId: roomId,

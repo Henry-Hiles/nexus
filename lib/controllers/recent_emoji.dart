@@ -23,7 +23,13 @@ class RecentEmojiController extends Notifier<IList<RecentEmoji>> {
       ),
     );
 
-    return .new(recents.where((recent) => emoji.contains(recent.emoji)));
+    return .new(
+      recents.where(
+        (recent) =>
+            // Is unicode or custom emote
+            emoji.contains(recent.emoji) || recent.emoji.startsWith("mxc://"),
+      ),
+    );
   }
 
   Future<void> add(String emoji) => ref

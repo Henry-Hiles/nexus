@@ -16,10 +16,24 @@ class const AccountData({
 
   @JsonKey(name: AccountData.recentEmojiKey)
   final RecentEmojiData recentEmoji = const RecentEmojiData(),
+
+  /// Room image packs the user has enabled everywhere
+  @JsonKey(
+    name: AccountData.imagePackRoomsKey,
+    fromJson: ImagePackRooms.tryFromJson,
+  )
+  final ImagePackRooms? imagePackRooms,
+  @JsonKey(
+    name: AccountData.legacyImagePackRoomsKey,
+    fromJson: ImagePackRooms.tryFromJson,
+  )
+  final ImagePackRooms? legacyImagePackRooms,
 }) with _$AccountData {
   static const invitePermissionConfigKey = "m.invite_permission_config";
   static const directKey = "m.direct";
   static const recentEmojiKey = "m.recent_emoji";
+  static const imagePackRoomsKey = "m.image_pack.rooms";
+  static const legacyImagePackRoomsKey = "im.ponies.emote_rooms";
 
   Map<String, Object?> toJson() => _$AccountDataToJson(this);
 
@@ -36,6 +50,28 @@ class const RecentEmojiData({
 
   factory RecentEmojiData.fromJson(Map<String, Object?> json) =>
       _$RecentEmojiDataFromJson(json);
+}
+
+@Freezed(toJson: false, fromJson: false)
+@JsonSerializable()
+class const ImagePackRooms({
+  /// Room IDs to the state keys of their enabled packs, each to a (currently
+  /// empty) object
+  final IMap<String, IMap<String, Map<String, dynamic>>> rooms = const .empty(),
+}) with _$ImagePackRooms {
+  static ImagePackRooms? tryFromJson(Map<String, dynamic>? json) {
+    if (json == null) return null;
+    try {
+      return .fromJson(json);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Map<String, Object?> toJson() => _$ImagePackRoomsToJson(this);
+
+  factory ImagePackRooms.fromJson(Map<String, Object?> json) =>
+      _$ImagePackRoomsFromJson(json);
 }
 
 @Freezed(toJson: false, fromJson: false)

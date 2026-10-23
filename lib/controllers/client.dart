@@ -29,6 +29,7 @@ import "package:nexus/models/requests/get_event_context.dart";
 import "package:nexus/models/requests/get_mentions.dart";
 import "package:nexus/models/requests/get_related_events.dart";
 import "package:nexus/models/requests/get_room_state.dart";
+import "package:nexus/models/requests/get_specific_room_state.dart";
 import "package:nexus/models/requests/get_space_hierarchy.dart";
 import "package:nexus/models/requests/join_room.dart";
 import "package:nexus/models/profile_response.dart";
@@ -185,11 +186,12 @@ class ClientController extends AsyncNotifier<int> {
         ...json,
         "content": {
           ...content,
-          "m.relates_to": {
-            ...((content["m.relates_to"] as Map<String, dynamic>?) ?? {}),
-            "event_id": request.relatesTo,
-            "rel_type": request.relationType,
-          },
+          if (request.relatesTo != null)
+            "m.relates_to": {
+              ...((content["m.relates_to"] as Map<String, dynamic>?) ?? {}),
+              "event_id": request.relatesTo,
+              "rel_type": request.relationType,
+            },
         },
       }),
     );
@@ -264,6 +266,15 @@ class ClientController extends AsyncNotifier<int> {
       ),
     );
   }
+
+  Future<IList<Event>> getSpecificRoomState(
+    GetSpecificRoomStateRequest request,
+  ) async => .new(
+    ((await _sendCommand("get_specific_room_state", request.toJson()))
+                as List? ??
+            [])
+        .map((event) => .fromJson(event)),
+  );
 
   Future<IList<Event>?> getRelatedEvents(
     GetRelatedEventsRequest request,

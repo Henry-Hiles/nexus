@@ -18,6 +18,7 @@ import "package:nexus/models/content/message.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/models/relation_type.dart";
 import "package:nexus/widgets/emoji_picker.dart";
+import "package:nexus/widgets/mxc_emoji.dart";
 import "package:nexus/main.dart";
 
 extension BuildEventOptions on Event {
@@ -97,6 +98,8 @@ extension BuildEventOptions on Event {
               mainAxisAlignment: isDesktop ? .center : .spaceEvenly,
               children: [
                 ...{
+                      // Custom emoji are sent without their shortcode, as only
+                      // their mxc URL is recorded
                       ...ref
                           .read(RecentEmojiController.provider)
                           .map((entry) => entry.emoji),
@@ -109,10 +112,15 @@ extension BuildEventOptions on Event {
                     .take(isDesktop ? 3 : 5)
                     .map(
                       (emoji) => IconButton(
-                        icon: Text(
-                          emoji,
-                          style: .new(fontSize: isDesktop ? null : 18),
-                        ),
+                        icon: emoji.startsWith("mxc://")
+                            ? SizedBox.square(
+                                dimension: isDesktop ? 18 : 24,
+                                child: MxcEmoji(Uri.parse(emoji)),
+                              )
+                            : Text(
+                                emoji,
+                                style: .new(fontSize: isDesktop ? null : 18),
+                              ),
                         onPressed: () async {
                           Navigator.of(context).pop();
                           await ref
@@ -134,12 +142,13 @@ extension BuildEventOptions on Event {
 
                     context.showAdaptiveSheet(
                       (context) => EmojiPicker(
+                        roomId: roomId,
                         allowFreeText: true,
-                        onSelection: (emoji) {
+                        onSelection: (emoji, {shortcode}) {
                           Navigator.of(context).pop();
                           ref
                               .read(notifier)
-                              .sendReaction(emoji, this)
+                              .sendReaction(emoji, this, shortcode: shortcode)
                               .onError(showError);
                         },
                       ),

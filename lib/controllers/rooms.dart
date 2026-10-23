@@ -11,29 +11,35 @@ class RoomsController extends Notifier<IMap<String, Room>> {
   @override
   IMap<String, Room> build() => .new();
 
-  void addState(
-    String roomId,
-    IList<Event> state, {
-    bool isMembers = false,
-  }) => update(
-    .new({
-      roomId: Room(
-        events: .fromEntries(state.map((event) => .new(event.rowId, event))),
-        hasFetchedState: true,
-        hasFetchedMembers: isMembers,
-        state: .new(
-          state
-              .groupListsBy((event) => event.type)
-              .map(
-                (type, group) => .new(
-                  type,
-                  .fromEntries(group.map((e) => .new(e.stateKey!, e.rowId))),
-                ),
-              ),
-        ),
-      ),
-    }),
-    .new(),
+  void addState(String roomId, IList<Event> state, {bool isMembers = false}) =>
+      update(
+        .new({
+          roomId: stateRoom(state)
+              .copyWith(hasFetchedState: true, hasFetchedMembers: isMembers),
+        }),
+        .new(),
+      );
+
+  void addSpecificState(Iterable<Event> state) => update(
+    .new(
+      state
+          .groupListsBy((event) => event.roomId)
+          .map((roomId, roomState) => .new(roomId, stateRoom(roomState))),
+    ),
+  );
+
+  static Room stateRoom(Iterable<Event> state) => Room(
+    events: .fromEntries(state.map((event) => .new(event.rowId, event))),
+    state: .new(
+      state
+          .groupListsBy((event) => event.type)
+          .map(
+            (type, group) => .new(
+              type,
+              .fromEntries(group.map((e) => .new(e.stateKey!, e.rowId))),
+            ),
+          ),
+    ),
   );
 
   static IMap<String, IList<ReadReceipt>> mergeReceipts(

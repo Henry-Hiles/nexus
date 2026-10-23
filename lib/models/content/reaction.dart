@@ -11,11 +11,15 @@ sealed class ReactionContent extends Content with _$ReactionContent {
 
   factory ReactionContent({
     @JsonKey(readValue: ReactionContent.keyJsonFromJson) String? key,
+
+    /// For custom emoji reactions
+    @JsonKey(name: "com.beeper.reaction.shortcode") String? shortcode,
   }) = _ReactionContent;
 
   @override
   Map<String, dynamic> toJson() => {
     "m.relates_to": {"key": key},
+    "com.beeper.reaction.shortcode": ?shortcode,
   };
 
   factory ReactionContent.fromJson(Map<String, Object?> json) =>

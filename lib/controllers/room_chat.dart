@@ -9,7 +9,9 @@ import "package:nexus/controllers/attachment.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/models/content/content.dart";
+import "package:nexus/models/content/image_pack.dart";
 import "package:nexus/models/content/reaction.dart";
+import "package:nexus/models/content/sticker.dart";
 import "package:nexus/models/direction.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/models/requests/redact_event.dart";
@@ -315,20 +317,57 @@ class RoomChatController(final ChatParams info)
     }
   }
 
-  Future<void> sendReaction(String reaction, Event event) async {
+  /// Reacts to [event] with [reaction], which is an mxc URL for custom emoji,
+  /// with their [shortcode].
+  Future<void> sendReaction(
+    String reaction,
+    Event event, {
+    String? shortcode,
+  }) async {
     final client = ref.read(ClientController.provider.notifier);
 
     await client.sendEvent(
       .new(
         roomId: info.roomId,
         type: EventType.reaction.type,
-        content: ReactionContent(key: reaction),
+        // Wrapped in colons, like other clients send it
+        content: ReactionContent(
+          key: reaction,
+          shortcode: shortcode == null ? null : ":$shortcode:",
+        ),
         synchronous: true,
         disableEncryption: true,
         relatesTo: event.eventId,
         relationType: "m.annotation",
       ),
     );
+  }
+
+  Future<void> sendSticker(String shortcode, PackImage image) async {
+    final event = await ref
+        .read(ClientController.provider.notifier)
+        .sendEvent(
+          .new(
+            roomId: info.roomId,
+            type: EventType.sticker.type,
+            content: StickerContent(
+              body: image.body ?? shortcode,
+              info: image.info ?? const .new(),
+              url: image.url,
+            ),
+          ),
+        );
+
+    ref
+        .read(RoomsController.provider.notifier)
+        .update(
+          .new({
+            info.roomId: .new(
+              events: .new({event.rowId: event}),
+              clientSticky: .new({event.rowId}),
+            ),
+          }),
+        );
   }
 
   static final provider = AsyncNotifierProvider.family

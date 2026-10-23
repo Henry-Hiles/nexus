@@ -16,6 +16,7 @@ import "package:nexus/models/content/server_acl.dart";
 import "package:nexus/models/content/topic.dart";
 import "package:nexus/models/content/sticker.dart";
 import "package:nexus/models/content/history_visibility.dart";
+import "package:nexus/models/content/image_pack.dart";
 
 class const Content({final String? parseError, final StackTrace? stackTrace}) {
   factory Content.fromJson(Map<String, dynamic> json) => const Content();
@@ -61,5 +62,7 @@ enum EventType(
   tombstone("m.room.tombstone", Content.fromJson),
   reaction("m.reaction", ReactionContent.fromJson),
   pinnedEvents("m.room.pinned_events", PinnedEventsContent.fromJson),
+  imagePack("m.room.image_pack", ImagePackContent.fromJson),
+  legacyImagePack("im.ponies.room_emotes", ImagePackContent.fromJson),
   message("m.room.message", MessageContent.fromJson),
 }
