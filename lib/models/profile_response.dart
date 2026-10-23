@@ -39,8 +39,7 @@ class const Profile({
   )
   final String? displayName,
 
-  @JsonKey(readValue: Profile.readTimezone, name: Profile.timezoneKey)
-  final String? timezone,
+  @JsonKey(name: Profile.timezoneKey) final String? timezone,
 
   @JsonKey(readValue: Profile.readPronouns, name: Profile.pronounsKey)
   final IList<Pronoun> pronouns = const .empty(),
@@ -48,7 +47,6 @@ class const Profile({
   static const avatarUrlKey = "avatar_url";
   static const displayNameKey = "displayname";
   static const timezoneKey = "m.tz";
-  static const unstableTimezoneKey = "us.cloke.msc4175.tz";
   static const pronounsKey = "m.pronouns";
   static const unstablePronounsKey = "io.fsky.nyx.pronouns";
 
@@ -68,9 +66,6 @@ class const Profile({
   static Object? readPronouns(Map<dynamic, dynamic> map, String key) =>
       /* until stable, commented out:  map[key] ?? */ map[Profile
           .unstablePronounsKey];
-
-  static Object? readTimezone(Map<dynamic, dynamic> map, String key) =>
-      map[key] ?? map[Profile.unstableTimezoneKey];
 
   factory Profile.fromJson(Map<String, dynamic> json) =>
       _$ProfileFromJson(json);
