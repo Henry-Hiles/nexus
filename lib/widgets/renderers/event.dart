@@ -90,12 +90,13 @@ class const EventRenderer(
 
     if (event == null) return SizedBox.shrink();
 
-    final hideMembershipEvents = (ref
+    final (hideMembershipEvents, hideServerAclEvents) = ref
         .watch(SettingsController.provider)
         .maybeWhen(
-          orElse: () => false,
-          data: (settings) => settings.hideMembershipEvents,
-        ));
+          orElse: () => (false, true),
+          data: (settings) =>
+              (settings.hideMembershipEvents, settings.hideServerAclEvents),
+        );
 
     // Knocks and their outcomes stay visible, as moderators need to act on them
     if (hideMembershipEvents &&
@@ -103,6 +104,10 @@ class const EventRenderer(
         ![event.content, event.previousContent].any(
           (content) => content is MembershipContent && content.status == .knock,
         )) {
+      return SizedBox.shrink();
+    }
+
+    if (hideServerAclEvents && event.content is ServerACLContent) {
       return SizedBox.shrink();
     }
 

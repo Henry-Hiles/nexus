@@ -17,6 +17,7 @@ class const Settings({
   final bool showMinimizeButton = false,
   final bool swipeToReply = false,
   final bool hideMembershipEvents = false,
+  final bool hideServerAclEvents = true,
   final RoomOrder roomOrder = .unreadFirst,
   final NameColor nameColor = .powerLevel,
   final ShowAndSend typingIndicators = .showAndSend,
