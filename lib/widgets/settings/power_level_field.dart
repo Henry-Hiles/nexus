@@ -13,7 +13,7 @@ class const PowerLevelField({
   super.key,
 }) extends HookWidget {
   /// The furthest from zero Matrix allows integers to be.
-  static const maxMagnitude = (2 ^ 53) - 1;
+  static const maxMagnitude = (1 << 53) - 1;
 
   /// The level in [text], if it's one someone with [ownLevel] can set.
   static int? levelFrom(String text, double ownLevel) => switch (int.tryParse(
