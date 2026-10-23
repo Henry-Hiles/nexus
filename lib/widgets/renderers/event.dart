@@ -29,6 +29,8 @@ import "package:nexus/widgets/reaction_row.dart";
 import "package:nexus/widgets/read_receipts_row.dart";
 import "package:nexus/widgets/renderers/membership.dart";
 import "package:nexus/widgets/renderers/generic_event.dart";
+import "package:nexus/widgets/renderers/pinned_events_diff.dart";
+import "package:nexus/widgets/renderers/server_acl_diff.dart";
 import "package:nexus/widgets/swipe_to_reply.dart";
 import "package:nexus/widgets/timestamp.dart";
 
@@ -103,14 +105,23 @@ class const EventRenderer(
         event.sender == previousEvent?.sender &&
         event.pmp?.id == previousEvent?.pmp?.id;
 
-    GenericEventRenderer generic(IconData icon, String text) =>
-        .new(icon, maxLines: maxLines, [
-          WidgetSpan(
-            alignment: .middle,
-            child: MessageDisplayname(event, shouldWrap: maxLines == null),
-          ),
-          TextSpan(text: text),
-        ]);
+    GenericEventRenderer generic(
+      IconData icon,
+      String text, {
+      List<Widget> details = const [],
+    }) => .new(
+      icon,
+      maxLines: maxLines,
+      details: details,
+      trailing: Timestamp(event.timestamp),
+      [
+        WidgetSpan(
+          alignment: .middle,
+          child: MessageDisplayname(event, shouldWrap: maxLines == null),
+        ),
+        TextSpan(text: text),
+      ],
+    );
 
     final child = event.isShownAsMessage
         ? MessageRenderer(
@@ -177,13 +188,47 @@ class const EventRenderer(
                 .worldReadable => "all history visible (world readable)",
               }}",
             ),
-            PinnedEventsContent() => generic(
-              Icons.push_pin,
-              "pinned/unpinned some events",
-            ),
-            ServerACLContent() => generic(
+            PinnedEventsContent(:final pinnedEvents) => () {
+              final before = switch (event.previousContent) {
+                PinnedEventsContent(:final pinnedEvents) => pinnedEvents,
+                _ => const IList<String>.empty(),
+              };
+              final pinned = pinnedEvents
+                  .where((id) => !before.contains(id))
+                  .toIList();
+              final unpinned = before
+                  .where((id) => !pinnedEvents.contains(id))
+                  .toIList();
+
+              return generic(
+                Icons.push_pin,
+                switch ((pinned.length, unpinned.length)) {
+                  (1, 0) => "pinned a message",
+                  (0, 1) => "unpinned a message",
+                  _ => "changed the pinned messages",
+                },
+                details: [
+                  PinnedEventsDiff(
+                    roomId,
+                    pinned: pinned,
+                    unpinned: unpinned,
+                    jumpToEvent: jumpToEvent,
+                  ),
+                ],
+              );
+            }(),
+            final ServerACLContent content => generic(
               Icons.list,
               "updated the server ban list",
+              details: [
+                ServerAclDiff(
+                  content,
+                  previous: switch (event.previousContent) {
+                    final ServerACLContent previous => previous,
+                    _ => null,
+                  },
+                ),
+              ],
             ),
             CanonicalAliasContent(:final alias, :final altAliases) => generic(
               Icons.numbers,
@@ -270,7 +315,8 @@ class const EventRenderer(
                           crossAxisAlignment: .center,
                           children: [
                             child,
-                            if (child is! MessageRenderer)
+                            if (child is! MessageRenderer &&
+                                child is! GenericEventRenderer)
                               Timestamp(event.timestamp),
                           ],
                         ),

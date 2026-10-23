@@ -1,6 +1,5 @@
 import "package:collection/collection.dart";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
-import "package:dynamic_color/dynamic_color.dart";
 import "package:material_ui/material_ui.dart";
 import "package:nexus/widgets/sheet_layout.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
@@ -17,6 +16,7 @@ import "package:nexus/controllers/user.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
 import "package:nexus/helpers/extensions/create_room.dart";
 import "package:nexus/helpers/extensions/show_adaptive_sheet.dart";
+import "package:nexus/helpers/extensions/success_scheme.dart";
 import "package:nexus/helpers/extensions/get_localpart.dart";
 import "package:nexus/widgets/error_dialog.dart";
 import "package:nexus/widgets/loading.dart";
@@ -78,12 +78,6 @@ final class const UserBottomSheet(
         member.displayName ?? userId.localpart,
         dimension: 200,
       ),
-    );
-
-    // Green for accepting knocks, harmonized so it fits the current theme
-    final acceptScheme = ColorScheme.fromSeed(
-      seedColor: Colors.green.harmonizeWith(theme.colorScheme.primary),
-      brightness: theme.brightness,
     );
 
     void showMembershipSheet(MembershipAction action) =>
@@ -407,8 +401,8 @@ final class const UserBottomSheet(
                             icon: Icon(Icons.check),
                             label: Text("Accept knock"),
                             decoration: .styleFrom(
-                              backgroundColor: acceptScheme.primary,
-                              foregroundColor: acceptScheme.onPrimary,
+                              backgroundColor: theme.successScheme.primary,
+                              foregroundColor: theme.successScheme.onPrimary,
                             ),
                           ),
                         ),
