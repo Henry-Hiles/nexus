@@ -9,7 +9,9 @@ class const PowerLevelTile({
   required final Widget leading,
   required final String title,
   required final String? description,
-  required final int value,
+
+  /// Null for several levels that differ, shown as custom.
+  required final int? value,
 
   /// The user's own power level, which they can't set or change levels above.
   required final double ownLevel,
@@ -22,11 +24,14 @@ class const PowerLevelTile({
 
   /// If given, asked before removing the level.
   final String? removeConfirmation,
+
+  /// Shown after the level, like a button to expand what it sets.
+  final Widget? trailing,
   super.key,
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final enabled = onChanged != null && value <= ownLevel;
+    final enabled = onChanged != null && (value ?? 0) <= ownLevel;
 
     Future<void> remove() async {
       if (removeConfirmation case final confirmation?) {
@@ -65,7 +70,7 @@ class const PowerLevelTile({
         children: [
           Chip(
             label: Text(
-              "$value",
+              value?.toString() ?? "Custom",
               style: enabled ? null : .new(color: Colors.grey),
             ),
           ),
@@ -75,12 +80,15 @@ class const PowerLevelTile({
               icon: Icon(Icons.delete),
               onPressed: enabled ? remove : null,
             ),
+          ?trailing,
         ],
       ),
       onTap: () => context.showAdaptiveSheet(
         (context) => HookBuilder(
           builder: (context) {
-            final controller = useTextEditingController(text: "$value");
+            final controller = useTextEditingController(
+              text: value?.toString(),
+            );
             final level = PowerLevelField.levelFrom(
               useValueListenable(controller).text,
               ownLevel,

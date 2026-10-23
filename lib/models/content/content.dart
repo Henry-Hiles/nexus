@@ -58,6 +58,7 @@ enum EventType(
   avatar("m.room.avatar", AvatarContent.fromJson),
   topic("m.room.topic", TopicContent.fromJson),
   name("m.room.name", NameContent.fromJson),
+  tombstone("m.room.tombstone", Content.fromJson),
   reaction("m.reaction", ReactionContent.fromJson),
   pinnedEvents("m.room.pinned_events", PinnedEventsContent.fromJson),
   message("m.room.message", MessageContent.fromJson),

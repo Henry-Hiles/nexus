@@ -218,7 +218,10 @@ class RoomSettingsSectionsController(final String roomId)
         .run(() => setState(.powerLevels, content).onError(showError));
 
     // Event types with their own level that don't have a setting of their own
-    final listedEvents = shownEvents.map((event) => event.type.type).toISet();
+    final listedEvents = shownEvents
+        .addAll(PowerLevelGroup.values.expand((group) => group.events))
+        .map((event) => event.type.type)
+        .toISet();
     final otherEvents = powerLevels.events.entries
         .where((entry) => !listedEvents.contains(entry.key))
         .toIList()
@@ -303,6 +306,76 @@ class RoomSettingsSectionsController(final String roomId)
             events: powerLevels.events.add(event.type.type, level),
           ),
         );
+
+    Widget tileOf(Setting setting) =>
+        setting.builder(setting.title, setting.description, setting.icon);
+
+    /// A setting for all of [group]'s levels at once, which expands to set each.
+    Setting groupSetting(PowerLevelGroup group) => .new(
+      title: group.title,
+      description: group.description,
+      icon: group.icon,
+      builder: (title, description, icon) => HookBuilder(
+        builder: (context) {
+          final expanded = useState(false);
+
+          return Column(
+            mainAxisSize: .min,
+            children: [
+              PowerLevelTile(
+                leading: Icon(icon),
+                title: title,
+                description: description,
+                value: group.levelIn(powerLevels),
+                ownLevel: ownLevel,
+                // Changing it would change levels above the user's own
+                onChanged:
+                    canSetPowerLevels &&
+                        group.highestIn(powerLevels) <= ownLevel
+                    ? (level) =>
+                          setPowerLevels(group.withLevel(powerLevels, level))
+                    : null,
+                trailing: IconButton(
+                  tooltip: expanded.value ? "Collapse" : "Set each",
+                  icon: AnimatedRotation(
+                    turns: expanded.value ? 0.5 : 0,
+                    duration: Durations.medium2,
+                    child: Icon(Icons.expand_more),
+                  ),
+                  onPressed: () => expanded.value = !expanded.value,
+                ),
+              ),
+              AnimatedSize(
+                duration: Durations.medium2,
+                curve: Curves.easeInOut,
+                alignment: .topCenter,
+                child: expanded.value
+                    ? Padding(
+                        padding: .only(left: 16),
+                        child: Column(
+                          mainAxisSize: .min,
+                          children: [
+                            ...group.permissions
+                                .map(permissionSetting)
+                                .map(tileOf),
+                            ...group.events
+                                .map(
+                                  (event) => eventSetting(
+                                    event,
+                                    fallback: powerLevels.stateDefault,
+                                  ),
+                                )
+                                .map(tileOf),
+                          ],
+                        ),
+                      )
+                    : const SizedBox(width: .infinity),
+              ),
+            ],
+          );
+        },
+      ),
+    );
 
     return .new({
       "Room": .new([
@@ -669,6 +742,12 @@ class RoomSettingsSectionsController(final String roomId)
               ),
             ),
             header(
+              "Groups",
+              "Power levels set together, which can each be set on their own.",
+              Icons.workspaces,
+            ),
+            ...PowerLevelGroup.values.map(groupSetting),
+            header(
               "Regular Events",
               "Power levels needed to send messages and other timeline events.",
               Icons.chat,
@@ -682,14 +761,10 @@ class RoomSettingsSectionsController(final String roomId)
             permissionSetting(.eventsDefault),
             header(
               "State Events",
-              "Power levels needed to manage members and change the room's state.",
+              "Power levels needed to change the room's state.",
               Icons.settings,
             ),
-            eventSetting(.pinnedEvents, fallback: powerLevels.stateDefault),
             permissionSetting(.invite),
-            permissionSetting(.kick),
-            permissionSetting(.ban),
-            permissionSetting(.redact),
             permissionSetting(.stateDefault),
             header(
               "Other Events",
