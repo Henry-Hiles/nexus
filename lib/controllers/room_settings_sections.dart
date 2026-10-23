@@ -11,6 +11,7 @@ import "package:nexus/controllers/room_power_levels.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/controllers/space_edges.dart";
 import "package:nexus/helpers/extensions/show_adaptive_sheet.dart";
+import "package:nexus/helpers/extensions/join_rule_name.dart";
 import "package:nexus/helpers/file_dialog_helper.dart";
 import "package:nexus/helpers/hooks/saving.dart";
 import "package:nexus/main.dart";
@@ -27,6 +28,7 @@ import "package:nexus/models/content/name.dart";
 import "package:nexus/models/content/power_levels.dart";
 import "package:nexus/models/content/topic.dart";
 import "package:nexus/models/join_rule.dart";
+import "package:nexus/models/power_level_permission.dart";
 import "package:nexus/models/setting.dart";
 import "package:nexus/models/settings_category.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
@@ -288,22 +290,29 @@ class RoomSettingsSectionsController(final String roomId)
       ),
     );
 
-    /// A setting for the level needed to send [type], which otherwise needs [fallback].
-    Setting eventSetting(
-      EventType type, {
-      required String title,
-      required String description,
-      required IconData icon,
-      required int fallback,
-    }) => powerLevelSetting(
-      title: title,
-      description: description,
-      icon: icon,
-      value: powerLevels.events[type.type] ?? fallback,
-      update: (level) => powerLevels.copyWith(
-        events: powerLevels.events.add(type.type, level),
-      ),
-    );
+    Setting permissionSetting(PowerLevelPermission permission) =>
+        powerLevelSetting(
+          title: permission.title,
+          description: permission.description,
+          icon: permission.icon,
+          value: permission.levelIn(powerLevels),
+          update: (level) => permission.withLevel(powerLevels, level),
+        );
+
+    /// A setting for the level needed to send [event], which otherwise needs [fallback].
+    Setting eventSetting(PowerLevelEvent event, {required int fallback}) {
+      final type = event == .message ? messageType : event.types.first;
+
+      return powerLevelSetting(
+        title: event.title,
+        description: event.description,
+        icon: event.icon,
+        value: powerLevels.events[type.type] ?? fallback,
+        update: (level) => powerLevels.copyWith(
+          events: powerLevels.events.add(type.type, level),
+        ),
+      );
+    }
 
     return .new({
       "Room": .new([
@@ -431,14 +440,7 @@ class RoomSettingsSectionsController(final String roomId)
                 subtitle: Text(description),
                 value: joinRules.joinRule,
                 options: joinRuleOptions,
-                getName: (rule) => switch (rule) {
-                  .public => "Public",
-                  .invite => "Invite only",
-                  .knock => "Knock",
-                  .restricted => "Restricted",
-                  .knockRestricted => "Restricted or knock",
-                  .private => "Private",
-                },
+                getName: (rule) => rule.displayName,
                 onChanged: canSetJoinRules
                     ? (rule) => setState(
                         .joinRules,
@@ -615,13 +617,7 @@ class RoomSettingsSectionsController(final String roomId)
           title: "Permissions",
           icon: Icons.admin_panel_settings,
           settings: .new([
-            powerLevelSetting(
-              title: "Default Power Level",
-              description: "The power level of users who aren't given one.",
-              icon: Icons.person,
-              value: powerLevels.usersDefault,
-              update: (level) => powerLevels.copyWith(usersDefault: level),
-            ),
+            permissionSetting(.usersDefault),
             header("Users", "Power levels of specific users.", Icons.group),
             ...users.map((entry) {
               final member = memberOf(entry.key);
@@ -687,82 +683,21 @@ class RoomSettingsSectionsController(final String roomId)
               "Power levels needed to send messages and other timeline events.",
               Icons.chat,
             ),
-            eventSetting(
-              messageType,
-              title: "Send Messages",
-              description: "The power level needed to send messages.",
-              icon: Icons.message,
-              fallback: powerLevels.eventsDefault,
-            ),
-            eventSetting(
-              .sticker,
-              title: "Send Stickers",
-              description: "The power level needed to send stickers.",
-              icon: Icons.sticky_note_2,
-              fallback: powerLevels.eventsDefault,
-            ),
-            eventSetting(
-              .reaction,
-              title: "Send Reactions",
-              description: "The power level needed to react to messages.",
-              icon: Icons.add_reaction,
-              fallback: powerLevels.eventsDefault,
-            ),
-            powerLevelSetting(
-              title: "Default for Events",
-              description:
-                  "The power level needed to send events without their own.",
-              icon: Icons.more_horiz,
-              value: powerLevels.eventsDefault,
-              update: (level) => powerLevels.copyWith(eventsDefault: level),
-            ),
+            eventSetting(.message, fallback: powerLevels.eventsDefault),
+            eventSetting(.sticker, fallback: powerLevels.eventsDefault),
+            eventSetting(.reaction, fallback: powerLevels.eventsDefault),
+            permissionSetting(.eventsDefault),
             header(
               "State Events",
               "Power levels needed to manage members and change the room's state.",
               Icons.settings,
             ),
-            eventSetting(
-              .pinnedEvents,
-              title: "Pin Messages",
-              description: "The power level needed to pin messages.",
-              icon: Icons.push_pin,
-              fallback: powerLevels.stateDefault,
-            ),
-            powerLevelSetting(
-              title: "Invite Users",
-              description: "The power level needed to invite users.",
-              icon: Icons.person_add,
-              value: powerLevels.invite,
-              update: (level) => powerLevels.copyWith(invite: level),
-            ),
-            powerLevelSetting(
-              title: "Kick Users",
-              description: "The power level needed to kick users.",
-              icon: Icons.sports_martial_arts,
-              value: powerLevels.kick,
-              update: (level) => powerLevels.copyWith(kick: level),
-            ),
-            powerLevelSetting(
-              title: "Ban Users",
-              description: "The power level needed to ban and unban users.",
-              icon: Icons.gavel,
-              value: powerLevels.ban,
-              update: (level) => powerLevels.copyWith(ban: level),
-            ),
-            powerLevelSetting(
-              title: "Delete Others' Messages",
-              description: "The power level needed to remove others' messages.",
-              icon: Icons.delete,
-              value: powerLevels.redact,
-              update: (level) => powerLevels.copyWith(redact: level),
-            ),
-            powerLevelSetting(
-              title: "Default for State Events",
-              description: "The power level needed to send state events without their own.",
-              icon: Icons.tune,
-              value: powerLevels.stateDefault,
-              update: (level) => powerLevels.copyWith(stateDefault: level),
-            ),
+            eventSetting(.pinnedEvents, fallback: powerLevels.stateDefault),
+            permissionSetting(.invite),
+            permissionSetting(.kick),
+            permissionSetting(.ban),
+            permissionSetting(.redact),
+            permissionSetting(.stateDefault),
             header(
               "Other Events",
               "Power levels for specific event types.",

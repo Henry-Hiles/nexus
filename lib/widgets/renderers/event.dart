@@ -9,14 +9,17 @@ import "package:nexus/controllers/rooms.dart";
 import "package:nexus/controllers/settings.dart";
 import "package:nexus/helpers/extensions/is_shown_as_message.dart";
 import "package:nexus/helpers/extensions/show_adaptive_menu.dart";
+import "package:nexus/helpers/extensions/success_scheme.dart";
 import "package:nexus/helpers/hooks/chat_scroll.dart";
 import "package:nexus/models/content/avatar.dart";
 import "package:nexus/models/content/canonical_alias.dart";
 import "package:nexus/models/content/content.dart";
 import "package:nexus/models/content/create.dart";
+import "package:nexus/models/content/encryption.dart";
 import "package:nexus/models/content/history_visibility.dart";
 import "package:nexus/models/content/join_rules.dart";
 import "package:nexus/models/content/membership.dart";
+import "package:nexus/models/content/name.dart";
 import "package:nexus/models/content/pinned_events.dart";
 import "package:nexus/models/content/power_levels.dart";
 import "package:nexus/models/content/server_acl.dart";
@@ -28,7 +31,10 @@ import "package:nexus/widgets/renderers/message.dart";
 import "package:nexus/widgets/reaction_row.dart";
 import "package:nexus/widgets/read_receipts_row.dart";
 import "package:nexus/widgets/renderers/membership.dart";
+import "package:nexus/widgets/renderers/change_line.dart";
 import "package:nexus/widgets/renderers/generic_event.dart";
+import "package:nexus/widgets/renderers/join_rules_diff.dart";
+import "package:nexus/widgets/renderers/power_levels_diff.dart";
 import "package:nexus/widgets/renderers/pinned_events_diff.dart";
 import "package:nexus/widgets/renderers/server_acl_diff.dart";
 import "package:nexus/widgets/swipe_to_reply.dart";
@@ -105,6 +111,10 @@ class const EventRenderer(
         event.sender == previousEvent?.sender &&
         event.pmp?.id == previousEvent?.pmp?.id;
 
+    // For what a state event changed, from and to
+    final removedColor = colorScheme.error;
+    final addedColor = theme.successScheme.primary;
+
     GenericEventRenderer generic(
       IconData icon,
       String text, {
@@ -167,18 +177,57 @@ class const EventRenderer(
               "changed the room avatar",
             ),
             CreateContent() => generic(Icons.add, "created the room"),
-            PowerLevelsContent() => generic(
+            final PowerLevelsContent content => generic(
               Icons.power,
               "changed the room's power levels",
+              details: [
+                PowerLevelsDiff(
+                  roomId,
+                  content,
+                  previous: switch (event.previousContent) {
+                    final PowerLevelsContent previous => previous,
+                    _ => null,
+                  },
+                ),
+              ],
             ),
-            JoinRulesContent() => generic(
+            final JoinRulesContent content => generic(
               Icons.rule,
               "changed the room's join rules",
+              details: [
+                JoinRulesDiff(
+                  content,
+                  previous: switch (event.previousContent) {
+                    final JoinRulesContent previous => previous,
+                    _ => null,
+                  },
+                ),
+              ],
             ),
-            TopicContent() => generic(
-              Icons.description,
-              "updated the room topic",
-            ),
+            TopicContent(:final topic) => () {
+              final previous = switch (event.previousContent) {
+                TopicContent(:final topic) when topic.isNotEmpty => topic,
+                _ => null,
+              };
+
+              return generic(
+                Icons.description,
+                topic.isEmpty
+                    ? "removed the room topic"
+                    : previous == null
+                    ? "set the room topic"
+                    : "changed the room topic",
+                details: [
+                  ChangeLine(
+                    removed: [?previous].lock,
+                    added: [if (topic.isNotEmpty) topic].lock,
+                    removedColor: removedColor,
+                    addedColor: addedColor,
+                    quoted: false,
+                  ),
+                ],
+              );
+            }(),
             HistoryVisibilityContent(:final historyVisibility) => generic(
               Icons.history,
               "changed the room's history visibility to ${switch (historyVisibility) {
@@ -230,32 +279,71 @@ class const EventRenderer(
                 ),
               ],
             ),
-            CanonicalAliasContent(:final alias, :final altAliases) => generic(
-              Icons.numbers,
-              switch ([
-                if (event.previousContent case CanonicalAliasContent(
-                  alias: final prevAlias,
-                  altAliases: final prevAltAliases,
-                )) ...[
-                  if (prevAlias != alias)
-                    if (alias == null)
-                      "removed the room's canonical alias"
-                    else
-                      "changed the room's canonical alias to $alias",
+            CanonicalAliasContent(:final alias, :final altAliases) => () {
+              final previous = switch (event.previousContent) {
+                final CanonicalAliasContent previous => previous,
+                _ => null,
+              };
+              final previousAltAliases =
+                  previous?.altAliases ?? const ISet<String>.empty();
 
-                  if (prevAltAliases
-                          .remove(alias ?? "")
-                          .remove(prevAlias ?? "") !=
-                      altAliases.remove(alias ?? "").remove(prevAlias ?? ""))
-                    "changed the room's aliases",
-                ] else ...[
-                  if (alias != null) "set the room's canonical alias",
-                  if (altAliases.isNotEmpty) "set the room's aliases",
+              return generic(
+                Icons.numbers,
+                previous == null
+                    ? "set the room's aliases"
+                    : "changed the room's aliases",
+                details: [
+                  if (previous?.alias != alias)
+                    ChangeLine(
+                      label: "Canonical alias",
+                      removed: [?previous?.alias].lock,
+                      added: [?alias].lock,
+                      removedColor: removedColor,
+                      addedColor: addedColor,
+                    ),
+                  if (previousAltAliases != altAliases)
+                    ChangeLine(
+                      label: "Aliases",
+                      removed: previousAltAliases
+                          .difference(altAliases)
+                          .toIList(),
+                      added: altAliases
+                          .difference(previousAltAliases)
+                          .toIList(),
+                      removedColor: removedColor,
+                      addedColor: addedColor,
+                    ),
                 ],
-              ]) {
-                [] => "did something related to room aliases",
-                List prev => prev.join(" and "),
-              },
+              );
+            }(),
+            NameContent(:final name) => () {
+              final previous = switch (event.previousContent) {
+                NameContent(:final name) when name.isNotEmpty => name,
+                _ => null,
+              };
+
+              return generic(
+                Icons.title,
+                name.isEmpty
+                    ? "removed the room name"
+                    : previous == null
+                    ? "set the room name"
+                    : "changed the room name",
+                details: [
+                  ChangeLine(
+                    removed: [?previous].lock,
+                    added: [if (name.isNotEmpty) name].lock,
+                    removedColor: removedColor,
+                    addedColor: addedColor,
+                  ),
+                ],
+              );
+            }(),
+            EncryptionContent() => generic(
+              Icons.lock,
+              event.previousContent is EncryptionContent
+                  ? "changed the room's encryption settings"
+                  : "enabled encryption",
             ),
             _ => null,
           };

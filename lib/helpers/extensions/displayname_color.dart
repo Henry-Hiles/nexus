@@ -20,6 +20,15 @@ extension DisplaynameColor on WidgetRef {
     ),
   };
 
+  /// Like [displaynameColor], for when [userId]'s [level] is already known,
+  /// like a level they're being given.
+  Color displaynameColorAt(String userId, double level) => switch (watch(
+    SettingsController.provider.select((settings) => settings.value?.nameColor),
+  )) {
+    .user => userId.colorHash,
+    .powerLevel || null => powerLevelColor(level),
+  };
+
   static Color powerLevelColor(double level) => HSLColor.fromAHSL(
     1,
     level.isInfinite ? 30 : (210 + level / 50 * 137.50776) % 360,
