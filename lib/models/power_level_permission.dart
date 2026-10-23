@@ -77,39 +77,50 @@ enum PowerLevelPermission(
 }
 
 enum PowerLevelEvent(
+  final EventType type,
   final String title,
   final String description,
   final IconData icon,
 ) {
   message(
+    .message,
     "Send Messages",
     "The power level needed to send messages.",
     Icons.message,
   ),
+  // Everything a client encrypts is sent as this, so its level is what limits
+  // messages, stickers, and the like in encrypted rooms
+  encrypted(
+    .encrypted,
+    "Send Encrypted Events",
+    "The power level needed to send messages, stickers, files and anything else encrypted.",
+    Icons.lock,
+  ),
   sticker(
+    .sticker,
     "Send Stickers",
     "The power level needed to send stickers.",
     Icons.sticky_note_2,
   ),
   reaction(
+    .reaction,
     "Send Reactions",
     "The power level needed to react to messages.",
     Icons.add_reaction,
   ),
   pinnedEvents(
+    .pinnedEvents,
     "Pin Messages",
     "The power level needed to pin messages.",
     Icons.push_pin,
   );
 
-  IList<EventType> get types => .new(switch (this) {
-    .message => [.message, .encrypted],
-    .sticker => [.sticker],
-    .reaction => [.reaction],
-    .pinnedEvents => [.pinnedEvents],
-  });
+  static IList<PowerLevelEvent> shownIn({required bool encrypted}) => .new([
+    if (encrypted) .encrypted else ...[.message, .sticker],
+    .reaction,
+    .pinnedEvents,
+  ]);
 
-  static PowerLevelEvent? of(String type) => values
-      .where((event) => event.types.any((eventType) => eventType.type == type))
-      .firstOrNull;
+  static PowerLevelEvent? of(String type) =>
+      values.where((event) => event.type.type == type).firstOrNull;
 }

@@ -158,10 +158,8 @@ class RoomSettingsSectionsController(final String roomId)
       ClientStateController.provider.select((state) => state?.userId),
     );
     final ownLevel = userId == null ? 0.0 : roomPowerLevels.levelOf(userId);
-    // Encrypted rooms send messages as m.room.encrypted, so that's what limits them
-    final messageType = stateContent(.encryption) is EncryptionContent
-        ? EventType.encrypted
-        : EventType.message;
+    final encrypted = stateContent(.encryption) is EncryptionContent;
+    final shownEvents = PowerLevelEvent.shownIn(encrypted: encrypted);
 
     Future<void> setState(EventType type, Content content) async {
       final eventId = await client.setState(
@@ -220,12 +218,7 @@ class RoomSettingsSectionsController(final String roomId)
         .run(() => setState(.powerLevels, content).onError(showError));
 
     // Event types with their own level that don't have a setting of their own
-    final listedEvents = [
-      messageType,
-      EventType.sticker,
-      EventType.reaction,
-      EventType.pinnedEvents,
-    ].map((type) => type.type).toISet();
+    final listedEvents = shownEvents.map((event) => event.type.type).toISet();
     final otherEvents = powerLevels.events.entries
         .where((entry) => !listedEvents.contains(entry.key))
         .toIList()
@@ -300,19 +293,16 @@ class RoomSettingsSectionsController(final String roomId)
         );
 
     /// A setting for the level needed to send [event], which otherwise needs [fallback].
-    Setting eventSetting(PowerLevelEvent event, {required int fallback}) {
-      final type = event == .message ? messageType : event.types.first;
-
-      return powerLevelSetting(
-        title: event.title,
-        description: event.description,
-        icon: event.icon,
-        value: powerLevels.events[type.type] ?? fallback,
-        update: (level) => powerLevels.copyWith(
-          events: powerLevels.events.add(type.type, level),
-        ),
-      );
-    }
+    Setting eventSetting(PowerLevelEvent event, {required int fallback}) =>
+        powerLevelSetting(
+          title: event.title,
+          description: event.description,
+          icon: event.icon,
+          value: powerLevels.events[event.type.type] ?? fallback,
+          update: (level) => powerLevels.copyWith(
+            events: powerLevels.events.add(event.type.type, level),
+          ),
+        );
 
     return .new({
       "Room": .new([
@@ -683,9 +673,12 @@ class RoomSettingsSectionsController(final String roomId)
               "Power levels needed to send messages and other timeline events.",
               Icons.chat,
             ),
-            eventSetting(.message, fallback: powerLevels.eventsDefault),
-            eventSetting(.sticker, fallback: powerLevels.eventsDefault),
-            eventSetting(.reaction, fallback: powerLevels.eventsDefault),
+            ...shownEvents
+                .where((event) => event != .pinnedEvents)
+                .map(
+                  (event) =>
+                      eventSetting(event, fallback: powerLevels.eventsDefault),
+                ),
             permissionSetting(.eventsDefault),
             header(
               "State Events",
