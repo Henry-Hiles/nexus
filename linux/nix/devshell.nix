@@ -10,7 +10,6 @@ let
     cmakeVersions = [ "3.22.1" ];
     platformVersions = [
       "34"
-      "35"
       "36"
     ];
     abiVersions = [
