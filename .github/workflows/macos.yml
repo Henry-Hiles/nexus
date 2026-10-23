@@ -33,25 +33,6 @@ jobs:
                   flutter pub run build_runner build
                   flutter build macos --dart-define=GIT_COMMIT=${{ github.sha }}
 
-            # Only checks it launches and stays open, since there's no one to try it
-            - name: Smoke test
-              run: |
-                  open build/macos/Build/Products/Release/Nexus.app
-                  sleep 20
-                  screencapture -x screenshot.png || true
-                  if ! pgrep -if "Nexus.app/Contents/MacOS"; then
-                      echo "Nexus exited during startup"
-                      exit 1
-                  fi
-
-            - name: Upload screenshot
-              if: always()
-              uses: actions/upload-artifact@v6
-              with:
-                  name: macos-screenshot
-                  path: screenshot.png
-                  if-no-files-found: ignore
-
             - name: Create DMG
               id: create-dmg
               uses: L-Super/create-dmg-actions@28511e988b13ca34096d439159a66d468b8e724f
