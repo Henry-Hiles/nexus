@@ -1,7 +1,8 @@
 import "package:material_ui/material_ui.dart";
 import "package:nexus/helpers/extensions/get_localpart.dart";
 import "package:nexus/helpers/extensions/show_user_popover.dart";
-import "package:nexus/helpers/extensions/string_to_color.dart";
+import "package:flutter_riverpod/flutter_riverpod.dart";
+import "package:nexus/helpers/extensions/displayname_color.dart";
 import "package:nexus/models/content/membership.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/widgets/lazy_loading/message_displayname.dart";
@@ -11,9 +12,9 @@ class const MembershipRenderer(
   final Event event, {
   final int? maxLines,
   super.key,
-}) extends StatelessWidget {
+}) extends ConsumerWidget {
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     assert(
       event.content is MembershipContent,
       "Make sure to only pass membership events to MembershipRenderer",
@@ -40,7 +41,10 @@ class const MembershipRenderer(
                 overflow: .ellipsis,
                 content.displayName ?? event.stateKey!.localpart,
                 maxLines: 1,
-                style: .new(color: event.sender.colorHash, fontWeight: .bold),
+                style: .new(
+                  color: ref.displaynameColor(event.roomId, event.stateKey!),
+                  fontWeight: .bold,
+                ),
               ),
             ),
           ),

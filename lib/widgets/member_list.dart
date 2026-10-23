@@ -8,7 +8,7 @@ import "package:nexus/controllers/members_by_status.dart";
 import "package:nexus/controllers/members_grouped.dart";
 import "package:nexus/helpers/extensions/get_localpart.dart";
 import "package:nexus/helpers/extensions/show_user_popover.dart";
-import "package:nexus/helpers/extensions/string_to_color.dart";
+import "package:nexus/helpers/extensions/displayname_color.dart";
 import "package:nexus/models/content/membership.dart";
 import "package:nexus/models/membership_status.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
@@ -108,42 +108,44 @@ class const MemberList(final String roomId, {super.key})
                                         :final avatarUrl,
                                         :final displayName,
                                       ) =>
-                                        Builder(
-                                          builder: (context) => ListTile(
-                                            onTap: () =>
-                                                context.showUserPopover(
-                                                  members[index].stateKey!,
-                                                  roomId: roomId,
+                                        Consumer(
+                                          builder: (context, ref, _) =>
+                                              ListTile(
+                                                onTap: () =>
+                                                    context.showUserPopover(
+                                                      members[index].stateKey!,
+                                                      roomId: roomId,
+                                                    ),
+                                                title: Text(
+                                                  displayName ??
+                                                      members[index]
+                                                          .stateKey!
+                                                          .localpart,
+                                                  overflow: .ellipsis,
+                                                  style: .new(
+                                                    color: ref.displaynameColor(
+                                                      roomId,
+                                                      members[index].stateKey!,
+                                                    ),
+                                                    fontWeight: .bold,
+                                                  ),
                                                 ),
-                                            title: Text(
-                                              displayName ??
-                                                  members[index]
-                                                      .stateKey!
-                                                      .localpart,
-                                              overflow: .ellipsis,
-                                              style: .new(
-                                                color: members[index]
-                                                    .stateKey!
-                                                    .colorHash,
-                                                fontWeight: .bold,
+                                                subtitle: Text(
+                                                  members[index].stateKey!,
+                                                  overflow: .ellipsis,
+                                                ),
+                                                leading: Transform.translate(
+                                                  offset: .new(0, 2),
+                                                  child: AvatarOrHash(
+                                                    avatarUrl,
+                                                    dimension: 40,
+                                                    displayName ??
+                                                        members[index]
+                                                            .stateKey!
+                                                            .localpart,
+                                                  ),
+                                                ),
                                               ),
-                                            ),
-                                            subtitle: Text(
-                                              members[index].stateKey!,
-                                              overflow: .ellipsis,
-                                            ),
-                                            leading: Transform.translate(
-                                              offset: .new(0, 2),
-                                              child: AvatarOrHash(
-                                                avatarUrl,
-                                                dimension: 40,
-                                                displayName ??
-                                                    members[index]
-                                                        .stateKey!
-                                                        .localpart,
-                                              ),
-                                            ),
-                                          ),
                                         ),
                                       _ => throw Exception(
                                         "Member content was not MembershipContent",
