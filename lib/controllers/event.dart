@@ -9,11 +9,12 @@ class EventController(final GetEventRequest request)
     extends AsyncNotifier<Event?> {
   @override
   Future<Event?> build() async {
-    final room = ref.watch(
-      RoomsController.provider.select((value) => value[request.roomId]),
-    );
-    final event = room?.events.values.firstWhereOrNull(
-      (event) => event.eventId == request.eventId,
+    final event = ref.watch(
+      RoomsController.provider.select(
+        (rooms) => rooms[request.roomId]?.events.values.firstWhereOrNull(
+          (event) => event.eventId == request.eventId,
+        ),
+      ),
     );
 
     if (event != null) return event;

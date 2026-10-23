@@ -53,7 +53,8 @@ class const PinnedEventsDiff(
                 .new(roomId: roomId, eventId: change.$1),
               ),
             )) {
-              AsyncData(value: final event?) => InkWell(
+              // Keeps showing the event while it reloads
+              AsyncValue(value: final event?) => InkWell(
                 borderRadius: .circular(4),
                 hoverColor: color.withValues(alpha: 0.12),
                 onTap: jumpToEvent == null
