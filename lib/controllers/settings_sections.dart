@@ -18,12 +18,14 @@ import "package:nexus/controllers/unified_push_allowed.dart";
 import "package:nexus/controllers/unified_push_distributors.dart";
 import "package:nexus/helpers/extensions/distributor_name.dart";
 import "package:nexus/models/account_data.dart";
+import "package:nexus/models/client_state.dart";
 import "package:nexus/models/room_order.dart";
 import "package:nexus/models/settings.dart";
 import "package:nexus/models/settings_category.dart";
 import "package:nexus/models/show_and_send.dart";
 import "package:nexus/main.dart";
 import "package:nexus/widgets/settings/dialog_list_tile.dart";
+import "package:nexus/widgets/user_bottom_sheet.dart";
 import "package:nexus/widgets/reset_encryption_sheet.dart";
 import "package:nexus/helpers/extensions/show_adaptive_sheet.dart";
 
@@ -240,9 +242,28 @@ class SettingsSectionsController
           ]),
         ),
       ]),
-      if (ref.watch(ClientStateController.provider)?.isLoggedIn == true)
+      if (ref.watch(ClientStateController.provider) case ClientState(
+        isLoggedIn: true,
+        :final userId?,
+      ))
         "Account": .new([
-          .new(title: "Profile", icon: Icons.person, settings: .new([])),
+          .new(
+            title: "Profile",
+            icon: Icons.person,
+            settings: .new([
+              .new(
+                title: "Profile",
+                description: "Your avatar, display name, pronouns, and timezone, as others see them.",
+                icon: Icons.person,
+                builder: (title, description, icon) => Center(
+                  child: ConstrainedBox(
+                    constraints: .new(maxWidth: 500),
+                    child: UserBottomSheet(userId, editable: true),
+                  ),
+                ),
+              ),
+            ]),
+          ),
           .new(
             title: "Notifications",
             icon: Icons.notifications,

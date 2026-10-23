@@ -10,6 +10,15 @@ class ProfileController(final String userId)
     return client.getProfile(userId);
   }
 
+  Future<void> setField(String field, Object? value) async {
+    await ref
+        .read(ClientController.provider.notifier)
+        .setProfileField(field, value);
+    if (!ref.mounted) return;
+    ref.invalidateSelf();
+    await future;
+  }
+
   static final provider = AsyncNotifierProvider.family
       .autoDispose<ProfileController, ProfileResponse, String>(
         ProfileController.new,

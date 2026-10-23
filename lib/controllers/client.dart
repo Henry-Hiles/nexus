@@ -307,6 +307,15 @@ class ClientController extends AsyncNotifier<int> {
     }
   }
 
+  Future<void> setProfileField(String field, Object? value) => _sendCommand(
+    "set_profile_field",
+    {
+      "field": field,
+      // gomuks deletes the field when the value is omitted, not when it's null
+      "value": ?value,
+    },
+  );
+
   Future<void> reportEvent(ReportRequest request) =>
       _sendCommand("report_event", request.toJson());
 

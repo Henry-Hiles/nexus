@@ -1,4 +1,5 @@
 import "package:collection/collection.dart";
+import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:dynamic_color/dynamic_color.dart";
 import "package:material_ui/material_ui.dart";
 import "package:nexus/widgets/sheet_layout.dart";
@@ -20,15 +21,23 @@ import "package:nexus/helpers/extensions/get_localpart.dart";
 import "package:nexus/widgets/error_dialog.dart";
 import "package:nexus/widgets/loading.dart";
 import "package:nexus/widgets/mutual_rooms_sheet.dart";
+import "package:nexus/models/content/membership.dart";
 import "package:nexus/models/membership_action.dart";
+import "package:nexus/models/profile_response.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/main.dart";
+import "package:nexus/widgets/editable_avatar.dart";
 import "package:nexus/widgets/expandable_image.dart";
+import "package:nexus/widgets/settings/inline_text_field.dart";
 import "package:nexus/widgets/start_dm_sheet.dart";
+import "package:nexus/widgets/timezone_field.dart";
 
 final class const UserBottomSheet(
   final String userId, {
   final String? roomId,
+
+  /// Edits the current user's global profile, instead of showing actions.
+  final bool editable = false,
   super.key,
 }) extends ConsumerWidget {
   @override
@@ -39,6 +48,38 @@ final class const UserBottomSheet(
       color: theme.colorScheme.onSurfaceVariant,
     );
     final client = ref.read(ClientController.provider.notifier);
+    final profileController = ref.read(
+      ProfileController.provider(userId).notifier,
+    );
+    Future<void> setProfileField(String field, Object? value) =>
+        profileController.setField(field, value).onError(showError);
+
+    final profile = ref
+        .watch(ProfileController.provider(userId))
+        .value
+        ?.profile;
+    final englishPronouns = (profile?.pronouns ?? const IList<Pronoun>.empty())
+        // TODO: Check system language (l10n)
+        .where((pronoun) => pronoun.language == "en");
+    final divider = SizedBox(
+      height: 16,
+      child: VerticalDivider(
+        thickness: 1.5,
+        width: 4,
+        color: theme.colorScheme.onSurfaceVariant,
+      ),
+    );
+
+    Widget avatarOf(MembershipContent member) => ExpandableImage(
+      member.avatarUrl == null ? null : .new(mxc: member.avatarUrl!),
+      downloadFilename: member.displayName ?? userId.localpart,
+      child: AvatarOrHash(
+        member.avatarUrl,
+        member.displayName ?? userId.localpart,
+        dimension: 200,
+      ),
+    );
+
     // Green for accepting knocks, harmonized so it fits the current theme
     final acceptScheme = ColorScheme.fromSeed(
       seedColor: Colors.green.harmonizeWith(theme.colorScheme.primary),
@@ -101,45 +142,62 @@ final class const UserBottomSheet(
       AsyncData(value: final member) ||
       AsyncLoading(value: final member?) => SingleChildScrollView(
         child: Padding(
-          padding: .all(42),
+          padding: .all(editable ? 16 : 42),
           child: Column(
             spacing: 4,
             mainAxisSize: .min,
             crossAxisAlignment: .center,
             children: [
-              Row(
-                mainAxisAlignment: .end,
-                children: [
-                  M3EButton(
-                    onPressed: Navigator.of(context).pop,
-                    child: Icon(Icons.close),
-                  ),
-                ],
-              ),
-              SizedBox(height: 18),
-
-              ExpandableImage(
-                member.avatarUrl == null ? null : .new(mxc: member.avatarUrl!),
-                downloadFilename: member.displayName ?? userId.localpart,
-                child: AvatarOrHash(
-                  member.avatarUrl,
-                  member.displayName ?? userId.localpart,
-                  dimension: 200,
+              if (!editable) ...[
+                Row(
+                  mainAxisAlignment: .end,
+                  children: [
+                    M3EButton(
+                      onPressed: Navigator.of(context).pop,
+                      child: Icon(Icons.close),
+                    ),
+                  ],
                 ),
-              ),
+                SizedBox(height: 18),
+              ],
+
+              if (editable)
+                EditableAvatar(
+                  hasAvatar: member.avatarUrl != null,
+                  onChanged: (url) => setProfileField(
+                    Profile.avatarUrlKey,
+                    url?.toString() ?? "",
+                  ),
+                  child: avatarOf(member),
+                )
+              else
+                avatarOf(member),
 
               SizedBox(height: 8),
 
-              SelectableText(
-                member.displayName ?? userId.localpart,
-                style: textTheme.headlineLarge,
-                textAlign: .center,
-              ),
+              if (editable)
+                InlineTextField(
+                  value: profile?.displayName,
+                  hint: userId.localpart,
+                  style: textTheme.headlineLarge,
+                  onChanged: profile == null
+                      ? null
+                      : (value) =>
+                            setProfileField(Profile.displayNameKey, value),
+                )
+              else
+                SelectableText(
+                  member.displayName ?? userId.localpart,
+                  style: textTheme.headlineLarge,
+                  textAlign: .center,
+                ),
               SelectableText(userId, textAlign: .center, style: subtitleStyle),
 
               ref
                   .watch(ProfileController.provider(userId))
                   .betterWhen(
+                    // Keeps showing the profile while it's fetched again after saving
+                    skipLoadingOnRefresh: true,
                     loading: () => Text(""),
                     data: (profileResponse) => Column(
                       children: [
@@ -148,53 +206,108 @@ final class const UserBottomSheet(
                           alignment: .center,
                           spacing: 4,
                           runSpacing: 4,
-                          children: [
-                            ...profileResponse.profile.pronouns
-                                .where(
-                                  // TODO: Check system language (l10n)
-                                  (pronoun) => pronoun.language == "en",
-                                )
-                                .mapIndexed(
-                                  (index, pronoun) => [
-                                    if (index != 0)
-                                      Icon(
-                                        Icons.circle,
-                                        size: 4,
-                                        color:
-                                            theme.colorScheme.onSurfaceVariant,
-                                      ),
+                          children: editable
+                              ? [
+                                  InlineTextField(
+                                    value: englishPronouns
+                                        .map((pronoun) => pronoun.summary)
+                                        .join(", "),
+                                    hint: "Pronouns, e.g. they/them",
+                                    balanced: false,
+                                    style: subtitleStyle,
+                                    onChanged: (value) {
+                                      final pronouns = profileResponse
+                                          .profile
+                                          .pronouns
+                                          .where(
+                                            (pronoun) =>
+                                                // TODO: Check system language (l10n)
+                                                pronoun.language != "en",
+                                          )
+                                          .toIList()
+                                          .addAll(
+                                            value
+                                                .split(",")
+                                                .map(
+                                                  (summary) => summary.trim(),
+                                                )
+                                                .where(
+                                                  (summary) =>
+                                                      summary.isNotEmpty,
+                                                )
+                                                .map(
+                                                  (summary) => Pronoun(
+                                                    language: "en",
+                                                    summary: summary,
+                                                  ),
+                                                ),
+                                          );
+
+                                      return setProfileField(
+                                        Profile.unstablePronounsKey,
+                                        pronouns.isEmpty
+                                            ? null
+                                            : pronouns
+                                                  .map(
+                                                    (pronoun) =>
+                                                        pronoun.toJson(),
+                                                  )
+                                                  .toList(),
+                                      );
+                                    },
+                                  ),
+                                  divider,
+                                  TimezoneField(
+                                    value: profileResponse.profile.timezone,
+                                    style: subtitleStyle,
+                                    onChanged: (value) => setProfileField(
+                                      Profile.timezoneKey,
+                                      value,
+                                    ),
+                                  ),
+                                ]
+                              : [
+                                  ...englishPronouns
+                                      .mapIndexed(
+                                        (index, pronoun) => [
+                                          if (index != 0)
+                                            Icon(
+                                              Icons.circle,
+                                              size: 4,
+                                              color: theme
+                                                  .colorScheme
+                                                  .onSurfaceVariant,
+                                            ),
+                                          Text(
+                                            pronoun.summary,
+                                            textAlign: .center,
+                                            style: subtitleStyle,
+                                          ),
+                                        ],
+                                      )
+                                      .flattened,
+
+                                  if (profileResponse.profile.timezone !=
+                                      null) ...[
+                                    if (profileResponse
+                                        .profile
+                                        .pronouns
+                                        .isNotEmpty)
+                                      divider,
                                     Text(
-                                      pronoun.summary,
+                                      profileResponse.profile.timezone!,
                                       textAlign: .center,
                                       style: subtitleStyle,
                                     ),
                                   ],
-                                )
-                                .flattened,
-
-                            if (profileResponse.profile.timezone != null) ...[
-                              if (profileResponse.profile.pronouns.isNotEmpty)
-                                SizedBox(
-                                  height: 16,
-                                  child: VerticalDivider(
-                                    thickness: 1.5,
-                                    width: 4,
-                                    color: theme.colorScheme.onSurfaceVariant,
-                                  ),
-                                ),
-                              Text(
-                                profileResponse.profile.timezone!,
-                                textAlign: .center,
-                                style: subtitleStyle,
-                              ),
-                            ],
-                          ],
+                                ],
                         ),
                       ],
                     ),
                   ),
 
-              if (userId != ref.watch(ClientStateController.provider)?.userId)
+              if (!editable &&
+                  userId != ref.watch(ClientStateController.provider)?.userId)
                 switch (ref.watch(MutualRoomsController.provider(userId))) {
                   AsyncData(value: final roomIds) => switch (ref.watch(
                     RoomsController.provider.select(
@@ -215,30 +328,46 @@ final class const UserBottomSheet(
                 },
 
               SizedBox(height: 8),
-              if (userId !=
-                  ref.watch(ClientStateController.provider)?.userId) ...[
+              if (editable ||
+                  userId !=
+                      ref.watch(ClientStateController.provider)?.userId) ...[
                 Row(
                   children: [
                     Expanded(
                       child: M3EButton.icon(
-                        onPressed: () async {
-                          final name = member.displayName ?? userId.localpart;
-                          final hasDm = ref
-                              .read(RoomsController.provider)
-                              .values
-                              .any((room) => room.metadata?.dmUserId == userId);
+                        onPressed: editable
+                            ? null
+                            : () async {
+                                final name =
+                                    member.displayName ?? userId.localpart;
+                                final hasDm = ref
+                                    .read(RoomsController.provider)
+                                    .values
+                                    .any(
+                                      (room) =>
+                                          room.metadata?.dmUserId == userId,
+                                    );
 
-                          if (hasDm) {
-                            context.startDirectMessage(userId, name: name);
-                          } else if (await context.showAdaptiveSheet<bool>(
-                                (_) => StartDmSheet(userId: userId, name: name),
-                              ) !=
-                              true) {
-                            return;
-                          }
+                                if (hasDm) {
+                                  context.startDirectMessage(
+                                    userId,
+                                    name: name,
+                                  );
+                                } else if (await context
+                                        .showAdaptiveSheet<bool>(
+                                          (_) => StartDmSheet(
+                                            userId: userId,
+                                            name: name,
+                                          ),
+                                        ) !=
+                                    true) {
+                                  return;
+                                }
 
-                          if (context.mounted) Navigator.of(context).pop();
-                        },
+                                if (context.mounted) {
+                                  Navigator.of(context).pop();
+                                }
+                              },
                         shape: .square,
                         style: .tonal,
                         icon: Icon(Icons.message),
@@ -287,24 +416,32 @@ final class const UserBottomSheet(
                     ),
                   ),
 
-                if (roomId != null &&
-                    ref.watch(
-                      PowerLevelController.provider(
-                        .membershipAction(
-                          action: .kick,
-                          roomId: roomId!,
-                          targetUser: userId,
-                        ),
-                      ),
-                    ))
+                // Shown as a moderator would see it, while editing
+                if (editable ||
+                    (roomId != null &&
+                        ref.watch(
+                          PowerLevelController.provider(
+                            .membershipAction(
+                              action: .kick,
+                              roomId: roomId!,
+                              targetUser: userId,
+                            ),
+                          ),
+                        )))
                   Padding(
                     padding: .only(top: 4),
                     child: Row(
                       spacing: 8,
                       children: [
-                        if (member.status case .join || .invite || .knock)
+                        if (editable ||
+                            switch (member.status) {
+                              .join || .invite || .knock => true,
+                              _ => false,
+                            })
                           M3EButton.icon(
-                            onPressed: () => showMembershipSheet(.kick),
+                            onPressed: editable
+                                ? null
+                                : () => showMembershipSheet(.kick),
                             shape: .square,
                             icon: Icon(Icons.sports_martial_arts),
                             label: Text("Kick"),
@@ -315,7 +452,9 @@ final class const UserBottomSheet(
                           ),
 
                         M3EButton.icon(
-                          onPressed: () => showMembershipSheet(.ban),
+                          onPressed: editable
+                              ? null
+                              : () => showMembershipSheet(.ban),
                           shape: .square,
                           icon: Icon(Icons.gavel),
                           label: Text("Ban"),

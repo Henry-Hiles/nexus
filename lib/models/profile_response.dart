@@ -31,24 +31,46 @@ class const Bio({required final String html, final String? editSource})
 class const Profile({
   final String? id,
   final String? parseError,
-  final Uri? avatarUrl,
+  @JsonKey(name: Profile.avatarUrlKey) final Uri? avatarUrl,
 
-  @JsonKey(name: "displayname", fromJson: MembershipContent.displaynameFromJson)
+  @JsonKey(
+    name: Profile.displayNameKey,
+    fromJson: MembershipContent.displaynameFromJson,
+  )
   final String? displayName,
 
-  @JsonKey(readValue: Profile.readTimezone, name: "m.tz")
+  @JsonKey(readValue: Profile.readTimezone, name: Profile.timezoneKey)
   final String? timezone,
 
-  @JsonKey(readValue: Profile.readPronouns, name: "m.pronouns")
+  @JsonKey(readValue: Profile.readPronouns, name: Profile.pronounsKey)
   final IList<Pronoun> pronouns = const .empty(),
 }) with _$Profile {
+  static const avatarUrlKey = "avatar_url";
+  static const displayNameKey = "displayname";
+  static const timezoneKey = "m.tz";
+  static const unstableTimezoneKey = "us.cloke.msc4175.tz";
+  static const pronounsKey = "m.pronouns";
+  static const unstablePronounsKey = "io.fsky.nyx.pronouns";
+
   Map<String, Object?> toJson() => _$ProfileToJson(this);
 
+  Profile withPronouns(String language, Iterable<String> summaries) => copyWith(
+    pronouns: pronouns
+        .where((pronoun) => pronoun.language != language)
+        .toIList()
+        .addAll(
+          summaries.map(
+            (summary) => Pronoun(language: language, summary: summary),
+          ),
+        ),
+  );
+
   static Object? readPronouns(Map<dynamic, dynamic> map, String key) =>
-      map[key] ?? map["io.fsky.nyx.pronouns"];
+      /* until stable, commented out:  map[key] ?? */ map[Profile
+          .unstablePronounsKey];
 
   static Object? readTimezone(Map<dynamic, dynamic> map, String key) =>
-      map[key] ?? map["us.cloke.msc4175.tz"];
+      map[key] ?? map[Profile.unstableTimezoneKey];
 
   factory Profile.fromJson(Map<String, dynamic> json) =>
       _$ProfileFromJson(json);
