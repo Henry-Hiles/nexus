@@ -85,26 +85,6 @@ class SettingsSectionsController
               ),
             ),
             .new(
-              title: "Name Colors",
-              description: "Color names by power level, so moderators and admins stand out, or by user, so everyone has their own.",
-              icon: Icons.format_color_text,
-              builder: (title, description, icon) => DialogListTile<NameColor>(
-                icon: Icon(icon),
-                title: title,
-                subtitle: Text(description),
-                value: settings.nameColor,
-                options: NameColor.values,
-                getName: (option) => switch (option) {
-                  .powerLevel => "By power level",
-                  .user => "By user",
-                },
-                onChanged: (value) => ref
-                    .read(SettingsController.provider.notifier)
-                    .set(settings.copyWith(nameColor: value))
-                    .onError(showError),
-              ),
-            ),
-            .new(
               title: "Use Dynamic Theme",
               icon: Icons.palette,
               description: "Toggle on or off Dynamic Theme. Only available on Android, Linux, Windows, or MacOS.",
@@ -123,6 +103,26 @@ class SettingsSectionsController
                           .set(settings.copyWith(useDynamicTheming: value))
                           .onError(showError)
                     : null,
+              ),
+            ),
+            .new(
+              title: "Name Colors",
+              description: "Color names by power level, so moderators and admins stand out, or by user, so everyone has their own.",
+              icon: Icons.format_color_text,
+              builder: (title, description, icon) => DialogListTile<NameColor>(
+                icon: Icon(icon),
+                title: title,
+                subtitle: Text(description),
+                value: settings.nameColor,
+                options: NameColor.values,
+                getName: (option) => switch (option) {
+                  .powerLevel => "By power level",
+                  .user => "By user",
+                },
+                onChanged: (value) => ref
+                    .read(SettingsController.provider.notifier)
+                    .set(settings.copyWith(nameColor: value))
+                    .onError(showError),
               ),
             ),
           ]),
