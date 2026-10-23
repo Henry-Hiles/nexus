@@ -44,30 +44,39 @@ class RoomSettingsSectionsController(final String roomId)
     extends AsyncNotifier<IMap<String, IList<SettingsCategory>>> {
   @override
   Future<IMap<String, IList<SettingsCategory>>> build() async {
-    final room = ref.watch(
-      RoomsController.provider.select((rooms) => rooms[roomId]),
+    final (:state, :metadataTopic, :metadataAvatar) = ref.watch(
+      RoomsController.provider.select((rooms) {
+        final room = rooms[roomId];
+        return (
+          state: room?.state ?? const IMap.empty(),
+          metadataTopic: room?.metadata?.topic,
+          metadataAvatar: room?.metadata?.avatar,
+        );
+      }),
     );
+
+    Content? contentOf(int rowId) =>
+        ref.read(RoomsController.provider)[roomId]?.events[rowId]?.content;
     final client = ref.read(ClientController.provider.notifier);
     final roomsController = ref.read(RoomsController.provider.notifier);
 
     // The room's own state, rather than metadata like a name made up from
     // its members when it has none
-    Content? stateContent(EventType type) =>
-        switch (room?.state[type.type]?[""]) {
-          final rowId? => room?.events[rowId]?.content,
-          null => null,
-        };
+    Content? stateContent(EventType type) => switch (state[type.type]?[""]) {
+      final rowId? => contentOf(rowId),
+      null => null,
+    };
     final name = switch (stateContent(.name)) {
       NameContent(:final name) => name,
       _ => null,
     };
     final topic = switch (stateContent(.topic)) {
       TopicContent(:final topic) => topic,
-      _ => room?.metadata?.topic,
+      _ => metadataTopic,
     };
     final avatar = switch (stateContent(.avatar)) {
       AvatarContent(:final url) => url,
-      _ => room?.metadata?.avatar,
+      _ => metadataAvatar,
     };
 
     bool canSet(EventType type) => ref.watch(
@@ -132,7 +141,7 @@ class RoomSettingsSectionsController(final String roomId)
                 .toIList(),
           ),
         )
-        .addAll(room?.state["m.space.parent"]?.keys ?? const [])
+        .addAll(state["m.space.parent"]?.keys ?? const [])
         .toISet();
     final allowedRooms = joinRules.allow
         .map((condition) => condition.roomId)
@@ -228,8 +237,8 @@ class RoomSettingsSectionsController(final String roomId)
       },
     );
     MembershipContent? memberOf(String userId) =>
-        switch (room?.state[EventType.membership.type]?[userId]) {
-          final rowId? => switch (room?.events[rowId]?.content) {
+        switch (state[EventType.membership.type]?[userId]) {
+          final rowId? => switch (contentOf(rowId)) {
             final MembershipContent content => content,
             _ => null,
           },
