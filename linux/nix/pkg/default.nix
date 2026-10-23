@@ -47,6 +47,14 @@ flutter.buildFlutterApplication {
     linkify = "sha256-TpMD6+0zyY6i9l+6d8ErnVufmepCv362rCtnbOht/z4=";
     fab_m3e = "sha256-5V9m6yY0jimx2gh7lQHYg4HDKQ4Wrl0ATmBhw5DkQMI=";
     m3e_design = "sha256-5V9m6yY0jimx2gh7lQHYg4HDKQ4Wrl0ATmBhw5DkQMI=";
+    media_kit = "sha256-twu/4NxTc9RumYh8R0sIfSoo24c/OZtiwXa0fWkxWmg=";
+    media_kit_libs_android_video = "sha256-twu/4NxTc9RumYh8R0sIfSoo24c/OZtiwXa0fWkxWmg=";
+    media_kit_libs_ios_video = "sha256-twu/4NxTc9RumYh8R0sIfSoo24c/OZtiwXa0fWkxWmg=";
+    media_kit_libs_linux = "sha256-twu/4NxTc9RumYh8R0sIfSoo24c/OZtiwXa0fWkxWmg=";
+    media_kit_libs_macos_video = "sha256-twu/4NxTc9RumYh8R0sIfSoo24c/OZtiwXa0fWkxWmg=";
+    media_kit_libs_video = "sha256-twu/4NxTc9RumYh8R0sIfSoo24c/OZtiwXa0fWkxWmg=";
+    media_kit_libs_windows_video = "sha256-twu/4NxTc9RumYh8R0sIfSoo24c/OZtiwXa0fWkxWmg=";
+    media_kit_video = "sha256-twu/4NxTc9RumYh8R0sIfSoo24c/OZtiwXa0fWkxWmg=";
     native_toolchain_cmake = "sha256-/drnHZebmTnsCnHgC1xmlAe+U4PSrjw5Sm9axicuTrY=";
     navigation_rail_m3e = "sha256-5V9m6yY0jimx2gh7lQHYg4HDKQ4Wrl0ATmBhw5DkQMI=";
     unifiedpush_linux = "sha256-KQKyBPL2ORK9O89C4K3RHGve/lvFaU1vIjSDnj6+bj4=";
