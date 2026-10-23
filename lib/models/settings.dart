@@ -1,5 +1,6 @@
 import "package:material_ui/material_ui.dart";
 import "package:freezed_annotation/freezed_annotation.dart";
+import "package:nexus/models/name_color.dart";
 import "package:nexus/models/room_order.dart";
 import "package:nexus/models/show_and_send.dart";
 
@@ -17,6 +18,7 @@ class const Settings({
   final bool swipeToReply = false,
   final bool hideMembershipEvents = false,
   final RoomOrder roomOrder = .unreadFirst,
+  final NameColor nameColor = .powerLevel,
   final ShowAndSend typingIndicators = .showAndSend,
 
   /// When not sending, read receipts are still sent privately, so that the

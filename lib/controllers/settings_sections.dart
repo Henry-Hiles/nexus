@@ -19,6 +19,7 @@ import "package:nexus/controllers/unified_push_distributors.dart";
 import "package:nexus/helpers/extensions/distributor_name.dart";
 import "package:nexus/models/account_data.dart";
 import "package:nexus/models/client_state.dart";
+import "package:nexus/models/name_color.dart";
 import "package:nexus/models/room_order.dart";
 import "package:nexus/models/settings.dart";
 import "package:nexus/models/settings_category.dart";
@@ -80,6 +81,26 @@ class SettingsSectionsController
                 onChanged: (value) => ref
                     .read(SettingsController.provider.notifier)
                     .set(settings.copyWith(theme: value))
+                    .onError(showError),
+              ),
+            ),
+            .new(
+              title: "Name Colors",
+              description: "Color names by power level, so moderators and admins stand out, or by user, so everyone has their own.",
+              icon: Icons.format_color_text,
+              builder: (title, description, icon) => DialogListTile<NameColor>(
+                icon: Icon(icon),
+                title: title,
+                subtitle: Text(description),
+                value: settings.nameColor,
+                options: NameColor.values,
+                getName: (option) => switch (option) {
+                  .powerLevel => "By power level",
+                  .user => "By user",
+                },
+                onChanged: (value) => ref
+                    .read(SettingsController.provider.notifier)
+                    .set(settings.copyWith(nameColor: value))
                     .onError(showError),
               ),
             ),
