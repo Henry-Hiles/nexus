@@ -37,6 +37,9 @@ class const TypingIndicator(final String roomId, {super.key})
                             .value
                             ?.displayName ??
                         typingUserId.localpart,
+                    maxLines: 1,
+                    overflow: .ellipsis,
+                    softWrap: false,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       fontWeight: .bold,
                     ),
