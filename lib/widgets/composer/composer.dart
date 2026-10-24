@@ -399,11 +399,11 @@ class const Composer(
 
                                       if (!shiftPressed) {
                                         send();
-                                        return KeyEventResult.handled;
+                                        return .handled;
                                       }
                                     }
 
-                                    return KeyEventResult.ignored;
+                                    return .ignored;
                                   },
                                   // Overrides the keyboard shortcut for pasting
                                   child: Actions(

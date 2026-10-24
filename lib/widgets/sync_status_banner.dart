@@ -67,7 +67,7 @@ class const SyncStatusBanner({super.key}) extends ConsumerWidget {
                           banner.title,
                           maxLines: 1,
                           overflow: .ellipsis,
-                          style: TextStyle(
+                          style: .new(
                             color: banner.foreground,
                             fontWeight: .bold,
                           ),

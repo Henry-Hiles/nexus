@@ -146,7 +146,7 @@ final class const RoomMenuButton(
             ),
             child: ListTile(
               leading: Icon(Icons.logout, color: danger),
-              title: Text("Leave", style: TextStyle(color: danger)),
+              title: Text("Leave", style: .new(color: danger)),
             ),
           ),
         ],

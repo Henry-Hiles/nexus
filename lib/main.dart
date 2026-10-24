@@ -147,7 +147,7 @@ class const App({super.key}) extends StatelessWidget {
               .watch(SettingsController.provider)
               .maybeWhen(
                 data: (settings) => settings.theme,
-                orElse: () => ThemeMode.system,
+                orElse: () => .system,
               ),
           home: child,
         );

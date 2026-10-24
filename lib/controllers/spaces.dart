@@ -25,55 +25,50 @@ class SpacesController extends AsyncNotifier<IList<Space>> {
           MapEntry(spaceId, edges.map((edge) => edge.childId).toList()),
     );
 
-    Set<String> collectDescendants(String startId) {
-      final visited = <String>{};
-      final stack = [startId];
-
-      while (stack.isNotEmpty) {
-        final current = stack.removeLast();
-        final children = childrenById[current] ?? const [];
-
-        for (final child in children) {
-          if (visited.add(child)) {
-            stack.add(child);
-          }
-        }
-      }
-
-      return visited;
-    }
+    /// Everything under [spaceId], however deep, skipping any already
+    /// [visited] so cycles end.
+    ISet<String> collectDescendants(
+      String spaceId, [
+      ISet<String> visited = const .empty(),
+    ]) => (childrenById[spaceId] ?? const []).fold(
+      visited,
+      (visited, childId) => visited.contains(childId)
+          ? visited
+          : collectDescendants(childId, visited.add(childId)),
+    );
 
     Space buildSpace(String spaceId) {
       final space = rooms[spaceId];
       final directChildrenIds = childrenById[spaceId] ?? const [];
 
-      final directRooms = <Room>[];
-      final subSpaces = <Subspace>[];
-
-      for (final childId in directChildrenIds) {
-        final room = rooms[childId];
-        if (room == null) continue;
-
-        if (childrenById.containsKey(childId)) {
-          final descendants = collectDescendants(childId);
-
-          subSpaces.add(
-            .new(
-              room: room,
-              children: .new(descendants.map((id) => rooms[id]).nonNulls),
-            ),
-          );
-        } else {
-          directRooms.add(room);
-        }
-      }
-
       return .new(
         id: spaceId,
         room: space,
         title: space?.metadata?.name ?? "Unnamed Space",
-        children: .new(directRooms),
-        subSpaces: .new(subSpaces),
+        children: .new(
+          directChildrenIds
+              .where((childId) => !childrenById.containsKey(childId))
+              .map((childId) => rooms[childId])
+              .nonNulls,
+        ),
+        subSpaces: .new(
+          directChildrenIds
+              .where(childrenById.containsKey)
+              .map(
+                (childId) => switch (rooms[childId]) {
+                  final room? => Subspace(
+                    room: room,
+                    children: .new(
+                      collectDescendants(childId)
+                          .map((id) => rooms[id])
+                          .nonNulls,
+                    ),
+                  ),
+                  null => null,
+                },
+              )
+              .nonNulls,
+        ),
       );
     }
 

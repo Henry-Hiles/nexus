@@ -49,7 +49,7 @@ class const MessageDisplayname(
           final children => Row(
             spacing: 4,
             mainAxisSize: .min,
-            children: [for (final child in children) Flexible(child: child)],
+            children: children.map((child) => Flexible(child: child)).toList(),
           ),
         },
       ),

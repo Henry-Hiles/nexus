@@ -38,7 +38,7 @@ class const RelationPreview(
               onPressed: toggleShouldMention,
               child: Text(
                 shouldMention ? "@On" : "@Off",
-                style: TextStyle(
+                style: .new(
                   fontWeight: .w900,
                   color: shouldMention ? null : Theme.of(context).disabledColor,
                 ),

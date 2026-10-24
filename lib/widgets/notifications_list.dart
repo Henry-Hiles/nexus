@@ -151,7 +151,7 @@ class const NotificationsList({super.key})
                           listController: listController.value,
                           controller: scrollController,
                           itemCount: value.length,
-                          padding: const EdgeInsets.symmetric(
+                          padding: const .symmetric(
                             horizontal: 8,
                             vertical: 12,
                           ),

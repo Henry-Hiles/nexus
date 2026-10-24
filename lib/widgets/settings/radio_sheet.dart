@@ -36,7 +36,7 @@ final class const RadioSheet<T>({
           onChanged: (value) => chosen.value = (value as T,),
 
           child: Column(
-            mainAxisSize: MainAxisSize.min,
+            mainAxisSize: .min,
             children: options
                 .map(
                   (option) => RadioListTile<T>(

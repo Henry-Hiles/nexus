@@ -243,17 +243,14 @@ class RoomChatController(final ChatParams info)
       ref.invalidate(provider);
     }
 
-    var taggedMessage = text;
-
-    for (final tag in tags) {
-      final escaped = RegExp.escape(tag.id);
-      final pattern = RegExp(r"@+(" + escaped + r")(#[^#]*#)?");
-
-      taggedMessage = taggedMessage.replaceAllMapped(
-        pattern,
+    // Replaces each formatted tag, like "@id#name#", with its ID
+    final taggedMessage = tags.fold(
+      text,
+      (message, tag) => message.replaceAllMapped(
+        RegExp(r"@+(" + RegExp.escape(tag.id) + r")(#[^#]*#)?"),
         (match) => match.group(1)!,
-      );
-    }
+      ),
+    );
 
     final client = ref.read(ClientController.provider.notifier);
     final event = await client.sendMessage(

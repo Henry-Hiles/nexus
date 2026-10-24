@@ -76,7 +76,7 @@ class const Html(
           src == null
               ? SizedBox.shrink()
               : InlineCustomWidget(
-                  alignment: PlaceholderAlignment.middle,
+                  alignment: .middle,
                   child: ExpandableImage(
                     .new(mxc: src),
                     downloadFilename: src.pathSegments.last,

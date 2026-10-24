@@ -42,7 +42,7 @@ final class const DialogListTile<T>({
         child: Chip(
           label: Text(
             value is T ? getName(value as T) : "None",
-            overflow: TextOverflow.ellipsis,
+            overflow: .ellipsis,
             style: onChanged == null || saving.active
                 ? .new(color: Colors.grey)
                 : null,

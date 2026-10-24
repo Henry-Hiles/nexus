@@ -27,7 +27,7 @@ final class const MessageImage(
           child: Image(
             image: MxcImage(ref, request),
             width: info?.width?.toDouble(),
-            fit: BoxFit.fitWidth,
+            fit: .fitWidth,
             loadingBuilder: (_, child, loadingProgress) =>
                 loadingProgress == null
                 ? child
