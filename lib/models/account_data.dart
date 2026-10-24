@@ -18,15 +18,9 @@ class const AccountData({
   final RecentEmojiData recentEmoji = const RecentEmojiData(),
 
   /// Room image packs the user has enabled everywhere
-  @JsonKey(
-    name: AccountData.imagePackRoomsKey,
-    fromJson: ImagePackRooms.tryFromJson,
-  )
+  @JsonKey(name: AccountData.imagePackRoomsKey)
   final ImagePackRooms? imagePackRooms,
-  @JsonKey(
-    name: AccountData.legacyImagePackRoomsKey,
-    fromJson: ImagePackRooms.tryFromJson,
-  )
+  @JsonKey(name: AccountData.legacyImagePackRoomsKey)
   final ImagePackRooms? legacyImagePackRooms,
 }) with _$AccountData {
   static const invitePermissionConfigKey = "m.invite_permission_config";
@@ -59,15 +53,6 @@ class const ImagePackRooms({
   /// empty) object
   final IMap<String, IMap<String, Map<String, dynamic>>> rooms = const .empty(),
 }) with _$ImagePackRooms {
-  static ImagePackRooms? tryFromJson(Map<String, dynamic>? json) {
-    if (json == null) return null;
-    try {
-      return .fromJson(json);
-    } catch (_) {
-      return null;
-    }
-  }
-
   Map<String, Object?> toJson() => _$ImagePackRoomsToJson(this);
 
   factory ImagePackRooms.fromJson(Map<String, Object?> json) =>
