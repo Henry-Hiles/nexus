@@ -17,7 +17,8 @@ sealed class MembershipContent extends Content with _$MembershipContent {
       fromJson: MembershipContent.displaynameFromJson,
     )
     required String? displayName,
-    @JsonKey(name: "membership") required MembershipStatus status,
+    @JsonKey(name: "membership", unknownEnumValue: MembershipStatus.unknown)
+    required MembershipStatus status,
     Uri? avatarUrl,
     String? reason,
     @Default(false) bool isDirect,

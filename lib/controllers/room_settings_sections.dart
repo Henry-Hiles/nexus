@@ -663,6 +663,7 @@ class RoomSettingsSectionsController(final String roomId)
                       .invited => "After invite",
                       .joined => "After join",
                       .worldReadable => "Anyone",
+                      .unknown => "Unknown",
                     },
                     onChanged: canSetHistoryVisibility
                         ? (visibility) => setState(

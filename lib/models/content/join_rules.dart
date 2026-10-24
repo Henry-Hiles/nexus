@@ -9,7 +9,7 @@ part "join_rules.g.dart";
 sealed class JoinRulesContent extends Content with _$JoinRulesContent {
   JoinRulesContent._();
   factory JoinRulesContent({
-    required JoinRule joinRule,
+    @JsonKey(unknownEnumValue: JoinRule.unknown) required JoinRule joinRule,
     @Default(ISet.empty()) ISet<AllowCondition> allow,
   }) = _JoinRulesContent;
 

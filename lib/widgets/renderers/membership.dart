@@ -57,6 +57,7 @@ class const MembershipRenderer(
                   .leave => event.sender == event.stateKey ? "left" : (previous == .ban ? "was unbanned from" : "was kicked from"),
                   .ban => "was banned from",
                   .knock => "asked to join",
+                  .unknown => "changed their membership in",
                 }} the room${event.sender == event.stateKey ? "" : " by"}",
           ),
           if (event.sender != event.stateKey)

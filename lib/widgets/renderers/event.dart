@@ -240,6 +240,7 @@ class const EventRenderer(
                 .joined => "since joined",
                 .shared => "all history visible (shared)",
                 .worldReadable => "all history visible (world readable)",
+                .unknown => "something Nexus doesn't know about",
               }}",
             ),
             PinnedEventsContent(:final pinnedEvents) => () {

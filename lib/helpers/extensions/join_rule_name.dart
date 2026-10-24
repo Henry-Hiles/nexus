@@ -9,5 +9,6 @@ extension JoinRuleName on JoinRule {
     .restricted => "Restricted",
     .knockRestricted => "Restricted or knock",
     .private => "Private",
+    .unknown => "Unknown",
   };
 }

@@ -1,1 +1,1 @@
-enum MembershipStatus { leave, invite, ban, join, knock }
+enum MembershipStatus { leave, invite, ban, join, knock, unknown }

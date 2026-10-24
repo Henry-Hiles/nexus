@@ -8,6 +8,7 @@ sealed class HistoryVisibilityContent extends Content
     with _$HistoryVisibilityContent {
   HistoryVisibilityContent._();
   factory HistoryVisibilityContent({
+    @JsonKey(unknownEnumValue: HistoryVisibility.unknown)
     required HistoryVisibility historyVisibility,
   }) = _HistoryVisibilityContent;
 
@@ -16,4 +17,4 @@ sealed class HistoryVisibilityContent extends Content
 }
 
 @JsonEnum(fieldRename: FieldRename.snake)
-enum HistoryVisibility { invited, joined, shared, worldReadable }
+enum HistoryVisibility { invited, joined, shared, worldReadable, unknown }

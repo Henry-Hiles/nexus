@@ -14,7 +14,7 @@ part "room_summary.g.dart";
 class const RoomSummary({
   required final String roomId,
   @JsonKey(name: "num_joined_members") final int? joinedMembers,
-  final JoinRule? joinRule,
+  @JsonKey(unknownEnumValue: JoinRule.unknown) final JoinRule? joinRule,
 
   /// Rooms whose members may join without an invite, for restricted rooms.
   final IList<String> allowedRoomIds = const .empty(),

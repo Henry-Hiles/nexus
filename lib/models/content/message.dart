@@ -20,6 +20,7 @@ sealed class MessageContent extends Content with _$MessageContent {
   @FreezedUnionValue("m.text")
   factory MessageContent.text({
     required String body,
+    @JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue)
     MessageFormat? format,
     String? formattedBody,
   }) = TextMessageContent;
@@ -27,6 +28,7 @@ sealed class MessageContent extends Content with _$MessageContent {
   @FreezedUnionValue("m.notice")
   factory MessageContent.notice({
     required String body,
+    @JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue)
     MessageFormat? format,
     String? formattedBody,
   }) = NoticeMessageContent;
@@ -34,6 +36,7 @@ sealed class MessageContent extends Content with _$MessageContent {
   @FreezedUnionValue("m.emote")
   factory MessageContent.emote({
     required String body,
+    @JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue)
     MessageFormat? format,
     String? formattedBody,
   }) = EmoteMessageContent;
@@ -41,6 +44,7 @@ sealed class MessageContent extends Content with _$MessageContent {
   @FreezedUnionValue("m.image")
   factory MessageContent.image({
     required String body,
+    @JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue)
     MessageFormat? format,
     String? formattedBody,
     EncryptedFile? file,
@@ -52,6 +56,7 @@ sealed class MessageContent extends Content with _$MessageContent {
   @FreezedUnionValue("m.file")
   factory MessageContent.file({
     required String body,
+    @JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue)
     MessageFormat? format,
     String? formattedBody,
     EncryptedFile? file,
@@ -63,6 +68,7 @@ sealed class MessageContent extends Content with _$MessageContent {
   @FreezedUnionValue("m.audio")
   factory MessageContent.audio({
     required String body,
+    @JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue)
     MessageFormat? format,
     String? formattedBody,
     EncryptedFile? file,
@@ -74,6 +80,7 @@ sealed class MessageContent extends Content with _$MessageContent {
   @FreezedUnionValue("m.video")
   factory MessageContent.video({
     required String body,
+    @JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue)
     MessageFormat? format,
     String? formattedBody,
     EncryptedFile? file,
