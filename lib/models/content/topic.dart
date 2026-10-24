@@ -5,14 +5,12 @@ import "package:nexus/models/content/content.dart";
 part "topic.freezed.dart";
 part "topic.g.dart";
 
-@freezed
-sealed class TopicContent extends Content with _$TopicContent {
-  TopicContent._();
-  factory TopicContent({
-    required String topic,
-    @JsonKey(name: "m.topic") TopicContentBlock? content,
-  }) = _TopicContent;
-
+@Freezed(toJson: false, fromJson: false)
+@JsonSerializable()
+class const TopicContent({
+  required final String topic,
+  @JsonKey(name: "m.topic") final TopicContentBlock? content,
+}) extends Content with _$TopicContent {
   factory TopicContent.fromJson(Map<String, Object?> json) =>
       _$TopicContentFromJson(json);
 }
@@ -20,7 +18,7 @@ sealed class TopicContent extends Content with _$TopicContent {
 @Freezed(toJson: false, fromJson: false)
 @JsonSerializable()
 class const TopicContentBlock({
-  final IList<TextualRepresentation> representations = const IList.empty(),
+  final IList<TextualRepresentation> representations = const .empty(),
 }) with _$TopicContentBlock {
   Map<String, Object?> toJson() => _$TopicContentBlockToJson(this);
 

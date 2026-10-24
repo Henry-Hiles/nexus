@@ -4,15 +4,12 @@ import "package:nexus/models/content/content.dart";
 part "canonical_alias.freezed.dart";
 part "canonical_alias.g.dart";
 
-@freezed
-sealed class CanonicalAliasContent extends Content
-    with _$CanonicalAliasContent {
-  CanonicalAliasContent._();
-  factory CanonicalAliasContent({
-    @JsonKey(includeIfNull: false) String? alias,
-    @Default(ISet.empty()) ISet<String> altAliases,
-  }) = _CanonicalAliasContent;
-
+@Freezed(toJson: false, fromJson: false)
+@JsonSerializable()
+class const CanonicalAliasContent({
+  @JsonKey(includeIfNull: false) final String? alias,
+  final ISet<String> altAliases = const .empty(),
+}) extends Content with _$CanonicalAliasContent {
   factory CanonicalAliasContent.fromJson(Map<String, Object?> json) =>
       _$CanonicalAliasContentFromJson(json);
 }

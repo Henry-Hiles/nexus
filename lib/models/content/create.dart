@@ -4,22 +4,16 @@ import "package:nexus/models/content/content.dart";
 part "create.freezed.dart";
 part "create.g.dart";
 
-@freezed
-sealed class CreateContent extends Content with _$CreateContent {
-  CreateContent._();
-  factory CreateContent({
-    @JsonKey(name: "additional_creators")
-    @Default(IList.empty())
-    IList<String> additionalCreatorIds,
-
-    PreviousRoom? predecessor,
-
-    @JsonKey(name: "m.federate") @Default(true) bool federated,
-
-    @Default("1") String roomVersion,
-    @JsonKey(unknownEnumValue: RoomType.room) RoomType? type,
-  }) = _CreateContent;
-
+@Freezed(toJson: false, fromJson: false)
+@JsonSerializable()
+class const CreateContent({
+  @JsonKey(name: "additional_creators")
+  final IList<String> additionalCreatorIds = const .empty(),
+  final PreviousRoom? predecessor,
+  @JsonKey(name: "m.federate") final bool federated = true,
+  final String roomVersion = "1",
+  @JsonKey(unknownEnumValue: RoomType.room) final RoomType? type,
+}) extends Content with _$CreateContent {
   factory CreateContent.fromJson(Map<String, Object?> json) =>
       _$CreateContentFromJson(json);
 }

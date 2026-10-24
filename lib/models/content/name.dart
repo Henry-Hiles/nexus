@@ -3,11 +3,11 @@ import "package:nexus/models/content/content.dart";
 part "name.freezed.dart";
 part "name.g.dart";
 
-@freezed
-sealed class NameContent extends Content with _$NameContent {
-  NameContent._();
-  factory NameContent({required String name}) = _NameContent;
-
+@Freezed(toJson: false, fromJson: false)
+@JsonSerializable()
+class const NameContent({required final String name})
+    extends Content
+    with _$NameContent {
   factory NameContent.fromJson(Map<String, Object?> json) =>
       _$NameContentFromJson(json);
 }

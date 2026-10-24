@@ -4,15 +4,13 @@ import "package:nexus/models/content/content.dart";
 part "server_acl.freezed.dart";
 part "server_acl.g.dart";
 
-@freezed
-sealed class ServerACLContent extends Content with _$ServerACLContent {
-  ServerACLContent._();
-  factory ServerACLContent({
-    @Default(IList.empty()) IList<String> allow,
-    @Default(IList.empty()) IList<String> deny,
-    @Default(true) allowIpLiterals,
-  }) = _ServerACLContent;
-
+@Freezed(toJson: false, fromJson: false)
+@JsonSerializable()
+class const ServerACLContent({
+  final IList<String> allow = const .empty(),
+  final IList<String> deny = const .empty(),
+  final bool allowIpLiterals = true,
+}) extends Content with _$ServerACLContent {
   factory ServerACLContent.fromJson(Map<String, Object?> json) =>
       _$ServerACLContentFromJson(json);
 }

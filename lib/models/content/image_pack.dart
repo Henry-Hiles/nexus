@@ -6,14 +6,12 @@ part "image_pack.freezed.dart";
 part "image_pack.g.dart";
 
 /// An image pack (MSC2545), from a room's state.
-@freezed
-sealed class ImagePackContent extends Content with _$ImagePackContent {
-  ImagePackContent._();
-  factory ImagePackContent({
-    @Default(IMap.empty()) IMap<String, PackImage> images,
-    PackInfo? pack,
-  }) = _ImagePackContent;
-
+@Freezed(toJson: false, fromJson: false)
+@JsonSerializable()
+class const ImagePackContent({
+  final IMap<String, PackImage> images = const .empty(),
+  final PackInfo? pack,
+}) extends Content with _$ImagePackContent {
   IMap<String, PackImage> imagesFor(ImageUsage usage) => images.where(
     (_, image) => switch ((image.usage, pack?.usage ?? const .empty())) {
       (final usages, _) when usages.isNotEmpty => usages.contains(usage),

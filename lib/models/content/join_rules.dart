@@ -5,14 +5,12 @@ import "package:nexus/models/join_rule.dart";
 part "join_rules.freezed.dart";
 part "join_rules.g.dart";
 
-@freezed
-sealed class JoinRulesContent extends Content with _$JoinRulesContent {
-  JoinRulesContent._();
-  factory JoinRulesContent({
-    @JsonKey(unknownEnumValue: JoinRule.unknown) required JoinRule joinRule,
-    @Default(ISet.empty()) ISet<AllowCondition> allow,
-  }) = _JoinRulesContent;
-
+@Freezed(toJson: false, fromJson: false)
+@JsonSerializable()
+class const JoinRulesContent({
+  @JsonKey(unknownEnumValue: JoinRule.unknown) required final JoinRule joinRule,
+  final ISet<AllowCondition> allow = const .empty(),
+}) extends Content with _$JoinRulesContent {
   factory JoinRulesContent.fromJson(Map<String, Object?> json) =>
       _$JoinRulesContentFromJson(json);
 }

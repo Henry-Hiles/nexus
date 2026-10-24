@@ -3,21 +3,13 @@ import "package:nexus/models/content/content.dart";
 part "encryption.freezed.dart";
 part "encryption.g.dart";
 
-@freezed
-sealed class EncryptionContent extends Content with _$EncryptionContent {
-  EncryptionContent._();
-  factory EncryptionContent({
-    required String algorithm,
-
-    @JsonKey(name: "rotation_period_ms")
-    @Default(604800000)
-    int rotationPeriodMS,
-
-    @JsonKey(name: "rotation_period_msgs")
-    @Default(100)
-    int rotationPeriodMessages,
-  }) = _EncryptionContent;
-
+@Freezed(toJson: false, fromJson: false)
+@JsonSerializable()
+class const EncryptionContent({
+  required final String algorithm,
+  @JsonKey(name: "rotation_period_ms") final int rotationPeriodMS = 604800000,
+  @JsonKey(name: "rotation_period_msgs") final int rotationPeriodMessages = 100,
+}) extends Content with _$EncryptionContent {
   factory EncryptionContent.fromJson(Map<String, Object?> json) =>
       _$EncryptionContentFromJson(json);
 }

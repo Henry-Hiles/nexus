@@ -3,12 +3,11 @@ import "package:nexus/models/content/content.dart";
 part "redaction.freezed.dart";
 part "redaction.g.dart";
 
-@freezed
-sealed class RedactionContent extends Content with _$RedactionContent {
-  RedactionContent._();
-  factory RedactionContent({String? reason, String? redacts}) =
-      _RedactionContent;
-
+@Freezed(toJson: false, fromJson: false)
+@JsonSerializable()
+class const RedactionContent({final String? reason, final String? redacts})
+    extends Content
+    with _$RedactionContent {
   factory RedactionContent.fromJson(Map<String, Object?> json) =>
       _$RedactionContentFromJson(json);
 }

@@ -4,22 +4,20 @@ import "package:nexus/models/content/content.dart";
 part "power_levels.freezed.dart";
 part "power_levels.g.dart";
 
-@freezed
-sealed class PowerLevelsContent extends Content with _$PowerLevelsContent {
-  PowerLevelsContent._();
-  factory PowerLevelsContent({
-    @Default(IMap.empty()) IMap<String, int> events,
-    @Default(IMap.empty()) IMap<String, int> users,
-    @JsonKey(includeIfNull: false) Notifications? notifications,
-    @Default(50) int ban,
-    @Default(0) int eventsDefault,
-    @Default(0) int invite,
-    @Default(50) int kick,
-    @Default(50) int redact,
-    @Default(50) int stateDefault,
-    @Default(0) int usersDefault,
-  }) = _PowerLevelsContent;
-
+@Freezed(toJson: false, fromJson: false)
+@JsonSerializable()
+class const PowerLevelsContent({
+  final IMap<String, int> events = const .empty(),
+  final IMap<String, int> users = const .empty(),
+  @JsonKey(includeIfNull: false) final Notifications? notifications,
+  final int ban = 50,
+  final int eventsDefault = 0,
+  final int invite = 0,
+  final int kick = 50,
+  final int redact = 50,
+  final int stateDefault = 50,
+  final int usersDefault = 0,
+}) extends Content with _$PowerLevelsContent {
   factory PowerLevelsContent.fromJson(Map<String, Object?> json) =>
       _$PowerLevelsContentFromJson(json);
 }
