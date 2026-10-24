@@ -160,8 +160,8 @@ class const App({super.key}) extends StatelessWidget {
               MultiProviderController.provider(
                 .new([
                   GomuksListenerController.provider,
-                  NotificationController.provider,
                   UnifiedPushController.provider,
+                  NotificationController.provider,
                   MemberListOpenedController.provider,
                   KeyController.provider(KeyController.roomKey),
                   KeyController.provider(KeyController.spaceKey),

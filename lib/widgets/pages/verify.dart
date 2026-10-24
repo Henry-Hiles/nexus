@@ -18,6 +18,7 @@ class const VerifyPage({super.key}) extends HookConsumerWidget {
     final isLoading = useState(false);
     final inputError = useState<String?>(null);
     final formKey = useRef(GlobalKey<FormState>());
+
     final verificationState = ref.watch(
       ClientStateController.provider.select(
         (state) => state?.verificationState,
@@ -25,18 +26,24 @@ class const VerifyPage({super.key}) extends HookConsumerWidget {
     );
 
     Future<void> verify() async {
+      if (isLoading.value) return;
+
+      if (formKey.value.currentState?.validate() != true) {
+        return;
+      }
+
       isLoading.value = true;
 
       try {
-        if (formKey.value.currentState?.validate() != true) {
-          return;
-        }
-
-        inputError.value = await ref
+        await ref
             .read(ClientController.provider.notifier)
             .verify(passphraseController.text);
+      } catch (error) {
+        inputError.value = error.toString();
       } finally {
-        isLoading.value = false;
+        if (context.mounted) {
+          isLoading.value = false;
+        }
       }
     }
 
@@ -52,7 +59,8 @@ class const VerifyPage({super.key}) extends HookConsumerWidget {
       ),
       body: switch (verificationState) {
         null || VerificationState(stateChecked: false) => const Loading(),
-        // Nothing to verify with yet, so go straight to setting it up.
+
+        // Nothing to verify yet, so go straight to setup.
         VerificationState(hasSecretStorage: false) => Dialog(
           insetPadding: const .symmetric(vertical: 12, horizontal: 32),
           child: ConstrainedBox(
@@ -60,6 +68,7 @@ class const VerifyPage({super.key}) extends HookConsumerWidget {
             child: const ResetEncryptionSheet(isPage: true),
           ),
         ),
+
         _ => AlertDialog(
           insetPadding: .symmetric(vertical: 12, horizontal: 32),
           scrollable: true,
@@ -71,7 +80,9 @@ class const VerifyPage({super.key}) extends HookConsumerWidget {
               crossAxisAlignment: .start,
               children: [
                 Text(
-                  "Enter your recovery key or passphrase below to unlock encrypted events.\nYour passphrase is usually not the same as your password.",
+                  "Enter your recovery key or passphrase below to "
+                  "unlock encrypted events.\nYour passphrase is usually "
+                  "not the same as your password.",
                 ),
                 SizedBox(height: 12),
                 TextFormField(
@@ -94,9 +105,13 @@ class const VerifyPage({super.key}) extends HookConsumerWidget {
           ),
           actions: [
             TextButton(
-              onPressed: () => context.showAdaptiveSheet(
-                (_) => const ResetEncryptionSheet(),
-              ),
+              onPressed: isLoading.value
+                  ? null
+                  : () {
+                      context.showAdaptiveSheet(
+                        (_) => const ResetEncryptionSheet(),
+                      );
+                    },
               style: TextButton.styleFrom(
                 foregroundColor: Theme.of(context).colorScheme.error,
               ),

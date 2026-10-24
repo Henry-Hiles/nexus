@@ -60,6 +60,8 @@ class const SelectServerPage({super.key}) extends HookConsumerWidget {
               return;
             }
 
+            if (!context.mounted) return;
+
             await ref.read(LaunchHelper.provider).launchUrl(codeResponse.url);
 
             AppLinks().uriLinkStream.listen((encodedUri) async {
@@ -70,7 +72,7 @@ class const SelectServerPage({super.key}) extends HookConsumerWidget {
               try {
                 final code = encodedUri.queryParameters["code"];
 
-                if (code != null) {
+                if (code != null && context.mounted) {
                   await ref
                       .read(ClientController.provider.notifier)
                       .exchangeToken(

@@ -169,7 +169,7 @@ class NotificationController
 
     if (Platform.isLinux) {
       final portal = await ref.read(PortalController.provider.future);
-      const escape = HtmlEscape(HtmlEscapeMode.element);
+      const escape = HtmlEscape(.element);
 
       await portal.notification.addNotification(
         id.toString(),

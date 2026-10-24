@@ -200,14 +200,8 @@ class ClientController extends AsyncNotifier<int> {
   Future<String?> setState(SetStateRequest request) async =>
       await _sendCommand("set_state", request.toJson());
 
-  Future<String?> verify(String recoveryKey) async {
-    try {
-      await _sendCommand("verify", {"recovery_key": recoveryKey});
-      return null;
-    } catch (error) {
-      return error.toString();
-    }
-  }
+  Future<void> verify(String recoveryKey) =>
+      _sendCommand("verify", {"recovery_key": recoveryKey});
 
   Future<RecoveryKey> generateRecoveryKey(String passphrase) async => .fromJson(
     await _sendCommand("generate_recovery_key", {"passphrase": passphrase}),
