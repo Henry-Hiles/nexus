@@ -1,6 +1,6 @@
 name: nexus
 description: "A simple and user-friendly Matrix client"
-version: 1.0.0
+version: 1.0.1
 publish_to: none
 
 flutter:

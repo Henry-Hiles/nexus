@@ -49,7 +49,7 @@ nexus = {
 This tracks the latest commit on `main`. To stay on a release instead, pin the input to its tag:
 
 ```nix
-url = "git+https://git.federated.nexus/Nexus/nexus?ref=refs/tags/v1.0.0";
+url = "git+https://git.federated.nexus/Nexus/nexus?ref=refs/tags/v1.0.1";
 ```
 
 Then import the module and enable it in your NixOS configuration:

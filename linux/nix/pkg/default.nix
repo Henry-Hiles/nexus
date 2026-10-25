@@ -14,7 +14,7 @@
 
 flutter.buildFlutterApplication {
   pname = "nexus";
-  version = "1.0.0";
+  version = "1.0.1";
   inherit src;
 
   preBuild = ''
