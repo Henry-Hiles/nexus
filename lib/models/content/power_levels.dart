@@ -24,10 +24,7 @@ class const PowerLevelsContent({
 
 @Freezed(toJson: false, fromJson: false)
 @JsonSerializable()
-class const Notifications({
-  final int room = 50,
-  final IMap<String, int> other = const .empty(),
-}) with _$Notifications {
+class const Notifications({final int room = 50}) with _$Notifications {
   Map<String, Object?> toJson() => _$NotificationsToJson(this);
 
   factory Notifications.fromJson(Map<String, Object?> json) =>
