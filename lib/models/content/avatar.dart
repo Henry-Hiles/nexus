@@ -9,6 +9,9 @@ part "avatar.g.dart";
 class const AvatarContent({final ImageInfo? info, final Uri? url})
     extends Content
     with _$AvatarContent {
+  @override
+  Map<String, Object?> toJson() => _$AvatarContentToJson(this);
+
   factory AvatarContent.fromJson(Map<String, Object?> json) =>
       _$AvatarContentFromJson(json);
 }

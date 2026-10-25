@@ -9,6 +9,9 @@ class const HistoryVisibilityContent({
   @JsonKey(unknownEnumValue: HistoryVisibility.unknown)
   required final HistoryVisibility historyVisibility,
 }) extends Content with _$HistoryVisibilityContent {
+  @override
+  Map<String, Object?> toJson() => _$HistoryVisibilityContentToJson(this);
+
   factory HistoryVisibilityContent.fromJson(Map<String, Object?> json) =>
       _$HistoryVisibilityContentFromJson(json);
 }

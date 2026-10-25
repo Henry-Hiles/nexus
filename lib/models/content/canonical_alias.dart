@@ -10,6 +10,9 @@ class const CanonicalAliasContent({
   @JsonKey(includeIfNull: false) final String? alias,
   final ISet<String> altAliases = const .empty(),
 }) extends Content with _$CanonicalAliasContent {
+  @override
+  Map<String, Object?> toJson() => _$CanonicalAliasContentToJson(this);
+
   factory CanonicalAliasContent.fromJson(Map<String, Object?> json) =>
       _$CanonicalAliasContentFromJson(json);
 }

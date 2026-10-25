@@ -10,6 +10,9 @@ class const EncryptionContent({
   @JsonKey(name: "rotation_period_ms") final int rotationPeriodMS = 604800000,
   @JsonKey(name: "rotation_period_msgs") final int rotationPeriodMessages = 100,
 }) extends Content with _$EncryptionContent {
+  @override
+  Map<String, Object?> toJson() => _$EncryptionContentToJson(this);
+
   factory EncryptionContent.fromJson(Map<String, Object?> json) =>
       _$EncryptionContentFromJson(json);
 }

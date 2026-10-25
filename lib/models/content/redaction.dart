@@ -8,6 +8,9 @@ part "redaction.g.dart";
 class const RedactionContent({final String? reason, final String? redacts})
     extends Content
     with _$RedactionContent {
+  @override
+  Map<String, Object?> toJson() => _$RedactionContentToJson(this);
+
   factory RedactionContent.fromJson(Map<String, Object?> json) =>
       _$RedactionContentFromJson(json);
 }

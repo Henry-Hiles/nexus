@@ -11,6 +11,9 @@ class const StickerContent({
   required final ImageInfo info,
   required final Uri url,
 }) extends Content with _$StickerContent {
+  @override
+  Map<String, Object?> toJson() => _$StickerContentToJson(this);
+
   factory StickerContent.fromJson(Map<String, Object?> json) =>
       _$StickerContentFromJson(json);
 }

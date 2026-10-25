@@ -11,6 +11,9 @@ class const TopicContent({
   required final String topic,
   @JsonKey(name: "m.topic") final TopicContentBlock? content,
 }) extends Content with _$TopicContent {
+  @override
+  Map<String, Object?> toJson() => _$TopicContentToJson(this);
+
   factory TopicContent.fromJson(Map<String, Object?> json) =>
       _$TopicContentFromJson(json);
 }

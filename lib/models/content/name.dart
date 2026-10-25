@@ -8,6 +8,9 @@ part "name.g.dart";
 class const NameContent({required final String name})
     extends Content
     with _$NameContent {
+  @override
+  Map<String, Object?> toJson() => _$NameContentToJson(this);
+
   factory NameContent.fromJson(Map<String, Object?> json) =>
       _$NameContentFromJson(json);
 }

@@ -11,6 +11,9 @@ class const JoinRulesContent({
   @JsonKey(unknownEnumValue: JoinRule.unknown) required final JoinRule joinRule,
   final ISet<AllowCondition> allow = const .empty(),
 }) extends Content with _$JoinRulesContent {
+  @override
+  Map<String, Object?> toJson() => _$JoinRulesContentToJson(this);
+
   factory JoinRulesContent.fromJson(Map<String, Object?> json) =>
       _$JoinRulesContentFromJson(json);
 }

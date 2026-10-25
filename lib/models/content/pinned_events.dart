@@ -9,6 +9,9 @@ part "pinned_events.g.dart";
 class const PinnedEventsContent({
   @JsonKey(name: "pinned") final IList<String> pinnedEvents = const .empty(),
 }) extends Content with _$PinnedEventsContent {
+  @override
+  Map<String, Object?> toJson() => _$PinnedEventsContentToJson(this);
+
   factory PinnedEventsContent.fromJson(Map<String, Object?> json) =>
       _$PinnedEventsContentFromJson(json);
 }

@@ -18,6 +18,9 @@ class const MembershipContent({
   static String? displaynameFromJson(String? displayName) =>
       displayName?.isEmpty == true ? null : displayName;
 
+  @override
+  Map<String, Object?> toJson() => _$MembershipContentToJson(this);
+
   factory MembershipContent.fromJson(Map<String, Object?> json) =>
       _$MembershipContentFromJson(json);
 }

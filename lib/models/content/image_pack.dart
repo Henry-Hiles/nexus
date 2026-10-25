@@ -22,6 +22,9 @@ class const ImagePackContent({
     },
   );
 
+  @override
+  Map<String, Object?> toJson() => _$ImagePackContentToJson(this);
+
   factory ImagePackContent.fromJson(Map<String, Object?> json) =>
       _$ImagePackContentFromJson(json);
 }

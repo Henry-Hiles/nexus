@@ -18,6 +18,9 @@ class const PowerLevelsContent({
   final int stateDefault = 50,
   final int usersDefault = 0,
 }) extends Content with _$PowerLevelsContent {
+  @override
+  Map<String, Object?> toJson() => _$PowerLevelsContentToJson(this);
+
   factory PowerLevelsContent.fromJson(Map<String, Object?> json) =>
       _$PowerLevelsContentFromJson(json);
 }

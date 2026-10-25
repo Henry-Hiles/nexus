@@ -14,6 +14,9 @@ class const CreateContent({
   final String roomVersion = "1",
   @JsonKey(unknownEnumValue: RoomType.room) final RoomType? type,
 }) extends Content with _$CreateContent {
+  @override
+  Map<String, Object?> toJson() => _$CreateContentToJson(this);
+
   factory CreateContent.fromJson(Map<String, Object?> json) =>
       _$CreateContentFromJson(json);
 }

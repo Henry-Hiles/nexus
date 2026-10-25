@@ -11,6 +11,9 @@ class const ServerACLContent({
   final IList<String> deny = const .empty(),
   final bool allowIpLiterals = true,
 }) extends Content with _$ServerACLContent {
+  @override
+  Map<String, Object?> toJson() => _$ServerACLContentToJson(this);
+
   factory ServerACLContent.fromJson(Map<String, Object?> json) =>
       _$ServerACLContentFromJson(json);
 }
