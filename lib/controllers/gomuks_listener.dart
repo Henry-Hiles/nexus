@@ -156,11 +156,12 @@ class GomuksListenerController extends AsyncNotifier<void> {
       // Mobile OSes block network access for backgrounded apps, so pause
       // syncing instead of letting it fail.
       ref.listen(AppPausedController.provider, (_, paused) {
+        final client = ref.read(ClientController.provider.notifier);
         if (paused) {
-          GomuksPauseSync(handle);
+          client.pauseSync().onError(showError);
         } else {
           ref.invalidate(TypingController.provider);
-          GomuksResumeSync(handle);
+          client.resumeSync().onError(showError);
         }
       }, fireImmediately: true);
     }

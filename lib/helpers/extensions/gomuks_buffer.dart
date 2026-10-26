@@ -15,7 +15,10 @@ extension GomuksOwnedBufferToX on GomuksOwnedBuffer {
     }
   }
 
-  dynamic toJsonAndFree() => jsonDecode(utf8.decode(toBytesAndFree()));
+  dynamic toJsonAndFree() {
+    final bytes = toBytesAndFree();
+    return bytes.isEmpty ? null : jsonDecode(utf8.decode(bytes));
+  }
 }
 
 extension JsonToGomuksBuffer on Map<String, dynamic> {
