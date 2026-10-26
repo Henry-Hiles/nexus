@@ -126,3 +126,42 @@ if(NOT CMAKE_BUILD_TYPE MATCHES "Debug")
   install(FILES "${AOT_LIBRARY}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
     COMPONENT Runtime)
 endif()
+
+# On Debug builds, register this build as the handler for the app's URI
+# scheme, so links like OAuth redirects open it, based on the packaged
+# desktop file but running this bundle's binary.
+if(CMAKE_BUILD_TYPE MATCHES "Debug")
+  install(CODE "
+    set(URI_DESKTOP_FILE \"${CMAKE_CURRENT_SOURCE_DIR}/${APPLICATION_ID}.uri.desktop\")
+    set(URI_DESKTOP_NAME \"${APPLICATION_ID}.uri.desktop\")
+    set(URI_BINARY_NAME \"${BINARY_NAME}\")
+    " COMPONENT Runtime)
+  install(CODE [[
+    if(DEFINED ENV{XDG_DATA_HOME} AND NOT "$ENV{XDG_DATA_HOME}" STREQUAL "")
+      set(applications_dir "$ENV{XDG_DATA_HOME}/applications")
+    else()
+      set(applications_dir "$ENV{HOME}/.local/share/applications")
+    endif()
+
+    file(READ "${URI_DESKTOP_FILE}" desktop_entry)
+    string(REGEX REPLACE "(^|\n)Exec=${URI_BINARY_NAME} "
+      "\\1Exec=\"${CMAKE_INSTALL_PREFIX}/${URI_BINARY_NAME}\" "
+      desktop_entry "${desktop_entry}")
+
+    # Only rewritten when it changes, so the desktop database isn't refreshed
+    # on every build
+    set(destination "${applications_dir}/${URI_DESKTOP_NAME}")
+    set(existing "")
+    if(EXISTS "${destination}")
+      file(READ "${destination}" existing)
+    endif()
+    if(NOT existing STREQUAL desktop_entry)
+      message(STATUS "Registering URI handler: ${destination}")
+      file(WRITE "${destination}" "${desktop_entry}")
+      execute_process(
+        COMMAND update-desktop-database "${applications_dir}"
+        RESULT_VARIABLE _ OUTPUT_QUIET ERROR_QUIET
+      )
+    endif()
+    ]] COMPONENT Runtime)
+endif()
