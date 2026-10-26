@@ -11,6 +11,7 @@ import "package:nexus/helpers/extensions/is_shown_as_message.dart";
 import "package:nexus/helpers/extensions/show_adaptive_menu.dart";
 import "package:nexus/helpers/extensions/success_scheme.dart";
 import "package:nexus/helpers/hooks/chat_scroll.dart";
+import "package:nexus/helpers/hooks/tap_recognizer.dart";
 import "package:nexus/models/content/avatar.dart";
 import "package:nexus/models/content/canonical_alias.dart";
 import "package:nexus/models/content/content.dart";
@@ -26,7 +27,6 @@ import "package:nexus/models/content/server_acl.dart";
 import "package:nexus/models/content/topic.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/widgets/error_dialog.dart";
-import "package:nexus/widgets/lazy_loading/message_displayname.dart";
 import "package:nexus/widgets/renderers/message.dart";
 import "package:nexus/widgets/reaction_row.dart";
 import "package:nexus/widgets/read_receipts_row.dart";
@@ -39,6 +39,7 @@ import "package:nexus/widgets/renderers/pinned_events_diff.dart";
 import "package:nexus/widgets/renderers/server_acl_diff.dart";
 import "package:nexus/widgets/swipe_to_reply.dart";
 import "package:nexus/widgets/timestamp.dart";
+import "package:nexus/widgets/user_span.dart";
 
 class const EventRenderer(
   final int eventRowId, {
@@ -64,6 +65,7 @@ class const EventRenderer(
     final errorStyle = TextStyle(color: colorScheme.error);
     final focusNode = useFocusNode();
     useListenable(focusNode);
+    final senderRecognizer = useTapRecognizer();
 
     final (event, previousEvent) = ref.watch(
       RoomsController.provider.select((rooms) {
@@ -130,10 +132,7 @@ class const EventRenderer(
       details: details,
       trailing: Timestamp(event.timestamp),
       [
-        WidgetSpan(
-          alignment: .middle,
-          child: MessageDisplayname(event, shouldWrap: maxLines == null),
-        ),
+        UserSpan.sender(context, ref, event, recognizer: senderRecognizer),
         TextSpan(text: text),
       ],
     );

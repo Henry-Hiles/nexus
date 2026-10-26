@@ -12,4 +12,12 @@ extension GlobalRect on BuildContext {
       _ => Rect.zero,
     };
   }
+
+  /// [position] on screen as an empty rect, like where text was tapped, to
+  /// open a popover there.
+  Rect globalRectAt(Offset position) {
+    final overlay = Overlay.of(this).context.findRenderObject() as RenderBox;
+
+    return overlay.globalToLocal(position) & .zero;
+  }
 }

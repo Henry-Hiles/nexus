@@ -4,11 +4,12 @@ import "package:material_ui/material_ui.dart";
 import "package:nexus/controllers/room_typing.dart";
 import "package:nexus/controllers/user.dart";
 import "package:nexus/helpers/extensions/get_localpart.dart";
-import "package:nexus/helpers/extensions/show_user_popover.dart";
+import "package:nexus/helpers/hooks/tap_recognizer.dart";
 import "package:nexus/widgets/bouncing_dots.dart";
+import "package:nexus/widgets/user_span.dart";
 
 class const TypingIndicator(final String roomId, {super.key})
-    extends ConsumerWidget {
+    extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
@@ -16,36 +17,31 @@ class const TypingIndicator(final String roomId, {super.key})
 
     // Past three people, only the first two are named
     final named = typing.length > 3 ? 2 : typing.length;
+    // One for each person who can be named
+    final recognizers = [
+      useTapRecognizer(),
+      useTapRecognizer(),
+      useTapRecognizer(),
+    ];
     final subjects = [
       ...typing
           .take(named)
-          .map(
-            (typingUserId) => WidgetSpan(
-              alignment: .baseline,
-              baseline: .alphabetic,
-              child: Builder(
-                builder: (context) => InkWell(
-                  onTap: () =>
-                      context.showUserPopover(typingUserId, roomId: roomId),
-                  child: Text(
-                    ref
-                            .watch(
-                              UserController.provider(
-                                .new(roomId: roomId, userId: typingUserId),
-                              ),
-                            )
-                            .value
-                            ?.displayName ??
-                        typingUserId.localpart,
-                    maxLines: 1,
-                    overflow: .ellipsis,
-                    softWrap: false,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      fontWeight: .bold,
-                    ),
-                  ),
-                ),
-              ),
+          .mapIndexed(
+            (index, typingUserId) => UserSpan(
+              context,
+              ref
+                      .watch(
+                        UserController.provider(
+                          .new(roomId: roomId, userId: typingUserId),
+                        ),
+                      )
+                      .value
+                      ?.displayName ??
+                  typingUserId.localpart,
+              userId: typingUserId,
+              roomId: roomId,
+              recognizer: recognizers[index],
+              style: TextStyle(fontWeight: .bold),
             ),
           ),
       if (typing.length > named)
