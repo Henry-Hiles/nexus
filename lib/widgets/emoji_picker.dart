@@ -16,7 +16,12 @@ import "package:nexus/models/content/image_pack.dart";
 class const EmojiPicker({
   required final String roomId,
 
-  required final FutureOr<void> Function(String value, {String? shortcode})
+  /// Has the [shortcode] and [description] of images from packs.
+  required final FutureOr<void> Function(
+    String value, {
+    String? shortcode,
+    String? description,
+  })
   onSelection,
   final bool allowFreeText = false,
   super.key,
@@ -41,11 +46,14 @@ class const EmojiPicker({
 
             return upstream.EmojiPicker(
               onSelection: (emoji) async {
+                final image = switch (emoji.data) {
+                  final PackImage image => image,
+                  _ => null,
+                };
                 await onSelection(
                   emoji.value,
-                  shortcode: emoji.data is PackImage
-                      ? emoji.aliases.first
-                      : null,
+                  shortcode: image == null ? null : emoji.aliases.first,
+                  description: image?.body,
                 );
 
                 await ref

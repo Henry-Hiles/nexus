@@ -144,7 +144,7 @@ extension BuildEventOptions on Event {
                       (context) => EmojiPicker(
                         roomId: roomId,
                         allowFreeText: true,
-                        onSelection: (emoji, {shortcode}) {
+                        onSelection: (emoji, {shortcode, description}) {
                           Navigator.of(context).pop();
                           ref
                               .read(notifier)

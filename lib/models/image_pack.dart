@@ -13,21 +13,42 @@ class const ImagePack({
   /// Map of shortcode to images
   required final IMap<String, PackImage> emoticons,
   required final IMap<String, PackImage> stickers,
+
+  /// The state event the pack is from, for editing it.
+  required final ImagePackContent content,
 }) with _$ImagePack {
-  static String emojiMarkdown(String shortcode, String url) {
-    final title = ":$shortcode:".replaceAll(r"\", r"\\").replaceAll('"', r'\"');
-    return '![:$shortcode:]($url "Emoji: $title")';
-  }
+  /// The pack's avatar, or its first image if it has none.
+  Uri? get icon => avatar ?? content.images.values.firstOrNull?.url;
+
+  String get imageCountLabel => content.images.length == 1
+      ? "1 image"
+      : "${content.images.length} images";
+
+  /// The name of a pack without one, from its room's name and state key.
+  static String fallbackName(String roomName, String stateKey) =>
+      stateKey.isEmpty ? roomName : "$roomName - $stateKey";
+
+  static String emojiMarkdown(
+    String shortcode,
+    String url, {
+    String? description,
+  }) =>
+      '![:$shortcode:]($url "Emoji: ${switch (description) {
+        final description? when description.isNotEmpty => description,
+        _ => ":$shortcode:",
+      }.replaceAll(r"\", r"\\").replaceAll('"', r'\"')}")';
 
   factory ImagePack.fromContent(
     ImagePackContent content, {
-    required String id,
-    required String fallbackName,
+    required String roomId,
+    required String roomName,
+    required String stateKey,
   }) => .new(
-    id: id,
-    name: content.pack?.displayName ?? fallbackName,
+    id: "$roomId/$stateKey",
+    name: content.pack?.displayName ?? fallbackName(roomName, stateKey),
     avatar: content.pack?.avatarUrl,
     emoticons: content.imagesFor(.emoticon),
     stickers: content.imagesFor(.sticker),
+    content: content,
   );
 }

@@ -271,28 +271,30 @@ class const Composer(
                               onPressed: () => context.showAdaptiveSheet(
                                 (context) => EmojiPicker(
                                   roomId: roomId,
-                                  onSelection: (value, {shortcode}) {
-                                    Navigator.of(context).pop();
-                                    if (shortcode == null) {
-                                      controller.text += value;
-                                    } else {
-                                      final text = "${controller.text}:";
-                                      controller.value = .new(
-                                        text: text,
-                                        selection: .collapsed(
-                                          offset: text.length,
-                                        ),
-                                      );
-                                      controller.addTag(
-                                        id: ImagePack.emojiMarkdown(
-                                          shortcode,
-                                          value,
-                                        ),
-                                        name: shortcode,
-                                      );
-                                    }
-                                    node?.requestFocus();
-                                  },
+                                  onSelection:
+                                      (value, {shortcode, description}) {
+                                        Navigator.of(context).pop();
+                                        if (shortcode == null) {
+                                          controller.text += value;
+                                        } else {
+                                          final text = "${controller.text}:";
+                                          controller.value = .new(
+                                            text: text,
+                                            selection: .collapsed(
+                                              offset: text.length,
+                                            ),
+                                          );
+                                          controller.addTag(
+                                            id: ImagePack.emojiMarkdown(
+                                              shortcode,
+                                              value,
+                                              description: description,
+                                            ),
+                                            name: shortcode,
+                                          );
+                                        }
+                                        node?.requestFocus();
+                                      },
                                 ),
                               ),
                               icon: Icon(Icons.emoji_emotions),

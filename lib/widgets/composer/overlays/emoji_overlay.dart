@@ -3,6 +3,7 @@ import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:material_ui/material_ui.dart";
 import "package:nexus/controllers/all_emoji.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
+import "package:nexus/models/content/image_pack.dart";
 import "package:nexus/models/image_pack.dart";
 
 class const EmojiOverlay(
@@ -39,6 +40,10 @@ class const EmojiOverlay(
                         ? ImagePack.emojiMarkdown(
                             emoji.aliases.first,
                             emoji.value,
+                            description: switch (emoji.data) {
+                              PackImage(:final body) => body,
+                              _ => null,
+                            },
                           )
                         : emoji.value,
                     name: emoji.aliases.first,

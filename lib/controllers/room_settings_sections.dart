@@ -7,6 +7,7 @@ import "package:nexus/controllers/client_state.dart";
 import "package:nexus/controllers/local_aliases.dart";
 import "package:nexus/controllers/power_level.dart";
 import "package:nexus/controllers/power_levels_saving.dart";
+import "package:nexus/controllers/room_image_packs.dart";
 import "package:nexus/controllers/room_power_levels.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/controllers/space_edges.dart";
@@ -21,6 +22,7 @@ import "package:nexus/models/content/content.dart";
 import "package:nexus/models/content/create.dart";
 import "package:nexus/models/content/encryption.dart";
 import "package:nexus/models/content/history_visibility.dart";
+import "package:nexus/models/content/image_pack.dart";
 import "package:nexus/models/content/join_rules.dart";
 import "package:nexus/models/content/membership.dart";
 import "package:nexus/models/content/message.dart";
@@ -33,10 +35,12 @@ import "package:nexus/models/setting.dart";
 import "package:nexus/models/settings_category.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/widgets/divider_text.dart";
+import "package:nexus/widgets/image_pack_avatar.dart";
 import "package:nexus/widgets/settings/add_users_power_level_sheet.dart";
 import "package:nexus/widgets/settings/aliases_sheet.dart";
 import "package:nexus/widgets/settings/allowed_rooms_sheet.dart";
 import "package:nexus/widgets/settings/dialog_list_tile.dart";
+import "package:nexus/widgets/settings/image_pack_sheet.dart";
 import "package:nexus/widgets/settings/local_aliases_sheet.dart";
 import "package:nexus/widgets/settings/power_level_entry_sheet.dart";
 import "package:nexus/widgets/settings/power_level_tile.dart";
@@ -91,6 +95,7 @@ class RoomSettingsSectionsController(final String roomId)
     final canSetJoinRules = canSet(.joinRules);
     final canSetHistoryVisibility = canSet(.historyVisibility);
     final canSetAliases = canSet(.canonicalAlias);
+    final canCreatePacks = canSet(.imagePack);
     final canSetPowerLevels =
         canSet(.powerLevels) &&
         !ref.watch(PowerLevelsSavingController.provider(roomId));
@@ -161,13 +166,76 @@ class RoomSettingsSectionsController(final String roomId)
     final encrypted = stateContent(.encryption) is EncryptionContent;
     final shownEvents = PowerLevelEvent.shownIn(encrypted: encrypted);
 
-    Future<void> setState(EventType type, Content content) async {
+    Future<void> setState(
+      EventType type,
+      Content content, {
+      String stateKey = "",
+    }) async {
       final eventId = await client.setState(
-        .new(roomId: roomId, type: type.type, stateKey: "", content: content),
+        .new(
+          roomId: roomId,
+          type: type.type,
+          stateKey: stateKey,
+          content: content,
+        ),
       );
       if (eventId case final eventId?) {
-        await roomsController.awaitState(roomId, type.type, eventId);
+        await roomsController.awaitState(
+          roomId,
+          type.type,
+          eventId,
+          stateKey: stateKey,
+        );
       }
+    }
+
+    final imagePacks =
+        ref.watch(RoomImagePacksController.provider(roomId)).value ??
+        const .empty();
+
+    // Pack sheets can stay open while the state changes, so these read it when
+    // called, rather than using the state from building
+    IMap<String, IMap<String, int>> currentState() =>
+        ref.read(RoomsController.provider)[roomId]?.state ?? const .empty();
+
+    // Whether the legacy type still has a pack at [stateKey], to clear it
+    bool hasLegacyPack(String stateKey) =>
+        switch (currentState()[EventType.legacyImagePack.type]?[stateKey]) {
+          final rowId? => switch (contentOf(rowId)) {
+            final ImagePackContent content => content.hasContent,
+            _ => false,
+          },
+          null => false,
+        };
+    final canSetLegacyPacks = canSet(.legacyImagePack);
+
+    /// Saves the pack at [stateKey] as the stable type, migrating it by
+    /// clearing its legacy event if it has one.
+    Future<void> setPack(String stateKey, Content content) async {
+      await setState(.imagePack, content, stateKey: stateKey);
+      if (hasLegacyPack(stateKey)) {
+        await setState(.legacyImagePack, const .new(), stateKey: stateKey);
+      }
+    }
+
+    /// A state key for a new pack named [name]. It's one no pack has ever
+    /// had, even deleted ones, as users may still have those enabled.
+    String newPackKey(String name) {
+      final state = currentState();
+      final usedKeys = [
+        EventType.imagePack,
+        EventType.legacyImagePack,
+      ].expand((type) => state[type.type]?.keys ?? []).toISet();
+      final slug = name
+          .toLowerCase()
+          .replaceAll(RegExp(r"[^\p{L}\p{N}_-]+", unicode: true), "_")
+          .replaceAll(RegExp(r"^_+|_+$"), "");
+      final base = slug.isEmpty ? "pack" : slug;
+
+      return Iterable.generate(
+        usedKeys.length + 1,
+        (index) => index == 0 ? base : "${base}_${index + 1}",
+      ).firstWhere((key) => !usedKeys.contains(key));
     }
 
     Future<void> setAliases(
@@ -813,6 +881,90 @@ class RoomSettingsSectionsController(final String roomId)
                     events: powerLevels.events.add(type, level),
                   ),
                 ),
+              ),
+            ),
+          ]),
+        ),
+        .new(
+          title: "Image Packs",
+          icon: Icons.emoji_emotions,
+          settings: .new([
+            ...imagePacks.entries.map((entry) {
+              final stateKey = entry.key;
+              final pack = entry.value;
+              final canEdit =
+                  canCreatePacks &&
+                  (canSetLegacyPacks || !hasLegacyPack(stateKey));
+
+              return Setting(
+                title: pack.name,
+                description: pack.imageCountLabel,
+                icon: Icons.emoji_emotions,
+                builder: (title, description, _) => HookBuilder(
+                  key: ValueKey(stateKey),
+                  builder: (context) {
+                    final saving = Saving.use();
+
+                    return ListTile(
+                      enabled: !saving.active,
+                      leading: ImagePackAvatar(pack.icon),
+                      title: Text(title),
+                      subtitle: Text(description),
+                      onTap: () => context.showAdaptiveSheet(
+                        (_) => ImagePackSheet(
+                          title: canEdit ? "Edit Image Pack" : title,
+                          content: pack.content,
+                          onSave: canEdit
+                              ? (content) => saving.run(
+                                  () => setPack(
+                                    stateKey,
+                                    content,
+                                  ).onError(showError),
+                                )
+                              : null,
+                          onDeleted: canEdit
+                              ? () => saving.run(
+                                  () => setPack(
+                                    stateKey,
+                                    const .new(),
+                                  ).onError(showError),
+                                )
+                              : null,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              );
+            }),
+            .new(
+              title: "Create Pack",
+              description: "Add a pack of emoticons and stickers to the room.",
+              icon: Icons.add,
+              builder: (title, description, icon) => HookBuilder(
+                builder: (context) {
+                  final saving = Saving.use();
+
+                  return ListTile(
+                    enabled: canCreatePacks && !saving.active,
+                    leading: Icon(icon),
+                    title: Text(title),
+                    subtitle: Text(description),
+                    onTap: () => context.showAdaptiveSheet(
+                      (_) => ImagePackSheet(
+                        title: "Create Pack",
+                        content: const .new(),
+                        onSave: (content) => saving.run(
+                          () => setState(
+                            .imagePack,
+                            content,
+                            stateKey: newPackKey(content.pack!.displayName!),
+                          ).onError(showError),
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
           ]),

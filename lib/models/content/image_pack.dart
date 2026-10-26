@@ -7,11 +7,14 @@ part "image_pack.g.dart";
 
 /// An image pack (MSC2545), from a room's state.
 @Freezed(toJson: false, fromJson: false)
-@JsonSerializable()
+@JsonSerializable(includeIfNull: false)
 class const ImagePackContent({
   final IMap<String, PackImage> images = const .empty(),
   final PackInfo? pack,
 }) extends Content with _$ImagePackContent {
+  /// Whether the pack has images or a name, as deleted packs are left empty.
+  bool get hasContent => images.isNotEmpty || pack?.displayName != null;
+
   IMap<String, PackImage> imagesFor(ImageUsage usage) => images.where(
     (_, image) => switch ((image.usage, pack?.usage ?? const .empty())) {
       (final usages, _) when usages.isNotEmpty => usages.contains(usage),
@@ -30,12 +33,12 @@ class const ImagePackContent({
 }
 
 @Freezed(toJson: false, fromJson: false)
-@JsonSerializable()
+@JsonSerializable(includeIfNull: false)
 class const PackImage({
   required final Uri url,
   final String? body,
   final ImageInfo? info,
-  @JsonKey(fromJson: ImageUsage.setFromJson)
+  @JsonKey(fromJson: ImageUsage.setFromJson, toJson: ImageUsage.setToJson)
   final ISet<ImageUsage> usage = const .empty(),
 }) with _$PackImage {
   Map<String, Object?> toJson() => _$PackImageToJson(this);
@@ -45,12 +48,12 @@ class const PackImage({
 }
 
 @Freezed(toJson: false, fromJson: false)
-@JsonSerializable()
+@JsonSerializable(includeIfNull: false)
 class const PackInfo({
   final String? displayName,
   final Uri? avatarUrl,
   final String? attribution,
-  @JsonKey(fromJson: ImageUsage.setFromJson)
+  @JsonKey(fromJson: ImageUsage.setFromJson, toJson: ImageUsage.setToJson)
   final ISet<ImageUsage> usage = const .empty(),
 }) with _$PackInfo {
   Map<String, Object?> toJson() => _$PackInfoToJson(this);
@@ -66,4 +69,8 @@ enum ImageUsage {
   /// Ignores usages we don't know about.
   static ISet<ImageUsage> setFromJson(List<dynamic>? json) =>
       ISet(values.where((value) => json?.contains(value.name) ?? false));
+
+  /// Omits an empty set, which means every usage.
+  static List<String>? setToJson(ISet<ImageUsage> usages) =>
+      usages.isEmpty ? null : usages.map((usage) => usage.name).toList();
 }

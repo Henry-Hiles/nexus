@@ -9,23 +9,31 @@ import "package:m3e_buttons/m3e_buttons.dart";
 import "package:nexus/controllers/account_data.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/client_state.dart";
+import "package:nexus/controllers/enabled_image_packs.dart";
 import "package:nexus/controllers/init_complete.dart";
 import "package:nexus/controllers/notification.dart";
+import "package:nexus/controllers/rooms.dart";
 import "package:nexus/controllers/settings.dart";
 import "package:nexus/controllers/unified_push.dart";
 import "package:nexus/controllers/spec_versions.dart";
 import "package:nexus/controllers/unified_push_allowed.dart";
 import "package:nexus/controllers/unified_push_distributors.dart";
 import "package:nexus/helpers/extensions/distributor_name.dart";
+import "package:nexus/helpers/extensions/room_image_packs.dart";
+import "package:nexus/helpers/hooks/saving.dart";
 import "package:nexus/models/account_data.dart";
 import "package:nexus/models/client_state.dart";
+import "package:nexus/models/image_pack.dart";
 import "package:nexus/models/name_color.dart";
 import "package:nexus/models/room_order.dart";
+import "package:nexus/models/setting.dart";
 import "package:nexus/models/settings.dart";
 import "package:nexus/models/settings_category.dart";
 import "package:nexus/models/show_and_send.dart";
 import "package:nexus/main.dart";
+import "package:nexus/widgets/image_pack_avatar.dart";
 import "package:nexus/widgets/settings/dialog_list_tile.dart";
+import "package:nexus/widgets/settings/enable_image_packs_sheet.dart";
 import "package:nexus/widgets/user_bottom_sheet.dart";
 import "package:nexus/widgets/reset_encryption_sheet.dart";
 import "package:nexus/helpers/extensions/show_adaptive_sheet.dart";
@@ -35,6 +43,33 @@ class SettingsSectionsController
   @override
   Future<IMap<String, IList<SettingsCategory>>> build() async {
     final settings = await ref.watch(SettingsController.provider.future);
+
+    // Loads the enabled packs' state, so they can be shown
+    ref.watch(EnabledImagePacksController.provider);
+    final enabledPacks = ref.watch(
+      AccountDataController.provider.select((data) => data.enabledImagePacks),
+    );
+    final enabledPackInfo = ref.watch(
+      RoomsController.provider.select(
+        (rooms) => enabledPacks.rooms.entries.expand((entry) {
+          final room = rooms[entry.key];
+          final packs = room?.imagePacks(entry.key) ?? const .empty();
+
+          return entry.value.keys.map(
+            (stateKey) => (
+              roomId: entry.key,
+              stateKey: stateKey,
+              roomName: room?.metadata?.name ?? entry.key,
+              pack: packs[stateKey],
+            ),
+          );
+        }).toIList(),
+      ),
+    );
+
+    Future<void> setEnabledPacks(ImagePackRooms packs) => ref
+        .read(AccountDataController.provider.notifier)
+        .setEnabledImagePacks(packs);
 
     /// A tile for a [ShowAndSend] setting, saving the settings from [update].
     Widget showAndSendTile(
@@ -296,6 +331,78 @@ class SettingsSectionsController
                     constraints: .new(maxWidth: 500),
                     child: UserBottomSheet(userId, editable: true),
                   ),
+                ),
+              ),
+            ]),
+          ),
+          .new(
+            title: "Image Packs",
+            icon: Icons.emoji_emotions,
+            settings: .new([
+              ...enabledPackInfo.map(
+                (info) => Setting(
+                  title:
+                      info.pack?.name ??
+                      ImagePack.fallbackName(info.roomName, info.stateKey),
+                  description: info.roomName,
+                  icon: Icons.emoji_emotions,
+                  builder: (title, description, _) => HookBuilder(
+                    key: ValueKey((info.roomId, info.stateKey)),
+                    builder: (context) {
+                      final saving = Saving.use();
+
+                      return ListTile(
+                        enabled: !saving.active,
+                        leading: ImagePackAvatar(info.pack?.icon),
+                        title: Text(title),
+                        subtitle: Text(description),
+                        trailing: IconButton(
+                          tooltip: "Remove pack",
+                          icon: Icon(Icons.delete),
+                          onPressed: saving.active
+                              ? null
+                              : () => saving.run(
+                                  () => setEnabledPacks(
+                                    ref
+                                        .read(AccountDataController.provider)
+                                        .enabledImagePacks
+                                        .withPack(
+                                          info.roomId,
+                                          info.stateKey,
+                                          enabled: false,
+                                        ),
+                                  ).onError(showError),
+                                ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              .new(
+                title: "Add Packs",
+                description:
+                    "Use image packs from any of your rooms in every room.",
+                icon: Icons.add,
+                builder: (title, description, icon) => HookBuilder(
+                  builder: (context) {
+                    final saving = Saving.use();
+
+                    return ListTile(
+                      enabled: !saving.active,
+                      leading: Icon(icon),
+                      title: Text(title),
+                      subtitle: Text(description),
+                      onTap: () => context.showAdaptiveSheet(
+                        (_) => EnableImagePacksSheet(
+                          enabled: enabledPacks,
+                          onSave: (packs) => saving.run(
+                            () => setEnabledPacks(packs).onError(showError),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
             ]),

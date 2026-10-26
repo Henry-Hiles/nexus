@@ -29,6 +29,9 @@ class const AccountData({
   static const imagePackRoomsKey = "m.image_pack.rooms";
   static const legacyImagePackRoomsKey = "im.ponies.emote_rooms";
 
+  ImagePackRooms get enabledImagePacks =>
+      imagePackRooms ?? legacyImagePackRooms ?? const .new();
+
   Map<String, Object?> toJson() => _$AccountDataToJson(this);
 
   factory AccountData.fromJson(Map<String, Object?> json) =>
@@ -53,6 +56,29 @@ class const ImagePackRooms({
   /// empty) object
   final IMap<String, IMap<String, Map<String, dynamic>>> rooms = const .empty(),
 }) with _$ImagePackRooms {
+  bool contains(String roomId, String stateKey) =>
+      rooms[roomId]?.containsKey(stateKey) ?? false;
+
+  ImagePackRooms withPack(
+    String roomId,
+    String stateKey, {
+    required bool enabled,
+  }) {
+    final packs =
+        rooms[roomId] ?? const IMap<String, Map<String, dynamic>>.empty();
+    final updated = switch ((enabled, packs.containsKey(stateKey))) {
+      (true, false) => packs.add(stateKey, const {}),
+      (false, true) => packs.remove(stateKey),
+      _ => packs,
+    };
+
+    return copyWith(
+      rooms: updated.isEmpty
+          ? rooms.remove(roomId)
+          : rooms.add(roomId, updated),
+    );
+  }
+
   Map<String, Object?> toJson() => _$ImagePackRoomsToJson(this);
 
   factory ImagePackRooms.fromJson(Map<String, Object?> json) =>

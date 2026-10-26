@@ -1,11 +1,9 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
-import "package:nexus/controllers/account_data.dart";
 import "package:nexus/controllers/client.dart";
+import "package:nexus/controllers/enabled_image_packs.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/controllers/space_edges.dart";
-import "package:nexus/models/content/content.dart";
-import "package:nexus/models/requests/get_specific_room_state.dart";
 
 typedef ImagePackSource = ({String roomId, String? stateKey});
 
@@ -13,14 +11,8 @@ class ImagePackSourcesController(final String roomId)
     extends AsyncNotifier<IList<ImagePackSource>> {
   @override
   Future<IList<ImagePackSource>> build() async {
-    final enabledPacks = ref.watch(
-      AccountDataController.provider.select(
-        (data) =>
-            (data.imagePackRooms ?? data.legacyImagePackRooms)?.rooms.map(
-              (roomId, packs) => .new(roomId, packs.keys.toISet()),
-            ) ??
-            const .empty(),
-      ),
+    final enabledPacksFuture = ref.watch(
+      EnabledImagePacksController.provider.future,
     );
     final spaceEdges = ref.watch(SpaceEdgesController.provider);
     final directParents = ref.watch(
@@ -63,36 +55,7 @@ class ImagePackSourcesController(final String roomId)
             ),
           ),
     );
-
-    const packTypes = <EventType>[.imagePack, .legacyImagePack];
-    // Rooms we aren't in can't be fetched, and fetched rooms have every pack
-    final missingKeys = enabledPacks.entries
-        .where((entry) => !(rooms[entry.key]?.hasFetchedState ?? true))
-        .expand(
-          (entry) => entry.value
-              .where(
-                (stateKey) => packTypes.every(
-                  (type) =>
-                      rooms[entry.key]?.state[type.type]?[stateKey] == null,
-                ),
-              )
-              .expand(
-                (stateKey) => packTypes.map(
-                  (type) => RoomStateKey(
-                    roomId: entry.key,
-                    type: type.type,
-                    stateKey: stateKey,
-                  ),
-                ),
-              ),
-        )
-        .toIList();
-
-    if (missingKeys.isNotEmpty) {
-      roomsNotifier.addSpecificState(
-        await client.getSpecificRoomState(.new(keys: missingKeys)),
-      );
-    }
+    final enabledPacks = await enabledPacksFuture;
 
     return .new([
       (roomId: roomId, stateKey: null),
