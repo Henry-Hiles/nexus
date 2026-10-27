@@ -73,11 +73,11 @@ class const MessageRenderer(
         ) => Column(
           crossAxisAlignment: .start,
           children: [
-            format == .html && !textOnly
+            format == .html && formattedBody != null && !textOnly
                 ? Html(
                     roomId: event.roomId,
                     textStyle: textStyle,
-                    formattedBody!.replaceAllMapped(
+                    formattedBody.replaceAllMapped(
                       RegExp(
                         r"(<a\b[^>]*>.*?<\/a>)|(\bhttps?:\/\/[^\s<]+)",
                         caseSensitive: false,
