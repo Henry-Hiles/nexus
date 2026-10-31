@@ -49,6 +49,7 @@ import "package:nexus/models/requests/send_message.dart";
 import "package:nexus/models/requests/set_account_data.dart";
 import "package:nexus/models/requests/set_membership.dart";
 import "package:nexus/models/requests/set_state.dart";
+import "package:nexus/models/requests/update_push_rule.dart";
 import "package:nexus/models/requests/upload_media.dart";
 import "package:nexus/models/room.dart";
 import "package:nexus/models/room_summary.dart";
@@ -332,6 +333,9 @@ class ClientController extends AsyncNotifier<int> {
 
   Future<void> setAccountData(SetAccountDataRequest request) =>
       _sendCommand("set_account_data", request.toJson());
+
+  Future<void> updatePushRule(UpdatePushRuleRequest request) =>
+      _sendCommand("update_push_rule", request.toJson());
 
   Future<void> registerPusher(RegisterPusherRequest request) =>
       _sendCommand("register_homeserver_push", request.toJson());

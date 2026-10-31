@@ -1,5 +1,6 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:freezed_annotation/freezed_annotation.dart";
+import "package:nexus/models/push_rules.dart";
 
 part "account_data.freezed.dart";
 part "account_data.g.dart";
@@ -22,12 +23,15 @@ class const AccountData({
   final ImagePackRooms? imagePackRooms,
   @JsonKey(name: AccountData.legacyImagePackRoomsKey)
   final ImagePackRooms? legacyImagePackRooms,
+  @JsonKey(name: AccountData.pushRulesKey)
+  final PushRules pushRules = const .new(),
 }) with _$AccountData {
   static const invitePermissionConfigKey = "m.invite_permission_config";
   static const directKey = "m.direct";
   static const recentEmojiKey = "m.recent_emoji";
   static const imagePackRoomsKey = "m.image_pack.rooms";
   static const legacyImagePackRoomsKey = "im.ponies.emote_rooms";
+  static const pushRulesKey = "m.push_rules";
 
   ImagePackRooms get enabledImagePacks =>
       imagePackRooms ?? legacyImagePackRooms ?? const .new();

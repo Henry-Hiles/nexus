@@ -6,6 +6,7 @@ import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:material_ui/material_ui.dart";
 import "package:intl/intl.dart";
 import "package:m3e_buttons/m3e_buttons.dart";
+import "package:multi_state_switch/multi_state_switch.dart";
 import "package:nexus/controllers/account_data.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/client_state.dart";
@@ -25,15 +26,18 @@ import "package:nexus/models/account_data.dart";
 import "package:nexus/models/client_state.dart";
 import "package:nexus/models/image_pack.dart";
 import "package:nexus/models/name_color.dart";
+import "package:nexus/models/push_rule_switch.dart";
 import "package:nexus/models/room_order.dart";
 import "package:nexus/models/setting.dart";
 import "package:nexus/models/settings.dart";
 import "package:nexus/models/settings_category.dart";
 import "package:nexus/models/show_and_send.dart";
 import "package:nexus/main.dart";
+import "package:nexus/widgets/divider_text.dart";
 import "package:nexus/widgets/image_pack_avatar.dart";
 import "package:nexus/widgets/settings/dialog_list_tile.dart";
 import "package:nexus/widgets/settings/enable_image_packs_sheet.dart";
+import "package:nexus/widgets/settings/keyword_field.dart";
 import "package:nexus/widgets/user_bottom_sheet.dart";
 import "package:nexus/widgets/reset_encryption_sheet.dart";
 import "package:nexus/helpers/extensions/show_adaptive_sheet.dart";
@@ -93,6 +97,67 @@ class SettingsSectionsController
           .read(SettingsController.provider.notifier)
           .set(update(value))
           .onError(showError),
+    );
+
+    final pushRules = ref.watch(
+      AccountDataController.provider.select((data) => data.pushRules.global),
+    );
+    final accountData = ref.read(AccountDataController.provider.notifier);
+
+    Setting header(String title, String description, IconData icon) => .new(
+      title: title,
+      description: description,
+      icon: icon,
+      builder: (title, _, _) => Padding(
+        padding: .symmetric(horizontal: 16),
+        child: DividerText(title),
+      ),
+    );
+
+    /// A switch for push rules, which is disabled while [onChanged] saves. A
+    /// null [value] is shown in the middle, for rules set up some other way.
+    Setting pushSwitchSetting({
+      required String title,
+      required String description,
+      required IconData icon,
+      required bool? value,
+      required Future<void> Function(bool value) onChanged,
+    }) => .new(
+      title: title,
+      description: description,
+      icon: icon,
+      builder: (title, description, icon) => HookBuilder(
+        builder: (context) {
+          final saving = Saving.use();
+          final position = switch (value) {
+            false => 0,
+            null => 1,
+            true => 2,
+          };
+          void change(bool value) =>
+              saving.run(() => onChanged(value)).onError(showError);
+
+          return ListTile(
+            enabled: !saving.active,
+            leading: Icon(icon),
+            title: Text(title),
+            subtitle: Text(description),
+            trailing: MultiStateSwitch(
+              states: 3,
+              // As wide as a regular switch, which has 2 states 20 apart
+              stepWidth: 10,
+              value: position,
+              semanticFormatterCallback: (position) =>
+                  ["Off", "Custom", "On"][position],
+              onChanged: saving.active
+                  ? null
+                  : (newPosition) => change(newPosition > position),
+            ),
+            // Tapping turns it off only when it's fully on
+            onTap: () => change(value != true),
+          );
+        },
+      ),
     );
 
     return .new({
@@ -412,7 +477,7 @@ class SettingsSectionsController
             icon: Icons.notifications,
             settings: .new([
               .new(
-                title: "Push notifications",
+                title: "Push Notifications",
                 description: "Enable push notifications using Web Push, and choose which UnifiedPush distributor to use.",
                 builder: (title, description, icon) => HookConsumer(
                   builder: (context, ref, _) {
@@ -508,6 +573,102 @@ class SettingsSectionsController
                   },
                 ),
                 icon: Icons.notification_add,
+              ),
+              if (pushRules.master case final master?)
+                pushSwitchSetting(
+                  title: "Mute All",
+                  description: "Don't notify for anything, without changing your other rules.",
+                  icon: Icons.notifications_off,
+                  value: master.enabled,
+                  onChanged: (mute) => accountData.savePushRule(
+                    .override,
+                    master.copyWith(enabled: mute),
+                  ),
+                ),
+              ...PushRuleSection.values.expand(
+                (section) => [
+                  header(section.title, section.description, section.icon),
+                  ...PushRuleSwitch.values
+                      .where(
+                        (option) =>
+                            option.section == section &&
+                            option.rulesIn(pushRules).isNotEmpty,
+                      )
+                      .map(
+                        (option) => pushSwitchSetting(
+                          title: option.title,
+                          description: option.description,
+                          icon: option.icon,
+                          value: option.valueIn(pushRules),
+                          onChanged: (value) => Future.wait(
+                            option
+                                .changesIn(pushRules, value)
+                                .map(
+                                  (change) => accountData.savePushRule(
+                                    change.kind,
+                                    change.rule,
+                                  ),
+                                ),
+                          ),
+                        ),
+                      ),
+                ],
+              ),
+              header(
+                "Keywords",
+                "Messages containing these words, which notify with a highlight and sound.",
+                Icons.text_fields,
+              ),
+              ...pushRules.keywords.map(
+                (rule) => Setting(
+                  title: rule.pattern ?? rule.ruleId,
+                  description: "Messages containing this keyword.",
+                  icon: Icons.text_fields,
+                  builder: (title, description, icon) => HookBuilder(
+                    key: ValueKey(rule.ruleId),
+                    builder: (context) {
+                      final saving = Saving.use();
+                      final custom =
+                          !rule.enabled || rule.actions != .highlightWithSound;
+
+                      return ListTile(
+                        enabled: !saving.active,
+                        leading: Icon(icon),
+                        title: Text(title),
+                        trailing: IconButton(
+                          tooltip: custom
+                              ? "Set up differently by another client. Press to reset to Nexus defaults."
+                              : "Remove keyword",
+                          icon: Icon(custom ? Icons.warning : Icons.delete),
+                          onPressed: saving.active
+                              ? null
+                              : () => saving
+                                    .run(
+                                      () => custom
+                                          ? accountData.savePushRule(
+                                              .content,
+                                              rule.copyWith(
+                                                enabled: true,
+                                                actions: .highlightWithSound,
+                                              ),
+                                            )
+                                          : accountData.deletePushRule(
+                                              .content,
+                                              rule.ruleId,
+                                            ),
+                                    )
+                                    .onError(showError),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              .new(
+                title: "Add Keyword",
+                description: "Notify for messages containing a word.",
+                icon: Icons.add,
+                builder: (_, _, _) => KeywordField(),
               ),
             ]),
           ),
