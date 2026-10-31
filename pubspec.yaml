@@ -78,7 +78,9 @@ dependencies:
     flutter_svg: 2.3.0
     json_annotation: 4.12.0
     shared_preferences: 2.5.6
-    fluttertagger: 2.3.2
+    fluttertagger:
+        git:
+            url: https://github.com/Henry-Hiles/fluttertagger # Fixes the last tag search being dropped from formattedText
     dynamic_polls: 0.0.8
     flutter_hooks: 0.21.3+1
     ffi: 2.2.0

@@ -609,10 +609,11 @@ packages:
   fluttertagger:
     dependency: "direct main"
     description:
-      name: fluttertagger
-      sha256: "04514674b41a063b97901aedf6970d0675b828bd723a0fb9f9dba89b91953382"
-      url: "https://pub.dev"
-    source: hosted
+      path: "."
+      ref: HEAD
+      resolved-ref: "78a5099499728917e7595f738f3b369b47804dc5"
+      url: "https://github.com/Henry-Hiles/fluttertagger"
+    source: git
     version: "2.3.2"
   freezed:
     dependency: "direct dev"
