@@ -440,8 +440,8 @@ class const Composer(
                                   null => FlutterTagger(
                                     triggerStrategy: .eager,
                                     // Characters that continue a search, for
-                                    // e.g. :+1, :custom_emoji or @user.name
-                                    searchRegex: .new(r"^[\w.+-]*$"),
+                                    // e.g. :+1, :custom_emoji or @user:server
+                                    searchRegex: .new(r"^[\w.:+-]*$"),
                                     overlay: TaggerOverlay(
                                       query.value,
                                       roomId: roomId,
