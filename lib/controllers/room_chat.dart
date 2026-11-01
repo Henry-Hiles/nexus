@@ -340,7 +340,21 @@ class RoomChatController(final ChatParams info)
     );
   }
 
-  Future<void> sendSticker(String shortcode, PackImage image) async {
+  /// Sends [image] as a sticker, as a reply to [repliedEventRowId] if set.
+  Future<void> sendSticker(
+    String shortcode,
+    PackImage image, {
+    bool shouldMention = true,
+    int? repliedEventRowId,
+  }) async {
+    final repliedEvent = repliedEventRowId == null
+        ? null
+        : ref.read(
+            RoomsController.provider.select(
+              (rooms) => rooms[info.roomId]?.events[repliedEventRowId],
+            ),
+          );
+
     final event = await ref
         .read(ClientController.provider.notifier)
         .sendEvent(
@@ -352,6 +366,12 @@ class RoomChatController(final ChatParams info)
               info: image.info ?? const .new(),
               url: image.url,
             ),
+            mentions: Mentions(
+              userIds: [
+                if (shouldMention && repliedEvent != null) repliedEvent.sender,
+              ].toIList(),
+            ),
+            replyTo: repliedEvent?.eventId,
           ),
         );
 

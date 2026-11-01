@@ -178,25 +178,8 @@ class ClientController extends AsyncNotifier<int> {
   Future<Event> sendMessage(SendMessageRequest request) async =>
       Event.fromJson(await _sendCommand("send_message", request.toJson()));
 
-  Future<Event> sendEvent(SendEventRequest request) async {
-    final json = request.toJson();
-    final content = request.content.toJson();
-
-    return .fromJson(
-      await _sendCommand("send_event", {
-        ...json,
-        "content": {
-          ...content,
-          if (request.relatesTo != null)
-            "m.relates_to": {
-              ...((content["m.relates_to"] as Map<String, dynamic>?) ?? {}),
-              "event_id": request.relatesTo,
-              "rel_type": request.relationType,
-            },
-        },
-      }),
-    );
-  }
+  Future<Event> sendEvent(SendEventRequest request) async =>
+      Event.fromJson(await _sendCommand("send_event", request.toJson()));
 
   Future<String?> setState(SetStateRequest request) async =>
       await _sendCommand("set_state", request.toJson());

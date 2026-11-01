@@ -323,9 +323,21 @@ final class const RoomChat({
                                                   relatedEvent.value,
                                             )
                                             .onError(showError),
-                                    onSendSticker: (shortcode, image) =>
-                                        notifier
-                                            .sendSticker(shortcode, image)
+                                    onSendSticker:
+                                        (
+                                          shortcode,
+                                          image, {
+                                          required shouldMention,
+                                        }) => notifier
+                                            .sendSticker(
+                                              shortcode,
+                                              image,
+                                              shouldMention: shouldMention,
+                                              repliedEventRowId:
+                                                  relationType.value == .reply
+                                                  ? relatedEvent.value
+                                                  : null,
+                                            )
                                             .onError(showError),
                                     relationType: relationType.value,
                                     relatedEvent: relatedEvent.value,

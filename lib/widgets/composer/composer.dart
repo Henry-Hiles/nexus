@@ -21,6 +21,7 @@ import "package:nexus/controllers/image_packs.dart";
 import "package:nexus/models/content/image_pack.dart";
 import "package:nexus/models/content/message.dart";
 import "package:nexus/models/image_pack.dart";
+import "package:nexus/widgets/mxc_emoji.dart";
 import "package:nexus/widgets/sticker_picker.dart";
 import "package:nexus/models/relation_type.dart";
 import "package:nexus/widgets/composer/overlays/tagger_overlay.dart";
@@ -42,7 +43,11 @@ class const Composer(
     required IList<Tag> tags,
   })
   onSend,
-  required final Future<void> Function(String shortcode, PackImage image)
+  required final Future<void> Function(
+    String shortcode,
+    PackImage image, {
+    required bool shouldMention,
+  })
   onSendSticker,
   final FocusNode? node,
   super.key,
@@ -87,9 +92,18 @@ class const Composer(
 
     final textBefore = useState<String?>(null);
 
+    /// The sticker to send, which replaces the text field until it is sent or
+    /// removed, as stickers can't have a caption
+    final sticker = useState<(String, PackImage)?>(null);
+    useEffect(() {
+      sticker.value = null;
+      return null;
+    }, [roomId]);
+
     useEffect(() {
       if (relationType == .edit && relatedEvent != null) {
         textBefore.value ??= controller.text;
+        sticker.value = null;
 
         final text =
             relatedEvent.localContent?.editSource ??
@@ -202,6 +216,15 @@ class const Composer(
     }
 
     void send() {
+      if (sticker.value case (final shortcode, final image)?) {
+        onSendSticker(shortcode, image, shouldMention: shouldMention.value);
+        onDismiss();
+        // The draft is kept, so it can still be sent after the sticker
+        sticker.value = null;
+        node?.requestFocus();
+        return;
+      }
+
       if (controller.value.text.isEmpty && attachment == null ||
           attachment != null && attachment.$2 == null) {
         return;
@@ -214,6 +237,17 @@ class const Composer(
 
       onDismiss();
       controller.text = "";
+    }
+
+    KeyEventResult sendOnEnter(FocusNode _, KeyEvent event) {
+      if (event is KeyDownEvent &&
+          event.logicalKey == LogicalKeyboardKey.enter &&
+          !HardwareKeyboard.instance.isShiftPressed) {
+        send();
+        return .handled;
+      }
+
+      return .ignored;
     }
 
     final style = TextStyle(
@@ -268,40 +302,44 @@ class const Composer(
                         )
                         ? [
                             IconButton(
-                              onPressed: () => context.showAdaptiveSheet(
-                                (context) => EmojiPicker(
-                                  roomId: roomId,
-                                  onSelection:
-                                      (value, {shortcode, description}) {
-                                        Navigator.of(context).pop();
-                                        if (shortcode == null) {
-                                          controller.text += value;
-                                        } else {
-                                          final text = "${controller.text}:";
-                                          controller.value = .new(
-                                            text: text,
-                                            selection: .collapsed(
-                                              offset: text.length,
-                                            ),
-                                          );
-                                          controller.addTag(
-                                            id: ImagePack.emojiMarkdown(
-                                              shortcode,
-                                              value,
-                                              description: description,
-                                            ),
-                                            name: shortcode,
-                                          );
-                                        }
-                                        node?.requestFocus();
-                                      },
-                                ),
-                              ),
+                              onPressed: sticker.value != null
+                                  ? null
+                                  : () => context.showAdaptiveSheet(
+                                      (context) => EmojiPicker(
+                                        roomId: roomId,
+                                        onSelection:
+                                            (value, {shortcode, description}) {
+                                              Navigator.of(context).pop();
+                                              if (shortcode == null) {
+                                                controller.text += value;
+                                              } else {
+                                                final text =
+                                                    "${controller.text}:";
+                                                controller.value = .new(
+                                                  text: text,
+                                                  selection: .collapsed(
+                                                    offset: text.length,
+                                                  ),
+                                                );
+                                                controller.addTag(
+                                                  id: ImagePack.emojiMarkdown(
+                                                    shortcode,
+                                                    value,
+                                                    description: description,
+                                                  ),
+                                                  name: shortcode,
+                                                );
+                                              }
+                                              node?.requestFocus();
+                                            },
+                                      ),
+                                    ),
                               icon: Icon(Icons.emoji_emotions),
                             ),
                             AdaptiveMenuButton(
                               tooltip: "Add media",
-                              enabled: attachment == null,
+                              enabled:
+                                  attachment == null && sticker.value == null,
                               itemBuilder: (context) => [
                                 for (final (source, title, icon) in [
                                   if (Platform.isAndroid || Platform.isIOS)
@@ -347,12 +385,14 @@ class const Composer(
                                 ),
                                 if (canSendStickers)
                                   PopupMenuItem(
+                                    // Stickers can't replace messages
+                                    enabled: relationType != .edit,
                                     onTap: () => context.showAdaptiveSheet(
                                       (context) => StickerPicker(
                                         roomId: roomId,
                                         onSelection: (shortcode, image) {
                                           Navigator.of(context).pop();
-                                          onSendSticker(shortcode, image);
+                                          sticker.value = (shortcode, image);
                                         },
                                       ),
                                     ),
@@ -366,108 +406,129 @@ class const Composer(
                             ),
                             SizedBox(width: 8),
                             Expanded(
-                              child: FlutterTagger(
-                                triggerStrategy: .eager,
-                                // Characters that continue a search, for
-                                // e.g. :+1, :custom_emoji or @user.name
-                                searchRegex: .new(r"^[\w.+-]*$"),
-                                overlay: TaggerOverlay(
-                                  query.value,
-                                  roomId: roomId,
-                                  triggerCharacter: triggerCharacter.value,
-                                  addTag: ({required id, required name}) {
-                                    controller.addTag(id: id, name: name);
-                                    node?.requestFocus();
-                                  },
-                                ),
-                                controller: controller,
-                                onSearch: (newQuery, newTriggerCharacter) {
-                                  triggerCharacter.value = newTriggerCharacter;
-                                  query.value = newQuery;
-                                },
-                                triggerCharacterAndStyles: {
-                                  "@": style,
-                                  "#": style,
-                                  ":": style,
-                                },
-                                builder: (context, key) => Focus(
-                                  onKeyEvent: (_, event) {
-                                    if (event is KeyDownEvent &&
-                                        event.logicalKey ==
-                                            LogicalKeyboardKey.enter) {
-                                      final shiftPressed = HardwareKeyboard
-                                          .instance
-                                          .isShiftPressed;
-
-                                      if (!shiftPressed) {
-                                        send();
-                                        return .handled;
-                                      }
-                                    }
-
-                                    return .ignored;
-                                  },
-                                  // Overrides the keyboard shortcut for pasting
-                                  child: Actions(
-                                    actions: {
-                                      PasteTextIntent: PasteFilesAction(
-                                        pasteFiles,
-                                      ),
-                                    },
-                                    child: TextField(
-                                      maxLines: 12,
-                                      minLines: 1,
-                                      textCapitalization: .sentences,
-                                      autofocus:
-                                          (Platform.isLinux ||
-                                          Platform.isMacOS ||
-                                          Platform.isWindows),
-                                      decoration: .new(
-                                        hintText: "Your message here...",
-                                        border: .none,
-                                      ),
-                                      controller: controller,
-                                      key: key,
-                                      focusNode: node,
-                                      // The toolbar's paste button doesn't use the shortcut's action, so replace it too
-                                      contextMenuBuilder: (_, editableText) =>
-                                          AdaptiveTextSelectionToolbar.buttonItems(
-                                            anchors:
-                                                editableText.contextMenuAnchors,
-                                            buttonItems: editableText
-                                                .contextMenuButtonItems
-                                                .map(
-                                                  (item) => item.type == .paste
-                                                      ? item.copyWith(
-                                                          onPressed: () async {
-                                                            editableText
-                                                                .hideToolbar();
-                                                            if (!await pasteFiles()) {
-                                                              item.onPressed
-                                                                  ?.call();
-                                                            }
-                                                          },
-                                                        )
-                                                      : item,
-                                                )
-                                                .toList(),
+                              child: AnimatedSize(
+                                duration: Durations.short4,
+                                alignment: .bottomCenter,
+                                child: switch (sticker.value) {
+                                  (final shortcode, final image)? => Focus(
+                                    autofocus: true,
+                                    onKeyEvent: sendOnEnter,
+                                    child: Padding(
+                                      padding: .symmetric(vertical: 8),
+                                      child: Row(
+                                        children: [
+                                          ConstrainedBox(
+                                            constraints: .loose(.square(128)),
+                                            child: MxcEmoji(
+                                              image.url,
+                                              label: image.body ?? shortcode,
+                                            ),
                                           ),
-                                      // Images pasted from Android keyboards' clipboards are inserted as content
-                                      contentInsertionConfiguration: .new(
-                                        onContentInserted: (content) {
-                                          if (attachment != null) return;
-
-                                          if (content.data case final data?) {
-                                            attachBytes(
-                                              data,
-                                              "image.${content.mimeType.split("/").last}",
-                                            ).onError(showError);
-                                          }
-                                        },
+                                          Spacer(),
+                                          IconButton(
+                                            tooltip: "Remove sticker",
+                                            onPressed: () {
+                                              sticker.value = null;
+                                              node?.requestFocus();
+                                            },
+                                            icon: Icon(Icons.close),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ),
-                                ),
+                                  null => FlutterTagger(
+                                    triggerStrategy: .eager,
+                                    // Characters that continue a search, for
+                                    // e.g. :+1, :custom_emoji or @user.name
+                                    searchRegex: .new(r"^[\w.+-]*$"),
+                                    overlay: TaggerOverlay(
+                                      query.value,
+                                      roomId: roomId,
+                                      triggerCharacter: triggerCharacter.value,
+                                      addTag: ({required id, required name}) {
+                                        controller.addTag(id: id, name: name);
+                                        node?.requestFocus();
+                                      },
+                                    ),
+                                    controller: controller,
+                                    onSearch: (newQuery, newTriggerCharacter) {
+                                      triggerCharacter.value =
+                                          newTriggerCharacter;
+                                      query.value = newQuery;
+                                    },
+                                    triggerCharacterAndStyles: {
+                                      "@": style,
+                                      "#": style,
+                                      ":": style,
+                                    },
+                                    builder: (context, key) => Focus(
+                                      onKeyEvent: sendOnEnter,
+                                      // Overrides the keyboard shortcut for pasting
+                                      child: Actions(
+                                        actions: {
+                                          PasteTextIntent: PasteFilesAction(
+                                            pasteFiles,
+                                          ),
+                                        },
+                                        child: TextField(
+                                          maxLines: 12,
+                                          minLines: 1,
+                                          textCapitalization: .sentences,
+                                          autofocus:
+                                              (Platform.isLinux ||
+                                              Platform.isMacOS ||
+                                              Platform.isWindows),
+                                          decoration: .new(
+                                            hintText: "Your message here...",
+                                            border: .none,
+                                          ),
+                                          controller: controller,
+                                          key: key,
+                                          focusNode: node,
+                                          // The toolbar's paste button doesn't use the shortcut's action, so replace it too
+                                          contextMenuBuilder: (_, editableText) =>
+                                              AdaptiveTextSelectionToolbar.buttonItems(
+                                                anchors: editableText
+                                                    .contextMenuAnchors,
+                                                buttonItems: editableText
+                                                    .contextMenuButtonItems
+                                                    .map(
+                                                      (item) =>
+                                                          item.type == .paste
+                                                          ? item.copyWith(
+                                                              onPressed: () async {
+                                                                editableText
+                                                                    .hideToolbar();
+                                                                if (!await pasteFiles()) {
+                                                                  item.onPressed
+                                                                      ?.call();
+                                                                }
+                                                              },
+                                                            )
+                                                          : item,
+                                                    )
+                                                    .toList(),
+                                              ),
+                                          // Images pasted from Android keyboards' clipboards are inserted as content
+                                          contentInsertionConfiguration: .new(
+                                            onContentInserted: (content) {
+                                              if (attachment != null) return;
+
+                                              if (content.data
+                                                  case final data?) {
+                                                attachBytes(
+                                                  data,
+                                                  "image.${content.mimeType.split("/").last}",
+                                                ).onError(showError);
+                                              }
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                },
                               ),
                             ),
                             IconButton(
