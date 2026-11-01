@@ -38,6 +38,7 @@
 			<array>
 				<!-- your schemes -->
 				<string>nexus.federated.nexus</string>
+				<string>matrix</string>
 			</array>
 		</dict>
 	</array>

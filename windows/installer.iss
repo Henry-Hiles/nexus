@@ -19,3 +19,5 @@ Name: "{commondesktop}\Nexus"; Filename: "{app}\nexus.exe"
 [Registry]
 Root: HKCU; Subkey: "Software\Classes\nexus.federated.nexus"; ValueType: string; ValueName: "URL Protocol"; ValueData: ""
 Root: HKCU; Subkey: "Software\Classes\nexus.federated.nexus\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\nexus.exe"" ""%1"""
+Root: HKCU; Subkey: "Software\Classes\matrix"; ValueType: string; ValueName: "URL Protocol"; ValueData: ""
+Root: HKCU; Subkey: "Software\Classes\matrix\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\nexus.exe"" ""%1"""

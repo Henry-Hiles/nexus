@@ -2,6 +2,9 @@ import "package:flutter_hooks/flutter_hooks.dart";
 import "package:material_ui/material_ui.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/init_complete.dart";
+import "package:nexus/controllers/link_request.dart";
+import "package:nexus/helpers/extensions/open_link_info.dart";
+import "package:nexus/main.dart";
 import "package:nexus/controllers/selected_room.dart";
 import "package:nexus/controllers/notification_request.dart";
 import "package:nexus/helpers/extensions/is_desktop.dart";
@@ -32,6 +35,23 @@ class const ChatPage({super.key}) extends HookConsumerWidget {
       });
       return null;
     }, [notificationRequest, initComplete]);
+
+    final linkRequest = ref.watch(LinkRequestController.provider);
+
+    // Open Matrix links the OS launched Nexus with, once sync has completed
+    useEffect(() {
+      if (linkRequest == null || !initComplete) return null;
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref.read(LinkRequestController.provider.notifier).consume();
+        navigatorKey.currentState?.popUntil((route) => route.isFirst);
+        final navigatorContext = navigatorKey.currentContext;
+        if (navigatorContext == null) return;
+
+        ref.openLinkInfo(navigatorContext, linkRequest).onError(showError);
+      });
+      return null;
+    }, [linkRequest, initComplete]);
 
     return LayoutBuilder(
       builder: (context, constraints) {

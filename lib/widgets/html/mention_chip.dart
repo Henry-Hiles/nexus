@@ -1,15 +1,11 @@
 import "package:material_ui/material_ui.dart";
-import "package:nexus/helpers/extensions/show_adaptive_sheet.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
-import "package:nexus/controllers/event.dart";
 import "package:nexus/controllers/room_summary.dart";
 import "package:nexus/controllers/user.dart";
-import "package:nexus/helpers/extensions/focus_room.dart";
 import "package:nexus/helpers/extensions/get_link_info.dart";
-import "package:nexus/helpers/extensions/show_user_popover.dart";
+import "package:nexus/helpers/extensions/open_link_info.dart";
 import "package:nexus/models/content/membership.dart";
 import "package:nexus/models/room_summary.dart";
-import "package:nexus/widgets/room_summary_sheet.dart";
 
 class const MentionChip(final String content, final String? roomId, {super.key})
     extends ConsumerWidget {
@@ -28,7 +24,9 @@ class const MentionChip(final String content, final String? roomId, {super.key})
       "#" || "!" =>
         ref
                 .watch(
-                  RoomSummaryController.provider(.new(roomIdOrAlias: mention!)),
+                  RoomSummaryController.provider(
+                    .new(roomIdOrAlias: mention!, via: linkInfo!.via),
+                  ),
                 )
                 .whenOrNull(data: (data) => data) ??
             RoomSummary(roomId: mention),
@@ -39,43 +37,7 @@ class const MentionChip(final String content, final String? roomId, {super.key})
     return mention == null
         ? SizedBox.shrink()
         : InkWell(
-            onTap: () async {
-              if (data is MembershipContent) {
-                context.showUserPopover(mention, roomId: roomId);
-              } else if (data case RoomSummary summary) {
-                final eventRowId = linkInfo?.eventId == null
-                    ? null
-                    : await ref
-                          .read(
-                            EventController.provider(
-                              .new(
-                                roomId: summary.roomId,
-                                eventId: linkInfo!.eventId!,
-                              ),
-                            ).selectAsync((data) => data?.rowId),
-                          )
-                          .onError((_, _) => null);
-
-                if (!await ref.focusRoom(summary.roomId, eventRowId) &&
-                    context.mounted) {
-                  context.showAdaptiveSheet(
-                    (context) => Consumer(
-                      builder: (context, ref, _) => RoomSummarySheet(
-                        ref
-                                .watch(
-                                  RoomSummaryController.provider(
-                                    .new(roomIdOrAlias: mention),
-                                  ),
-                                )
-                                .whenOrNull(data: (data) => data) ??
-                            summary,
-                        via: linkInfo?.via,
-                      ),
-                    ),
-                  );
-                }
-              }
-            },
+            onTap: () => ref.openLinkInfo(context, linkInfo!, roomId: roomId),
             child: Text(
               switch (data) {
                 RoomSummary summary =>

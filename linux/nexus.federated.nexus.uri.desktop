@@ -5,4 +5,4 @@ Icon=nexus
 Terminal=false
 Type=Application
 NoDisplay=true
-MimeType=x-scheme-handler/nexus.federated.nexus;
+MimeType=x-scheme-handler/nexus.federated.nexus;x-scheme-handler/matrix;
