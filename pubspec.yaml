@@ -89,8 +89,8 @@ dependencies:
     ffigen: 23.0.0
     timeago: 3.7.1
     http: 1.6.0
-    flutter_linkify: 6.0.0
     linkify: 5.0.0
+    html: 0.15.7
     flutter_blurhash: 0.9.1
     super_sliver_list: 0.4.1
     media_kit: 1.2.6

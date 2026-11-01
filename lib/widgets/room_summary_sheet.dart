@@ -174,7 +174,7 @@ class const RoomSummarySheet(
             if (summary.topic != null)
               ListTile(
                 title: Text("Topic"),
-                subtitle: LinkifiedText(summary.topic!),
+                subtitle: LinkifiedText(summary.topic!, roomId: summary.roomId),
                 leading: Icon(Icons.info),
               ),
             if (isKnocking)

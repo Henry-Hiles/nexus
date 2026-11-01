@@ -5,6 +5,7 @@ import "package:linkify/linkify.dart";
 import "package:nexus/controllers/client_state.dart";
 import "package:nexus/controllers/event.dart";
 import "package:nexus/helpers/extensions/get_filename.dart";
+import "package:nexus/helpers/extensions/linkify_html.dart";
 import "package:nexus/models/content/encrypted.dart";
 import "package:nexus/models/content/message.dart";
 import "package:nexus/models/content/sticker.dart";
@@ -77,26 +78,11 @@ class const MessageRenderer(
                 ? Html(
                     roomId: event.roomId,
                     textStyle: textStyle,
-                    formattedBody.replaceAllMapped(
-                      RegExp(
-                        r"(<a\b[^>]*>.*?<\/a>)|(\bhttps?:\/\/[^\s<]+)",
-                        caseSensitive: false,
-                        dotAll: true,
-                      ),
-                      (m) {
-                        // If it's already an <a> tag, leave it unchanged
-                        if (m.group(1) != null) {
-                          return m.group(1)!;
-                        }
-
-                        // Otherwise, wrap the bare URL
-                        final url = m.group(2)!;
-                        return "<a href=\"$url\">$url</a>";
-                      },
-                    ),
+                    formattedBody.linkifiedHtml,
                   )
                 : LinkifiedText(
                     body.isEmpty ? content.filename ?? "" : body,
+                    roomId: event.roomId,
                     style: textStyle,
                     maxLines: maxLines,
                   ),
