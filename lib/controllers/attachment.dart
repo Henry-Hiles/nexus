@@ -29,6 +29,8 @@ class AttachmentController(final String roomId)
     state = (filename, content);
   }
 
+  void set((String, MessageContent?)? attachment) => state = attachment;
+
   static final provider = NotifierProvider.family
       .autoDispose<AttachmentController, (String, MessageContent?)?, String>(
         AttachmentController.new,

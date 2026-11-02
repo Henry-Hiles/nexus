@@ -8,6 +8,7 @@ import "package:fluttertagger/fluttertagger.dart";
 import "package:nexus/controllers/attachment.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/rooms.dart";
+import "package:nexus/helpers/extensions/is_media.dart";
 import "package:nexus/helpers/extensions/send_failed.dart";
 import "package:nexus/models/content/content.dart";
 import "package:nexus/models/content/image_pack.dart";
@@ -231,22 +232,24 @@ class RoomChatController(final ChatParams info)
     required RelationType relationType,
     int? relatedEventRowId,
   }) async {
-    Content? baseContent;
+    final events = ref.read(RoomsController.provider)[info.roomId]?.events;
     final relatedEvent = relatedEventRowId == null
         ? null
-        : ref.read(
-            RoomsController.provider.select(
-              (rooms) => rooms[info.roomId]?.events[relatedEventRowId],
-            ),
-          );
+        : events?[relatedEventRowId];
 
-    if (relationType == .edit && relatedEventRowId != null) {
-      baseContent = relatedEvent?.content;
-    } else {
-      final provider = AttachmentController.provider(info.roomId);
-      baseContent = ref.read(provider)?.$2;
-      ref.invalidate(provider);
-    }
+    final attachmentProvider = AttachmentController.provider(info.roomId);
+    final attachment = ref.read(attachmentProvider)?.$2;
+    ref.invalidate(attachmentProvider);
+
+    // Edits of media use the attachment, which starts as the current media
+    final latestContent = relatedEvent == null
+        ? null
+        : (events?[relatedEvent.lastEditRowId] ?? relatedEvent).content;
+    final baseContent =
+        attachment ??
+        (relationType == .edit && latestContent?.isMedia == false
+            ? latestContent
+            : null);
 
     // Replaces each formatted tag, like "@id#name#", with its ID
     final taggedMessage = tags.fold(

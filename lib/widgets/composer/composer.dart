@@ -3,6 +3,8 @@ import "dart:io";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/widgets/emoji_picker.dart";
+import "package:nexus/helpers/extensions/get_filename.dart";
+import "package:nexus/helpers/extensions/is_media.dart";
 import "package:nexus/helpers/extensions/show_adaptive_sheet.dart";
 import "package:nexus/widgets/adaptive_menu_button.dart";
 import "package:material_ui/material_ui.dart";
@@ -111,6 +113,8 @@ class const Composer(
           );
 
     final textBefore = useState<String?>(null);
+    // Wrapped, since no attachment is a draft too
+    final attachmentBefore = useState<((String, MessageContent?)?,)?>(null);
 
     /// The sticker to send, which replaces the text field until it is sent or
     /// removed, as stickers can't have a caption
@@ -132,16 +136,24 @@ class const Composer(
     final isEditing = relationType == .edit && relatedEvent != null;
 
     useEffect(() {
+      final attachmentProvider = AttachmentController.provider(roomId);
+
       if (relationType == .edit && relatedEvent != null) {
         textBefore.value ??= controller.text;
+        attachmentBefore.value ??= (ref.read(attachmentProvider),);
         sticker.value = null;
         poll.value = null;
         location.value = null;
 
+        final content = relatedEvent.content;
         final text =
             relatedEvent.localContent?.editSource ??
-            switch (relatedEvent.content) {
-              TextMessageContent(:final body) => body,
+            switch (content) {
+              TextMessageContent(:final body) ||
+              ImageMessageContent(:final body) ||
+              VideoMessageContent(:final body) ||
+              AudioMessageContent(:final body) ||
+              FileMessageContent(:final body) => body,
               _ => "",
             };
 
@@ -149,12 +161,34 @@ class const Composer(
           text: text,
           selection: .collapsed(offset: text.length),
         );
-      } else if (textBefore.value case final draft?) {
-        controller.value = .new(
-          text: draft,
-          selection: .collapsed(offset: draft.length),
+
+        Future.microtask(
+          () => ref
+              .read(attachmentProvider.notifier)
+              .set(
+                content is MessageContent && content.isMedia
+                    ? (
+                        content.filename ?? content.body ?? "Attachment",
+                        content,
+                      )
+                    : null,
+              ),
         );
-        textBefore.value = null;
+      } else {
+        if (textBefore.value case final draft?) {
+          controller.value = .new(
+            text: draft,
+            selection: .collapsed(offset: draft.length),
+          );
+          textBefore.value = null;
+        }
+
+        if (attachmentBefore.value case (final draft,)) {
+          Future.microtask(
+            () => ref.read(attachmentProvider.notifier).set(draft),
+          );
+          attachmentBefore.value = null;
+        }
       }
 
       return null;
