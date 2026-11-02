@@ -8,6 +8,7 @@ import "package:navigation_rail_m3e/navigation_rail_m3e.dart";
 import "package:nexus/helpers/extensions/get_all_child_rooms.dart";
 import "package:nexus/helpers/extensions/room_destinations.dart";
 import "package:nexus/helpers/extensions/show_adaptive_sheet.dart";
+import "package:nexus/widgets/account_switcher.dart";
 import "package:nexus/widgets/adaptive_menu_button.dart";
 import "package:nexus/models/nav_page.dart";
 import "package:nexus/widgets/appbar.dart";
@@ -192,6 +193,7 @@ class const SpacesRail({super.key}) extends ConsumerWidget {
                       ],
                       icon: const Icon(Icons.add),
                     ),
+                    const AccountSwitcher(),
                     const IconButton(
                       tooltip: "Explore other rooms (Not yet implemented)",
                       onPressed: null,

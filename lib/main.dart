@@ -5,6 +5,7 @@ import "package:flutter/foundation.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:material_emoji_picker/material_emoji_picker.dart";
 import "package:media_kit/media_kit.dart";
+import "package:nexus/controllers/active_account.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/client_state.dart";
 import "package:nexus/controllers/gomuks_listener.dart";
@@ -20,6 +21,7 @@ import "package:nexus/widgets/pages/chat.dart";
 import "package:nexus/widgets/pages/select_server.dart";
 import "package:nexus/widgets/pages/settings.dart";
 import "package:nexus/widgets/pages/verify.dart";
+import "package:nexus/widgets/account_scope.dart";
 import "package:nexus/widgets/appbar.dart";
 import "package:nexus/widgets/error_dialog.dart";
 import "package:nexus/widgets/loading.dart";
@@ -74,10 +76,17 @@ void main(List<String> args) async {
       Platform.environment["FLUTTER_HEADLESS"] != null ||
       args.contains("--unifiedpush-bg");
 
+  final accountId = await ActiveAccountController.stored();
+
   if (isInBackground) {
-    await ProviderContainer()
-        .read(UnifiedPushController.provider.future)
-        .timeout(Duration(seconds: 5));
+    await ProviderContainer(
+      overrides: [
+        // Nothing to switch to in the background
+        ActiveAccountController.provider.overrideWith(
+          () => ActiveAccountController(accountId, (_) {}),
+        ),
+      ],
+    ).read(UnifiedPushController.provider.future).timeout(Duration(seconds: 5));
 
     await Future.delayed(Duration(seconds: 10));
     exit(0);
@@ -90,7 +99,8 @@ void main(List<String> args) async {
     }
 
     runApp(
-      ProviderScope(
+      AccountScope(
+        initialAccountId: accountId,
         retry: (_, _) => null,
         observers: [
           // Change false to true if you want debug information on provider reloads

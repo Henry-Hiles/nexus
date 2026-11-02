@@ -7,6 +7,7 @@ import "package:nexus/models/client_state.dart";
 import "package:nexus/helpers/extensions/show_adaptive_sheet.dart";
 import "package:nexus/widgets/loading.dart";
 import "package:nexus/widgets/pages/settings.dart";
+import "package:nexus/widgets/account_switcher.dart";
 import "package:nexus/widgets/appbar.dart";
 import "package:nexus/helpers/required_validator_helper.dart";
 import "package:nexus/widgets/reset_encryption_sheet.dart";
@@ -50,6 +51,7 @@ class const VerifyPage({super.key}) extends HookConsumerWidget {
     return Scaffold(
       appBar: Appbar(
         actions: .new([
+          const AccountSwitcher(onlyWithOthers: true),
           IconButton(
             onPressed: () =>
                 showDialog(context: context, builder: (_) => SettingsPage()),

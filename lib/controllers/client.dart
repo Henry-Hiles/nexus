@@ -1,15 +1,18 @@
 import "dart:async";
 import "dart:ffi";
 import "dart:io";
-import "dart:isolate";
 import "dart:math";
 
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:ffi/ffi.dart";
 import "package:flutter/cupertino.dart";
 import "package:intl/intl.dart";
+import "package:nexus/controllers/accounts.dart";
+import "package:nexus/controllers/active_account.dart";
 import "package:nexus/controllers/settings.dart";
 import "package:nexus/helpers/extensions/gomuks_buffer.dart";
+import "package:nexus/main.dart";
+import "package:nexus/models/account.dart";
 import "package:nexus/models/capabilities.dart";
 import "package:nexus/models/content/message.dart";
 import "package:nexus/models/event.dart";
@@ -57,47 +60,47 @@ import "package:nexus/models/space_hierarchy.dart";
 import "package:nexus/models/spec_versions_response.dart";
 import "package:nexus/src/third_party/gomuks.g.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
+import "package:path/path.dart";
 import "package:path_provider/path_provider.dart";
 
-class ClientController extends AsyncNotifier<int> {
+class ClientController(final String? accountId) extends AsyncNotifier<int> {
   @override
   Future<int> build() async {
-    debugPrint("Setting Gomuks env...");
-    if (Platform.isAndroid || Platform.isIOS) {
-      final env = {
-        "GOMUKS_ROOT": (await getApplicationSupportDirectory()).path,
-        "GOMUKS_CACHE_HOME": (await getApplicationCacheDirectory()).path,
-      };
-      for (final MapEntry(:key, :value) in env.entries) {
-        final keyPtr = key.toNativeUtf8().cast<Char>();
-        final valuePtr = value.toNativeUtf8().cast<Char>();
-        try {
-          GomuksSetEnv(keyPtr, valuePtr);
-        } finally {
-          calloc
-            ..free(keyPtr)
-            ..free(valuePtr);
-        }
+    final String account =
+        accountId ?? ref.watch(ActiveAccountController.provider);
+    if (accountId == null && !isInBackground) await _deleteRemovedAccounts();
+
+    final environment = await _environment(account);
+
+    debugPrint("Setting Gomuks env for $account...");
+    for (final MapEntry(:key, :value) in environment.entries) {
+      final keyPtr = key.toNativeUtf8().cast<Char>();
+      final valuePtr = value.toNativeUtf8().cast<Char>();
+      try {
+        GomuksSetEnv(keyPtr, valuePtr);
+      } finally {
+        calloc
+          ..free(keyPtr)
+          ..free(valuePtr);
       }
     }
 
     debugPrint("Initializing Gomuks...");
-    final handle = await Isolate.run(() {
-      final bufferPointer = GomuksConfig(
-        matrix: .new(
-          initialDeviceDisplayName:
-              "Nexus on ${toBeginningOfSentenceCase(Platform.operatingSystem)}",
-        ),
-      ).toJson().toGomuksBufferPtr();
+    final bufferPointer = GomuksConfig(
+      matrix: .new(
+        initialDeviceDisplayName:
+            "Nexus on ${toBeginningOfSentenceCase(Platform.operatingSystem)}",
+      ),
+    ).toJson().toGomuksBufferPtr();
 
-      try {
-        return GomuksInit(bufferPointer.ref);
-      } finally {
-        calloc
-          ..free(bufferPointer.ref.base)
-          ..free(bufferPointer);
-      }
-    });
+    final int handle;
+    try {
+      handle = GomuksInit(bufferPointer.ref);
+    } finally {
+      calloc
+        ..free(bufferPointer.ref.base)
+        ..free(bufferPointer);
+    }
 
     if (!ref.mounted) {
       GomuksDestroy(handle);
@@ -106,7 +109,58 @@ class ClientController extends AsyncNotifier<int> {
 
     ref.onDispose(() => GomuksDestroy(handle));
 
+    if (accountId != null) {
+      await _callGomuksMethod(handle, {}, GomuksHandlePushAsync);
+    }
+
     return handle;
+  }
+
+  static Future<({Directory data, Directory cache})>
+  _accountsDirectories() async => (
+    data: Directory(
+      join((await getApplicationSupportDirectory()).path, "accounts"),
+    ),
+    cache: Directory(
+      join((await getApplicationCacheDirectory()).path, "accounts"),
+    ),
+  );
+
+  static Future<IMap<String, String>> _environment(String accountId) async {
+    if (accountId == Account.legacyId) {
+      // Keep the directories gomuks used before account switching existed
+      final isMobile = Platform.isAndroid || Platform.isIOS;
+      return .new({
+        "GOMUKS_ROOT": isMobile
+            ? (await getApplicationSupportDirectory()).path
+            : Platform.environment["GOMUKS_ROOT"] ?? "",
+        "GOMUKS_CACHE_HOME": isMobile
+            ? (await getApplicationCacheDirectory()).path
+            : Platform.environment["GOMUKS_CACHE_HOME"] ?? "",
+      });
+    }
+
+    final (:data, :cache) = await _accountsDirectories();
+    return .new({
+      "GOMUKS_ROOT": join(data.path, accountId),
+      "GOMUKS_CACHE_HOME": join(cache.path, accountId),
+    });
+  }
+
+  // Can't be done on removal, since the old container still has them open
+  Future<void> _deleteRemovedAccounts() async {
+    final ids = (await ref.read(AccountsController.provider.future))
+        .map((account) => account.id)
+        .toISet();
+
+    final (:data, :cache) = await _accountsDirectories();
+    final removed = await Stream.fromIterable([data, cache])
+        .where((directory) => directory.existsSync())
+        .asyncExpand((directory) => directory.list())
+        .where((entry) => !ids.contains(basename(entry.path)))
+        .toList();
+
+    await Future.wait(removed.map((entry) => entry.delete(recursive: true)));
   }
 
   /// Calls gomuks with [data] as JSON, returning its decoded response.
@@ -118,8 +172,18 @@ class ClientController extends AsyncNotifier<int> {
       Pointer<NativeFunction<Void Function(GomuksResponse)>> callback,
     )
     call,
-  ) async {
-    final handle = await future;
+  ) async => _callGomuksMethod(await future, data, call);
+
+  static Future<dynamic> _callGomuksMethod(
+    int handle,
+    Map<String, dynamic> data,
+    void Function(
+      int handle,
+      GomuksOwnedBuffer data,
+      Pointer<NativeFunction<Void Function(GomuksResponse)>> callback,
+    )
+    call,
+  ) {
     final buffer = data.toGomuksOwnedBuffer();
 
     final completer = Completer<dynamic>();
@@ -421,6 +485,12 @@ class ClientController extends AsyncNotifier<int> {
   }
 
   static final provider = AsyncNotifierProvider<ClientController, int>(
-    ClientController.new,
+    () => ClientController(null),
   );
+
+  /// The instance for an account other than the active one.
+  static final forAccount =
+      AsyncNotifierProvider.family<ClientController, int, String>(
+        ClientController.new,
+      );
 }

@@ -11,7 +11,6 @@ import "package:nexus/controllers/account_data.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/client_state.dart";
 import "package:nexus/controllers/enabled_image_packs.dart";
-import "package:nexus/controllers/init_complete.dart";
 import "package:nexus/controllers/notification.dart";
 import "package:nexus/controllers/profile.dart";
 import "package:nexus/controllers/rooms.dart";
@@ -808,43 +807,6 @@ class SettingsSectionsController
                   ),
                 ),
                 icon: Icons.key_off,
-              ),
-              .new(
-                title: "Log Out",
-                description:
-                    "Log out of your account, returning you to the login page.",
-                builder: (title, description, icon) => Builder(
-                  builder: (context) {
-                    final colorScheme = Theme.of(context).colorScheme;
-                    return M3EButton.icon(
-                      onPressed: () async {
-                        final container = ProviderScope.containerOf(context);
-
-                        final route = ModalRoute.of(context)!;
-                        Navigator.of(context).popUntil((r) => r.isFirst);
-                        await route.completed;
-
-                        await container
-                            .read(UnifiedPushController.provider.notifier)
-                            .deregister()
-                            .onError(showError);
-                        container.invalidate(InitCompleteController.provider);
-                        await container
-                            .read(ClientController.provider.notifier)
-                            .logout()
-                            .onError(showError);
-                      },
-                      label: Text(title),
-                      icon: Icon(icon),
-                      tooltip: description,
-                      decoration: .styleFrom(
-                        backgroundColor: colorScheme.errorContainer,
-                        foregroundColor: colorScheme.onErrorContainer,
-                      ),
-                    );
-                  },
-                ),
-                icon: Icons.logout,
               ),
             ]),
           ),

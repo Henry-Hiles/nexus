@@ -2,11 +2,15 @@ import "dart:async";
 import "dart:convert";
 import "dart:io";
 
+import "package:collection/collection.dart";
 import "package:flutter/foundation.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:intl/intl.dart";
+import "package:nexus/controllers/accounts.dart";
+import "package:nexus/controllers/active_account.dart";
 import "package:nexus/controllers/selected_room.dart";
 import "package:nexus/controllers/notification.dart";
+import "package:nexus/controllers/client_state.dart";
 import "package:nexus/controllers/push_key.dart";
 import "package:nexus/main.dart";
 import "package:nexus/controllers/client.dart";
@@ -17,6 +21,19 @@ import "package:window_manager/window_manager.dart";
 
 class UnifiedPushController extends AsyncNotifier<String?> {
   Completer<void>? _endpoint;
+
+  /// The account [instance] (its device ID) belongs to, or the active one for
+  /// devices registered before account switching.
+  Future<String> _accountFor(String instance) async =>
+      (await ref.read(AccountsController.provider.future))
+          .firstWhereOrNull((account) => account.deviceId == instance)
+          ?.id ??
+      ref.read(ActiveAccountController.provider);
+
+  ClientController _clientFor(String accountId) =>
+      accountId == ref.read(ActiveAccountController.provider)
+      ? ref.read(ClientController.provider.notifier)
+      : ref.read(ClientController.forAccount(accountId).notifier);
 
   @override
   Future<String?> build() async {
@@ -36,23 +53,21 @@ class UnifiedPushController extends AsyncNotifier<String?> {
               .read(PushKeyController.provider(instance).notifier)
               .set(pushKey);
 
-          await ref
-              .read(ClientController.provider.notifier)
-              .registerPusher(
-                .new(
-                  appDisplayName: "Nexus",
-                  appId: "nexus.federated.nexus",
-                  data: .webPush(
-                    url: .parse(endpoint.url),
-                    auth: endpoint.pubKeySet!.auth,
-                  ),
-                  deviceDisplayName:
-                      "Nexus on ${toBeginningOfSentenceCase(Platform.operatingSystem)}",
-                  kind: .webPush,
-                  lang: "en",
-                  pushKey: pushKey,
-                ),
-              );
+          await _clientFor(await _accountFor(instance)).registerPusher(
+            .new(
+              appDisplayName: "Nexus",
+              appId: "nexus.federated.nexus",
+              data: .webPush(
+                url: .parse(endpoint.url),
+                auth: endpoint.pubKeySet!.auth,
+              ),
+              deviceDisplayName:
+                  "Nexus on ${toBeginningOfSentenceCase(Platform.operatingSystem)}",
+              kind: .webPush,
+              lang: "en",
+              pushKey: pushKey,
+            ),
+          );
 
           state = .data(await UnifiedPush.getDistributor());
         });
@@ -82,12 +97,17 @@ class UnifiedPushController extends AsyncNotifier<String?> {
             "Failed to decrypt notification. Try toggling off and on UnifiedPush in settings.",
           );
         }
-        final notification = await ref
-            .read(ClientController.provider.notifier)
-            .handlePush(json.decode(String.fromCharCodes(message.content)));
+        final accountId = await _accountFor(instance);
+        final client = _clientFor(accountId);
+        final isActive =
+            accountId == ref.read(ActiveAccountController.provider);
+        final notification = await client.handlePush(
+          json.decode(String.fromCharCodes(message.content)),
+        );
 
         if (notification == null ||
             (!isInBackground &&
+                isActive &&
                 (!Platform.isAndroid &&
                     (WindowManager.instance.getCurrent()?.isFocused ?? true)) &&
                 ref.read(SelectedRoomController.provider) ==
@@ -96,7 +116,8 @@ class UnifiedPushController extends AsyncNotifier<String?> {
           return;
         }
 
-        final client = ref.read(ClientController.provider.notifier);
+        final hasOtherAccounts =
+            (await ref.read(AccountsController.provider.future)).length > 1;
 
         final icon = notification.roomAvatar == null
             ? null
@@ -116,17 +137,20 @@ class UnifiedPushController extends AsyncNotifier<String?> {
         await ref
             .read(NotificationController.provider.notifier)
             .send(
-              // Android stacks messages into one conversation per room
+              // Android stacks messages into one conversation per room (and
+              // account, since two accounts can share a room)
               id:
-                  (Platform.isAndroid
-                          ? notification.roomId
-                          : notification.eventId)
+                  "$accountId/${Platform.isAndroid ? notification.roomId : notification.eventId}"
                       .hashCode &
                   0x7fffffff,
-              threadId: notification.roomId,
+              threadId: "$accountId/${notification.roomId}",
               title: notification.roomName,
+              subtitle: hasOtherAccounts ? notification.self.id : null,
               body: notification.text,
-              payload: notification.eventRowId.toString(),
+              payload: NotificationController.payloadFor(
+                accountId,
+                notification.eventRowId,
+              ),
               timestamp: notification.timestamp,
               icon: icon,
               sound: notification.sound,
@@ -147,14 +171,32 @@ class UnifiedPushController extends AsyncNotifier<String?> {
 
     if (!registered || isInBackground) return null;
 
-    try {
-      if (await deregisterIfDisabled()) return null;
+    ref.listen(
+      ClientStateController.provider.select((state) => state?.isLoggedIn),
+      (previous, isLoggedIn) => Future(() async {
+        if (isLoggedIn != true) return;
+        if (await deregisterIfDisabled()) return;
 
-      return await register();
-    } catch (error, stackTrace) {
-      showError(error, stackTrace);
-      return null;
-    }
+        // On startup, only accounts with push on (which have a push key).
+        // After logging in, push is on by default.
+        final deviceId = ref.read(ClientStateController.provider)?.deviceId;
+        if (previous != false &&
+            (deviceId == null ||
+                await ref.read(PushKeyController.provider(deviceId).future) ==
+                    null)) {
+          return;
+        }
+
+        try {
+          await register();
+        } on UnsupportedError {
+          // The settings tile explains that the homeserver can't send Web Push
+        }
+      }).catchError(showError),
+      fireImmediately: true,
+    );
+
+    return null;
   }
 
   /// Registers with [distributor], or the current/default distributor if none
@@ -166,12 +208,13 @@ class UnifiedPushController extends AsyncNotifier<String?> {
       await deregister();
     }
 
+    // Not loading until logged in, since the app waits for this
+    final deviceId = await ref
+        .read(GomuksListenerController.provider.notifier)
+        .deviceId();
+
     state = .loading();
     try {
-      final deviceId = await ref
-          .read(GomuksListenerController.provider.notifier)
-          .deviceId();
-
       await Future(() async {
         final capabilities = await ref
             .read(ClientController.provider.notifier)
@@ -238,10 +281,10 @@ class UnifiedPushController extends AsyncNotifier<String?> {
 
     final keyProvider = PushKeyController.provider(instance);
     final key = await ref.read(keyProvider.future);
+    final accountId = await _accountFor(instance);
 
     if (key != null) {
-      await ref
-          .read(ClientController.provider.notifier)
+      await _clientFor(accountId)
           .deregisterPusher(.new(appId: "nexus.federated.nexus", pushKey: key));
       await ref.read(keyProvider.notifier).set(null);
     } else {
@@ -251,7 +294,9 @@ class UnifiedPushController extends AsyncNotifier<String?> {
     }
 
     await UnifiedPush.unregister(instance);
-    state = .data(null);
+    if (accountId == ref.read(ActiveAccountController.provider)) {
+      state = .data(null);
+    }
   }
 
   static final provider = AsyncNotifierProvider<UnifiedPushController, String?>(

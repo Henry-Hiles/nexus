@@ -4,12 +4,12 @@ import "dart:io";
 
 import "package:flutter/services.dart";
 import "package:material_ui/material_ui.dart";
+import "package:nexus/controllers/active_account.dart";
 import "package:nexus/controllers/portal.dart";
 import "package:nexus/controllers/sidebar_page.dart";
 import "package:nexus/main.dart";
 import "package:flutter_local_notifications/flutter_local_notifications.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
-import "package:nexus/controllers/notification_request.dart";
 import "package:nexus/models/push_notification.dart";
 import "package:xdg_desktop_portal/xdg_desktop_portal.dart";
 
@@ -41,17 +41,7 @@ class NotificationController
           macOS: darwin,
         ),
         onDidReceiveNotificationResponse: (details) {
-          if (details.payload == null) return;
-
-          if (int.tryParse(details.payload!) case final rowId?) {
-            navigatorKey.currentState?.popUntil((route) => route.isFirst);
-            ref
-                .read(SidebarPageController.provider.notifier)
-                .set(.notifications);
-            ref
-                .read(NotificationRequestController.provider.notifier)
-                .request(rowId);
-          }
+          if (details.payload case final payload?) _open(payload);
         },
       );
     }
@@ -64,19 +54,34 @@ class NotificationController
           return;
         }
 
-        if (int.tryParse(call.arguments) case int rowId) {
-          navigatorKey.currentState?.popUntil((route) => route.isFirst);
-          ref.read(SidebarPageController.provider.notifier).set(.notifications);
-          ref
-              .read(NotificationRequestController.provider.notifier)
-              .request(rowId);
-        }
+        if (call.arguments case final String payload) _open(payload);
       });
-
-      ref.onDispose(() => notificationChannel.setMethodCallHandler(null));
     }
 
     return notifications;
+  }
+
+  static String payloadFor(String accountId, int rowId) => "$accountId:$rowId";
+
+  void _open(String payload) {
+    final (accountId, rowId) = switch (payload.split(":")) {
+      [final accountId, final rowId] => (accountId, int.tryParse(rowId)),
+      // From before notifications were per account
+      [final rowId] => (null, int.tryParse(rowId)),
+      _ => (null, null),
+    };
+    if (rowId == null) return;
+
+    navigatorKey.currentState?.popUntil((route) => route.isFirst);
+    ref.read(SidebarPageController.provider.notifier).set(.notifications);
+
+    ref
+        .read(ActiveAccountController.provider.notifier)
+        .switchTo(
+          accountId ?? ref.read(ActiveAccountController.provider),
+          notificationRowId: rowId,
+        )
+        .onError(showError);
   }
 
   Future<bool> requestPermissions() async {
@@ -149,10 +154,12 @@ class NotificationController
   }
 
   /// Passing [message] shows it as a chat message in the conversation for
-  /// [threadId], naming the sender in group chats.
+  /// [threadId], naming the sender in group chats. [subtitle] is shown on
+  /// platforms that support it.
   Future<void> send({
     required int id,
     required String title,
+    String? subtitle,
     required String body,
     String? payload,
     String? threadId,
@@ -208,6 +215,7 @@ class NotificationController
         : null;
 
     final darwin = DarwinNotificationDetails(
+      subtitle: subtitle,
       presentSound: sound,
       threadIdentifier: threadId,
     );
@@ -222,6 +230,7 @@ class NotificationController
             ? .new(
                 "general",
                 "General",
+                subText: subtitle,
                 silent: !sound,
                 when: timestamp?.millisecondsSinceEpoch,
                 largeIcon: icon == null
@@ -232,6 +241,7 @@ class NotificationController
             : .new(
                 "messages",
                 "Messages",
+                subText: subtitle,
                 silent: !sound,
                 when: timestamp?.millisecondsSinceEpoch,
                 category: .message,

@@ -3,9 +3,12 @@ import "dart:ffi";
 import "dart:io";
 import "dart:isolate";
 
+import "package:collection/collection.dart";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/foundation.dart";
 import "package:nexus/controllers/account_data.dart";
+import "package:nexus/controllers/accounts.dart";
+import "package:nexus/controllers/active_account.dart";
 import "package:nexus/controllers/app_paused.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/client_state.dart";
@@ -151,6 +154,45 @@ class GomuksListenerController extends AsyncNotifier<void> {
     }
 
     if (!ref.mounted) return;
+
+    // Cached so the account switcher and push routing have them while the
+    // account isn't active
+    ref.listen(
+      ClientStateController.provider.select(
+        (state) => (state?.isInitialized, state?.userId, state?.deviceId),
+      ),
+      (_, ids) => Future(() async {
+        final id = ref.read(ActiveAccountController.provider);
+        final accounts = ref.read(AccountsController.provider.notifier);
+
+        switch (ids) {
+          // Logged out, so it shouldn't show as an account anymore
+          case (true, null, _):
+            await accounts.reset(id);
+          case (_, final userId?, final deviceId):
+            final previous = (await ref.read(
+              AccountsController.provider.future,
+            )).firstWhereOrNull((account) => account.id == id);
+            final profile =
+                (await ref
+                        .read(ClientController.provider.notifier)
+                        .getProfile(userId))
+                    .profile;
+
+            // Fetching the profile fails while offline, so keep what was cached
+            await accounts.save(
+              .new(
+                id: id,
+                userId: userId,
+                deviceId: deviceId,
+                displayName: profile.displayName ?? previous?.displayName,
+                avatar: profile.avatarUrl ?? previous?.avatar,
+              ),
+            );
+        }
+      }).catchError(showError),
+      fireImmediately: true,
+    );
 
     if (Platform.isAndroid || Platform.isIOS) {
       // Mobile OSes block network access for backgrounded apps, so pause
