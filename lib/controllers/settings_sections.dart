@@ -13,6 +13,7 @@ import "package:nexus/controllers/client_state.dart";
 import "package:nexus/controllers/enabled_image_packs.dart";
 import "package:nexus/controllers/init_complete.dart";
 import "package:nexus/controllers/notification.dart";
+import "package:nexus/controllers/profile.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/controllers/settings.dart";
 import "package:nexus/controllers/unified_push.dart";
@@ -20,6 +21,7 @@ import "package:nexus/controllers/spec_versions.dart";
 import "package:nexus/controllers/unified_push_allowed.dart";
 import "package:nexus/controllers/unified_push_distributors.dart";
 import "package:nexus/helpers/extensions/distributor_name.dart";
+import "package:nexus/helpers/extensions/get_localpart.dart";
 import "package:nexus/helpers/extensions/room_image_packs.dart";
 import "package:nexus/helpers/hooks/saving.dart";
 import "package:nexus/models/account_data.dart";
@@ -33,8 +35,10 @@ import "package:nexus/models/settings.dart";
 import "package:nexus/models/settings_category.dart";
 import "package:nexus/models/show_and_send.dart";
 import "package:nexus/main.dart";
+import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/widgets/divider_text.dart";
 import "package:nexus/widgets/image_pack_avatar.dart";
+import "package:nexus/widgets/settings/block_user_field.dart";
 import "package:nexus/widgets/settings/dialog_list_tile.dart";
 import "package:nexus/widgets/settings/enable_image_packs_sheet.dart";
 import "package:nexus/widgets/settings/keyword_field.dart";
@@ -101,6 +105,11 @@ class SettingsSectionsController
 
     final pushRules = ref.watch(
       AccountDataController.provider.select((data) => data.pushRules.global),
+    );
+    final ignoredUsers = ref.watch(
+      AccountDataController.provider.select(
+        (data) => data.ignoredUserList.ignoredUsers.keys.toIList().sort(),
+      ),
     );
     final accountData = ref.read(AccountDataController.provider.notifier);
 
@@ -725,6 +734,59 @@ class SettingsSectionsController
                   },
                 ),
                 icon: Icons.person_off,
+              ),
+              header(
+                "Blocked Users",
+                "Users whose messages and invites are hidden. They aren't told they're blocked.",
+                Icons.block,
+              ),
+              ...ignoredUsers.map(
+                (userId) => Setting(
+                  title: userId,
+                  description: "A blocked user.",
+                  icon: Icons.person,
+                  builder: (title, description, icon) => HookConsumer(
+                    key: ValueKey(userId),
+                    builder: (context, ref, _) {
+                      final saving = Saving.use();
+                      final profile = ref
+                          .watch(ProfileController.provider(userId))
+                          .value
+                          ?.profile;
+                      final name = profile?.displayName ?? userId.localpart;
+
+                      return ListTile(
+                        enabled: !saving.active,
+                        leading: AvatarOrHash(profile?.avatarUrl, name),
+                        title: Text(name, overflow: .ellipsis),
+                        subtitle: Text(userId, overflow: .ellipsis),
+                        onTap: () => context.showAdaptiveSheet(
+                          (_) => UserBottomSheet(userId),
+                        ),
+                        trailing: IconButton(
+                          tooltip: "Unblock",
+                          icon: Icon(Icons.lock_open),
+                          onPressed: saving.active
+                              ? null
+                              : () => saving
+                                    .run(
+                                      () => accountData.setIgnored(
+                                        userId,
+                                        ignored: false,
+                                      ),
+                                    )
+                                    .onError(showError),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              .new(
+                title: "Block User",
+                description: "Block a user by their ID.",
+                icon: Icons.block,
+                builder: (_, _, _) => BlockUserField(),
               ),
             ]),
           ),

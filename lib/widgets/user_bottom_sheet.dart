@@ -6,6 +6,7 @@ import "package:flutter_hooks/flutter_hooks.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:intl/intl.dart";
 import "package:m3e_buttons/m3e_buttons.dart";
+import "package:nexus/controllers/account_data.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/client_state.dart";
 import "package:nexus/controllers/mutual_rooms.dart";
@@ -17,6 +18,7 @@ import "package:nexus/helpers/extensions/better_when.dart";
 import "package:nexus/helpers/extensions/create_room.dart";
 import "package:nexus/helpers/extensions/show_adaptive_sheet.dart";
 import "package:nexus/helpers/extensions/success_scheme.dart";
+import "package:nexus/helpers/extensions/with_progress_snackbar.dart";
 import "package:nexus/helpers/extensions/get_localpart.dart";
 import "package:nexus/widgets/error_dialog.dart";
 import "package:nexus/widgets/loading.dart";
@@ -145,7 +147,65 @@ final class const UserBottomSheet(
               if (!editable) ...[
                 Row(
                   mainAxisAlignment: .end,
+                  spacing: 8,
                   children: [
+                    if (userId !=
+                        ref.watch(ClientStateController.provider)?.userId)
+                      Consumer(
+                        builder: (context, ref, _) {
+                          final ignored = ref.watch(
+                            AccountDataController.provider.select(
+                              (data) => data.ignoredUserList.contains(userId),
+                            ),
+                          );
+                          final name = member.displayName ?? userId.localpart;
+                          Future<void> setIgnored(
+                            bool ignored,
+                          ) => context.withProgressSnackbar(
+                            "${ignored ? "Blocking" : "Unblocking"} $name...",
+                            () => ref
+                                .read(AccountDataController.provider.notifier)
+                                .setIgnored(userId, ignored: ignored),
+                          );
+
+                          return M3EButton(
+                            tooltip: ignored ? "Unblock" : "Block",
+                            onPressed: ignored
+                                ? () => setIgnored(false)
+                                : () => context.showAdaptiveSheet(
+                                    (context) => SheetLayout(
+                                      title: Text("Block $name"),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: Navigator.of(context).pop,
+                                          child: Text("Cancel"),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                            setIgnored(true);
+                                          },
+                                          style: TextButton.styleFrom(
+                                            foregroundColor:
+                                                theme.colorScheme.error,
+                                          ),
+                                          child: Text("Block"),
+                                        ),
+                                      ],
+                                      children: [
+                                        Text(
+                                          "Are you sure you want to block $userId? You won't see their new messages or invites.",
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                            style: .tonal,
+                            child: Icon(
+                              ignored ? Icons.lock_open : Icons.block,
+                            ),
+                          );
+                        },
+                      ),
                     M3EButton(
                       onPressed: Navigator.of(context).pop,
                       child: Icon(Icons.close),

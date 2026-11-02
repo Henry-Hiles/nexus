@@ -25,6 +25,8 @@ class const AccountData({
   final ImagePackRooms? legacyImagePackRooms,
   @JsonKey(name: AccountData.pushRulesKey)
   final PushRules pushRules = const .new(),
+  @JsonKey(name: AccountData.ignoredUserListKey)
+  final IgnoredUserList ignoredUserList = const .new(),
 }) with _$AccountData {
   static const invitePermissionConfigKey = "m.invite_permission_config";
   static const directKey = "m.direct";
@@ -32,6 +34,7 @@ class const AccountData({
   static const imagePackRoomsKey = "m.image_pack.rooms";
   static const legacyImagePackRoomsKey = "im.ponies.emote_rooms";
   static const pushRulesKey = "m.push_rules";
+  static const ignoredUserListKey = "m.ignored_user_list";
 
   ImagePackRooms get enabledImagePacks =>
       imagePackRooms ?? legacyImagePackRooms ?? const .new();
@@ -87,6 +90,27 @@ class const ImagePackRooms({
 
   factory ImagePackRooms.fromJson(Map<String, Object?> json) =>
       _$ImagePackRoomsFromJson(json);
+}
+
+@Freezed(toJson: false, fromJson: false)
+@JsonSerializable()
+class const IgnoredUserList({
+  /// Blocked user IDs, each to a (currently empty) object
+  @JsonKey(name: "ignored_users")
+  final IMap<String, Map<String, dynamic>> ignoredUsers = const .empty(),
+}) with _$IgnoredUserList {
+  bool contains(String userId) => ignoredUsers.containsKey(userId);
+
+  IgnoredUserList withUser(String userId, {required bool ignored}) => copyWith(
+    ignoredUsers: ignored
+        ? ignoredUsers.add(userId, const {})
+        : ignoredUsers.remove(userId),
+  );
+
+  Map<String, Object?> toJson() => _$IgnoredUserListToJson(this);
+
+  factory IgnoredUserList.fromJson(Map<String, Object?> json) =>
+      _$IgnoredUserListFromJson(json);
 }
 
 @Freezed(toJson: false, fromJson: false)

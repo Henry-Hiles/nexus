@@ -50,6 +50,22 @@ class AccountDataController extends Notifier<AccountData> {
     );
   }
 
+  Future<void> setIgnored(String userId, {required bool ignored}) =>
+      _sendAndWait(
+        () => ref
+            .read(ClientController.provider.notifier)
+            .setAccountData(
+              .new(
+                type: AccountData.ignoredUserListKey,
+                content: state.ignoredUserList.withUser(
+                  userId,
+                  ignored: ignored,
+                ),
+              ),
+            ),
+        (data) => data.ignoredUserList.contains(userId) == ignored,
+      );
+
   /// Saves [rule] of [kind], creating it if it's new, or otherwise changing only
   /// its actions and whether it's enabled.
   Future<void> savePushRule(PushRuleKind kind, PushRule rule) {
