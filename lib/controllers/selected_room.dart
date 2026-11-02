@@ -17,7 +17,9 @@ class SelectedRoomController extends Notifier<String?> {
         (space) => space?.allChildRooms
             .map((room) => room.metadata?.id)
             .nonNulls
-            .toIList(),
+            .toIList()
+            // Real spaces have a timeline of their own
+            .addAll([?space.room?.metadata?.id]),
       ),
     );
     if (roomIds == null) return roomId;

@@ -1,5 +1,6 @@
 import "dart:math";
 
+import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:material_ui/material_ui.dart";
 import "package:m3e_design/m3e_design.dart";
@@ -222,6 +223,9 @@ class const RoomsPane({super.key}) extends ConsumerWidget {
     final selectedSpace = ref.watch(SelectedSpaceController.provider)!;
     final isDm = selectedSpace.id == "dms";
     final spaceMetadata = selectedSpace.room?.metadata;
+    // In the order the rail shows them, with the space's own timeline first
+    final destinationIds = IList<String?>([?spaceMetadata?.id])
+        .addAll(selectedSpace.allChildRooms.map((room) => room.metadata?.id));
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -287,13 +291,19 @@ class const RoomsPane({super.key}) extends ConsumerWidget {
                   scrollable: true,
                   background: Colors.transparent,
                   type: .alwaysExpand,
-                  selectedIndex: max(
-                    0,
-                    selectedSpace.allChildRooms.indexWhere(
-                      (room) => room.metadata?.id == selectedRoomId,
-                    ),
-                  ),
+                  selectedIndex: max(0, destinationIds.indexOf(selectedRoomId)),
                   sections: [
+                    if (selectedSpace.room case final room?
+                        when spaceMetadata != null)
+                      .new(
+                        destinations: [
+                          room.toDestination(
+                            isDm: isDm,
+                            label: "Space timeline",
+                            icon: const Icon(Icons.forum),
+                          ),
+                        ],
+                      ),
                     .new(
                       header: selectedSpace.room == null
                           ? null
@@ -339,7 +349,7 @@ class const RoomsPane({super.key}) extends ConsumerWidget {
                           KeyController.provider(KeyController.roomKey)
                               .notifier,
                         )
-                        .set(selectedSpace.allChildRooms[value].metadata?.id);
+                        .set(destinationIds[value]);
                     if (Navigator.of(context).canPop()) {
                       Navigator.of(context).pop();
                     }
