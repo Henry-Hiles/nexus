@@ -42,5 +42,9 @@
 			</array>
 		</dict>
 	</array>
+	<key>NSLocationUsageDescription</key>
+	<string>Nexus uses your location only when you choose to share it in a message.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Nexus uses your location only when you choose to share it in a message.</string>
 </dict>
 </plist>

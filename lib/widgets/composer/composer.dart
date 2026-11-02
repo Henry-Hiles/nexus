@@ -25,6 +25,8 @@ import "package:nexus/models/image_pack.dart";
 import "package:nexus/widgets/mxc_emoji.dart";
 import "package:nexus/widgets/sticker_picker.dart";
 import "package:nexus/widgets/create_poll_sheet.dart";
+import "package:nexus/widgets/location_picker_sheet.dart";
+import "package:nexus/models/location.dart";
 import "package:nexus/models/relation_type.dart";
 import "package:nexus/widgets/composer/overlays/tagger_overlay.dart";
 import "package:nexus/widgets/composer/paste_files_action.dart";
@@ -57,6 +59,11 @@ class const Composer(
     required bool shouldMention,
   })
   onSendPoll,
+  required final Future<void> Function(
+    LocationMessageContent location, {
+    required bool shouldMention,
+  })
+  onSendLocation,
   final FocusNode? node,
   super.key,
 }) extends HookConsumerWidget {
@@ -110,13 +117,16 @@ class const Composer(
     final sticker = useState<(String, PackImage)?>(null);
 
     final poll = useState<PollStart?>(null);
+    final location = useState<LocationMessageContent?>(null);
     useEffect(() {
       sticker.value = null;
       poll.value = null;
+      location.value = null;
       return null;
     }, [roomId]);
 
-    final hasReplacement = sticker.value != null || poll.value != null;
+    final hasReplacement =
+        sticker.value != null || poll.value != null || location.value != null;
 
     // The relation type stays as edit after cancelling an edit
     final isEditing = relationType == .edit && relatedEvent != null;
@@ -126,6 +136,7 @@ class const Composer(
         textBefore.value ??= controller.text;
         sticker.value = null;
         poll.value = null;
+        location.value = null;
 
         final text =
             relatedEvent.localContent?.editSource ??
@@ -243,11 +254,14 @@ class const Composer(
           onSendSticker(shortcode, image, shouldMention: shouldMention.value);
         } else if (poll.value case final draft?) {
           onSendPoll(draft, shouldMention: shouldMention.value);
+        } else if (location.value case final draft?) {
+          onSendLocation(draft, shouldMention: shouldMention.value);
         }
         onDismiss();
         // The draft is kept, so it can still be sent after the replacement
         sticker.value = null;
         poll.value = null;
+        location.value = null;
         node?.requestFocus();
         return;
       }
@@ -443,6 +457,22 @@ class const Composer(
                                       leading: Icon(Icons.poll),
                                     ),
                                   ),
+                                PopupMenuItem(
+                                  enabled: !isEditing,
+                                  onTap: () => context.showAdaptiveSheet(
+                                    enableDrag: false,
+                                    (context) => LocationPickerSheet(
+                                      onPick: (picked) {
+                                        Navigator.of(context).pop();
+                                        location.value = picked;
+                                      },
+                                    ),
+                                  ),
+                                  child: ListTile(
+                                    title: Text("Location"),
+                                    leading: Icon(Icons.location_on),
+                                  ),
+                                ),
                               ],
                               icon: Icon(Icons.add),
                             ),
@@ -451,8 +481,12 @@ class const Composer(
                               child: AnimatedSize(
                                 duration: Durations.short4,
                                 alignment: .bottomCenter,
-                                child: switch ((sticker.value, poll.value)) {
-                                  (_, final draft?) => ComposerReplacement(
+                                child: switch ((
+                                  sticker.value,
+                                  poll.value,
+                                  location.value,
+                                )) {
+                                  (_, final draft?, _) => ComposerReplacement(
                                     removeTooltip: "Remove poll",
                                     onRemove: () {
                                       poll.value = null;
@@ -474,7 +508,7 @@ class const Composer(
                                       ),
                                     ),
                                   ),
-                                  ((final shortcode, final image)?, _) =>
+                                  ((final shortcode, final image)?, _, _) =>
                                     ComposerReplacement(
                                       removeTooltip: "Remove sticker",
                                       onRemove: () {
@@ -493,7 +527,35 @@ class const Composer(
                                         ),
                                       ),
                                     ),
-                                  (null, null) => FlutterTagger(
+                                  (_, _, final draft?) => ComposerReplacement(
+                                    removeTooltip: "Remove location",
+                                    onRemove: () {
+                                      location.value = null;
+                                      node?.requestFocus();
+                                    },
+                                    onKeyEvent: sendOnEnter,
+                                    ListTile(
+                                      leading: Icon(
+                                        draft.assetType == .pin
+                                            ? Icons.location_pin
+                                            : Icons.my_location,
+                                        color: theme.colorScheme.primary,
+                                      ),
+                                      title: Text(
+                                        draft.description ??
+                                            (draft.assetType == .pin
+                                                ? "Location"
+                                                : "My location"),
+                                      ),
+                                      subtitle: Text(
+                                        draft.point?.formatted ??
+                                            draft.geoUri.toString(),
+                                        maxLines: 1,
+                                        overflow: .ellipsis,
+                                      ),
+                                    ),
+                                  ),
+                                  (null, null, null) => FlutterTagger(
                                     triggerStrategy: .eager,
                                     // Characters that continue a search, for
                                     // e.g. :+1, :custom_emoji or @user:server

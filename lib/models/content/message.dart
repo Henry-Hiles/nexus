@@ -4,6 +4,7 @@ import "package:nexus/models/content/content.dart";
 import "package:nexus/models/info/file.dart";
 import "package:nexus/models/info/image.dart";
 import "package:nexus/models/info/video.dart";
+import "package:nexus/models/location.dart";
 part "message.freezed.dart";
 part "message.g.dart";
 
@@ -90,8 +91,12 @@ sealed class MessageContent extends Content with _$MessageContent {
   }) = VideoMessageContent;
 
   @FreezedUnionValue("m.location")
-  factory MessageContent.location({required String body, required Uri geoUri}) =
-      LocationMessageContent;
+  factory MessageContent.location({
+    required String body,
+    required Uri geoUri,
+    @JsonKey(name: "m.location", includeIfNull: false) LocationInfo? location,
+    @JsonKey(name: "m.asset", includeIfNull: false) LocationAsset? asset,
+  }) = LocationMessageContent;
 
   factory MessageContent.fromJson(Map<String, Object?> json) =>
       _$MessageContentFromJson(json);

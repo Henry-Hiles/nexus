@@ -20,6 +20,7 @@ import "package:nexus/models/direction.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/models/requests/redact_event.dart";
 import "package:nexus/models/relation_type.dart";
+import "package:nexus/models/content/message.dart";
 import "package:nexus/models/requests/send_message.dart";
 import "package:nexus/models/room.dart";
 import "package:nexus/models/room_chat.dart";
@@ -411,6 +412,17 @@ class RoomChatController(final ChatParams info)
   }) => sendWithReply(
     .pollStart,
     PollStartContent(poll: poll),
+    shouldMention: shouldMention,
+    repliedEventRowId: repliedEventRowId,
+  );
+
+  Future<void> sendLocation(
+    LocationMessageContent location, {
+    bool shouldMention = true,
+    int? repliedEventRowId,
+  }) => sendWithReply(
+    .message,
+    location,
     shouldMention: shouldMention,
     repliedEventRowId: repliedEventRowId,
   );

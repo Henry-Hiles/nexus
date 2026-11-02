@@ -4,7 +4,10 @@ import "package:nexus/helpers/extensions/is_desktop.dart";
 extension ShowAdaptiveSheet on BuildContext {
   /// Shows the widget from [builder] in a dialog on desktop, or a bottom sheet
   /// on mobile. Use the context passed to [builder] to close it.
-  Future<T?> showAdaptiveSheet<T>(WidgetBuilder builder) => isDesktop
+  Future<T?> showAdaptiveSheet<T>(
+    WidgetBuilder builder, {
+    bool enableDrag = true,
+  }) => isDesktop
       ? showDialog<T>(
           context: this,
           builder: (context) => Dialog(
@@ -18,6 +21,7 @@ extension ShowAdaptiveSheet on BuildContext {
       : showModalBottomSheet<T>(
           context: this,
           isScrollControlled: true,
+          enableDrag: enableDrag,
           constraints: .new(maxHeight: MediaQuery.sizeOf(this).height - 80),
           builder: (context) => SafeArea(child: builder(context)),
         );

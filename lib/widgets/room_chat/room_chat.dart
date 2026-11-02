@@ -350,6 +350,16 @@ final class const RoomChat({
                                                       repliedEventRowId,
                                                 )
                                                 .onError(showError),
+                                    onSendLocation:
+                                        (location, {required shouldMention}) =>
+                                            notifier
+                                                .sendLocation(
+                                                  location,
+                                                  shouldMention: shouldMention,
+                                                  repliedEventRowId:
+                                                      repliedEventRowId,
+                                                )
+                                                .onError(showError),
                                     relationType: relationType.value,
                                     relatedEvent: relatedEvent.value,
                                     onDismiss: () {

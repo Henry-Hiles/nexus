@@ -173,7 +173,9 @@ extension BuildEventOptions on Event {
           ),
         ),
 
-      if (content is MessageContent && sender == userId)
+      if (content is MessageContent &&
+          content is! LocationMessageContent &&
+          sender == userId)
         PopupMenuItem(
           onTap: () => onRelation(rowId, .edit),
           child: const ListTile(leading: Icon(Icons.edit), title: Text("Edit")),

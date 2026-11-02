@@ -8,6 +8,7 @@ import "package:nexus/helpers/extensions/get_filename.dart";
 import "package:nexus/helpers/extensions/linkify_html.dart";
 import "package:nexus/models/content/encrypted.dart";
 import "package:nexus/models/content/message.dart";
+import "package:nexus/models/location.dart";
 import "package:nexus/models/content/poll_start.dart";
 import "package:nexus/models/content/sticker.dart";
 import "package:nexus/models/event.dart";
@@ -16,6 +17,7 @@ import "package:nexus/widgets/html/html.dart";
 import "package:nexus/widgets/lazy_loading/message_avatar.dart";
 import "package:nexus/widgets/lazy_loading/message_displayname.dart";
 import "package:nexus/widgets/linkified_text.dart";
+import "package:nexus/widgets/location_message.dart";
 import "package:nexus/widgets/loading.dart";
 import "package:nexus/widgets/message_image.dart";
 import "package:nexus/widgets/reaction_row.dart";
@@ -64,9 +66,18 @@ class const MessageRenderer(
                 overflow: .ellipsis,
               )
             : PollRenderer(event, poll),
-      // TODO: Handle locations
-      // LocationMessageContent(:final body , :final geoUri) =>
       MessageContent content => switch (content) {
+        final LocationMessageContent location =>
+          textOnly
+              ? Text(
+                  switch (location.description) {
+                    final description? => "Location: $description",
+                    null => "Location",
+                  },
+                  maxLines: maxLines,
+                  overflow: .ellipsis,
+                )
+              : LocationMessage(location),
         TextMessageContent(:final body, :final formattedBody, :final format) ||
         NoticeMessageContent(
           :final body,
@@ -167,7 +178,6 @@ class const MessageRenderer(
             ],
           ],
         ),
-        LocationMessageContent(:final String? body) ||
         UnknownMessageContent(:final body) =>
           body == null
               ? Text("This message is redacted", style: errorStyle)
