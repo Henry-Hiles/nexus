@@ -9,6 +9,7 @@ import "package:flutter/cupertino.dart";
 import "package:intl/intl.dart";
 import "package:nexus/controllers/accounts.dart";
 import "package:nexus/controllers/active_account.dart";
+import "package:nexus/controllers/client_state.dart";
 import "package:nexus/controllers/settings.dart";
 import "package:nexus/helpers/extensions/gomuks_buffer.dart";
 import "package:nexus/main.dart";
@@ -396,8 +397,16 @@ class ClientController(final String? accountId) extends AsyncNotifier<int> {
   Future<MessageContent> uploadMedia(UploadMediaRequest request) async =>
       .fromJson(await _sendCommand("upload_media", request.toJson()));
 
-  Future<File> downloadMedia(DownloadMediaRequest request) async =>
-      .new((await _sendCommand("download_media", request.toJson()))["path"]);
+  Future<File> downloadMedia(DownloadMediaRequest request) async {
+    if (accountId == null &&
+        ref.read(ClientStateController.provider)?.isLoggedIn != true) {
+      throw StateError("Can't download media while logged out");
+    }
+
+    return .new(
+      (await _sendCommand("download_media", request.toJson()))["path"],
+    );
+  }
 
   Future<void> logout() => _sendCommand("logout");
 
