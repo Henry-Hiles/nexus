@@ -42,7 +42,7 @@ final class const RoomMenuButton(
         if (room != null) ...[
           PopupMenuItem(
             onTap: () async {
-              final vias = ref.read(ViaController.provider(room!));
+              final vias = ref.read(ViaController.provider(room!)).viaQuery;
 
               await Clipboard.setData(
                 .new(

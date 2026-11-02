@@ -7,9 +7,9 @@ import "package:nexus/models/content/power_levels.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/models/room.dart";
 
-class ViaController(final Room room) extends Notifier<String> {
+class ViaController(final Room room) extends Notifier<ISet<String>> {
   @override
-  String build() {
+  ISet<String> build() {
     final powerLevelUsers =
         switch (room.state[EventType.powerLevels.type]?[""]) {
           final rowId? => switch (room.events[rowId]?.content) {
@@ -35,7 +35,7 @@ class ViaController(final Room room) extends Notifier<String> {
             .nonNulls
             .toIList();
 
-    final servers = [?ref.watch(ClientStateController.provider)?.userId]
+    return [?ref.watch(ClientStateController.provider)?.userId]
         .toIList()
         .addAll(powerLevelUsers)
         .addAll(joinedMembers)
@@ -43,13 +43,16 @@ class ViaController(final Room room) extends Notifier<String> {
         .whereNoDuplicates()
         .take(5)
         .toISet();
-
-    return servers.isEmpty
-        ? ""
-        : "?${servers.map((server) => "via=$server").join("&")}";
   }
 
-  static final provider = NotifierProvider.family<ViaController, String, Room>(
-    ViaController.new,
-  );
+  static final provider =
+      NotifierProvider.family<ViaController, ISet<String>, Room>(
+        ViaController.new,
+      );
+}
+
+extension ViaQuery on ISet<String> {
+  /// These servers as a matrix: URI query, or empty if there are none.
+  String get viaQuery =>
+      isEmpty ? "" : "?${map((server) => "via=$server").join("&")}";
 }

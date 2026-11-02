@@ -3,15 +3,20 @@ import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:material_ui/material_ui.dart";
+import "package:nexus/controllers/client.dart";
+import "package:nexus/controllers/power_level.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/controllers/space_hierarchy.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
 import "package:nexus/helpers/extensions/join_room.dart";
 import "package:nexus/helpers/extensions/show_adaptive_sheet.dart";
 import "package:nexus/helpers/extensions/show_leave_room_sheet.dart";
+import "package:nexus/helpers/extensions/with_progress_snackbar.dart";
 import "package:nexus/main.dart";
+import "package:nexus/models/content/content.dart";
 import "package:nexus/models/content/create.dart";
 import "package:nexus/models/space_hierarchy.dart";
+import "package:nexus/widgets/add_space_rooms_sheet.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/widgets/expandable_image.dart";
 import "package:nexus/widgets/knock_sheet.dart";
@@ -64,6 +69,60 @@ class const SpaceHierarchySheet(final String spaceId, {super.key})
             child: const Text("Join"),
           );
 
+    Widget removeButton(
+      String spaceId,
+      String roomId, {
+      required String name,
+      required String spaceName,
+    }) => IconButton(
+      tooltip: "Remove from space",
+      icon: const Icon(Icons.remove_circle_outline),
+      onPressed: () => context.showAdaptiveSheet(
+        (context) => SheetLayout(
+          title: const Text("Remove Room"),
+          actions: [
+            TextButton(
+              onPressed: Navigator.of(context).pop,
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                final container = ProviderScope.containerOf(context);
+                context.withProgressSnackbar(
+                  "Removing $name from $spaceName...",
+                  () async {
+                    await container
+                        .read(ClientController.provider.notifier)
+                        .setState(
+                          .new(
+                            roomId: spaceId,
+                            type: EventType.spaceChild.type,
+                            stateKey: roomId,
+                            content: const Content(),
+                          ),
+                        );
+                    container.invalidate(
+                      SpaceHierarchyController.provider(spaceId),
+                    );
+                  },
+                );
+                Navigator.of(context).pop();
+              },
+              style: TextButton.styleFrom(
+                foregroundColor: Theme.of(context).colorScheme.error,
+              ),
+              child: const Text("Remove"),
+            ),
+          ],
+          children: [
+            Text(
+              "Are you sure you want to remove \"$name\" from \"$spaceName\"? Its members will stay in it.",
+            ),
+          ],
+        ),
+      ),
+    );
+
     Widget level(
       String spaceId,
       SpaceHierarchy hierarchy,
@@ -71,11 +130,20 @@ class const SpaceHierarchySheet(final String spaceId, {super.key})
     ) => HookConsumer(
       builder: (context, ref, _) {
         final loadingMore = useState(false);
+        final canManage = ref.watch(
+          PowerLevelController.provider(
+            .state(eventType: .spaceChild, roomId: spaceId),
+          ),
+        );
 
         final byId = IMap.fromValues(
           keyMapper: (room) => room.summary.roomId,
           values: hierarchy.rooms,
         );
+        final spaceName =
+            byId[spaceId]?.summary.name ??
+            byId[spaceId]?.summary.canonicalAlias ??
+            "Unnamed Space";
         final children = (byId[spaceId]?.children ?? const .empty())
             .map(
               (child) => switch (byId[child.roomId]) {
@@ -126,7 +194,19 @@ class const SpaceHierarchySheet(final String spaceId, {super.key})
                               overflow: .ellipsis,
                             ),
                       onTap: () => showSummary(room, child),
-                      trailing: membershipButton(room, child, name: name),
+                      trailing: Row(
+                        mainAxisSize: .min,
+                        children: [
+                          membershipButton(room, child, name: name),
+                          if (canManage)
+                            removeButton(
+                              spaceId,
+                              summary.roomId,
+                              name: name,
+                              spaceName: spaceName,
+                            ),
+                        ],
+                      ),
                     );
                   },
                 ),
@@ -172,6 +252,13 @@ class const SpaceHierarchySheet(final String spaceId, {super.key})
                                   child: const Icon(Icons.expand_more),
                                 ),
                               membershipButton(room, child, name: name),
+                              if (canManage)
+                                removeButton(
+                                  spaceId,
+                                  summary.roomId,
+                                  name: name,
+                                  spaceName: spaceName,
+                                ),
                             ],
                           ),
                         ),
@@ -190,6 +277,7 @@ class const SpaceHierarchySheet(final String spaceId, {super.key})
                                         ),
                                       )
                                       .betterWhen(
+                                        skipLoadingOnRefresh: true,
                                         loading: () =>
                                             const Loading(dimension: 24),
                                         data: (hierarchy) => level(
@@ -205,24 +293,43 @@ class const SpaceHierarchySheet(final String spaceId, {super.key})
                     );
                   },
                 ),
-            if (hierarchy.nextBatch != null)
-              Center(
-                child: TextButton(
-                  onPressed: loadingMore.value
-                      ? null
-                      : () async {
-                          loadingMore.value = true;
-                          await ref
-                              .read(
-                                SpaceHierarchyController.provider(spaceId)
-                                    .notifier,
-                              )
-                              .loadMore()
-                              .onError(showError);
-                          if (context.mounted) loadingMore.value = false;
-                        },
-                  child: const Text("Load more"),
-                ),
+            if (hierarchy.nextBatch != null || canManage)
+              Row(
+                mainAxisAlignment: .center,
+                spacing: 8,
+                children: [
+                  if (hierarchy.nextBatch != null)
+                    TextButton(
+                      onPressed: loadingMore.value
+                          ? null
+                          : () async {
+                              loadingMore.value = true;
+                              await ref
+                                  .read(
+                                    SpaceHierarchyController.provider(spaceId)
+                                        .notifier,
+                                  )
+                                  .loadMore()
+                                  .onError(showError);
+                              if (context.mounted) loadingMore.value = false;
+                            },
+                      child: const Text("Load more"),
+                    ),
+                  if (canManage)
+                    TextButton.icon(
+                      onPressed: () => context.showAdaptiveSheet(
+                        (_) => AddSpaceRoomsSheet(
+                          spaceId,
+                          spaceName: spaceName,
+                          existing: (byId[spaceId]?.children ?? const .empty())
+                              .map((child) => child.roomId)
+                              .toISet(),
+                        ),
+                      ),
+                      icon: const Icon(Icons.add),
+                      label: const Text("Add rooms"),
+                    ),
+                ],
               ),
           ],
         );
@@ -232,6 +339,7 @@ class const SpaceHierarchySheet(final String spaceId, {super.key})
     return ref
         .watch(SpaceHierarchyController.provider(spaceId))
         .betterWhen(
+          skipLoadingOnRefresh: true,
           data: (hierarchy) {
             final space = hierarchy.rooms
                 .where((room) => room.summary.roomId == spaceId)

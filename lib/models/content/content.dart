@@ -13,6 +13,7 @@ import "package:nexus/models/content/reaction.dart";
 import "package:nexus/models/content/encrypted.dart";
 import "package:nexus/models/content/redaction.dart";
 import "package:nexus/models/content/server_acl.dart";
+import "package:nexus/models/content/space_child.dart";
 import "package:nexus/models/content/topic.dart";
 import "package:nexus/models/content/sticker.dart";
 import "package:nexus/models/content/history_visibility.dart";
@@ -65,6 +66,7 @@ enum EventType(
   tombstone("m.room.tombstone", Content.fromJson),
   reaction("m.reaction", ReactionContent.fromJson),
   pinnedEvents("m.room.pinned_events", PinnedEventsContent.fromJson),
+  spaceChild("m.space.child", SpaceChildContent.fromJson),
   imagePack("m.room.image_pack", ImagePackContent.fromJson),
   legacyImagePack("im.ponies.room_emotes", ImagePackContent.fromJson),
   pollStart("org.matrix.msc3381.poll.start", PollStartContent.fromJson),

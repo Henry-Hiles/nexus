@@ -213,7 +213,7 @@ extension BuildEventOptions on Event {
           );
           if (room == null) return;
 
-          final vias = ref.read(ViaController.provider(room));
+          final vias = ref.read(ViaController.provider(room)).viaQuery;
 
           await Clipboard.setData(
             ClipboardData(
