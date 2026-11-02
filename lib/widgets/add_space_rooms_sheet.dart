@@ -131,9 +131,12 @@ class const AddSpaceRoomsSheet(
               : () {
                   final container = ProviderScope.containerOf(context);
                   final roomIds = chosen.value;
-                  context.withProgressSnackbar(
-                    "Adding ${roomIds.length == 1 ? nameOf(roomIds.single) : "${roomIds.length} rooms"} to $spaceName...",
-                    () => save(container, roomIds),
+                  SpaceHierarchyController.addChildrenMutation(spaceId).run(
+                    container,
+                    (_) => context.withProgressSnackbar(
+                      "Adding ${roomIds.length == 1 ? nameOf(roomIds.single) : "${roomIds.length} rooms"} to $spaceName...",
+                      () => save(container, roomIds),
+                    ),
                   );
                   Navigator.of(context).pop();
                 },

@@ -1,4 +1,3 @@
-import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:material_ui/material_ui.dart";
 import "package:nexus/helpers/extensions/show_adaptive_sheet.dart";
@@ -12,9 +11,7 @@ import "package:nexus/models/room_summary.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/widgets/room_summary_sheet.dart";
 
-class const InvitesList({super.key})
-    extends HookConsumerWidget
-    implements NavPage {
+class const InvitesList({super.key}) extends ConsumerWidget implements NavPage {
   @override
   String get title => "Invites";
 
@@ -32,7 +29,9 @@ class const InvitesList({super.key})
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final invites = ref.watch(InvitesController.provider);
-    final decliningAll = useState(false);
+    final decliningAll = ref
+        .watch(InvitesController.declineAllMutation)
+        .isPending;
 
     Future<void> declineAll() async {
       final confirmed = await context.showAdaptiveSheet<bool>(
@@ -57,12 +56,12 @@ class const InvitesList({super.key})
       );
       if (confirmed != true) return;
 
-      decliningAll.value = true;
-      await ref
-          .read(InvitesController.provider.notifier)
-          .declineAll()
+      await InvitesController.declineAllMutation
+          .run(
+            ref,
+            (_) => ref.read(InvitesController.provider.notifier).declineAll(),
+          )
           .onError(showError);
-      if (context.mounted) decliningAll.value = false;
     }
 
     return Scaffold(
@@ -70,8 +69,8 @@ class const InvitesList({super.key})
       floatingActionButton: invites.isEmpty
           ? null
           : FloatingActionButton.extended(
-              onPressed: decliningAll.value ? null : declineAll,
-              icon: decliningAll.value
+              onPressed: decliningAll ? null : declineAll,
+              icon: decliningAll
                   ? const SizedBox.square(
                       dimension: 24,
                       child: CircularProgressIndicator(),
@@ -96,9 +95,12 @@ class const InvitesList({super.key})
 }
 
 class const InviteCard(final RoomSummary invite, {super.key})
-    extends StatelessWidget {
+    extends ConsumerWidget {
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final responding = ref
+        .watch(InvitesController.respondMutation(invite.roomId))
+        .isPending;
     final name = invite.name ?? invite.canonicalAlias ?? invite.roomId;
     final inviterName =
         invite.inviterProfile?.displayName ?? invite.invitedBy?.localpart;
@@ -106,7 +108,15 @@ class const InviteCard(final RoomSummary invite, {super.key})
     return Card(
       clipBehavior: .antiAlias,
       child: ListTile(
-        onTap: () => context.showAdaptiveSheet((_) => RoomSummarySheet(invite)),
+        onTap: responding
+            ? null
+            : () => context.showAdaptiveSheet((_) => RoomSummarySheet(invite)),
+        trailing: responding
+            ? const SizedBox.square(
+                dimension: 24,
+                child: CircularProgressIndicator(),
+              )
+            : null,
         leading: AvatarOrHash(
           invite.avatarUrl,
           name,

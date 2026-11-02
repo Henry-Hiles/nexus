@@ -65,9 +65,13 @@ class const RoomSummarySheet(
               final container = ProviderScope.containerOf(context);
               Navigator.of(context).pop();
 
-              container
-                  .read(InvitesController.provider.notifier)
-                  .decline(summary.roomId)
+              InvitesController.respondMutation(summary.roomId)
+                  .run(
+                    container,
+                    (_) => container
+                        .read(InvitesController.provider.notifier)
+                        .decline(summary.roomId),
+                  )
                   .onError(showError);
             },
             style: TextButton.styleFrom(foregroundColor: colorScheme.error),
@@ -77,18 +81,19 @@ class const RoomSummarySheet(
             onPressed: () {
               final container = ProviderScope.containerOf(context);
 
-              context
-                  .joinRoom(
-                    .new(roomIdOrAlias: summary.roomId, fromInvite: true),
-                    name: name,
-                  )
-                  .then((roomId) {
+              InvitesController.respondMutation(summary.roomId)
+                  .run(container, (_) async {
+                    final roomId = await context.joinRoom(
+                      .new(roomIdOrAlias: summary.roomId, fromInvite: true),
+                      name: name,
+                    );
                     if (roomId != null) {
                       container
                           .read(InvitesController.provider.notifier)
                           .remove(summary.roomId);
                     }
-                  });
+                  })
+                  .onError(showError);
               Navigator.of(context).pop();
             },
             child: Text("Accept"),

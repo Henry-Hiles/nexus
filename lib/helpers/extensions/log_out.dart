@@ -8,7 +8,9 @@ import "package:nexus/controllers/unified_push.dart";
 import "package:nexus/main.dart";
 
 extension LogOut on MutationTarget {
-  Future<void> logOut(String accountId) async {
+  static final mutation = Mutation<void>();
+
+  Future<void> logOut(String accountId) => mutation.run(this, (_) async {
     final accounts = await container.read(AccountsController.provider.future);
     final account = accounts.firstWhereOrNull(
       (account) => account.id == accountId,
@@ -49,5 +51,5 @@ extension LogOut on MutationTarget {
     await container
         .read(ActiveAccountController.provider.notifier)
         .switchTo(other.id);
-  }
+  });
 }

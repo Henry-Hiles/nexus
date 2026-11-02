@@ -1,3 +1,4 @@
+import "package:flutter_riverpod/experimental/mutation.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/models/space_hierarchy.dart";
@@ -26,6 +27,12 @@ class SpaceHierarchyController(final String spaceId)
       ),
     );
   }
+
+  /// Adding rooms to a space, keyed by its ID
+  static final addChildrenMutation = Mutation<void>();
+
+  /// Removing a room from a space, keyed by (space ID, room ID)
+  static final removeChildMutation = Mutation<void>();
 
   static final provider = AsyncNotifierProvider.family
       .autoDispose<SpaceHierarchyController, SpaceHierarchy, String>(

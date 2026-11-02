@@ -74,53 +74,74 @@ class const SpaceHierarchySheet(final String spaceId, {super.key})
       String roomId, {
       required String name,
       required String spaceName,
-    }) => IconButton(
-      tooltip: "Remove from space",
-      icon: const Icon(Icons.remove_circle_outline),
-      onPressed: () => context.showAdaptiveSheet(
-        (context) => SheetLayout(
-          title: const Text("Remove Room"),
-          actions: [
-            TextButton(
-              onPressed: Navigator.of(context).pop,
-              child: const Text("Cancel"),
+    }) => Consumer(
+      builder: (context, ref, _) {
+        final mutation = SpaceHierarchyController.removeChildMutation((
+          spaceId,
+          roomId,
+        ));
+        if (ref.watch(mutation).isPending) {
+          return const Padding(
+            padding: .all(12),
+            child: SizedBox.square(
+              dimension: 24,
+              child: CircularProgressIndicator(),
             ),
-            TextButton(
-              onPressed: () {
-                final container = ProviderScope.containerOf(context);
-                context.withProgressSnackbar(
-                  "Removing $name from $spaceName...",
-                  () async {
-                    await container
-                        .read(ClientController.provider.notifier)
-                        .setState(
-                          .new(
-                            roomId: spaceId,
-                            type: EventType.spaceChild.type,
-                            stateKey: roomId,
-                            content: const Content(),
-                          ),
-                        );
-                    container.invalidate(
-                      SpaceHierarchyController.provider(spaceId),
+          );
+        }
+
+        return IconButton(
+          tooltip: "Remove from space",
+          icon: const Icon(Icons.remove_circle_outline),
+          onPressed: () => context.showAdaptiveSheet(
+            (context) => SheetLayout(
+              title: const Text("Remove Room"),
+              actions: [
+                TextButton(
+                  onPressed: Navigator.of(context).pop,
+                  child: const Text("Cancel"),
+                ),
+                TextButton(
+                  onPressed: () {
+                    final container = ProviderScope.containerOf(context);
+                    mutation.run(
+                      container,
+                      (_) => context.withProgressSnackbar(
+                        "Removing $name from $spaceName...",
+                        () async {
+                          await container
+                              .read(ClientController.provider.notifier)
+                              .setState(
+                                .new(
+                                  roomId: spaceId,
+                                  type: EventType.spaceChild.type,
+                                  stateKey: roomId,
+                                  content: const Content(),
+                                ),
+                              );
+                          container.invalidate(
+                            SpaceHierarchyController.provider(spaceId),
+                          );
+                        },
+                      ),
                     );
+                    Navigator.of(context).pop();
                   },
-                );
-                Navigator.of(context).pop();
-              },
-              style: TextButton.styleFrom(
-                foregroundColor: Theme.of(context).colorScheme.error,
-              ),
-              child: const Text("Remove"),
+                  style: TextButton.styleFrom(
+                    foregroundColor: Theme.of(context).colorScheme.error,
+                  ),
+                  child: const Text("Remove"),
+                ),
+              ],
+              children: [
+                Text(
+                  "Are you sure you want to remove \"$name\" from \"$spaceName\"? Its members will stay in it.",
+                ),
+              ],
             ),
-          ],
-          children: [
-            Text(
-              "Are you sure you want to remove \"$name\" from \"$spaceName\"? Its members will stay in it.",
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
 
     Widget level(
@@ -130,6 +151,9 @@ class const SpaceHierarchySheet(final String spaceId, {super.key})
     ) => HookConsumer(
       builder: (context, ref, _) {
         final loadingMore = useState(false);
+        final adding = ref
+            .watch(SpaceHierarchyController.addChildrenMutation(spaceId))
+            .isPending;
         final canManage = ref.watch(
           PowerLevelController.provider(
             .state(eventType: .spaceChild, roomId: spaceId),
@@ -317,16 +341,24 @@ class const SpaceHierarchySheet(final String spaceId, {super.key})
                     ),
                   if (canManage)
                     TextButton.icon(
-                      onPressed: () => context.showAdaptiveSheet(
-                        (_) => AddSpaceRoomsSheet(
-                          spaceId,
-                          spaceName: spaceName,
-                          existing: (byId[spaceId]?.children ?? const .empty())
-                              .map((child) => child.roomId)
-                              .toISet(),
-                        ),
-                      ),
-                      icon: const Icon(Icons.add),
+                      onPressed: adding
+                          ? null
+                          : () => context.showAdaptiveSheet(
+                              (_) => AddSpaceRoomsSheet(
+                                spaceId,
+                                spaceName: spaceName,
+                                existing:
+                                    (byId[spaceId]?.children ?? const .empty())
+                                        .map((child) => child.roomId)
+                                        .toISet(),
+                              ),
+                            ),
+                      icon: adding
+                          ? const SizedBox.square(
+                              dimension: 18,
+                              child: CircularProgressIndicator(),
+                            )
+                          : const Icon(Icons.add),
                       label: const Text("Add rooms"),
                     ),
                 ],

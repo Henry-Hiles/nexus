@@ -43,9 +43,17 @@ class const AccountSwitcher({final bool onlyWithOthers = false, super.key})
         .switchTo(accountId)
         .onError(showError);
 
+    final loggingOut = ref.watch(LogOut.mutation).isPending;
+
     return AdaptiveMenuButton(
-      tooltip: "Switch account",
-      icon: active == null
+      tooltip: loggingOut ? "Logging out..." : "Switch account",
+      enabled: !loggingOut,
+      icon: loggingOut
+          ? const SizedBox.square(
+              dimension: 24,
+              child: CircularProgressIndicator(),
+            )
+          : active == null
           ? const Icon(Icons.account_circle)
           : avatarOf(active, 28),
       itemBuilder: (_) => [

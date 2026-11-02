@@ -1,5 +1,6 @@
 import "package:collection/collection.dart";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
+import "package:flutter_riverpod/experimental/mutation.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/client_state.dart";
@@ -114,6 +115,10 @@ class InvitesController extends Notifier<IList<RoomSummary>> {
   /// first error is thrown once all have finished.
   Future<void> declineAll() =>
       Future.wait(state.map((invite) => decline(invite.roomId)));
+
+  /// Accepting or declining an invite, keyed by its room ID
+  static final respondMutation = Mutation<void>();
+  static final declineAllMutation = Mutation<void>();
 
   static final provider =
       NotifierProvider<InvitesController, IList<RoomSummary>>(
