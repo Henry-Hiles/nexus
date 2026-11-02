@@ -4,10 +4,12 @@ import "package:material_ui/material_ui.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/event.dart";
+import "package:nexus/controllers/poll_votes.dart";
 import "package:nexus/controllers/room_chat.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/controllers/settings.dart";
 import "package:nexus/helpers/extensions/is_shown_as_message.dart";
+import "package:nexus/helpers/extensions/send_failed.dart";
 import "package:nexus/helpers/extensions/show_adaptive_menu.dart";
 import "package:nexus/helpers/extensions/success_scheme.dart";
 import "package:nexus/helpers/hooks/chat_scroll.dart";
@@ -22,6 +24,7 @@ import "package:nexus/models/content/join_rules.dart";
 import "package:nexus/models/content/membership.dart";
 import "package:nexus/models/content/name.dart";
 import "package:nexus/models/content/pinned_events.dart";
+import "package:nexus/models/content/poll_end.dart";
 import "package:nexus/models/content/power_levels.dart";
 import "package:nexus/models/content/server_acl.dart";
 import "package:nexus/models/content/topic.dart";
@@ -181,6 +184,29 @@ class const EventRenderer(
               "changed the room avatar",
             ),
             CreateContent() => generic(Icons.add, "created the room"),
+            PollEndContent() => switch (event.relatesTo) {
+              final pollId? => switch (ref
+                  .watch(
+                    EventController.provider(
+                      .new(roomId: roomId, eventId: pollId),
+                    ),
+                  )
+                  .value) {
+                final poll?
+                    when ref
+                            .watch(
+                              PollVotesController.provider(
+                                .new(roomId: roomId, eventRowId: poll.rowId),
+                              ),
+                            )
+                            .value
+                            ?.endEventId ==
+                        event.eventId =>
+                  generic(Icons.poll, "ended a poll"),
+                _ => null,
+              },
+              null => null,
+            },
             final PowerLevelsContent content => generic(
               Icons.power,
               "changed the room's power levels",
@@ -427,7 +453,7 @@ class const EventRenderer(
               if (readReceiptsChat case final chat? when event.isShownAsMessage)
                 ReadReceiptsRow(event.eventId, chat: chat),
 
-              if (event.sendError != null && event.sendError != "not sent")
+              if (event.sendFailed)
                 Padding(
                   padding: .only(bottom: 4),
                   child: Row(

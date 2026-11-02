@@ -38,6 +38,9 @@ final class const RoomChat({
   Widget build(BuildContext context, WidgetRef ref) {
     final relatedEvent = useState<int?>(null);
     final relationType = useState(RelationType.reply);
+    final repliedEventRowId = relationType.value == .reply
+        ? relatedEvent.value
+        : null;
     final pendingJump = ref.read(JumpRequestController.provider);
     final contextualEvent = useState<int?>(
       pendingJump != null && pendingJump.roomId == this.roomId
@@ -334,11 +337,19 @@ final class const RoomChat({
                                               image,
                                               shouldMention: shouldMention,
                                               repliedEventRowId:
-                                                  relationType.value == .reply
-                                                  ? relatedEvent.value
-                                                  : null,
+                                                  repliedEventRowId,
                                             )
                                             .onError(showError),
+                                    onSendPoll:
+                                        (poll, {required shouldMention}) =>
+                                            notifier
+                                                .sendPoll(
+                                                  poll,
+                                                  shouldMention: shouldMention,
+                                                  repliedEventRowId:
+                                                      repliedEventRowId,
+                                                )
+                                                .onError(showError),
                                     relationType: relationType.value,
                                     relatedEvent: relatedEvent.value,
                                     onDismiss: () {

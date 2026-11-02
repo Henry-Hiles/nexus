@@ -17,6 +17,9 @@ import "package:nexus/models/content/topic.dart";
 import "package:nexus/models/content/sticker.dart";
 import "package:nexus/models/content/history_visibility.dart";
 import "package:nexus/models/content/image_pack.dart";
+import "package:nexus/models/content/poll_end.dart";
+import "package:nexus/models/content/poll_response.dart";
+import "package:nexus/models/content/poll_start.dart";
 
 class const Content({final String? parseError, final StackTrace? stackTrace}) {
   factory Content.fromJson(Map<String, dynamic> json) => const Content();
@@ -64,5 +67,11 @@ enum EventType(
   pinnedEvents("m.room.pinned_events", PinnedEventsContent.fromJson),
   imagePack("m.room.image_pack", ImagePackContent.fromJson),
   legacyImagePack("im.ponies.room_emotes", ImagePackContent.fromJson),
+  pollStart("org.matrix.msc3381.poll.start", PollStartContent.fromJson),
+  pollResponse(
+    "org.matrix.msc3381.poll.response",
+    PollResponseContent.fromJson,
+  ),
+  pollEnd("org.matrix.msc3381.poll.end", PollEndContent.fromJson),
   message("m.room.message", MessageContent.fromJson),
 }

@@ -89,14 +89,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.7.0"
-  asn1lib:
-    dependency: transitive
-    description:
-      name: asn1lib
-      sha256: "9a8f69025044eb466b9b60ef3bc3ac99b4dc6c158ae9c56d25eeccf5bc56d024"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.6.5"
   async:
     dependency: transitive
     description:
@@ -313,22 +305,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.0"
-  dynamic_polls:
-    dependency: "direct main"
-    description:
-      name: dynamic_polls
-      sha256: "58cd1fafbbaba6b485a61692aa3bd33ded6f0f61734543b6c754511c362d8ae1"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.0.8"
-  encrypt:
-    dependency: transitive
-    description:
-      name: encrypt
-      sha256: "62d9aa4670cc2a8798bab89b39fc71b6dfbacf615de6cf5001fb39f7e4a996a2"
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.0.3"
   equatable:
     dependency: transitive
     description:
@@ -623,14 +599,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.0"
-  get_x_storage:
-    dependency: transitive
-    description:
-      name: get_x_storage
-      sha256: "597cd8f6ef8b01c747a6d95ff7b0310066f6c82ddf5565ca371f047f316fe43e"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.2.0"
   glob:
     dependency: transitive
     description:
@@ -791,14 +759,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.0"
-  js:
-    dependency: transitive
-    description:
-      name: js
-      sha256: "53385261521cc4a0c4658fd0ad07a7d14591cf8fc33abbceae306ddb974888dc"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.7.2"
   json_annotation:
     dependency: "direct main"
     description:
@@ -1203,14 +1163,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.8"
-  pointycastle:
-    dependency: transitive
-    description:
-      name: pointycastle
-      sha256: "4be0097fcf3fd3e8449e53730c631200ebc7b88016acecab2b0da2f0149222fe"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.9.1"
   pool:
     dependency: transitive
     description:
@@ -1291,14 +1243,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.9"
-  rxdart:
-    dependency: transitive
-    description:
-      name: rxdart
-      sha256: "5c3004a4a8dbb94bd4bf5412a4def4acdaa12e12f269737a5751369e12d1a962"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.28.0"
   safe_local_storage:
     dependency: transitive
     description:

@@ -8,4 +8,7 @@ class const RoomPowerLevels({
   double levelOf(String userId) => creators.contains(userId)
       ? double.infinity
       : (content.users[userId] ?? content.usersDefault).toDouble();
+
+  bool canEndPoll(String userId, {required String pollSender}) =>
+      userId == pollSender || levelOf(userId) >= content.redact;
 }

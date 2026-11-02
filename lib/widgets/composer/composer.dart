@@ -20,9 +20,11 @@ import "package:nexus/controllers/power_level.dart";
 import "package:nexus/controllers/image_packs.dart";
 import "package:nexus/models/content/image_pack.dart";
 import "package:nexus/models/content/message.dart";
+import "package:nexus/models/content/poll_start.dart";
 import "package:nexus/models/image_pack.dart";
 import "package:nexus/widgets/mxc_emoji.dart";
 import "package:nexus/widgets/sticker_picker.dart";
+import "package:nexus/widgets/create_poll_sheet.dart";
 import "package:nexus/models/relation_type.dart";
 import "package:nexus/widgets/composer/overlays/tagger_overlay.dart";
 import "package:nexus/widgets/composer/paste_files_action.dart";
@@ -30,6 +32,7 @@ import "package:pasteboard/pasteboard.dart";
 import "package:path/path.dart";
 import "package:path_provider/path_provider.dart";
 import "package:nexus/widgets/composer/relation_preview.dart";
+import "package:nexus/widgets/composer/composer_replacement.dart";
 import "package:nexus/main.dart";
 
 class const Composer(
@@ -49,6 +52,11 @@ class const Composer(
     required bool shouldMention,
   })
   onSendSticker,
+  required final Future<void> Function(
+    PollStart poll, {
+    required bool shouldMention,
+  })
+  onSendPoll,
   final FocusNode? node,
   super.key,
 }) extends HookConsumerWidget {
@@ -70,6 +78,11 @@ class const Composer(
                 .value
                 ?.any((pack) => pack.stickers.isNotEmpty) ??
             false);
+    final canSendPolls = ref.watch(
+      PowerLevelController.provider(
+        .new(eventType: .pollStart, roomId: roomId),
+      ),
+    );
     final relatedEvent = this.relatedEvent == null
         ? null
         : ref.watch(
@@ -95,15 +108,24 @@ class const Composer(
     /// The sticker to send, which replaces the text field until it is sent or
     /// removed, as stickers can't have a caption
     final sticker = useState<(String, PackImage)?>(null);
+
+    final poll = useState<PollStart?>(null);
     useEffect(() {
       sticker.value = null;
+      poll.value = null;
       return null;
     }, [roomId]);
+
+    final hasReplacement = sticker.value != null || poll.value != null;
+
+    // The relation type stays as edit after cancelling an edit
+    final isEditing = relationType == .edit && relatedEvent != null;
 
     useEffect(() {
       if (relationType == .edit && relatedEvent != null) {
         textBefore.value ??= controller.text;
         sticker.value = null;
+        poll.value = null;
 
         final text =
             relatedEvent.localContent?.editSource ??
@@ -216,11 +238,16 @@ class const Composer(
     }
 
     void send() {
-      if (sticker.value case (final shortcode, final image)?) {
-        onSendSticker(shortcode, image, shouldMention: shouldMention.value);
+      if (hasReplacement) {
+        if (sticker.value case (final shortcode, final image)?) {
+          onSendSticker(shortcode, image, shouldMention: shouldMention.value);
+        } else if (poll.value case final draft?) {
+          onSendPoll(draft, shouldMention: shouldMention.value);
+        }
         onDismiss();
-        // The draft is kept, so it can still be sent after the sticker
+        // The draft is kept, so it can still be sent after the replacement
         sticker.value = null;
+        poll.value = null;
         node?.requestFocus();
         return;
       }
@@ -302,7 +329,7 @@ class const Composer(
                         )
                         ? [
                             IconButton(
-                              onPressed: sticker.value != null
+                              onPressed: hasReplacement
                                   ? null
                                   : () => context.showAdaptiveSheet(
                                       (context) => EmojiPicker(
@@ -338,8 +365,7 @@ class const Composer(
                             ),
                             AdaptiveMenuButton(
                               tooltip: "Add media",
-                              enabled:
-                                  attachment == null && sticker.value == null,
+                              enabled: attachment == null && !hasReplacement,
                               itemBuilder: (context) => [
                                 for (final (source, title, icon) in [
                                   if (Platform.isAndroid || Platform.isIOS)
@@ -386,7 +412,7 @@ class const Composer(
                                 if (canSendStickers)
                                   PopupMenuItem(
                                     // Stickers can't replace messages
-                                    enabled: relationType != .edit,
+                                    enabled: !isEditing,
                                     onTap: () => context.showAdaptiveSheet(
                                       (context) => StickerPicker(
                                         roomId: roomId,
@@ -401,6 +427,22 @@ class const Composer(
                                       leading: Icon(Icons.sticky_note_2),
                                     ),
                                   ),
+                                if (canSendPolls)
+                                  PopupMenuItem(
+                                    enabled: !isEditing,
+                                    onTap: () => context.showAdaptiveSheet(
+                                      (context) => CreatePollSheet(
+                                        onCreate: (created) {
+                                          Navigator.of(context).pop();
+                                          poll.value = created;
+                                        },
+                                      ),
+                                    ),
+                                    child: ListTile(
+                                      title: Text("Poll"),
+                                      leading: Icon(Icons.poll),
+                                    ),
+                                  ),
                               ],
                               icon: Icon(Icons.add),
                             ),
@@ -409,35 +451,49 @@ class const Composer(
                               child: AnimatedSize(
                                 duration: Durations.short4,
                                 alignment: .bottomCenter,
-                                child: switch (sticker.value) {
-                                  (final shortcode, final image)? => Focus(
-                                    autofocus: true,
+                                child: switch ((sticker.value, poll.value)) {
+                                  (_, final draft?) => ComposerReplacement(
+                                    removeTooltip: "Remove poll",
+                                    onRemove: () {
+                                      poll.value = null;
+                                      node?.requestFocus();
+                                    },
                                     onKeyEvent: sendOnEnter,
-                                    child: Padding(
-                                      padding: .symmetric(vertical: 8),
-                                      child: Row(
-                                        children: [
-                                          ConstrainedBox(
-                                            constraints: .loose(.square(128)),
-                                            child: MxcEmoji(
-                                              image.url,
-                                              label: image.body ?? shortcode,
-                                            ),
-                                          ),
-                                          Spacer(),
-                                          IconButton(
-                                            tooltip: "Remove sticker",
-                                            onPressed: () {
-                                              sticker.value = null;
-                                              node?.requestFocus();
-                                            },
-                                            icon: Icon(Icons.close),
-                                          ),
-                                        ],
+                                    ListTile(
+                                      leading: Icon(
+                                        Icons.poll,
+                                        color: theme.colorScheme.primary,
+                                      ),
+                                      title: Text(draft.question),
+                                      subtitle: Text(
+                                        draft.answers
+                                            .map((answer) => answer.text)
+                                            .join(" · "),
+                                        maxLines: 1,
+                                        overflow: .ellipsis,
                                       ),
                                     ),
                                   ),
-                                  null => FlutterTagger(
+                                  ((final shortcode, final image)?, _) =>
+                                    ComposerReplacement(
+                                      removeTooltip: "Remove sticker",
+                                      onRemove: () {
+                                        sticker.value = null;
+                                        node?.requestFocus();
+                                      },
+                                      onKeyEvent: sendOnEnter,
+                                      Align(
+                                        alignment: .centerLeft,
+                                        child: ConstrainedBox(
+                                          constraints: .loose(.square(128)),
+                                          child: MxcEmoji(
+                                            image.url,
+                                            label: image.body ?? shortcode,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  (null, null) => FlutterTagger(
                                     triggerStrategy: .eager,
                                     // Characters that continue a search, for
                                     // e.g. :+1, :custom_emoji or @user:server

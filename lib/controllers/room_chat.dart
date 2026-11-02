@@ -8,8 +8,12 @@ import "package:fluttertagger/fluttertagger.dart";
 import "package:nexus/controllers/attachment.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/rooms.dart";
+import "package:nexus/helpers/extensions/send_failed.dart";
 import "package:nexus/models/content/content.dart";
 import "package:nexus/models/content/image_pack.dart";
+import "package:nexus/models/content/poll_end.dart";
+import "package:nexus/models/content/poll_response.dart";
+import "package:nexus/models/content/poll_start.dart";
 import "package:nexus/models/content/reaction.dart";
 import "package:nexus/models/content/sticker.dart";
 import "package:nexus/models/direction.dart";
@@ -340,10 +344,10 @@ class RoomChatController(final ChatParams info)
     );
   }
 
-  /// Sends [image] as a sticker, as a reply to [repliedEventRowId] if set.
-  Future<void> sendSticker(
-    String shortcode,
-    PackImage image, {
+  /// Sends [content], as a reply to [repliedEventRowId] if set.
+  Future<void> sendWithReply(
+    EventType type,
+    Content content, {
     bool shouldMention = true,
     int? repliedEventRowId,
   }) async {
@@ -360,12 +364,8 @@ class RoomChatController(final ChatParams info)
         .sendEvent(
           .new(
             roomId: info.roomId,
-            type: EventType.sticker.type,
-            content: StickerContent(
-              body: image.body ?? shortcode,
-              info: image.info ?? const .new(),
-              url: image.url,
-            ),
+            type: type.type,
+            content: content,
             mentions: Mentions(
               userIds: [
                 if (shouldMention && repliedEvent != null) repliedEvent.sender,
@@ -386,6 +386,70 @@ class RoomChatController(final ChatParams info)
           }),
         );
   }
+
+  /// Sends [image] as a sticker, as a reply to [repliedEventRowId] if set.
+  Future<void> sendSticker(
+    String shortcode,
+    PackImage image, {
+    bool shouldMention = true,
+    int? repliedEventRowId,
+  }) => sendWithReply(
+    .sticker,
+    StickerContent(
+      body: image.body ?? shortcode,
+      info: image.info ?? const .new(),
+      url: image.url,
+    ),
+    shouldMention: shouldMention,
+    repliedEventRowId: repliedEventRowId,
+  );
+
+  Future<void> sendPoll(
+    PollStart poll, {
+    bool shouldMention = true,
+    int? repliedEventRowId,
+  }) => sendWithReply(
+    .pollStart,
+    PollStartContent(poll: poll),
+    shouldMention: shouldMention,
+    repliedEventRowId: repliedEventRowId,
+  );
+
+  /// Completes once the event has come down sync.
+  Future<void> sendPollReference(
+    Event poll,
+    EventType type,
+    Content content,
+  ) async {
+    final event = await ref
+        .read(ClientController.provider.notifier)
+        .sendEvent(
+          .new(
+            roomId: info.roomId,
+            type: type.type,
+            content: content,
+            relatesTo: poll.eventId,
+            relationType: "m.reference",
+            synchronous: true,
+          ),
+        );
+
+    if (event.sendFailed) throw Exception(event.sendError);
+
+    await ref
+        .read(RoomsController.provider.notifier)
+        .awaitEvent(info.roomId, event.eventId);
+  }
+
+  /// An empty [answers] removes the vote.
+  Future<void> votePoll(Event poll, IList<String> answers) => sendPollReference(
+    poll,
+    .pollResponse,
+    PollResponseContent(answers: answers),
+  );
+
+  Future<void> endPoll(Event poll) =>
+      sendPollReference(poll, .pollEnd, const PollEndContent());
 
   static final provider = AsyncNotifierProvider.family
       .autoDispose<RoomChatController, RoomChat?, ChatParams>(

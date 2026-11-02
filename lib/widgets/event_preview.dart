@@ -1,6 +1,5 @@
 import "package:material_ui/material_ui.dart";
-import "package:nexus/models/content/message.dart";
-import "package:nexus/models/content/sticker.dart";
+import "package:nexus/helpers/extensions/is_shown_as_message.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/widgets/lazy_loading/message_avatar.dart";
 import "package:nexus/widgets/lazy_loading/message_displayname.dart";
@@ -10,10 +9,7 @@ class const EventPreview(final Event event, {super.key})
     extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final showSender = switch (event.content) {
-      MessageContent() || StickerContent() => true,
-      _ => false,
-    };
+    final showSender = event.hasMessageContent;
 
     return IgnorePointer(
       child: Padding(

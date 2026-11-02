@@ -2,10 +2,10 @@ import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/rooms.dart";
-import "package:nexus/models/configs/reactions.dart";
+import "package:nexus/models/configs/event.dart";
 import "package:nexus/models/content/reaction.dart";
 
-class ReactionsController(final ReactionsConfig config)
+class ReactionsController(final EventConfig config)
     extends AsyncNotifier<IMap<String, IList<String>>> {
   @override
   Future<IMap<String, IList<String>>> build() async {
@@ -48,6 +48,6 @@ class ReactionsController(final ReactionsConfig config)
       AsyncNotifierProvider.family<
         ReactionsController,
         IMap<String, IList<String>>,
-        ReactionsConfig
+        EventConfig
       >(ReactionsController.new);
 }

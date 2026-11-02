@@ -24,6 +24,14 @@ class const Room({
   @JsonKey(fromJson: Room.eventsJsonToIMap)
   final IMap<int, Event> events = const .empty(),
 
+  /// [relations] is an IMap of event ID to the eventRowIds relating to it
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  final IMap<String, ISet<int>> relations = const .empty(),
+
+  /// [eventIds] is an IMap of event ID to eventRowId
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  final IMap<String, int> eventIds = const .empty(),
+
   final bool reset = false,
   @JsonKey(includeFromJson: false, includeToJson: false)
   final bool resetClientSticky = false,

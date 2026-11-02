@@ -82,6 +82,35 @@ class RoomsController extends Notifier<IMap<String, Room>> {
     ),
   );
 
+  static IMap<String, ISet<int>> addRelations(
+    IMap<String, ISet<int>> relations,
+    Iterable<Event> events,
+  ) => events.fold(
+    relations,
+    (acc, event) => switch (event.relatesTo) {
+      final relatesTo? => acc.update(
+        relatesTo,
+        (rowIds) => rowIds.add(event.rowId),
+        ifAbsent: () => .new([event.rowId]),
+      ),
+      null => acc,
+    },
+  );
+
+  /// IDs replace previous ones for the same row, e.g. once a local echo is sent.
+  static IMap<String, int> addEventIds(
+    IMap<String, int> eventIds,
+    IMap<int, Event> existing,
+    Iterable<Event> events,
+  ) => events.fold(eventIds, (acc, event) {
+    final previousId = existing[event.rowId]?.eventId;
+
+    return (previousId != null && previousId != event.eventId
+            ? acc.remove(previousId)
+            : acc)
+        .add(event.eventId, event.rowId);
+  });
+
   void update(
     IMap<String, Room> rooms, [
     ISet<String> leftRooms = const .empty(),
@@ -109,6 +138,15 @@ class RoomsController extends Notifier<IMap<String, Room>> {
               events: incoming.events.isEmpty
                   ? existing.events
                   : existing.events.addAll(incoming.events),
+              relations: addRelations(
+                existing.relations,
+                incoming.events.values,
+              ),
+              eventIds: addEventIds(
+                existing.eventIds,
+                existing.events,
+                incoming.events.values,
+              ),
               state: incoming.state.entries.fold(
                 existing.state,
                 (previousValue, event) => previousValue.add(
@@ -129,6 +167,12 @@ class RoomsController extends Notifier<IMap<String, Room>> {
             ) ??
             incoming.copyWith(
               receipts: mergeReceipts(const .empty(), incoming.receipts),
+              relations: addRelations(const .empty(), incoming.events.values),
+              eventIds: addEventIds(
+                const .empty(),
+                const .empty(),
+                incoming.events.values,
+              ),
             ),
       );
     });
@@ -144,12 +188,19 @@ class RoomsController extends Notifier<IMap<String, Room>> {
     String type,
     String eventId, {
     String stateKey = "",
-  }) {
-    bool arrived(IMap<String, Room> rooms) =>
-        switch (rooms[roomId]?.state[type]?[stateKey]) {
-          final rowId? => rooms[roomId]?.events[rowId]?.eventId == eventId,
-          null => false,
-        };
+  }) => awaitRooms(
+    (rooms) => switch (rooms[roomId]?.state[type]?[stateKey]) {
+      final rowId? => rooms[roomId]?.events[rowId]?.eventId == eventId,
+      null => false,
+    },
+  );
+
+  /// Waits for a sent event to come down sync, giving up after a while.
+  Future<void> awaitEvent(String roomId, String eventId) => awaitRooms(
+    (rooms) => rooms[roomId]?.eventIds.containsKey(eventId) ?? false,
+  );
+
+  Future<void> awaitRooms(bool Function(IMap<String, Room> rooms) arrived) {
     if (arrived(state)) return .value();
 
     final completer = Completer<void>();

@@ -8,6 +8,7 @@ import "package:nexus/helpers/extensions/get_filename.dart";
 import "package:nexus/helpers/extensions/linkify_html.dart";
 import "package:nexus/models/content/encrypted.dart";
 import "package:nexus/models/content/message.dart";
+import "package:nexus/models/content/poll_start.dart";
 import "package:nexus/models/content/sticker.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/widgets/file_card.dart";
@@ -23,6 +24,7 @@ import "package:nexus/widgets/url_preview.dart";
 import "package:nexus/widgets/event_preview.dart";
 import "package:nexus/widgets/players/video.dart";
 import "package:nexus/widgets/players/audio.dart";
+import "package:nexus/widgets/renderers/poll.dart";
 
 class const MessageRenderer(
   final Event event, {
@@ -54,6 +56,14 @@ class const MessageRenderer(
                 constraints: .loose(.square(200)),
                 child: MessageImage(url, info: info, encrypted: false),
               ),
+      PollStartContent(:final poll) =>
+        textOnly
+            ? Text(
+                "Poll: ${poll.question}",
+                maxLines: maxLines,
+                overflow: .ellipsis,
+              )
+            : PollRenderer(event, poll),
       // TODO: Handle locations
       // LocationMessageContent(:final body , :final geoUri) =>
       MessageContent content => switch (content) {

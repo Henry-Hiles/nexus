@@ -1,4 +1,3 @@
-import "package:collection/collection.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/rooms.dart";
@@ -10,11 +9,14 @@ class EventController(final GetEventRequest request)
   @override
   Future<Event?> build() async {
     final event = ref.watch(
-      RoomsController.provider.select(
-        (rooms) => rooms[request.roomId]?.events.values.firstWhereOrNull(
-          (event) => event.eventId == request.eventId,
-        ),
-      ),
+      RoomsController.provider.select((rooms) {
+        final room = rooms[request.roomId];
+
+        return switch (room?.eventIds[request.eventId]) {
+          final rowId? => room?.events[rowId],
+          null => null,
+        };
+      }),
     );
 
     if (event != null) return event;

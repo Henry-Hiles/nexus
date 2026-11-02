@@ -81,7 +81,6 @@ dependencies:
     fluttertagger:
         git:
             url: https://github.com/Henry-Hiles/fluttertagger # Fixes the last tag search being dropped from formattedText
-    dynamic_polls: 0.0.8
     flutter_hooks: 0.21.3+1
     ffi: 2.2.0
     hooks: 2.2.0
