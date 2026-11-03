@@ -14,6 +14,8 @@ import "package:nexus/helpers/extensions/send_failed.dart";
 import "package:nexus/helpers/extensions/success_scheme.dart";
 import "package:nexus/helpers/hooks/chat_scroll.dart";
 import "package:nexus/helpers/hooks/tap_recognizer.dart";
+import "package:nexus/helpers/extensions/open_link_info.dart";
+import "package:nexus/main.dart";
 import "package:nexus/models/content/avatar.dart";
 import "package:nexus/models/content/canonical_alias.dart";
 import "package:nexus/models/content/content.dart";
@@ -27,6 +29,7 @@ import "package:nexus/models/content/pinned_events.dart";
 import "package:nexus/models/content/poll_end.dart";
 import "package:nexus/models/content/power_levels.dart";
 import "package:nexus/models/content/server_acl.dart";
+import "package:nexus/models/content/tombstone.dart";
 import "package:nexus/models/content/topic.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/widgets/error_dialog.dart";
@@ -140,6 +143,27 @@ class const EventRenderer(
       ],
     );
 
+    // For rooms an upgrade links, i.e. the old and new rooms
+    Widget roomLink(String label, String linkedRoomId) => InkWell(
+      onTap: () => ref
+          .openLinkInfo(context, (
+            identifier: linkedRoomId,
+            eventId: null,
+            // The sender is in both rooms, so their server can be joined
+            // through
+            via: [event.sender.substring(event.sender.indexOf(":") + 1)].lock,
+          ))
+          .onError(showError),
+      child: Text(
+        label,
+        style: theme.textTheme.labelMedium?.copyWith(
+          color: colorScheme.primary,
+          decoration: .underline,
+          decorationColor: colorScheme.primary,
+        ),
+      ),
+    );
+
     final child = event.isShownAsMessage
         ? MessageRenderer(
             event,
@@ -185,7 +209,25 @@ class const EventRenderer(
               Icons.interests,
               "changed the room avatar",
             ),
-            CreateContent() => generic(Icons.add, "created the room"),
+            CreateContent(:final predecessor) => generic(
+              Icons.add,
+              predecessor == null
+                  ? "created the room"
+                  : "created the room, replacing an older one",
+              details: [
+                if (predecessor case PreviousRoom(:final roomId))
+                  roomLink("Go to old room", roomId),
+              ],
+            ),
+            TombstoneContent(:final body, :final replacementRoom) => generic(
+              Icons.upgrade,
+              "replaced the room",
+              details: [
+                if (body.isNotEmpty)
+                  Text(body, style: theme.textTheme.labelMedium),
+                roomLink("Go to new room", replacementRoom),
+              ],
+            ),
             PollEndContent() => switch (event.relatesTo) {
               final pollId? => switch (ref
                   .watch(

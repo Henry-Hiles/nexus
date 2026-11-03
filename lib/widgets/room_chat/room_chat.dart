@@ -9,6 +9,7 @@ import "package:nexus/controllers/client_state.dart";
 import "package:nexus/controllers/member_list_opened.dart";
 import "package:nexus/controllers/power_level.dart";
 import "package:nexus/controllers/settings.dart";
+import "package:nexus/controllers/tombstone.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/controllers/room_chat.dart";
 import "package:nexus/helpers/hooks/chat_scroll.dart";
@@ -23,6 +24,7 @@ import "package:nexus/widgets/member_list.dart";
 import "package:nexus/widgets/room_appbar.dart";
 import "package:nexus/widgets/search_drawer.dart";
 import "package:nexus/widgets/sync_status_banner.dart";
+import "package:nexus/widgets/tombstone_banner.dart";
 import "package:nexus/main.dart";
 import "package:nexus/widgets/room_chat/chat_timeline.dart";
 import "package:nexus/helpers/extensions/build_event_options.dart";
@@ -200,9 +202,14 @@ final class const RoomChat({
         (settings) => settings.value?.swipeToReply ?? false,
       ),
     );
-    final canReply = ref.watch(
-      PowerLevelController.provider(.new(eventType: .message, roomId: roomId)),
-    );
+    final tombstone = ref.watch(TombstoneController.provider(roomId));
+    final canReply =
+        tombstone == null &&
+        ref.watch(
+          PowerLevelController.provider(
+            .new(eventType: .message, roomId: roomId),
+          ),
+        );
 
     return Scaffold(
       endDrawerEnableOpenDragGesture: false,
@@ -308,71 +315,81 @@ final class const RoomChat({
                                 child: MeasureSize(
                                   onChange: (size) =>
                                       composerSize.value = size.height,
-                                  child: Composer(
-                                    roomId,
-                                    node: composerNode,
-                                    onSend:
-                                        (
-                                          text, {
-                                          required shouldMention,
-                                          required tags,
-                                        }) => notifier
-                                            .send(
-                                              text,
-                                              tags: tags,
-                                              relationType: relationType.value,
-                                              shouldMention: shouldMention,
-                                              relatedEventRowId:
-                                                  relatedEvent.value,
-                                            )
-                                            .onError(showError),
-                                    onSendSticker:
-                                        (
-                                          shortcode,
-                                          image, {
-                                          required shouldMention,
-                                        }) => notifier
-                                            .sendSticker(
-                                              shortcode,
-                                              image,
-                                              shouldMention: shouldMention,
-                                              repliedEventRowId:
-                                                  repliedEventRowId,
-                                            )
-                                            .onError(showError),
-                                    onSendPoll:
-                                        (poll, {required shouldMention}) =>
-                                            notifier
-                                                .sendPoll(
-                                                  poll,
-                                                  shouldMention: shouldMention,
-                                                  repliedEventRowId:
-                                                      repliedEventRowId,
-                                                )
-                                                .onError(showError),
-                                    onSendLocation:
-                                        (location, {required shouldMention}) =>
-                                            notifier
-                                                .sendLocation(
-                                                  location,
-                                                  shouldMention: shouldMention,
-                                                  repliedEventRowId:
-                                                      repliedEventRowId,
-                                                )
-                                                .onError(showError),
-                                    onSendBotCommand: (draft) => notifier
-                                        .sendBotCommand(
-                                          draft,
-                                          repliedEventRowId: repliedEventRowId,
-                                        )
-                                        .onError(showError),
-                                    relationType: relationType.value,
-                                    relatedEvent: relatedEvent.value,
-                                    onDismiss: () {
-                                      relatedEvent.value = null;
-                                      composerNode.requestFocus();
-                                    },
-                                  ),
+                                  child: switch (tombstone) {
+                                    final tombstone? => TombstoneBanner(
+                                      tombstone,
+                                    ),
+                                    null => Composer(
+                                      roomId,
+                                      node: composerNode,
+                                      onSend:
+                                          (
+                                            text, {
+                                            required shouldMention,
+                                            required tags,
+                                          }) => notifier
+                                              .send(
+                                                text,
+                                                tags: tags,
+                                                relationType:
+                                                    relationType.value,
+                                                shouldMention: shouldMention,
+                                                relatedEventRowId:
+                                                    relatedEvent.value,
+                                              )
+                                              .onError(showError),
+                                      onSendSticker:
+                                          (
+                                            shortcode,
+                                            image, {
+                                            required shouldMention,
+                                          }) => notifier
+                                              .sendSticker(
+                                                shortcode,
+                                                image,
+                                                shouldMention: shouldMention,
+                                                repliedEventRowId:
+                                                    repliedEventRowId,
+                                              )
+                                              .onError(showError),
+                                      onSendPoll:
+                                          (poll, {required shouldMention}) =>
+                                              notifier
+                                                  .sendPoll(
+                                                    poll,
+                                                    shouldMention:
+                                                        shouldMention,
+                                                    repliedEventRowId:
+                                                        repliedEventRowId,
+                                                  )
+                                                  .onError(showError),
+                                      onSendLocation:
+                                          (
+                                            location, {
+                                            required shouldMention,
+                                          }) => notifier
+                                              .sendLocation(
+                                                location,
+                                                shouldMention: shouldMention,
+                                                repliedEventRowId:
+                                                    repliedEventRowId,
+                                              )
+                                              .onError(showError),
+                                      onSendBotCommand: (draft) => notifier
+                                          .sendBotCommand(
+                                            draft,
+                                            repliedEventRowId:
+                                                repliedEventRowId,
+                                          )
+                                          .onError(showError),
+                                      relationType: relationType.value,
+                                      relatedEvent: relatedEvent.value,
+                                      onDismiss: () {
+                                        relatedEvent.value = null;
+                                        composerNode.requestFocus();
+                                      },
+                                    ),
+                                  },
                                 ),
                               ),
                             ],

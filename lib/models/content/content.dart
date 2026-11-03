@@ -16,6 +16,7 @@ import "package:nexus/models/content/redaction.dart";
 import "package:nexus/models/content/server_acl.dart";
 import "package:nexus/models/content/space_child.dart";
 import "package:nexus/models/content/topic.dart";
+import "package:nexus/models/content/tombstone.dart";
 import "package:nexus/models/content/sticker.dart";
 import "package:nexus/models/content/history_visibility.dart";
 import "package:nexus/models/content/image_pack.dart";
@@ -64,7 +65,7 @@ enum EventType(
   avatar("m.room.avatar", AvatarContent.fromJson),
   topic("m.room.topic", TopicContent.fromJson),
   name("m.room.name", NameContent.fromJson),
-  tombstone("m.room.tombstone", Content.fromJson),
+  tombstone("m.room.tombstone", TombstoneContent.fromJson),
   reaction("m.reaction", ReactionContent.fromJson),
   pinnedEvents("m.room.pinned_events", PinnedEventsContent.fromJson),
   spaceChild("m.space.child", SpaceChildContent.fromJson),
