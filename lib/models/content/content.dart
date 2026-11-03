@@ -1,5 +1,6 @@
 import "package:collection/collection.dart";
 import "package:nexus/models/content/avatar.dart";
+import "package:nexus/models/content/bot_command_description.dart";
 import "package:nexus/models/content/canonical_alias.dart";
 import "package:nexus/models/content/create.dart";
 import "package:nexus/models/content/encryption.dart";
@@ -75,5 +76,9 @@ enum EventType(
     PollResponseContent.fromJson,
   ),
   pollEnd("org.matrix.msc3381.poll.end", PollEndContent.fromJson),
+  botCommandDescription(
+    "org.matrix.msc4391.command_description",
+    BotCommandDescriptionContent.fromJson,
+  ),
   message("m.room.message", MessageContent.fromJson),
 }

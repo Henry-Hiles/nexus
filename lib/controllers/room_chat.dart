@@ -10,6 +10,8 @@ import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/helpers/extensions/is_media.dart";
 import "package:nexus/helpers/extensions/send_failed.dart";
+import "package:nexus/models/bot_command_draft.dart";
+import "package:nexus/models/content/bot_command.dart";
 import "package:nexus/models/content/content.dart";
 import "package:nexus/models/content/image_pack.dart";
 import "package:nexus/models/content/poll_end.dart";
@@ -354,6 +356,7 @@ class RoomChatController(final ChatParams info)
     Content content, {
     bool shouldMention = true,
     int? repliedEventRowId,
+    IList<String> mentionedUserIds = const .empty(),
   }) async {
     final repliedEvent = repliedEventRowId == null
         ? null
@@ -372,6 +375,7 @@ class RoomChatController(final ChatParams info)
             content: content,
             mentions: Mentions(
               userIds: [
+                ...mentionedUserIds,
                 if (shouldMention && repliedEvent != null) repliedEvent.sender,
               ].toIList(),
             ),
@@ -427,6 +431,17 @@ class RoomChatController(final ChatParams info)
     .message,
     location,
     shouldMention: shouldMention,
+    repliedEventRowId: repliedEventRowId,
+  );
+
+  Future<void> sendBotCommand(
+    BotCommandDraft draft, {
+    int? repliedEventRowId,
+  }) => sendWithReply(
+    .message,
+    BotCommandMessageContent(body: draft.body, command: draft.input),
+    shouldMention: false,
+    mentionedUserIds: [draft.command.sender].lock,
     repliedEventRowId: repliedEventRowId,
   );
 

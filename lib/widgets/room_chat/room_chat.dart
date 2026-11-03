@@ -360,6 +360,12 @@ final class const RoomChat({
                                                       repliedEventRowId,
                                                 )
                                                 .onError(showError),
+                                    onSendBotCommand: (draft) => notifier
+                                        .sendBotCommand(
+                                          draft,
+                                          repliedEventRowId: repliedEventRowId,
+                                        )
+                                        .onError(showError),
                                     relationType: relationType.value,
                                     relatedEvent: relatedEvent.value,
                                     onDismiss: () {

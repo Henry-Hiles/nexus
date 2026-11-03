@@ -164,9 +164,11 @@ class const EventRenderer(
         : switch (event.content) {
             Content(:final parseError?, :final stackTrace) => Row(
               children: [
-                ErrorDialog(
-                  "An error occurred while parsing event ${event.eventId}:\n$parseError",
-                  stackTrace,
+                Flexible(
+                  child: ErrorDialog(
+                    "An error occurred while parsing event ${event.eventId}:\n$parseError",
+                    stackTrace,
+                  ),
                 ),
               ],
             ),

@@ -1,4 +1,5 @@
 import "package:freezed_annotation/freezed_annotation.dart";
+import "package:nexus/models/content/bot_command.dart";
 import "package:nexus/models/info/audio.dart";
 import "package:nexus/models/content/content.dart";
 import "package:nexus/models/info/file.dart";
@@ -24,6 +25,7 @@ sealed class MessageContent extends Content with _$MessageContent {
     @JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue)
     MessageFormat? format,
     String? formattedBody,
+    @JsonKey(name: "org.matrix.msc4391.command") BotCommandInput? botCommand,
   }) = TextMessageContent;
 
   @FreezedUnionValue("m.notice")

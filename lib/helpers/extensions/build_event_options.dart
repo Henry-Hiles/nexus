@@ -173,9 +173,13 @@ extension BuildEventOptions on Event {
           ),
         ),
 
-      if (content is MessageContent &&
-          content is! LocationMessageContent &&
-          sender == userId)
+      if (sender == userId &&
+          switch (content) {
+            LocationMessageContent() ||
+            TextMessageContent(botCommand: _?) => false,
+            MessageContent() => true,
+            _ => false,
+          })
         PopupMenuItem(
           onTap: () => onRelation(rowId, .edit),
           child: const ListTile(leading: Icon(Icons.edit), title: Text("Edit")),

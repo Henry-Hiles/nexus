@@ -1,7 +1,16 @@
 import "dart:io";
 
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
+import "package:collection/collection.dart";
+import "package:nexus/controllers/bot_argument_suggestions.dart";
+import "package:nexus/controllers/bot_command_draft.dart";
+import "package:nexus/controllers/bot_commands.dart";
 import "package:nexus/controllers/rooms.dart";
+import "package:nexus/helpers/extensions/show_error_snack_bar.dart";
+import "package:nexus/models/bot_command.dart";
+import "package:nexus/models/bot_command_draft.dart";
+import "package:nexus/widgets/composer/bot_command_form.dart";
+import "package:nexus/widgets/composer/bot_command_panel.dart";
 import "package:nexus/widgets/emoji_picker.dart";
 import "package:nexus/helpers/extensions/get_filename.dart";
 import "package:nexus/helpers/extensions/is_media.dart";
@@ -66,6 +75,7 @@ class const Composer(
     required bool shouldMention,
   })
   onSendLocation,
+  required final Future<void> Function(BotCommandDraft draft) onSendBotCommand,
   final FocusNode? node,
   super.key,
 }) extends HookConsumerWidget {
@@ -122,6 +132,8 @@ class const Composer(
 
     final poll = useState<PollStart?>(null);
     final location = useState<LocationMessageContent?>(null);
+    final botCommandProvider = BotCommandDraftController.provider(roomId);
+    final botCommand = ref.watch(botCommandProvider);
     useEffect(() {
       sticker.value = null;
       poll.value = null;
@@ -130,7 +142,10 @@ class const Composer(
     }, [roomId]);
 
     final hasReplacement =
-        sticker.value != null || poll.value != null || location.value != null;
+        sticker.value != null ||
+        poll.value != null ||
+        location.value != null ||
+        botCommand != null;
 
     // The relation type stays as edit after cancelling an edit
     final isEditing = relationType == .edit && relatedEvent != null;
@@ -144,6 +159,7 @@ class const Composer(
         sticker.value = null;
         poll.value = null;
         location.value = null;
+        Future.microtask(ref.read(botCommandProvider.notifier).clear);
 
         final content = relatedEvent.content;
         final text =
@@ -282,22 +298,91 @@ class const Composer(
       return false;
     }
 
+    final botCommands = isEditing || hasReplacement || attachment != null
+        ? const IList<BotCommand>.empty()
+        : ref.watch(BotCommandsController.provider(roomId));
+
+    void pickBotCommand(BotCommand command) {
+      ref
+          .read(botCommandProvider.notifier)
+          .start(command, text: command.argumentsIn(controller.text) ?? "");
+      controller.text = "";
+    }
+
+    BotCommand? typedBotCommand(String text) => switch (botCommands
+        .where((command) => command.argumentsIn(text) != null)
+        .sortedBy<num>((command) => -command.prefix.length)) {
+      [final command, final other, ...] when command.prefix == other.prefix =>
+        null,
+      [final command, ...] => command,
+      [] => null,
+    };
+
+    void pickTypedBotCommand(String text) {
+      if (botCommands.any((command) => command.prefix.startsWith(text))) return;
+      if (typedBotCommand(text) case final command?) pickBotCommand(command);
+    }
+
+    void removeBotCommand({required bool keepText}) {
+      if (botCommand?.command.prefix case final prefix? when keepText) {
+        controller.value = .new(
+          text: prefix,
+          selection: .collapsed(offset: prefix.length),
+        );
+      }
+      ref.read(botCommandProvider.notifier).clear();
+      WidgetsBinding.instance.addPostFrameCallback((_) => node?.requestFocus());
+    }
+
     void send() {
       if (hasReplacement) {
+        if (botCommand != null) {
+          if (ref
+              .read(BotArgumentSuggestionsController.provider(roomId).notifier)
+              .pickTop()) {
+            return;
+          }
+          if (botCommand.missing.firstOrNull case final next?
+              when next.key != botCommand.focused &&
+                  !botCommand.errors.containsKey(botCommand.focused)) {
+            ref.read(botCommandProvider.notifier).focus(next.key);
+            return;
+          }
+          if (botCommand.problem case final problem?) {
+            ScaffoldMessenger.of(context).showErrorSnackBar(problem);
+            ref.read(botCommandProvider.notifier).focusNext();
+            return;
+          }
+        }
+
         if (sticker.value case (final shortcode, final image)?) {
           onSendSticker(shortcode, image, shouldMention: shouldMention.value);
         } else if (poll.value case final draft?) {
           onSendPoll(draft, shouldMention: shouldMention.value);
         } else if (location.value case final draft?) {
           onSendLocation(draft, shouldMention: shouldMention.value);
+        } else if (botCommand != null) {
+          onSendBotCommand(botCommand);
         }
         onDismiss();
         // The draft is kept, so it can still be sent after the replacement
         sticker.value = null;
         poll.value = null;
         location.value = null;
-        node?.requestFocus();
+        ref.read(botCommandProvider.notifier).clear();
+        // Once the text field is back
+        WidgetsBinding.instance.addPostFrameCallback(
+          (_) => node?.requestFocus(),
+        );
         return;
+      }
+
+      if (typedBotCommand(controller.text) ??
+              botCommands.firstWhereOrNull(
+                (command) => command.completes(controller.text),
+              )
+          case final command?) {
+        return pickBotCommand(command);
       }
 
       if (controller.value.text.isEmpty && attachment == null ||
@@ -353,6 +438,16 @@ class const Composer(
                 ),
               ),
             ),
+          AnimatedSize(
+            duration: Durations.short4,
+            alignment: .bottomCenter,
+            child: BotCommandPanel(
+              roomId,
+              commands: botCommands,
+              controller: controller,
+              onPick: pickBotCommand,
+            ),
+          ),
           ClipRRect(
             borderRadius: .all(.circular(12)),
             child: Column(
@@ -519,30 +614,32 @@ class const Composer(
                                   sticker.value,
                                   poll.value,
                                   location.value,
+                                  botCommand,
                                 )) {
-                                  (_, final draft?, _) => ComposerReplacement(
-                                    removeTooltip: "Remove poll",
-                                    onRemove: () {
-                                      poll.value = null;
-                                      node?.requestFocus();
-                                    },
-                                    onKeyEvent: sendOnEnter,
-                                    ListTile(
-                                      leading: Icon(
-                                        Icons.poll,
-                                        color: theme.colorScheme.primary,
-                                      ),
-                                      title: Text(draft.question),
-                                      subtitle: Text(
-                                        draft.answers
-                                            .map((answer) => answer.text)
-                                            .join(" · "),
-                                        maxLines: 1,
-                                        overflow: .ellipsis,
+                                  (_, final draft?, _, _) =>
+                                    ComposerReplacement(
+                                      removeTooltip: "Remove poll",
+                                      onRemove: () {
+                                        poll.value = null;
+                                        node?.requestFocus();
+                                      },
+                                      onKeyEvent: sendOnEnter,
+                                      ListTile(
+                                        leading: Icon(
+                                          Icons.poll,
+                                          color: theme.colorScheme.primary,
+                                        ),
+                                        title: Text(draft.question),
+                                        subtitle: Text(
+                                          draft.answers
+                                              .map((answer) => answer.text)
+                                              .join(" · "),
+                                          maxLines: 1,
+                                          overflow: .ellipsis,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  ((final shortcode, final image)?, _, _) =>
+                                  ((final shortcode, final image)?, _, _, _) =>
                                     ComposerReplacement(
                                       removeTooltip: "Remove sticker",
                                       onRemove: () {
@@ -561,35 +658,50 @@ class const Composer(
                                         ),
                                       ),
                                     ),
-                                  (_, _, final draft?) => ComposerReplacement(
-                                    removeTooltip: "Remove location",
-                                    onRemove: () {
-                                      location.value = null;
-                                      node?.requestFocus();
-                                    },
-                                    onKeyEvent: sendOnEnter,
-                                    ListTile(
-                                      leading: Icon(
-                                        draft.assetType == .pin
-                                            ? Icons.location_pin
-                                            : Icons.my_location,
-                                        color: theme.colorScheme.primary,
-                                      ),
-                                      title: Text(
-                                        draft.description ??
-                                            (draft.assetType == .pin
-                                                ? "Location"
-                                                : "My location"),
-                                      ),
-                                      subtitle: Text(
-                                        draft.point?.formatted ??
-                                            draft.geoUri.toString(),
-                                        maxLines: 1,
-                                        overflow: .ellipsis,
+                                  (_, _, final draft?, _) =>
+                                    ComposerReplacement(
+                                      removeTooltip: "Remove location",
+                                      onRemove: () {
+                                        location.value = null;
+                                        node?.requestFocus();
+                                      },
+                                      onKeyEvent: sendOnEnter,
+                                      ListTile(
+                                        leading: Icon(
+                                          draft.assetType == .pin
+                                              ? Icons.location_pin
+                                              : Icons.my_location,
+                                          color: theme.colorScheme.primary,
+                                        ),
+                                        title: Text(
+                                          draft.description ??
+                                              (draft.assetType == .pin
+                                                  ? "Location"
+                                                  : "My location"),
+                                        ),
+                                        subtitle: Text(
+                                          draft.point?.formatted ??
+                                              draft.geoUri.toString(),
+                                          maxLines: 1,
+                                          overflow: .ellipsis,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  (null, null, null) => FlutterTagger(
+                                  (_, _, _, final draft?) =>
+                                    ComposerReplacement(
+                                      removeTooltip: "Remove command",
+                                      onRemove: () =>
+                                          removeBotCommand(keepText: false),
+                                      onKeyEvent: sendOnEnter,
+                                      BotCommandForm(
+                                        draft,
+                                        key: ValueKey(draft.command),
+                                        onSubmit: send,
+                                        onRemove: () =>
+                                            removeBotCommand(keepText: true),
+                                      ),
+                                    ),
+                                  (null, null, null, null) => FlutterTagger(
                                     triggerStrategy: .eager,
                                     // Characters that continue a search, for
                                     // e.g. :+1, :custom_emoji or @user:server
@@ -627,6 +739,7 @@ class const Composer(
                                           maxLines: 12,
                                           minLines: 1,
                                           textCapitalization: .sentences,
+                                          onChanged: pickTypedBotCommand,
                                           autofocus:
                                               (Platform.isLinux ||
                                               Platform.isMacOS ||
