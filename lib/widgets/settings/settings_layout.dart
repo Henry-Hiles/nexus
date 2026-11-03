@@ -7,6 +7,7 @@ import "package:hooks_riverpod/misc.dart";
 import "package:m3e_card_list/m3e_card_list.dart";
 import "package:navigation_rail_m3e/navigation_rail_m3e.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
+import "package:nexus/helpers/extensions/weighted_search.dart";
 import "package:nexus/models/settings_category.dart";
 import "package:nexus/widgets/pages/settings_category.dart";
 import "package:nexus/widgets/divider_text.dart";
@@ -43,32 +44,22 @@ class const SettingsLayout({
             // Only searched once shown, by which point these have loaded
             final categories =
                 ref.read(sectionsProvider).value ?? const IMap.empty();
-            final query = controller.text.toLowerCase();
-
             final matches = categories.values.flattenedToList
                 .asMap()
                 .entries
                 .expand(
-                  (categoryEntry) => categoryEntry.value.settings
-                      .asMap()
-                      .entries
-                      .where(
-                        (settingEntry) =>
-                            settingEntry.value.title.toLowerCase().contains(
-                              query,
-                            ) ||
-                            settingEntry.value.description
-                                .toLowerCase()
-                                .contains(query),
-                      )
-                      .map(
+                  (categoryEntry) =>
+                      categoryEntry.value.settings.asMap().entries.map(
                         (settingEntry) => (
                           (categoryEntry.key, settingEntry.key),
                           settingEntry.value,
                         ),
                       ),
                 )
-                .toIList();
+                .search(
+                  controller.text,
+                  (match) => [(match.$2.title, 2), (match.$2.description, 1)],
+                );
 
             return matches.map(
               (match) => ListTile(

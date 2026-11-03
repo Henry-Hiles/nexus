@@ -3,6 +3,7 @@ import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:material_ui/material_ui.dart";
 import "package:nexus/controllers/all_emoji.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
+import "package:nexus/helpers/extensions/weighted_search.dart";
 import "package:nexus/models/content/image_pack.dart";
 import "package:nexus/models/image_pack.dart";
 
@@ -21,11 +22,13 @@ class const EmojiOverlay(
           children: emojis
               .map((element) => element.emojis)
               .flattened
-              .where(
-                (emoji) =>
-                    emoji.aliases.join().contains(query) ||
-                    emoji.description.contains(query) ||
-                    emoji.tags.join().contains(query),
+              .search(
+                query,
+                (emoji) => [
+                  ...emoji.aliases.map((alias) => (alias, 3)),
+                  ...emoji.tags.map((tag) => (tag, 2)),
+                  (emoji.description, 1),
+                ],
               )
               .map(
                 (emoji) => ListTile(

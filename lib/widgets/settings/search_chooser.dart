@@ -1,6 +1,7 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:material_ui/material_ui.dart";
+import "package:nexus/helpers/extensions/weighted_search.dart";
 
 /// The [chosen] items, above a field searching [options] to choose more.
 class const SearchChooser({
@@ -30,15 +31,10 @@ class const SearchChooser({
 }) extends HookWidget {
   @override
   Widget build(BuildContext context) {
-    final query = useValueListenable(controller).text.trim().toLowerCase();
+    final query = useValueListenable(controller).text;
     final shown = options
-        .where(
-          (id) =>
-              !chosen.contains(id) &&
-              (nameOf(id).toLowerCase().contains(query) ||
-                  id.toLowerCase().contains(query)),
-        )
-        .toIList();
+        .where((id) => !chosen.contains(id))
+        .search(query, (id) => [(nameOf(id), 2), (id, 1)]);
 
     ListTile tileOf(String id, {Widget? trailing, VoidCallback? onTap}) =>
         ListTile(

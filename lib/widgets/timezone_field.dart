@@ -4,6 +4,7 @@ import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:material_ui/material_ui.dart";
 import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
 import "package:nexus/controllers/timezones.dart";
+import "package:nexus/helpers/extensions/weighted_search.dart";
 import "package:nexus/helpers/hooks/saving.dart";
 import "package:nexus/widgets/settings/inline_text_field.dart";
 import "package:timezone/timezone.dart";
@@ -84,7 +85,7 @@ class const TimezoneField({
               onTap: () => choose(controller, null),
             ),
           ...timezones
-              .where((timezone) => timezone.toLowerCase().contains(query))
+              .search(query, (timezone) => [(timezone, 1)])
               .map(
                 (timezone) => ListTile(
                   leading: Icon(

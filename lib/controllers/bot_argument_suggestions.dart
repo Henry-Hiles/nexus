@@ -5,6 +5,7 @@ import "package:nexus/controllers/members_by_status.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/controllers/via.dart";
 import "package:nexus/helpers/extensions/get_localpart.dart";
+import "package:nexus/helpers/extensions/weighted_search.dart";
 import "package:nexus/models/bot_argument_suggestion.dart";
 import "package:nexus/models/bot_command_draft.dart";
 import "package:nexus/models/content/bot_command_description.dart";
@@ -91,13 +92,10 @@ class BotArgumentSuggestionsController(final String roomId)
               )
               .nonNulls,
         )
-        .where(
-          (suggestion) =>
-              !picked.contains(suggestion.text) &&
-              [
-                suggestion.title,
-                suggestion.subtitle,
-              ].any((text) => text?.toLowerCase().contains(query) == true),
+        .where((suggestion) => !picked.contains(suggestion.text))
+        .search(
+          query,
+          (suggestion) => [(suggestion.title, 2), (suggestion.subtitle, 1)],
         )
         .take(8)
         .toIList();
