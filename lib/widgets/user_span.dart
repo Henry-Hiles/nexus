@@ -1,10 +1,10 @@
 import "package:flutter/gestures.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:material_ui/material_ui.dart";
+import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
 import "package:nexus/controllers/author.dart";
 import "package:nexus/helpers/extensions/displayname_color.dart";
 import "package:nexus/helpers/extensions/get_localpart.dart";
-import "package:nexus/helpers/extensions/global_rect.dart";
 import "package:nexus/helpers/extensions/show_user_popover.dart";
 import "package:nexus/models/event.dart";
 

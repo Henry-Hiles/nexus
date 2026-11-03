@@ -7,6 +7,7 @@ import "package:material_ui/material_ui.dart";
 import "package:intl/intl.dart";
 import "package:m3e_buttons/m3e_buttons.dart";
 import "package:multi_state_switch/multi_state_switch.dart";
+import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
 import "package:nexus/controllers/account_data.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/client_state.dart";
@@ -43,7 +44,6 @@ import "package:nexus/widgets/settings/enable_image_packs_sheet.dart";
 import "package:nexus/widgets/settings/keyword_field.dart";
 import "package:nexus/widgets/user_bottom_sheet.dart";
 import "package:nexus/widgets/reset_encryption_sheet.dart";
-import "package:nexus/helpers/extensions/show_adaptive_sheet.dart";
 
 class SettingsSectionsController
     extends AsyncNotifier<IMap<String, IList<SettingsCategory>>> {

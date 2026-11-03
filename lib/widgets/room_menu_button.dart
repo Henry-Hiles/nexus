@@ -1,14 +1,12 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:material_ui/material_ui.dart";
+import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
 import "package:nexus/helpers/extensions/get_localpart.dart";
 import "package:nexus/helpers/extensions/show_leave_room_sheet.dart";
-import "package:nexus/helpers/extensions/show_adaptive_sheet.dart";
-import "package:nexus/widgets/sheet_layout.dart";
 import "package:flutter/services.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/room_settings_sections.dart";
-import "package:nexus/widgets/adaptive_menu_button.dart";
 import "package:nexus/widgets/settings/settings_layout.dart";
 import "package:nexus/controllers/via.dart";
 import "package:nexus/models/room.dart";

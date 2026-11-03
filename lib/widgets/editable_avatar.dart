@@ -1,7 +1,7 @@
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:material_ui/material_ui.dart";
+import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
 import "package:nexus/controllers/client.dart";
-import "package:nexus/helpers/extensions/show_adaptive_menu.dart";
 import "package:nexus/helpers/file_dialog_helper.dart";
 import "package:nexus/helpers/hooks/saving.dart";
 import "package:nexus/main.dart";

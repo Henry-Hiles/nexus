@@ -1,13 +1,13 @@
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:material_ui/material_ui.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
+import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
 import "package:nexus/controllers/init_complete.dart";
 import "package:nexus/controllers/link_request.dart";
 import "package:nexus/helpers/extensions/open_link_info.dart";
 import "package:nexus/main.dart";
 import "package:nexus/controllers/selected_room.dart";
 import "package:nexus/controllers/notification_request.dart";
-import "package:nexus/helpers/extensions/is_desktop.dart";
 import "package:nexus/widgets/appbar.dart";
 import "package:nexus/widgets/sidebar.dart";
 import "package:nexus/widgets/sync_status_banner.dart";

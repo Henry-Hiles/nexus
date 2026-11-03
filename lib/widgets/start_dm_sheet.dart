@@ -1,8 +1,8 @@
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:material_ui/material_ui.dart";
+import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
 import "package:nexus/helpers/extensions/get_localpart.dart";
 import "package:nexus/helpers/extensions/create_room.dart";
-import "package:nexus/widgets/sheet_layout.dart";
 
 /// Starts a DM, asking for a user ID unless [userId] is given. Pops with true
 /// if a DM was started.

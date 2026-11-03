@@ -3,13 +3,13 @@ import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:material_ui/material_ui.dart";
+import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
 import "package:nexus/controllers/room_image_packs.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
 import "package:nexus/models/account_data.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/widgets/image_pack_avatar.dart";
-import "package:nexus/widgets/sheet_layout.dart";
 
 /// Chooses a room, then which of its image packs to use in every room.
 class const EnableImagePacksSheet({

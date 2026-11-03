@@ -2,7 +2,7 @@ import "dart:async";
 
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:material_ui/material_ui.dart";
-import "package:nexus/helpers/extensions/show_adaptive_sheet.dart";
+import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
 import "package:nexus/helpers/hooks/saving.dart";
 import "package:nexus/widgets/settings/radio_sheet.dart";
 

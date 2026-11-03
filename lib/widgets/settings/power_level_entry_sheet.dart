@@ -1,7 +1,7 @@
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:material_ui/material_ui.dart";
+import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
 import "package:nexus/widgets/settings/power_level_field.dart";
-import "package:nexus/widgets/sheet_layout.dart";
 
 /// Gives something, like an event type, its own power level.
 class const PowerLevelEntrySheet({

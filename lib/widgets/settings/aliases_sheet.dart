@@ -1,7 +1,7 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:material_ui/material_ui.dart";
-import "package:nexus/widgets/sheet_layout.dart";
+import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
 
 /// Chooses which of a room's [aliases] it publishes, and which one of those is canonical.
 class const AliasesSheet({

@@ -1,9 +1,8 @@
 import "package:material_ui/material_ui.dart";
-import "package:nexus/helpers/extensions/show_adaptive_sheet.dart";
-import "package:nexus/widgets/sheet_layout.dart";
 import "package:flutter_svg/flutter_svg.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:m3e_card_list/m3e_card_list.dart";
+import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
 import "package:nexus/helpers/launch_helper.dart";
 import "package:package_info_plus/package_info_plus.dart";
 

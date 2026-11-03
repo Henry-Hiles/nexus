@@ -1,13 +1,13 @@
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:material_ui/material_ui.dart";
+import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
 import "package:nexus/controllers/client_state.dart";
 import "package:nexus/controllers/local_aliases.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
 import "package:nexus/helpers/hooks/saving.dart";
 import "package:nexus/main.dart";
 import "package:nexus/models/gomuks_exception.dart";
-import "package:nexus/widgets/sheet_layout.dart";
 
 class const LocalAliasesSheet(
   final String roomId, {

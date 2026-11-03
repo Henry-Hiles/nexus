@@ -1,13 +1,13 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:material_ui/material_ui.dart";
+import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
 import "package:nexus/controllers/mutual_rooms.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/controllers/sidebar_page.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
 import "package:nexus/helpers/extensions/focus_room.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
-import "package:nexus/widgets/sheet_layout.dart";
 
 /// The rooms the user shares with [userId].
 class const MutualRoomsSheet(final String userId, {super.key})

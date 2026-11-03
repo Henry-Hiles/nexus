@@ -3,6 +3,7 @@ import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:material_ui/material_ui.dart";
+import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/client_state.dart";
 import "package:nexus/controllers/rooms.dart";
@@ -15,7 +16,6 @@ import "package:nexus/models/content/content.dart";
 import "package:nexus/models/content/space_child.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/widgets/settings/search_chooser.dart";
-import "package:nexus/widgets/sheet_layout.dart";
 
 /// Chooses rooms to add to the space [spaceId], then adds them.
 class const AddSpaceRoomsSheet(

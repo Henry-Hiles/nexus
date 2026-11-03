@@ -5,18 +5,17 @@ import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:m3e_buttons/m3e_buttons.dart";
 import "package:m3e_card_list/m3e_card_list.dart";
 import "package:material_ui/material_ui.dart";
+import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
 import "package:nexus/controllers/client_state.dart";
 import "package:nexus/controllers/poll_votes.dart";
 import "package:nexus/controllers/power_level.dart";
 import "package:nexus/controllers/room_chat.dart";
 import "package:nexus/controllers/room_power_levels.dart";
 import "package:nexus/helpers/extensions/event_id_is_fake.dart";
-import "package:nexus/helpers/extensions/show_adaptive_sheet.dart";
 import "package:nexus/main.dart";
 import "package:nexus/models/content/poll_start.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/widgets/poll_option.dart";
-import "package:nexus/widgets/sheet_layout.dart";
 
 class const PollRenderer(final Event event, final PollStart poll, {super.key})
     extends HookConsumerWidget {

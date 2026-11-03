@@ -1,10 +1,10 @@
 import "package:material_ui/material_ui.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
+import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
 import "package:nexus/controllers/event.dart";
 import "package:nexus/controllers/room_summary.dart";
 import "package:nexus/helpers/extensions/focus_room.dart";
 import "package:nexus/helpers/extensions/get_link_info.dart";
-import "package:nexus/helpers/extensions/show_adaptive_sheet.dart";
 import "package:nexus/helpers/extensions/show_user_popover.dart";
 import "package:nexus/models/room_summary.dart";
 import "package:nexus/widgets/room_summary_sheet.dart";

@@ -1,8 +1,8 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:material_ui/material_ui.dart";
+import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
 import "package:nexus/helpers/extensions/join_room.dart";
-import "package:nexus/widgets/sheet_layout.dart";
 
 /// Asks the moderators of a room to let the user in, with an optional reason.
 ///

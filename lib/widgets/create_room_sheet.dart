@@ -1,10 +1,10 @@
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:material_ui/material_ui.dart";
+import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
 import "package:nexus/controllers/client_state.dart";
 import "package:nexus/helpers/extensions/create_room.dart";
 import "package:nexus/helpers/extensions/get_localpart.dart";
-import "package:nexus/widgets/sheet_layout.dart";
 
 class const CreateRoomSheet({super.key}) extends HookConsumerWidget {
   @override

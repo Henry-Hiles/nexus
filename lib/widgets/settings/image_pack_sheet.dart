@@ -2,8 +2,8 @@ import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:material_ui/material_ui.dart";
+import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
 import "package:nexus/controllers/client.dart";
-import "package:nexus/helpers/extensions/show_adaptive_sheet.dart";
 import "package:nexus/helpers/file_dialog_helper.dart";
 import "package:nexus/helpers/hooks/saving.dart";
 import "package:nexus/main.dart";
@@ -13,7 +13,6 @@ import "package:nexus/widgets/image_pack_avatar.dart";
 import "package:nexus/widgets/mxc_emoji.dart";
 import "package:nexus/widgets/settings/image_usage_chips.dart";
 import "package:nexus/widgets/settings/pack_image_sheet.dart";
-import "package:nexus/widgets/sheet_layout.dart";
 
 /// Edits an image pack, or only shows it if [onSave] is null.
 class const ImagePackSheet({

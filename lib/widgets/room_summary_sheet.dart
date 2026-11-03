@@ -1,13 +1,12 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:material_ui/material_ui.dart";
-import "package:nexus/widgets/sheet_layout.dart";
+import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/invites.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/helpers/extensions/get_localpart.dart";
 import "package:nexus/helpers/extensions/join_room.dart";
-import "package:nexus/helpers/extensions/show_adaptive_sheet.dart";
 import "package:nexus/main.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/widgets/expandable_image.dart";

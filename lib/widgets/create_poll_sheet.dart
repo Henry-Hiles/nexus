@@ -2,8 +2,8 @@ import "package:collection/collection.dart";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:material_ui/material_ui.dart";
+import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
 import "package:nexus/models/content/poll_start.dart";
-import "package:nexus/widgets/sheet_layout.dart";
 
 class const CreatePollSheet({
   required final void Function(PollStart poll) onCreate,

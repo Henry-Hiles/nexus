@@ -1,9 +1,8 @@
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:material_ui/material_ui.dart";
+import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
 import "package:nexus/controllers/client.dart";
-import "package:nexus/helpers/extensions/show_adaptive_sheet.dart";
 import "package:nexus/helpers/extensions/with_progress_snackbar.dart";
-import "package:nexus/widgets/sheet_layout.dart";
 
 extension ShowLeaveRoomSheet on BuildContext {
   /// Asks the user to confirm leaving the room, then leaves it.

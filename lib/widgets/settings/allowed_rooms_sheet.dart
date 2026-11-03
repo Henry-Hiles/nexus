@@ -3,12 +3,12 @@ import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:material_ui/material_ui.dart";
+import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/main.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/widgets/settings/search_chooser.dart";
-import "package:nexus/widgets/sheet_layout.dart";
 
 /// Chooses the rooms whose members can join [roomId] without an invite.
 class const AllowedRoomsSheet({

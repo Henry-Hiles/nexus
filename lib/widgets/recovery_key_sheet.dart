@@ -4,12 +4,12 @@ import "package:flutter/services.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:material_ui/material_ui.dart";
+import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/client_state.dart";
 import "package:nexus/helpers/launch_helper.dart";
 import "package:nexus/models/gomuks_exception.dart";
 import "package:nexus/models/recovery_key.dart";
-import "package:nexus/widgets/sheet_layout.dart";
 
 /// Shows a newly generated recovery key, and once the user confirms they've
 /// saved it, resets encryption with it. Pops with true if that succeeded.

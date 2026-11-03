@@ -114,6 +114,7 @@ dependencies:
     flutter_local_notifications: 22.3.1
     timezone: 0.11.1
     material_emoji_picker: 2.0.1
+    material_adaptive_sheets: 1.0.0
     xdg_desktop_portal:
         git:
             url: https://github.com/Henry-Hiles/xdg_desktop_portal.dart

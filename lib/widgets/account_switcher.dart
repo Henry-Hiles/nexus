@@ -1,12 +1,12 @@
 import "package:collection/collection.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:material_ui/material_ui.dart";
+import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
 import "package:nexus/controllers/accounts.dart";
 import "package:nexus/controllers/active_account.dart";
 import "package:nexus/helpers/extensions/log_out.dart";
 import "package:nexus/main.dart";
 import "package:nexus/models/account.dart";
-import "package:nexus/widgets/adaptive_menu_button.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 
 /// Switches between, adds and logs out of accounts. With [onlyWithOthers], it's
@@ -45,7 +45,7 @@ class const AccountSwitcher({final bool onlyWithOthers = false, super.key})
 
     final loggingOut = ref.watch(LogOut.mutation).isPending;
 
-    return AdaptiveMenuButton(
+    return AdaptiveMenuButton<void>(
       tooltip: loggingOut ? "Logging out..." : "Switch account",
       enabled: !loggingOut,
       icon: loggingOut

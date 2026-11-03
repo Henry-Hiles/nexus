@@ -2,8 +2,8 @@ import "dart:async";
 
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:material_ui/material_ui.dart";
+import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
 import "package:nexus/controllers/timezones.dart";
-import "package:nexus/helpers/extensions/is_desktop.dart";
 import "package:nexus/helpers/hooks/saving.dart";
 import "package:nexus/widgets/settings/inline_text_field.dart";
 import "package:timezone/timezone.dart";

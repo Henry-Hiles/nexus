@@ -3,13 +3,13 @@ import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:material_ui/material_ui.dart";
+import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/power_level.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/controllers/space_hierarchy.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
 import "package:nexus/helpers/extensions/join_room.dart";
-import "package:nexus/helpers/extensions/show_adaptive_sheet.dart";
 import "package:nexus/helpers/extensions/show_leave_room_sheet.dart";
 import "package:nexus/helpers/extensions/with_progress_snackbar.dart";
 import "package:nexus/main.dart";
@@ -22,7 +22,6 @@ import "package:nexus/widgets/expandable_image.dart";
 import "package:nexus/widgets/knock_sheet.dart";
 import "package:nexus/widgets/loading.dart";
 import "package:nexus/widgets/room_summary_sheet.dart";
-import "package:nexus/widgets/sheet_layout.dart";
 
 class const SpaceHierarchySheet(final String spaceId, {super.key})
     extends ConsumerWidget {

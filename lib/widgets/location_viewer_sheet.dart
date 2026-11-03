@@ -1,10 +1,10 @@
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:latlong2/latlong.dart";
 import "package:material_ui/material_ui.dart";
+import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
 import "package:nexus/helpers/launch_helper.dart";
 import "package:nexus/models/location.dart";
 import "package:nexus/widgets/location_map.dart";
-import "package:nexus/widgets/sheet_layout.dart";
 
 class const LocationViewerSheet(
   final LatLng point, {

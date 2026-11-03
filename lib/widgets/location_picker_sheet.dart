@@ -3,11 +3,11 @@ import "package:flutter_map/flutter_map.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:latlong2/latlong.dart";
 import "package:material_ui/material_ui.dart";
+import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
 import "package:nexus/helpers/current_location_helper.dart";
 import "package:nexus/models/content/message.dart";
 import "package:nexus/models/location.dart";
 import "package:nexus/widgets/location_map.dart";
-import "package:nexus/widgets/sheet_layout.dart";
 
 /// Chooses a location to share, either the user's own or a pin dropped on the
 /// map.

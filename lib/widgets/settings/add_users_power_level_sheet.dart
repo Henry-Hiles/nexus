@@ -3,13 +3,13 @@ import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:material_ui/material_ui.dart";
+import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
 import "package:nexus/controllers/members.dart";
 import "package:nexus/helpers/extensions/get_localpart.dart";
 import "package:nexus/models/content/membership.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/widgets/settings/power_level_field.dart";
 import "package:nexus/widgets/settings/search_chooser.dart";
-import "package:nexus/widgets/sheet_layout.dart";
 
 /// Chooses users of [roomId] to give a power level of their own.
 class const AddUsersPowerLevelSheet({

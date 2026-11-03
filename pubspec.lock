@@ -969,6 +969,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.12.20"
+  material_adaptive_sheets:
+    dependency: "direct main"
+    description:
+      name: material_adaptive_sheets
+      sha256: "9299e8dfa7459583516520db1fe0edec83ab306679c3cfd3d0848f666bc956e5"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   material_color_utilities:
     dependency: transitive
     description:

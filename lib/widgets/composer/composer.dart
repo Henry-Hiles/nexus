@@ -2,6 +2,7 @@ import "dart:io";
 
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:collection/collection.dart";
+import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
 import "package:nexus/controllers/bot_argument_suggestions.dart";
 import "package:nexus/controllers/bot_command_draft.dart";
 import "package:nexus/controllers/bot_commands.dart";
@@ -14,8 +15,6 @@ import "package:nexus/widgets/composer/bot_command_panel.dart";
 import "package:nexus/widgets/emoji_picker.dart";
 import "package:nexus/helpers/extensions/get_filename.dart";
 import "package:nexus/helpers/extensions/is_media.dart";
-import "package:nexus/helpers/extensions/show_adaptive_sheet.dart";
-import "package:nexus/widgets/adaptive_menu_button.dart";
 import "package:material_ui/material_ui.dart";
 import "package:flutter/services.dart";
 import "package:flutter_hooks/flutter_hooks.dart";

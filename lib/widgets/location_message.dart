@@ -1,5 +1,5 @@
 import "package:material_ui/material_ui.dart";
-import "package:nexus/helpers/extensions/show_adaptive_sheet.dart";
+import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
 import "package:nexus/models/content/message.dart";
 import "package:nexus/models/location.dart";
 import "package:nexus/widgets/location_map.dart";

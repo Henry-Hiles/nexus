@@ -1,7 +1,6 @@
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:material_ui/material_ui.dart";
-import "package:nexus/helpers/extensions/show_adaptive_sheet.dart";
-import "package:nexus/widgets/sheet_layout.dart";
+import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
 import "package:nexus/controllers/invites.dart";
 import "package:nexus/helpers/extensions/get_localpart.dart";
 import "package:nexus/main.dart";
