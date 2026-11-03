@@ -281,16 +281,23 @@ class RoomChatController(final ChatParams info)
       ),
     );
 
-    ref
-        .read(RoomsController.provider.notifier)
-        .update(
-          .new({
-            info.roomId: .new(
-              events: .new({event.rowId: event}),
-              clientSticky: .new({event.rowId}),
-            ),
-          }),
-        );
+    addSent(event);
+  }
+
+  /// Shows [event], which was just sent, until it comes down sync.
+  void addSent(Event? event) {
+    if (event case final event?) {
+      ref
+          .read(RoomsController.provider.notifier)
+          .update(
+            .new({
+              info.roomId: .new(
+                events: .new({event.rowId: event}),
+                clientSticky: .new({event.rowId}),
+              ),
+            }),
+          );
+    }
   }
 
   Future<void> removeReaction(
@@ -356,7 +363,6 @@ class RoomChatController(final ChatParams info)
     Content content, {
     bool shouldMention = true,
     int? repliedEventRowId,
-    IList<String> mentionedUserIds = const .empty(),
   }) async {
     final repliedEvent = repliedEventRowId == null
         ? null
@@ -375,7 +381,6 @@ class RoomChatController(final ChatParams info)
             content: content,
             mentions: Mentions(
               userIds: [
-                ...mentionedUserIds,
                 if (shouldMention && repliedEvent != null) repliedEvent.sender,
               ].toIList(),
             ),
@@ -383,16 +388,7 @@ class RoomChatController(final ChatParams info)
           ),
         );
 
-    ref
-        .read(RoomsController.provider.notifier)
-        .update(
-          .new({
-            info.roomId: .new(
-              events: .new({event.rowId: event}),
-              clientSticky: .new({event.rowId}),
-            ),
-          }),
-        );
+    addSent(event);
   }
 
   /// Sends [image] as a sticker, as a reply to [repliedEventRowId] if set.
@@ -437,13 +433,32 @@ class RoomChatController(final ChatParams info)
   Future<void> sendBotCommand(
     BotCommandDraft draft, {
     int? repliedEventRowId,
-  }) => sendWithReply(
-    .message,
-    BotCommandMessageContent(body: draft.body, command: draft.input),
-    shouldMention: false,
-    mentionedUserIds: [draft.command.sender].lock,
-    repliedEventRowId: repliedEventRowId,
-  );
+  }) async {
+    final repliedEvent = repliedEventRowId == null
+        ? null
+        : ref
+              .read(RoomsController.provider)[info.roomId]
+              ?.events[repliedEventRowId];
+
+    final event = await ref
+        .read(ClientController.provider.notifier)
+        .sendMessage(
+          .new(
+            roomId: info.roomId,
+            text: "",
+            baseContent: BotCommandMessageContent(
+              body: draft.body,
+              command: draft.input,
+            ),
+            mentions: .new(userIds: [draft.command.sender].lock),
+            relation: repliedEvent == null
+                ? null
+                : .new(eventId: repliedEvent.eventId, relationType: .reply),
+          ),
+        );
+
+    addSent(event);
+  }
 
   /// Completes once the event has come down sync.
   Future<void> sendPollReference(

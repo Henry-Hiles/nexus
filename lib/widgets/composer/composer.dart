@@ -300,7 +300,8 @@ class const Composer(
 
     final botCommands = isEditing || hasReplacement || attachment != null
         ? const IList<BotCommand>.empty()
-        : ref.watch(BotCommandsController.provider(roomId));
+        : ref.watch(BotCommandsController.provider(roomId)).value ??
+              const .empty();
 
     void pickBotCommand(BotCommand command) {
       ref

@@ -24,6 +24,8 @@ class const BotCommand({
     "htmlmd",
   });
 
+  static const gomuksSender = "@gomuks";
+
   String get prefix => "/${description.command}";
   String get about => [botName, ?description.description].join(" · ");
 

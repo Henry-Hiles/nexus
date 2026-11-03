@@ -13,6 +13,7 @@ import "package:nexus/controllers/client_state.dart";
 import "package:nexus/controllers/settings.dart";
 import "package:nexus/helpers/extensions/gomuks_buffer.dart";
 import "package:nexus/main.dart";
+import "package:nexus/models/content/bot_command_description.dart";
 import "package:nexus/models/account.dart";
 import "package:nexus/models/capabilities.dart";
 import "package:nexus/models/content/message.dart";
@@ -240,8 +241,23 @@ class ClientController(final String? accountId) extends AsyncNotifier<int> {
   Future<void> redactEvent(RedactEventRequest report) =>
       _sendCommand("redact_event", report.toJson());
 
-  Future<Event> sendMessage(SendMessageRequest request) async =>
-      Event.fromJson(await _sendCommand("send_message", request.toJson()));
+  /// Null for gomuks' own commands that don't reply.
+  Future<Event?> sendMessage(SendMessageRequest request) async =>
+      switch (await _sendCommand("send_message", request.toJson())) {
+        final Map<String, dynamic> json => .fromJson(json),
+        _ => null,
+      };
+
+  /// The MSC4391 definitions of gomuks' own commands.
+  Future<IList<BotCommandDescriptionContent>> getCommandDefinitions() async =>
+      switch (await _sendCommand("get_command_definitions")) {
+        final List definitions => .new(
+          definitions.whereType<Map<String, dynamic>>().map(
+            BotCommandDescriptionContent.fromJson,
+          ),
+        ),
+        _ => const .empty(),
+      };
 
   Future<Event> sendEvent(SendEventRequest request) async =>
       Event.fromJson(await _sendCommand("send_event", request.toJson()));
