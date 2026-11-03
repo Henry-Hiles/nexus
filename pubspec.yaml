@@ -19,7 +19,6 @@ environment:
     sdk: ^3.13.3
 
 dependency_overrides:
-    path_provider_android: 2.2.23 # Pinned to avoid JNI
     dynamic_color: 2.1.0
     code_assets: 2.1.0 # webcrypto requires ^1.0.0, but works with 2.x
     webcrypto:
