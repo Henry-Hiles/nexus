@@ -482,6 +482,18 @@ class ClientController(final String? accountId) extends AsyncNotifier<int> {
   Future<void> deleteAlias(String alias) =>
       _sendCommand("delete_alias", {"alias": alias});
 
+  Future<bool> getRoomPublished(String roomId) async =>
+      (await _sendCommand("get_room_visibility", {
+        "room_id": roomId,
+      }))["visibility"] ==
+      "public";
+
+  Future<void> setRoomPublished(String roomId, bool published) =>
+      _sendCommand("publish_room", {
+        "room_id": roomId,
+        "visibility": published ? "public" : "private",
+      });
+
   /// The room [alias] points to, or null if it doesn't exist.
   Future<String?> resolveAlias(String alias) async {
     try {

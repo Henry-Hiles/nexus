@@ -10,6 +10,7 @@ import "package:nexus/controllers/power_level.dart";
 import "package:nexus/controllers/power_levels_saving.dart";
 import "package:nexus/controllers/room_image_packs.dart";
 import "package:nexus/controllers/room_power_levels.dart";
+import "package:nexus/controllers/room_published.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/controllers/space_edges.dart";
 import "package:nexus/helpers/extensions/join_rule_name.dart";
@@ -553,6 +554,39 @@ class RoomSettingsSectionsController(final String roomId)
                         ),
                       ).onError(showError)
                     : null,
+              ),
+            ),
+            .new(
+              title: "Publish to Room Directory",
+              description: "List the room in your homeserver's directory.",
+              icon: Icons.travel_explore,
+              builder: (title, description, icon) => HookConsumer(
+                builder: (context, ref, _) {
+                  final saving = Saving.use();
+                  final published = ref.watch(
+                    RoomPublishedController.provider(roomId),
+                  );
+
+                  return SwitchListTile(
+                    secondary: Icon(icon),
+                    title: Text(title),
+                    subtitle: Text(description),
+                    value: published.value ?? false,
+                    onChanged:
+                        canSetAliases && published.hasValue && !saving.active
+                        ? (value) => saving.run(
+                            () => ref
+                                .read(
+                                  RoomPublishedController.provider(
+                                    roomId,
+                                  ).notifier,
+                                )
+                                .set(value)
+                                .onError(showError),
+                          )
+                        : null,
+                  );
+                },
               ),
             ),
           ]),
