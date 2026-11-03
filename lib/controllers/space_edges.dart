@@ -7,7 +7,10 @@ class SpaceEdgesController extends Notifier<IMap<String, IList<SpaceEdge>>> {
   @override
   IMap<String, IList<SpaceEdge>> build() => .new();
 
-  void handleSync(SyncData sync) => state = sync.spaceEdges ?? state;
+  void handleSync(SyncData sync) {
+    if (sync.clearState) state = .new();
+    state = state.addAll(sync.spaceEdges ?? const .empty());
+  }
 
   static final provider =
       NotifierProvider<SpaceEdgesController, IMap<String, IList<SpaceEdge>>>(
