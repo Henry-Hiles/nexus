@@ -52,9 +52,6 @@ dependency_overrides:
         git:
             url: https://github.com/appelladev/linkify
             ref: fix/consecutive-periods-loose-url
-    window_manager:
-        git:
-            url: https://github.com/leanflutter/window_manager
 
 dependencies:
     flutter:
@@ -72,7 +69,7 @@ dependencies:
     path: 1.9.1
     dynamic_color: 2.1.0
     collection: 1.19.1
-    window_manager: 0.5.2
+    window_manager: 0.6.0
     color_hash: 1.0.1
     flutter_widget_from_html_core: 0.18.0-beta.1
     flutter_svg: 2.3.0

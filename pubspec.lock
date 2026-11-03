@@ -213,10 +213,10 @@ packages:
     dependency: transitive
     description:
       name: cnativeapi
-      sha256: "251fb93cd7ec205445fa512ee5ddeb0b82b3273d071cfc0784ddffbbdebbf5d3"
+      sha256: "3c9e30d513cdc8ecb116f3017308f2480828c766e45aa00083c3d15d621e5d57"
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.2"
+    version: "0.5.8"
   code_assets:
     dependency: "direct main"
     description:
@@ -1134,18 +1134,18 @@ packages:
     dependency: transitive
     description:
       name: nativeapi
-      sha256: c4625e81f5ce2f4a9044c0ec1bdb38355119ffcf89e24eb20ae9fc5027a01e59
+      sha256: "87b0912bde3c9b7e0649c5e12047baf2bf179d3844a9b984313e897872120267"
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.2"
+    version: "0.5.8"
   nativeapi_flutter:
     dependency: transitive
     description:
       name: nativeapi_flutter
-      sha256: "4feaa68cb5c4fc3b2eeaee1a25e56e2d092178e1c59516d9db5dd34940dcf36c"
+      sha256: b62a42b8a86538119ba67b8eab8328eb89d69ac4a2142d623d08ac163faa9cd8
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.2"
+    version: "0.5.8"
   navigation_rail_m3e:
     dependency: "direct main"
     description:
@@ -1846,11 +1846,10 @@ packages:
   window_manager:
     dependency: "direct main"
     description:
-      path: "."
-      ref: HEAD
-      resolved-ref: "80acd536a1ea1c121c36e32d30e638a295087ed1"
-      url: "https://github.com/leanflutter/window_manager"
-    source: git
+      name: window_manager
+      sha256: bdd6b1a2c1ce50f3bba7ffbaa0d5dc5feb6b6a24fd20269da4de90244f77a471
+      url: "https://pub.dev"
+    source: hosted
     version: "0.6.0"
   wkt_parser:
     dependency: transitive
