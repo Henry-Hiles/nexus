@@ -29,7 +29,10 @@ final class const LinkifiedText(
                 ),
               LinkableElement(:final text, :final url) => TextSpan(
                 text: text,
-                style: .new(color: Theme.of(context).colorScheme.primary),
+                style: .new(
+                  color: Theme.of(context).colorScheme.primary,
+                  decoration: .underline,
+                ),
                 mouseCursor: SystemMouseCursors.click,
                 recognizer: TapGestureRecognizer()
                   ..onTap = () =>
