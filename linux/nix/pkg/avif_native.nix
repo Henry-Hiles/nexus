@@ -9,11 +9,11 @@ let
   artifacts = {
     x86_64-linux = {
       arch = "x64";
-      sha256 = "252b064f8ff4f0f265bc44294d4a7ed703dd7199688942c272dd8aa8d3039d5a";
+      sha256 = "fa36210bc95b70abd14c20fd626204f57d0ef947297e9ff8ee66855c01e2c17f";
     };
     aarch64-linux = {
       arch = "arm64";
-      sha256 = "cdcf17cfd18b9b0f965b72615ddf11246121114577dc570d0bba25964e56c726";
+      sha256 = "163487e98b5eee0676be0dc8d3f60b5e0e5b67191a8a0a2abb5c8fad14a3a506";
     };
   };
   inherit (artifacts.${stdenv.hostPlatform.system}) arch sha256;
@@ -28,7 +28,7 @@ stdenv.mkDerivation {
   nativeBuildInputs = [ jq ];
 
   library = fetchurl {
-    url = "https://github.com/Zhangw1998/avif_native/releases/download/native-v0.1.0/${key}-libavif_native.so.gz";
+    url = "https://github.com/Zhangw1998/avif_native/releases/download/native-v0.2.0/${key}-libavif_native.so.gz";
     inherit sha256;
   };
 
