@@ -17,6 +17,7 @@ import "package:nexus/models/content/name.dart";
 import "package:nexus/models/content/topic.dart";
 import "package:nexus/models/invited_room.dart";
 import "package:nexus/models/room_summary.dart";
+import "package:nexus/models/sync_data.dart";
 
 /// Pending invites, newest first.
 class InvitesController extends Notifier<IList<RoomSummary>> {
@@ -101,6 +102,15 @@ class InvitesController extends Notifier<IList<RoomSummary>> {
     state = newInvites
         .addAll(state.where((invite) => !newRoomIds.contains(invite.roomId)))
         .removeWhere((invite) => removed.contains(invite.roomId));
+  }
+
+  void handleSync(SyncData sync) {
+    if (sync.clearState) state = .new();
+    update(
+      sync.invitedRooms,
+      joinedRooms: sync.rooms.keys.toISet(),
+      leftRooms: sync.leftRooms,
+    );
   }
 
   void remove(String roomId) =>

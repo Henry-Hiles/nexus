@@ -1,5 +1,6 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
+import "package:nexus/models/sync_data.dart";
 import "package:nexus/models/typing.dart";
 
 class TypingController extends Notifier<IMap<String, IList<String>>> {
@@ -7,6 +8,10 @@ class TypingController extends Notifier<IMap<String, IList<String>>> {
   IMap<String, IList<String>> build() => .new();
 
   void set(Typing typing) => state = state.add(typing.roomId, typing.userIds);
+
+  void handleSync(SyncData sync) {
+    if (sync.clearState) state = .new();
+  }
 
   static final provider =
       NotifierProvider<TypingController, IMap<String, IList<String>>>(

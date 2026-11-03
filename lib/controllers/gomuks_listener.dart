@@ -4,7 +4,6 @@ import "dart:io";
 import "dart:isolate";
 
 import "package:collection/collection.dart";
-import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/foundation.dart";
 import "package:nexus/controllers/account_data.dart";
 import "package:nexus/controllers/accounts.dart";
@@ -22,9 +21,7 @@ import "package:nexus/controllers/typing.dart";
 import "package:nexus/helpers/extensions/gomuks_buffer.dart";
 import "package:nexus/main.dart";
 import "package:ffi/ffi.dart";
-import "package:nexus/models/event.dart";
-import "package:nexus/models/events_decrypted.dart";
-import "package:nexus/models/sync_data.dart";
+import "package:nexus/models/gomuks_event.dart";
 import "package:nexus/src/third_party/gomuks.g.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 
@@ -42,100 +39,43 @@ class GomuksListenerController extends AsyncNotifier<void> {
           int requestId,
           GomuksOwnedBuffer data,
         ) {
+          final type = command.cast<Utf8>().toDartString();
           try {
-            final muksEventType = command.cast<Utf8>().toDartString();
-            debugPrint("Handling $muksEventType...");
-            final decodedMuksEvent = data.toJsonAndFree();
-
-            switch (muksEventType) {
-              case "client_state":
-                ref
-                    .read(ClientStateController.provider.notifier)
-                    .set(.fromJson(decodedMuksEvent));
-              case "sync_status":
-                ref
-                    .read(SyncStatusController.provider.notifier)
-                    .set(.fromJson(decodedMuksEvent));
-              case "init_complete":
+            debugPrint("Handling $type...");
+            switch (GomuksEvent.parse(type, data.toJsonAndFree())) {
+              case ClientStateEvent(:final state):
+                ref.read(ClientStateController.provider.notifier).set(state);
+              case SyncStatusEvent(:final status):
+                ref.read(SyncStatusController.provider.notifier).set(status);
+              case InitCompleteEvent():
                 ref.read(InitCompleteController.provider.notifier).complete();
-              case "send_complete":
-                final event = Event.fromJson(decodedMuksEvent["event"]);
+              case SendCompleteEvent(:final event):
+                ref.read(RoomsController.provider.notifier).storeEvents([
+                  event,
+                ]);
+              case TypingEvent(:final typing):
+                ref.read(TypingController.provider.notifier).set(typing);
+              case EventsDecryptedEvent(:final decrypted):
                 ref
                     .read(RoomsController.provider.notifier)
-                    .update(
-                      .new({
-                        event.roomId: .new(events: .new({event.rowId: event})),
-                      }),
-                    );
-              case "typing":
+                    .handleDecrypted(decrypted);
+              case SyncCompleteEvent(:final sync):
+                ref.read(RoomsController.provider.notifier).handleSync(sync);
                 ref
-                    .read(TypingController.provider.notifier)
-                    .set(.fromJson(decodedMuksEvent));
-              case "events_decrypted":
-                final decrypted = EventsDecrypted.fromJson(decodedMuksEvent);
-                final metadata = ref
-                    .read(RoomsController.provider)[decrypted.roomId]
-                    ?.metadata;
-
+                    .read(AccountDataController.provider.notifier)
+                    .handleSync(sync);
+                ref.read(InvitesController.provider.notifier).handleSync(sync);
+                ref.read(TypingController.provider.notifier).handleSync(sync);
                 ref
-                    .read(RoomsController.provider.notifier)
-                    .update(
-                      .new({
-                        decrypted.roomId: .new(
-                          events: decrypted.events,
-                          metadata: metadata?.copyWith(
-                            previewEventRowID:
-                                decrypted.previewEventRowID ??
-                                metadata.previewEventRowID,
-                            sortingTimestamp:
-                                decrypted.sortingTimestamp ??
-                                metadata.sortingTimestamp,
-                          ),
-                        ),
-                      }),
-                    );
-              case "sync_complete":
-                final syncData = SyncData.fromJson(decodedMuksEvent);
-                final roomProvider = RoomsController.provider;
-                final accountDataProvider = AccountDataController.provider;
-                final invitesProvider = InvitesController.provider;
-
-                if (syncData.clearState) {
-                  ref.invalidate(roomProvider);
-                  ref.invalidate(accountDataProvider);
-                  ref.invalidate(invitesProvider);
-                  ref.invalidate(TypingController.provider);
-                }
-
+                    .read(TopLevelSpacesController.provider.notifier)
+                    .handleSync(sync);
                 ref
-                    .read(roomProvider.notifier)
-                    .update(syncData.rooms, syncData.leftRooms);
-                ref
-                    .read(accountDataProvider.notifier)
-                    .update(syncData.accountData);
-                ref
-                    .read(invitesProvider.notifier)
-                    .update(
-                      syncData.invitedRooms,
-                      joinedRooms: syncData.rooms.keys.toISet(),
-                      leftRooms: syncData.leftRooms,
-                    );
-
-                if (syncData.topLevelSpaces case final topLevelSpaces?) {
-                  ref
-                      .read(TopLevelSpacesController.provider.notifier)
-                      .set(topLevelSpaces);
-                }
-
-                if (syncData.spaceEdges case final spaceEdges?) {
-                  ref
-                      .read(SpaceEdgesController.provider.notifier)
-                      .set(spaceEdges);
-                }
-              default:
-                debugPrint("Unhandled event: $muksEventType");
+                    .read(SpaceEdgesController.provider.notifier)
+                    .handleSync(sync);
+              case UnknownGomuksEvent():
+                debugPrint("Unhandled event: $type");
             }
-            debugPrint("Finished handling $muksEventType...");
+            debugPrint("Finished handling $type...");
           } catch (error, stackTrace) {
             if (kDebugMode) {
               debugPrintStack(stackTrace: stackTrace, label: error.toString());

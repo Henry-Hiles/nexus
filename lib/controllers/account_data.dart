@@ -8,6 +8,7 @@ import "package:nexus/controllers/client.dart";
 import "package:nexus/models/account_data.dart";
 import "package:nexus/models/push_rules.dart";
 import "package:nexus/models/requests/update_push_rule.dart";
+import "package:nexus/models/sync_data.dart";
 
 class AccountDataController extends Notifier<AccountData> {
   @override
@@ -25,6 +26,11 @@ class AccountDataController extends Notifier<AccountData> {
           return data;
         }
       });
+
+  void handleSync(SyncData sync) {
+    if (sync.clearState) state = .new();
+    update(sync.accountData);
+  }
 
   Future<void> setEnabledImagePacks(ImagePackRooms packs) {
     ISet<(String, String)> keysOf(ImagePackRooms rooms) => rooms.rooms.entries

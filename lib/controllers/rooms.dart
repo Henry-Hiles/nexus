@@ -4,8 +4,10 @@ import "package:collection/collection.dart";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/models/event.dart";
+import "package:nexus/models/events_decrypted.dart";
 import "package:nexus/models/read_receipt.dart";
 import "package:nexus/models/room.dart";
+import "package:nexus/models/sync_data.dart";
 
 class RoomsController extends Notifier<IMap<String, Room>> {
   @override
@@ -81,6 +83,29 @@ class RoomsController extends Notifier<IMap<String, Room>> {
           ),
     ),
   );
+
+  void handleSync(SyncData sync) {
+    if (sync.clearState) state = .new();
+    update(sync.rooms, sync.leftRooms);
+  }
+
+  void handleDecrypted(EventsDecrypted decrypted) {
+    final metadata = state[decrypted.roomId]?.metadata;
+
+    update(
+      .new({
+        decrypted.roomId: .new(
+          events: decrypted.events,
+          metadata: metadata?.copyWith(
+            previewEventRowID:
+                decrypted.previewEventRowID ?? metadata.previewEventRowID,
+            sortingTimestamp:
+                decrypted.sortingTimestamp ?? metadata.sortingTimestamp,
+          ),
+        ),
+      }),
+    );
+  }
 
   static IMap<String, ISet<int>> addRelations(
     IMap<String, ISet<int>> relations,
