@@ -75,6 +75,7 @@ class const PollRenderer(final Event event, final PollStart poll, {super.key})
     ) async {
       pending.value = action;
       await send().onError(showError);
+      if (!context.mounted) return;
       // Otherwise the old votes show until they're refetched
       await ref.read(votesProvider.future).onError((_, _) => const .new());
       if (context.mounted) pending.value = null;

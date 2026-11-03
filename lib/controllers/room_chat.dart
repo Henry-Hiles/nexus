@@ -466,6 +466,8 @@ class RoomChatController(final ChatParams info)
     EventType type,
     Content content,
   ) async {
+    // The end event lands in the timeline and rebuilds this, so no ref after awaiting
+    final rooms = ref.read(RoomsController.provider.notifier);
     final event = await ref
         .read(ClientController.provider.notifier)
         .sendEvent(
@@ -481,9 +483,7 @@ class RoomChatController(final ChatParams info)
 
     if (event.sendFailed) throw Exception(event.sendError);
 
-    await ref
-        .read(RoomsController.provider.notifier)
-        .awaitEvent(info.roomId, event.eventId);
+    await rooms.awaitEvent(info.roomId, event.eventId);
   }
 
   /// An empty [answers] removes the vote.
