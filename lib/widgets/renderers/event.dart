@@ -533,7 +533,10 @@ class const EventRenderer(
             ].map((child) => Padding(padding: .only(left: 4), child: child)),
           ]
         else if (textOnly)
-          Text("Unknown event type", style: errorStyle),
+          Text(
+            event.redactedBy == null ? "Unknown event type" : "Redacted event",
+            style: errorStyle,
+          ),
       ],
     );
   }
