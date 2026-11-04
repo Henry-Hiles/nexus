@@ -1,3 +1,4 @@
 [submodule "gomuks"]
 	path = gomuks
 	url = https://github.com/gomuks/gomuks
+	branch = quad/nexus
