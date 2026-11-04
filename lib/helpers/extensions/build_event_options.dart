@@ -82,6 +82,18 @@ extension BuildEventOptions on Event {
       );
     }
 
+    if (eventId.isFake) {
+      return [
+        PopupMenuItem(
+          onTap: () => ref.read(notifier).hideClientSticky(rowId),
+          child: ListTile(
+            leading: Icon(Icons.delete, color: danger),
+            title: Text("Hide", style: .new(color: danger)),
+          ),
+        ),
+      ].lock;
+    }
+
     return .new([
       if (ref.read(
         PowerLevelController.provider(
@@ -242,11 +254,10 @@ extension BuildEventOptions on Event {
         ),
 
       if (ref.read(
-            PowerLevelController.provider(
-              .redaction(targetUser: sender, roomId: roomId),
-            ),
-          ) &&
-          !eventId.isFake)
+        PowerLevelController.provider(
+          .redaction(targetUser: sender, roomId: roomId),
+        ),
+      ))
         PopupMenuItem(
           onTap: () => showReasonSheet(
             title: "Delete Message",
@@ -260,15 +271,6 @@ extension BuildEventOptions on Event {
           child: ListTile(
             leading: Icon(Icons.delete, color: danger),
             title: Text("Delete", style: .new(color: danger)),
-          ),
-        ),
-
-      if (eventId.isFake)
-        PopupMenuItem(
-          onTap: () => ref.read(notifier).hideClientSticky(rowId),
-          child: ListTile(
-            leading: Icon(Icons.delete, color: danger),
-            title: Text("Hide", style: .new(color: danger)),
           ),
         ),
 
