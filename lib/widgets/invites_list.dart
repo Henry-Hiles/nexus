@@ -3,8 +3,8 @@ import "package:material_ui/material_ui.dart";
 import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
 import "package:nexus/controllers/invites.dart";
 import "package:nexus/helpers/extensions/get_localpart.dart";
+import "package:nexus/helpers/extensions/room_summary_display.dart";
 import "package:nexus/main.dart";
-import "package:nexus/models/content/create.dart";
 import "package:nexus/models/nav_page.dart";
 import "package:nexus/models/room_summary.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
@@ -120,13 +120,7 @@ class const InviteCard(final RoomSummary invite, {super.key})
           invite.avatarUrl,
           name,
           dimension: 40,
-          fallback: invite.isDirect
-              ? null
-              : Icon(
-                  invite.roomType == RoomType.space
-                      ? Icons.workspaces
-                      : Icons.numbers,
-                ),
+          fallback: invite.isDirect ? null : Icon(invite.icon),
         ),
         title: Text(name, maxLines: 1, overflow: .ellipsis),
         subtitle: Text(

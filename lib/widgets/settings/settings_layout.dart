@@ -12,6 +12,7 @@ import "package:nexus/models/settings_category.dart";
 import "package:nexus/widgets/pages/settings_category.dart";
 import "package:nexus/widgets/divider_text.dart";
 import "package:nexus/widgets/highlight_wrapper.dart";
+import "package:nexus/widgets/m3e_rail_theme.dart";
 import "package:super_sliver_list/super_sliver_list.dart";
 
 /// A settings screen split into categories: a list of them that opens each
@@ -170,8 +171,8 @@ class const SettingsLayout({
                       )
                     : Row(
                         children: [
-                          MaterialUiCompatibilityBridge(
-                            child: NavigationRailM3E(
+                          M3ERailTheme(
+                            builder: (_) => NavigationRailM3E(
                               type: .alwaysExpand,
                               trailing: searchBar,
                               scrollable: true,

@@ -17,6 +17,7 @@ extension JoinRoom on BuildContext {
   }) async {
     final container = ProviderScope.containerOf(this);
     final messenger = ScaffoldMessenger.of(this);
+    final navigator = Navigator.of(this);
 
     final roomId = await withProgressSnackbar(
       "Joining $name...",
@@ -31,6 +32,7 @@ extension JoinRoom on BuildContext {
         action: .new(
           label: "Open",
           onPressed: () async {
+            navigator.popUntil((route) => route.isFirst);
             await container.focusRoom(roomId);
             container.read(SidebarPageController.provider.notifier).set(.rooms);
           },

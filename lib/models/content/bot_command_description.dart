@@ -2,6 +2,7 @@ import "package:collection/collection.dart";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:freezed_annotation/freezed_annotation.dart";
 import "package:nexus/helpers/extensions/get_link_info.dart";
+import "package:nexus/helpers/extensions/get_localpart.dart";
 import "package:nexus/models/content/content.dart";
 
 part "bot_command_description.freezed.dart";
@@ -181,10 +182,6 @@ enum BotPrimitiveType(final String label, final String expected) {
   @JsonValue("event_id")
   eventId("event", r"a message link or event ID like $abc");
 
-  static final serverNamePattern = RegExp(
-    r"^(\[[0-9A-Fa-f:.]+\]|[A-Za-z0-9.-]+)(:\d{1,5})?$",
-  );
-
   Object? parse(String text, {required String roomId}) {
     final (:identifier, :eventId, :via) =
         text.linkInfo ??
@@ -206,7 +203,7 @@ enum BotPrimitiveType(final String label, final String expected) {
         identifier,
       .roomAlias when identifier.startsWith("#") && identifier.contains(":") =>
         identifier,
-      .serverName when serverNamePattern.hasMatch(text) => text,
+      .serverName when text.isValidServerName => text,
       .roomId when identifier.startsWith("!") && eventId == null => {
         "type": "room_id",
         "id": identifier,

@@ -10,6 +10,7 @@ import "package:nexus/controllers/rooms.dart";
 import "package:nexus/controllers/space_hierarchy.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
 import "package:nexus/helpers/extensions/join_room.dart";
+import "package:nexus/helpers/extensions/room_summary_display.dart";
 import "package:nexus/helpers/extensions/show_leave_room_sheet.dart";
 import "package:nexus/helpers/extensions/with_progress_snackbar.dart";
 import "package:nexus/main.dart";
@@ -163,10 +164,7 @@ class const SpaceHierarchySheet(final String spaceId, {super.key})
           keyMapper: (room) => room.summary.roomId,
           values: hierarchy.rooms,
         );
-        final spaceName =
-            byId[spaceId]?.summary.name ??
-            byId[spaceId]?.summary.canonicalAlias ??
-            "Unnamed Space";
+        final spaceName = byId[spaceId]?.summary.displayName ?? "Unnamed Space";
         final children = (byId[spaceId]?.children ?? const .empty())
             .map(
               (child) => switch (byId[child.roomId]) {
@@ -197,16 +195,13 @@ class const SpaceHierarchySheet(final String spaceId, {super.key})
                 Builder(
                   builder: (context) {
                     final summary = room.summary;
-                    final name =
-                        summary.name ??
-                        summary.canonicalAlias ??
-                        "Unnamed Room";
+                    final name = summary.displayName;
 
                     return ListTile(
                       leading: AvatarOrHash(
                         summary.avatarUrl,
                         name,
-                        fallback: const Icon(Icons.numbers),
+                        fallback: Icon(summary.icon),
                       ),
                       title: Text(name, maxLines: 1, overflow: .ellipsis),
                       subtitle: summary.topic == null
@@ -239,10 +234,7 @@ class const SpaceHierarchySheet(final String spaceId, {super.key})
                   builder: (context, ref, _) {
                     final expanded = useState(false);
                     final summary = room.summary;
-                    final name =
-                        summary.name ??
-                        summary.canonicalAlias ??
-                        "Unnamed Space";
+                    final name = summary.displayName;
                     final joined = joinedIds.contains(summary.roomId);
 
                     return Column(
@@ -255,7 +247,7 @@ class const SpaceHierarchySheet(final String spaceId, {super.key})
                           leading: AvatarOrHash(
                             summary.avatarUrl,
                             name,
-                            fallback: const Icon(Icons.workspaces),
+                            fallback: Icon(summary.icon),
                           ),
                           title: Text(name, maxLines: 1, overflow: .ellipsis),
                           subtitle: summary.topic == null
@@ -390,7 +382,7 @@ class const SpaceHierarchySheet(final String spaceId, {super.key})
                     ),
                   Expanded(
                     child: Text(
-                      space?.name ?? space?.canonicalAlias ?? "Unnamed Space",
+                      space?.displayName ?? "Unnamed Space",
                       overflow: .ellipsis,
                       maxLines: 3,
                     ),

@@ -7,6 +7,7 @@ import "package:nexus/controllers/invites.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/helpers/extensions/get_localpart.dart";
 import "package:nexus/helpers/extensions/join_room.dart";
+import "package:nexus/helpers/extensions/room_summary_display.dart";
 import "package:nexus/main.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 import "package:nexus/widgets/expandable_image.dart";
@@ -44,15 +45,11 @@ class const RoomSummarySheet(
                 summary.avatarUrl,
                 "",
                 dimension: 64,
-                fallback: Icon(Icons.numbers),
+                fallback: Icon(summary.icon),
               ),
             ),
           Expanded(
-            child: Text(
-              summary.name ?? summary.canonicalAlias ?? "Unnamed Room",
-              overflow: .ellipsis,
-              maxLines: 3,
-            ),
+            child: Text(summary.displayName, overflow: .ellipsis, maxLines: 3),
           ),
         ],
       ),

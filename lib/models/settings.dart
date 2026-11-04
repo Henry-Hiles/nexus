@@ -1,3 +1,4 @@
+import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:material_ui/material_ui.dart";
 import "package:freezed_annotation/freezed_annotation.dart";
 import "package:nexus/models/name_color.dart";
@@ -25,6 +26,10 @@ class const Settings({
   /// When not sending, read receipts are still sent privately, so that the
   /// user's other devices know what has been read.
   final ShowAndSend readReceipts = .showAndSend,
+  final IList<String> directoryServers = const IListConst([
+    "matrix.org",
+    "matrixrooms.info",
+  ]),
 }) with _$Settings {
   Map<String, Object?> toJson() => _$SettingsToJson(this);
 
