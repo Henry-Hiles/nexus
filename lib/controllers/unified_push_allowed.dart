@@ -1,7 +1,7 @@
 import "dart:io";
 
 import "package:flutter_riverpod/flutter_riverpod.dart";
-import "package:nexus/controllers/client.dart";
+import "package:nexus/controllers/capabilities.dart";
 import "package:nexus/controllers/unified_push_distributors.dart";
 
 class UnifiedPushAllowedController extends AsyncNotifier<String?> {
@@ -19,9 +19,9 @@ class UnifiedPushAllowedController extends AsyncNotifier<String?> {
           : "Your platform is not currently supported by UnifiedPush"}.";
     }
 
-    final capabilities = await ref
-        .read(ClientController.provider.notifier)
-        .getCapabilities();
+    final capabilities = await ref.watch(
+      CapabilitiesController.provider.future,
+    );
 
     if (capabilities.webpush?.vapid == null) {
       return "Your homeserver does not support MSC4174 (Web Push), and therefore cannot send notifications to Nexus.";

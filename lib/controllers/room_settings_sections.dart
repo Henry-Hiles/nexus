@@ -14,6 +14,7 @@ import "package:nexus/controllers/room_published.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/controllers/space_edges.dart";
 import "package:nexus/helpers/extensions/join_rule_name.dart";
+import "package:nexus/helpers/extensions/room_version_at_least.dart";
 import "package:nexus/helpers/file_dialog_helper.dart";
 import "package:nexus/helpers/hooks/saving.dart";
 import "package:nexus/main.dart";
@@ -29,6 +30,7 @@ import "package:nexus/models/content/membership.dart";
 import "package:nexus/models/content/message.dart";
 import "package:nexus/models/content/name.dart";
 import "package:nexus/models/content/power_levels.dart";
+import "package:nexus/models/content/tombstone.dart";
 import "package:nexus/models/content/topic.dart";
 import "package:nexus/models/join_rule.dart";
 import "package:nexus/models/power_level_permission.dart";
@@ -46,6 +48,7 @@ import "package:nexus/widgets/settings/local_aliases_sheet.dart";
 import "package:nexus/widgets/settings/power_level_entry_sheet.dart";
 import "package:nexus/widgets/settings/power_level_tile.dart";
 import "package:nexus/widgets/settings/text_setting_tile.dart";
+import "package:nexus/widgets/settings/upgrade_room_sheet.dart";
 
 class RoomSettingsSectionsController(final String roomId)
     extends AsyncNotifier<IMap<String, IList<SettingsCategory>>> {
@@ -122,18 +125,18 @@ class RoomSettingsSectionsController(final String roomId)
       ?canonicalAlias.alias,
     ]).toISet();
 
-    final roomVersion = switch (stateContent(.create)) {
-      CreateContent(:final roomVersion) => int.tryParse(roomVersion),
+    final versionName = switch (stateContent(.create)) {
+      CreateContent(:final roomVersion) => roomVersion,
       _ => null,
     };
-    bool versionAtLeast(int version) =>
-        roomVersion == null || roomVersion >= version;
+    final canUpgrade =
+        canSet(.tombstone) && stateContent(.tombstone) is! TombstoneContent;
     final joinRuleOptions = [
       JoinRule.public,
       JoinRule.invite,
-      if (versionAtLeast(7)) JoinRule.knock,
-      if (versionAtLeast(8)) JoinRule.restricted,
-      if (versionAtLeast(10)) JoinRule.knockRestricted,
+      if (versionName.versionAtLeast(7)) JoinRule.knock,
+      if (versionName.versionAtLeast(8)) JoinRule.restricted,
+      if (versionName.versionAtLeast(10)) JoinRule.knockRestricted,
     ];
     bool isRestricted(JoinRule rule) =>
         rule == .restricted || rule == .knockRestricted;
@@ -577,14 +580,59 @@ class RoomSettingsSectionsController(final String roomId)
                         ? (value) => saving.run(
                             () => ref
                                 .read(
-                                  RoomPublishedController.provider(
-                                    roomId,
-                                  ).notifier,
+                                  RoomPublishedController.provider(roomId)
+                                      .notifier,
                                 )
                                 .set(value)
                                 .onError(showError),
                           )
                         : null,
+                  );
+                },
+              ),
+            ),
+            .new(
+              title: "Room Version",
+              description: "The rules the room follows, set when it's created.",
+              icon: Icons.upgrade,
+              builder: (title, description, icon) => HookBuilder(
+                builder: (context) {
+                  final saving = Saving.use();
+
+                  return ListTile(
+                    leading: Icon(icon),
+                    title: Text(title),
+                    subtitle: Text(
+                      versionName == null
+                          ? description
+                          : "Version $versionName",
+                    ),
+                    trailing: TextButton(
+                      onPressed:
+                          canUpgrade && versionName != null && !saving.active
+                          ? () => context.showAdaptiveSheet(
+                              (_) => UpgradeRoomSheet(
+                                roomId: roomId,
+                                currentVersion: versionName,
+                                creators: roomPowerLevels.creators.remove(
+                                  userId ?? "",
+                                ),
+                                userId: userId,
+                                onSave: (version, creators) => saving.run(
+                                  () => client
+                                      .upgradeRoom(
+                                        roomId,
+                                        version,
+                                        additionalCreators: creators,
+                                      )
+                                      .then<void>((_) {})
+                                      .onError(showError),
+                                ),
+                              ),
+                            )
+                          : null,
+                      child: Text("Upgrade"),
+                    ),
                   );
                 },
               ),

@@ -488,11 +488,21 @@ class ClientController(final String? accountId) extends AsyncNotifier<int> {
       }))["visibility"] ==
       "public";
 
-  Future<void> setRoomPublished(String roomId, bool published) =>
-      _sendCommand("publish_room", {
-        "room_id": roomId,
-        "visibility": published ? "public" : "private",
-      });
+  Future<void> setRoomPublished(String roomId, bool published) => _sendCommand(
+    "publish_room",
+    {"room_id": roomId, "visibility": published ? "public" : "private"},
+  );
+
+  Future<String> upgradeRoom(
+    String roomId,
+    String version, {
+    ISet<String> additionalCreators = const .empty(),
+  }) async => (await _sendCommand("upgrade_room", {
+    "room_id": roomId,
+    "new_version": version,
+    if (additionalCreators.isNotEmpty)
+      "additional_creators": additionalCreators.toList(),
+  }))["replacement_room"];
 
   /// The room [alias] points to, or null if it doesn't exist.
   Future<String?> resolveAlias(String alias) async {

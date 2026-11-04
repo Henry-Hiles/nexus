@@ -1,6 +1,7 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/rooms.dart";
+import "package:nexus/helpers/extensions/room_version_at_least.dart";
 import "package:nexus/models/content/content.dart";
 import "package:nexus/models/content/create.dart";
 import "package:nexus/models/content/power_levels.dart";
@@ -26,8 +27,7 @@ class RoomPowerLevelsController(final String roomId)
       _ => null,
     };
     // Creators only outrank everyone from room version 12, earlier ones just have a power level
-    final creatorsPrivileged =
-        (int.tryParse(create?.roomVersion ?? "") ?? 0) >= 12;
+    final creatorsPrivileged = (create?.roomVersion).versionAtLeast(12);
 
     return .new(
       content: switch (stateEvent(.powerLevels)?.content) {

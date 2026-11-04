@@ -8,6 +8,7 @@ import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:intl/intl.dart";
 import "package:nexus/controllers/accounts.dart";
 import "package:nexus/controllers/active_account.dart";
+import "package:nexus/controllers/capabilities.dart";
 import "package:nexus/controllers/selected_room.dart";
 import "package:nexus/controllers/notification.dart";
 import "package:nexus/controllers/client_state.dart";
@@ -215,9 +216,9 @@ class UnifiedPushController extends AsyncNotifier<String?> {
     state = .loading();
     try {
       await Future(() async {
-        final capabilities = await ref
-            .read(ClientController.provider.notifier)
-            .getCapabilities();
+        final capabilities = await ref.read(
+          CapabilitiesController.provider.future,
+        );
 
         if (capabilities.webpush?.vapid == null) {
           throw UnsupportedError(
