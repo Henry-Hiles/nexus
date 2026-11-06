@@ -204,7 +204,12 @@ class const Composer(
     // the controller, which is also told about the draft being restored
     // during the build
     void onFormattedTextChanged(String text) {
-      if (text == ref.read(draftProvider).text) return;
+      final draft = ref.read(draftProvider);
+      if (text == draft.text ||
+          (draft.isEditing ? draft.relatedEvent : null) != editingEvent) {
+        return;
+      }
+
       draftNotifier.update(
         (draft) => draft.copyWith(text: text, tags: controller.tags.toIList()),
       );
