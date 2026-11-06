@@ -2,7 +2,6 @@ import "dart:convert";
 import "dart:ffi";
 import "dart:typed_data";
 
-import "package:ffi/ffi.dart";
 import "package:nexus/src/third_party/gomuks.g.dart";
 
 extension GomuksOwnedBufferToX on GomuksOwnedBuffer {
@@ -29,13 +28,13 @@ extension JsonToGomuksBuffer on Map<String, dynamic> {
     return buffer;
   }
 
-  Pointer<GomuksBorrowedBuffer> toGomuksBufferPtr() {
+  Pointer<GomuksBorrowedBuffer> toGomuksBufferPtr(Allocator allocator) {
     final bytes = utf8.encode(json.encode(this));
 
-    final dataPtr = calloc<Uint8>(bytes.length);
+    final dataPtr = allocator<Uint8>(bytes.length);
     dataPtr.asTypedList(bytes.length).setAll(0, bytes);
 
-    return calloc<GomuksBorrowedBuffer>()
+    return allocator<GomuksBorrowedBuffer>()
       ..ref.base = dataPtr
       ..ref.length = bytes.length;
   }

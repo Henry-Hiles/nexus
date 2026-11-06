@@ -79,34 +79,26 @@ class ClientController(final String? accountId) extends AsyncNotifier<int> {
     final environment = await _environment(account);
 
     debugPrint("Setting Gomuks env for $account...");
-    for (final MapEntry(:key, :value) in environment.entries) {
-      final keyPtr = key.toNativeUtf8().cast<Char>();
-      final valuePtr = value.toNativeUtf8().cast<Char>();
-      try {
-        GomuksSetEnv(keyPtr, valuePtr);
-      } finally {
-        calloc
-          ..free(keyPtr)
-          ..free(valuePtr);
+    using((arena) {
+      for (final MapEntry(:key, :value) in environment.entries) {
+        GomuksSetEnv(
+          key.toNativeUtf8(allocator: arena).cast(),
+          value.toNativeUtf8(allocator: arena).cast(),
+        );
       }
-    }
+    }, malloc);
 
     debugPrint("Initializing Gomuks...");
-    final bufferPointer = GomuksConfig(
+    final config = GomuksConfig(
       matrix: .new(
         initialDeviceDisplayName:
             "Nexus on ${toBeginningOfSentenceCase(Platform.operatingSystem)}",
       ),
-    ).toJson().toGomuksBufferPtr();
-
-    final int handle;
-    try {
-      handle = GomuksInit(bufferPointer.ref);
-    } finally {
-      calloc
-        ..free(bufferPointer.ref.base)
-        ..free(bufferPointer);
-    }
+    ).toJson();
+    final handle = using(
+      (arena) => GomuksInit(config.toGomuksBufferPtr(arena).ref),
+      malloc,
+    );
 
     if (!ref.mounted) {
       GomuksDestroy(handle);
@@ -233,13 +225,16 @@ class ClientController(final String? accountId) extends AsyncNotifier<int> {
     String command, [
     Map<String, dynamic> data = const {},
   ]) => callGomuksMethod(data, (handle, data, callback) {
-    final commandPointer = command.toNativeUtf8().cast<Char>();
-    try {
-      GomuksSubmitCommandAsync(handle, commandPointer, data, callback);
-    } finally {
-      // gomuks copies the command name before returning
-      calloc.free(commandPointer);
-    }
+    // gomuks copies the command name before returning
+    using(
+      (arena) => GomuksSubmitCommandAsync(
+        handle,
+        command.toNativeUtf8(allocator: arena).cast(),
+        data,
+        callback,
+      ),
+      malloc,
+    );
   });
 
   Future<void> redactEvent(RedactEventRequest report) =>
