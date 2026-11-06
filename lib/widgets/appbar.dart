@@ -77,11 +77,17 @@ final class const Appbar({
                 onPressed: maximize,
                 icon: const Icon(Icons.fullscreen),
               ),
-            IconButton(
-              tooltip: "Close window",
-              onPressed: () => exit(0),
-              icon: const Icon(Icons.close),
-            ),
+            if (ref
+                    .watch(SettingsController.provider)
+                    .whenOrNull(
+                      data: (settings) => !settings.linuxMobileMode,
+                    ) ??
+                true)
+              IconButton(
+                tooltip: "Close window",
+                onPressed: () => exit(0),
+                icon: const Icon(Icons.close),
+              ),
           ],
         ],
       ),

@@ -17,7 +17,6 @@ final class const RoomMenuButton(
   final Room? room, {
   final IList<Room> children = const .empty(),
   final VoidCallback? onOpenSearch,
-  final VoidCallback? onOpenThreads,
   super.key,
 }) extends ConsumerWidget {
   @override
@@ -29,18 +28,10 @@ final class const RoomMenuButton(
       icon: const Icon(Icons.more_vert),
       tooltip: "Room options",
       itemBuilder: (_) => [
-        if (onOpenSearch case final onOpenSearch?)
+        if (onOpenSearch != null)
           PopupMenuItem(
             onTap: onOpenSearch,
             child: ListTile(leading: Icon(Icons.search), title: Text("Search")),
-          ),
-        if (onOpenThreads case final onOpenThreads?)
-          PopupMenuItem(
-            onTap: onOpenThreads,
-            child: ListTile(
-              leading: Icon(Icons.forum),
-              title: Text("View Threads"),
-            ),
           ),
         PopupMenuItem(
           onTap: () async {

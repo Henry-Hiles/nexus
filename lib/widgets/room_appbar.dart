@@ -64,6 +64,11 @@ final class const RoomAppbar({
             ? []
             : [
                 IconButton(
+                  onPressed: onOpenThreads?.call,
+                  icon: Icon(Icons.forum),
+                  tooltip: "Open threads",
+                ),
+                IconButton(
                   onPressed: onOpenPinnedMessagesList?.call,
                   icon: Icon(Icons.push_pin),
                   tooltip: "Open pinned messages",
@@ -73,11 +78,7 @@ final class const RoomAppbar({
                   tooltip: "Open member list",
                   icon: Icon(Icons.people),
                 ),
-                RoomMenuButton(
-                  room,
-                  onOpenSearch: onOpenSearch,
-                  onOpenThreads: onOpenThreads,
-                ),
+                RoomMenuButton(room, onOpenSearch: onOpenSearch),
               ],
       ),
     );
