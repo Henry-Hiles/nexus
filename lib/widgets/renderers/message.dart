@@ -100,7 +100,14 @@ class const MessageRenderer(
         ) => Column(
           crossAxisAlignment: .start,
           children: [
-            format == .html && formattedBody != null && !textOnly
+            textOnly
+                ? Text(
+                    body.isEmpty ? content.filename ?? "" : body,
+                    style: textStyle,
+                    maxLines: maxLines,
+                    overflow: maxLines == null ? null : .ellipsis,
+                  )
+                : format == .html && formattedBody != null
                 ? Html(
                     roomId: event.roomId,
                     textStyle: textStyle,
@@ -250,7 +257,10 @@ class const MessageRenderer(
                             child: Padding(
                               padding: .symmetric(vertical: 8, horizontal: 12),
                               child: SizedBox(
-                                height: 48,
+                                // Two lines of text, plus EventPreview's padding
+                                height:
+                                    MediaQuery.textScalerOf(context).scale(40) +
+                                    8,
                                 child: switch (ref.watch(
                                   EventController.provider(
                                     .new(
