@@ -2,6 +2,7 @@ import "package:collection/collection.dart";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:freezed_annotation/freezed_annotation.dart";
 import "package:nexus/models/bot_command.dart";
+import "package:nexus/models/composer_params.dart";
 import "package:nexus/models/content/bot_command.dart";
 import "package:nexus/models/content/bot_command_description.dart";
 
@@ -10,7 +11,7 @@ part "bot_command_draft.freezed.dart";
 @Freezed(toJson: false, fromJson: false)
 class const BotCommandDraft({
   required final BotCommand command,
-  required final String roomId,
+  required final ComposerParams composer,
   final IMap<String, String> texts = const .empty(),
 
   // The servers to join rooms picked from suggestions through, by room ID
@@ -33,8 +34,9 @@ class const BotCommandDraft({
   BotParameter? get focusedParameter => command.description.parameters
       .firstWhereOrNull((parameter) => parameter.key == focused);
 
-  ({Object? value, String? error}) parse(BotParameter parameter) =>
-      parameter.schema.parseText(texts[parameter.key] ?? "", roomId: roomId);
+  ({Object? value, String? error}) parse(BotParameter parameter) => parameter
+      .schema
+      .parseText(texts[parameter.key] ?? "", roomId: composer.roomId);
 
   IMap<String, Object> get arguments => .fromEntries(
     shown

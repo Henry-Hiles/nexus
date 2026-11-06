@@ -13,7 +13,7 @@ class PinnedEventsController(final String roomId)
       pinIds.map(
         (eventId) => ref.watch(
           EventController.provider(.new(eventId: eventId, roomId: roomId))
-              .selectAsync((data) => data?.rowId),
+              .future,
         ),
       ),
     )).nonNulls.toIList();

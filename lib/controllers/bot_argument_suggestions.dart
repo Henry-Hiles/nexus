@@ -8,16 +8,17 @@ import "package:nexus/helpers/extensions/get_localpart.dart";
 import "package:nexus/helpers/extensions/weighted_search.dart";
 import "package:nexus/models/bot_argument_suggestion.dart";
 import "package:nexus/models/bot_command_draft.dart";
+import "package:nexus/models/composer_params.dart";
 import "package:nexus/models/content/bot_command_description.dart";
 import "package:nexus/models/content/membership.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/models/room.dart";
 
-class BotArgumentSuggestionsController(final String roomId)
+class BotArgumentSuggestionsController(final ComposerParams composer)
     extends Notifier<IList<BotArgumentSuggestion>> {
   @override
   IList<BotArgumentSuggestion> build() {
-    final draft = ref.watch(BotCommandDraftController.provider(roomId));
+    final draft = ref.watch(BotCommandDraftController.provider(composer));
     final (parameter, text) = switch (draft) {
       BotCommandDraft(focusedParameter: final parameter?, :final texts) => (
         parameter,
@@ -38,7 +39,7 @@ class BotArgumentSuggestionsController(final String roomId)
         ? ref
                   .watch(
                     MembersByStatusController.provider(
-                      .new(roomId: roomId, status: .join),
+                      .new(roomId: composer.roomId, status: .join),
                     ),
                   )
                   .value ??
@@ -102,7 +103,7 @@ class BotArgumentSuggestionsController(final String roomId)
   }
 
   void pick(BotArgumentSuggestion suggestion) => ref
-      .read(BotCommandDraftController.provider(roomId).notifier)
+      .read(BotCommandDraftController.provider(composer).notifier)
       .pick(
         suggestion,
         via: switch (suggestion.room) {
@@ -112,7 +113,7 @@ class BotArgumentSuggestionsController(final String roomId)
       );
 
   bool pickTop() {
-    final draft = ref.read(BotCommandDraftController.provider(roomId));
+    final draft = ref.read(BotCommandDraftController.provider(composer));
     if (state.firstOrNull case final suggestion?
         when draft != null && !draft.arguments.containsKey(draft.focused)) {
       pick(suggestion);
@@ -125,6 +126,6 @@ class BotArgumentSuggestionsController(final String roomId)
       .family<
         BotArgumentSuggestionsController,
         IList<BotArgumentSuggestion>,
-        String
+        ComposerParams
       >(BotArgumentSuggestionsController.new);
 }

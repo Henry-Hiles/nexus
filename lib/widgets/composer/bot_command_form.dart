@@ -33,12 +33,12 @@ class const BotCommandForm(
           (index, parameter) => BotOptionPill(
             parameter,
             key: ValueKey(parameter.key),
-            roomId: draft.roomId,
+            composer: draft.composer,
             onSubmit: onSubmit,
             onRemove: parameter.optional
                 ? () => ref
                       .read(
-                        BotCommandDraftController.provider(draft.roomId)
+                        BotCommandDraftController.provider(draft.composer)
                             .notifier,
                       )
                       .removeOption(parameter.key)

@@ -32,7 +32,12 @@ class ReadReceiptsController(final ChatParams chat)
     final room = ref.watch(
       RoomsController.provider.select(
         (rooms) => switch (rooms[chat.roomId]) {
-          final room? => (events: room.events, receipts: room.receipts),
+          final room? => (
+            events: room.events,
+            eventIds: room.eventIds,
+            receipts: room.receipts,
+            timeline: room.timeline,
+          ),
           null => null,
         },
       ),
@@ -50,15 +55,48 @@ class ReadReceiptsController(final ChatParams chat)
         .toIList();
     final messageIndexes = messages.map((entry) => entry.$1).toList();
 
+    final positions = IMap.fromEntries(
+      room.timeline.entries
+          .map(
+            (entry) => switch (entry.value) {
+              final rowId? => MapEntry(rowId, entry.key),
+              null => null,
+            },
+          )
+          .nonNulls,
+    );
+    final placed = events.indexed
+        .map(
+          (entry) => switch (positions[entry.$2.rowId]) {
+            final position? => (index: entry.$1, position: position),
+            null => null,
+          },
+        )
+        .nonNulls
+        .toList();
+    final placedPositions = placed.map((entry) => entry.position).toList();
+
+    int? indexOf(String eventId) {
+      if (indexes[eventId] case final index?) return index;
+
+      final position = switch (room.eventIds[eventId]) {
+        final rowId? => positions[rowId],
+        null => null,
+      };
+      if (position == null) return null;
+
+      final before = lowerBound(placedPositions, position + 1) - 1;
+      return before < 0 ? null : placed[before].index;
+    }
+
     return room.receipts.values.flattened
         .where(
           (receipt) =>
               receipt.userId != userId &&
-              // Receipts in threads are for the thread, not the timeline
-              receipt.thread == "main",
+              receipt.thread == (chat.threadRoot ?? "main"),
         )
         .map(
-          (receipt) => switch (indexes[receipt.eventId]) {
+          (receipt) => switch (indexOf(receipt.eventId)) {
             final index? => (
               receipt: receipt,
               message: lowerBound(messageIndexes, index + 1) - 1,

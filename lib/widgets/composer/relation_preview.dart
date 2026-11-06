@@ -29,7 +29,10 @@ class const RelationPreview(
           Expanded(
             child: Padding(
               padding: .symmetric(vertical: 8),
-              child: EventPreview(relatedEvent!),
+              child: EventPreview(
+                relatedEvent!.rowId,
+                roomId: relatedEvent!.roomId,
+              ),
             ),
           ),
 

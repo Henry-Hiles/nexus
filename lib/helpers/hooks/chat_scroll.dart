@@ -15,6 +15,8 @@ final class ChatScroll({
   required final GlobalKey centerKey,
   required final ScrollController scrollController,
   required final bool atBottom,
+  required final int? highlightedEvent,
+
   required final JumpToEvent jumpToEvent,
   required final Future<void> Function() jumpToBottom,
   required final GlobalKey Function(int eventRowId) keyFor,
@@ -28,6 +30,8 @@ final class ChatScroll({
     final anchorId = useState<int?>(null);
     final atBottom = useState(true);
     final pendingJump = useState<int?>(null);
+    final highlightedEvent = useState<int?>(null);
+    final hookContext = useContext();
     final pendingJumpDone = useRef<Completer<void>?>(null);
     void finishPendingJump() {
       pendingJumpDone.value?.complete();
@@ -95,15 +99,14 @@ final class ChatScroll({
 
       final anchorIndex = items.indexOf(anchor);
 
-      if (anchorIndex == -1) return (history: const .empty(), live: items);
-
+      final historyLength = anchorIndex == -1 ? items.length : anchorIndex + 1;
       return (
-        history: items.take(anchorIndex).toIList().reversed.toIList(),
-        live: items.skip(anchorIndex).toIList(),
+        history: items.take(historyLength).toIList().reversed.toIList(),
+        live: items.skip(historyLength).toIList(),
       );
     }, [controllerData, anchorId.value]);
 
-    final lastRowId = split.live.lastOrNull;
+    final lastRowId = controllerData.value?.timeline.lastOrNull;
     final previousLastRowId = useRef<int?>(null);
 
     useEffect(() {
@@ -118,7 +121,8 @@ final class ChatScroll({
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!scrollController.hasClients) return;
 
-        scrollController.jumpTo(scrollController.position.minScrollExtent);
+        anchorId.value = lastRowId;
+        scrollController.position.correctPixels(0);
       });
 
       return null;
@@ -173,37 +177,49 @@ final class ChatScroll({
       ],
     );
 
+    Future<void> scrollToEvent(int rowId) async {
+      if (!scrollController.hasClients) return;
+
+      final context = keyFor(rowId).currentContext;
+      if (context != null) {
+        await Scrollable.ensureVisible(
+          context,
+          alignment: 0.5,
+          duration: Durations.extralong1,
+          curve: Curves.easeInOut,
+        );
+        return;
+      }
+
+      finishPendingJump();
+      final done = pendingJumpDone.value = Completer();
+      pendingJump.value = rowId;
+      if (controllerData.value?.timeline.contains(rowId) ?? false) {
+        anchorId.value = rowId;
+      } else {
+        anchorId.value = null;
+        contextualEvent.value = rowId;
+      }
+      await done.future;
+    }
+
     return .new(
       historyRows: split.history,
       liveRows: split.live,
       centerKey: centerKey,
       scrollController: scrollController,
       atBottom: atBottom.value,
+      highlightedEvent: highlightedEvent.value,
       keyFor: keyFor,
       jumpToEvent: (int rowId) async {
-        if (!scrollController.hasClients) return;
+        highlightedEvent.value = rowId;
 
-        final context = keyFor(rowId).currentContext;
-        if (context != null) {
-          await Scrollable.ensureVisible(
-            context,
-            alignment: 0.5,
-            duration: Durations.extralong1,
-            curve: Curves.easeInOut,
-          );
-          return;
-        }
-
-        finishPendingJump();
-        final done = pendingJumpDone.value = Completer();
-        pendingJump.value = rowId;
-        if (controllerData.value?.timeline.contains(rowId) ?? false) {
-          anchorId.value = rowId;
-        } else {
-          anchorId.value = null;
-          contextualEvent.value = rowId;
-        }
-        await done.future;
+        await scrollToEvent(rowId);
+        await Future.delayed(Durations.extralong1, () {
+          if (hookContext.mounted && highlightedEvent.value == rowId) {
+            highlightedEvent.value = null;
+          }
+        });
       },
       jumpToBottom: () async {
         finishPendingJump();

@@ -4,9 +4,10 @@ import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/models/bot_argument_suggestion.dart";
 import "package:nexus/models/bot_command.dart";
 import "package:nexus/models/bot_command_draft.dart";
+import "package:nexus/models/composer_params.dart";
 import "package:nexus/models/content/bot_command_description.dart";
 
-class BotCommandDraftController(final String roomId)
+class BotCommandDraftController(final ComposerParams composer)
     extends Notifier<BotCommandDraft?> {
   @override
   BotCommandDraft? build() => null;
@@ -14,7 +15,7 @@ class BotCommandDraftController(final String roomId)
   void start(BotCommand command, {String text = ""}) {
     state = BotCommandDraft(
       command: command,
-      roomId: roomId,
+      composer: composer,
       texts: .fromEntries(
         command.description.parameters
             .where((parameter) => !parameter.optional)
@@ -97,7 +98,7 @@ class BotCommandDraftController(final String roomId)
   void clear() => state = null;
 
   static final provider = NotifierProvider.autoDispose
-      .family<BotCommandDraftController, BotCommandDraft?, String>(
+      .family<BotCommandDraftController, BotCommandDraft?, ComposerParams>(
         BotCommandDraftController.new,
       );
 }

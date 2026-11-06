@@ -66,6 +66,7 @@ class const PollRenderer(final Event event, final PollStart poll, {super.key})
     final notifier = RoomChatController.provider((
       roomId: event.roomId,
       contextualEvent: null,
+      threadRoot: null,
     )).notifier;
 
     Future<void> run(

@@ -17,6 +17,7 @@ final class const RoomAppbar({
   final void Function(BuildContext context)? onOpenMemberList,
   final void Function()? onOpenPinnedMessagesList,
   final void Function()? onOpenSearch,
+  final void Function()? onOpenThreads,
   super.key,
 }) extends ConsumerWidget implements PreferredSizeWidget {
   @override
@@ -63,11 +64,6 @@ final class const RoomAppbar({
             ? []
             : [
                 IconButton(
-                  onPressed: onOpenSearch?.call,
-                  icon: Icon(Icons.search),
-                  tooltip: "Search this room",
-                ),
-                IconButton(
                   onPressed: onOpenPinnedMessagesList?.call,
                   icon: Icon(Icons.push_pin),
                   tooltip: "Open pinned messages",
@@ -77,7 +73,11 @@ final class const RoomAppbar({
                   tooltip: "Open member list",
                   icon: Icon(Icons.people),
                 ),
-                RoomMenuButton(room),
+                RoomMenuButton(
+                  room,
+                  onOpenSearch: onOpenSearch,
+                  onOpenThreads: onOpenThreads,
+                ),
               ],
       ),
     );

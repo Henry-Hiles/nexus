@@ -27,10 +27,15 @@ import "package:nexus/widgets/event_preview.dart";
 import "package:nexus/widgets/players/video.dart";
 import "package:nexus/widgets/players/audio.dart";
 import "package:nexus/widgets/renderers/poll.dart";
+import "package:nexus/widgets/thread_summary.dart";
 
 class const MessageRenderer(
   final Event event, {
   final VoidCallback? onTapReply,
+
+  /// If set, thread roots show a summary of their thread, calling this when
+  /// tapped.
+  final VoidCallback? onTapThread,
   final bool textOnly = false,
   final bool isGrouped = false,
   final int? maxLines,
@@ -255,9 +260,10 @@ class const MessageRenderer(
                                   ),
                                 )) {
                                   AsyncData(:final value?) ||
-                                  AsyncLoading(
-                                    :final value?,
-                                  ) => EventPreview(value),
+                                  AsyncLoading(:final value?) => EventPreview(
+                                    value,
+                                    roomId: event.roomId,
+                                  ),
                                   AsyncError _ => Text(
                                     "An error occurred while fetching the reply",
                                     style: errorStyle,
@@ -270,6 +276,8 @@ class const MessageRenderer(
                         ),
                       rendered,
                       if (!textOnly) ReactionRow(event),
+                      if (onTapThread case final onTapThread? when !textOnly)
+                        ThreadSummary(event, onTap: onTapThread),
                     ],
                   ),
                 ),

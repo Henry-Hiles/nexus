@@ -3,6 +3,7 @@ import "package:flutter/scheduler.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:material_ui/material_ui.dart";
+import "package:nexus/models/composer_params.dart";
 import "package:nexus/controllers/bot_argument_suggestions.dart";
 import "package:nexus/controllers/bot_command_draft.dart";
 import "package:nexus/models/bot_argument_suggestion.dart";
@@ -10,7 +11,7 @@ import "package:nexus/models/bot_command.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 
 class const BotCommandPanel(
-  final String roomId, {
+  final ComposerParams composer, {
   required final IList<BotCommand> commands,
   required final TextEditingController controller,
   required final void Function(BotCommand command) onPick,
@@ -19,9 +20,9 @@ class const BotCommandPanel(
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final draftProvider = BotCommandDraftController.provider(roomId);
+    final draftProvider = BotCommandDraftController.provider(composer);
     final suggestionsProvider = BotArgumentSuggestionsController.provider(
-      roomId,
+      composer,
     );
 
     final text = useState(controller.text);

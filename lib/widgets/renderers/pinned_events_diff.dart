@@ -2,6 +2,7 @@ import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:material_ui/material_ui.dart";
 import "package:nexus/controllers/event.dart";
+import "package:nexus/controllers/rooms.dart";
 import "package:nexus/helpers/hooks/chat_scroll.dart";
 import "package:nexus/helpers/extensions/success_scheme.dart";
 import "package:nexus/models/content/message.dart";
@@ -54,17 +55,21 @@ class const PinnedEventsDiff(
               ),
             )) {
               // Keeps showing the event while it reloads
-              AsyncValue(value: final event?) => InkWell(
+              AsyncValue(value: final rowId?) => InkWell(
                 borderRadius: .circular(4),
                 hoverColor: color.withValues(alpha: 0.12),
-                onTap: jumpToEvent == null
-                    ? null
-                    : () => jumpToEvent!(event.rowId),
+                onTap: jumpToEvent == null ? null : () => jumpToEvent!(rowId),
                 child: Row(
                   mainAxisSize: .min,
                   children: [
                     // Other events already say who sent them
-                    if (event.content is MessageContent) ...[
+                    if (ref.watch(
+                          RoomsController.provider.select(
+                            (rooms) => rooms[roomId]?.events[rowId],
+                          ),
+                        )
+                        case final event?
+                        when event.content is MessageContent) ...[
                       MessageDisplayname(
                         event,
                         clickable: false,
@@ -81,8 +86,8 @@ class const PinnedEventsDiff(
                     Flexible(
                       child: IgnorePointer(
                         child: EventRenderer(
-                          event.rowId,
-                          roomId: event.roomId,
+                          rowId,
+                          roomId: roomId,
                           textOnly: true,
                           maxLines: 1,
                         ),

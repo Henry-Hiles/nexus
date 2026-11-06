@@ -32,7 +32,7 @@ extension OpenLinkInfo on WidgetRef {
         : await read(
             EventController.provider(
               .new(roomId: summary.roomId, eventId: linkInfo.eventId!),
-            ).selectAsync((data) => data?.rowId),
+            ).future,
           ).onError((_, _) => null);
 
     if (await focusRoom(summary.roomId, eventRowId) || !context.mounted) return;

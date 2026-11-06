@@ -1,25 +1,20 @@
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/rooms.dart";
-import "package:nexus/models/event.dart";
 import "package:nexus/models/requests/get_event.dart";
 
+/// The row ID of an event, fetching it if it isn't stored yet.
 class EventController(final GetEventRequest request)
-    extends AsyncNotifier<Event?> {
+    extends AsyncNotifier<int?> {
   @override
-  Future<Event?> build() async {
-    final event = ref.watch(
-      RoomsController.provider.select((rooms) {
-        final room = rooms[request.roomId];
-
-        return switch (room?.eventIds[request.eventId]) {
-          final rowId? => room?.events[rowId],
-          null => null,
-        };
-      }),
+  Future<int?> build() async {
+    final rowId = ref.watch(
+      RoomsController.provider.select(
+        (rooms) => rooms[request.roomId]?.eventIds[request.eventId],
+      ),
     );
 
-    if (event != null) return event;
+    if (rowId != null) return rowId;
 
     final link = ref.keepAlive();
     final fetchedEvent = await ref
@@ -44,11 +39,9 @@ class EventController(final GetEventRequest request)
       );
     }
 
-    return fetchedEvent;
+    return fetchedEvent?.rowId;
   }
 
   static final provider = AsyncNotifierProvider.family
-      .autoDispose<EventController, Event?, GetEventRequest>(
-        EventController.new,
-      );
+      .autoDispose<EventController, int?, GetEventRequest>(EventController.new);
 }

@@ -10,6 +10,7 @@ import "package:nexus/controllers/rooms.dart";
 import "package:nexus/helpers/extensions/show_error_snack_bar.dart";
 import "package:nexus/models/bot_command.dart";
 import "package:nexus/models/bot_command_draft.dart";
+import "package:nexus/models/composer_params.dart";
 import "package:nexus/widgets/composer/bot_command_form.dart";
 import "package:nexus/widgets/composer/bot_command_panel.dart";
 import "package:nexus/widgets/emoji_picker.dart";
@@ -75,6 +76,7 @@ class const Composer(
   })
   onSendLocation,
   required final Future<void> Function(BotCommandDraft draft) onSendBotCommand,
+  final String? threadRoot,
   final FocusNode? node,
   super.key,
 }) extends HookConsumerWidget {
@@ -131,7 +133,9 @@ class const Composer(
 
     final poll = useState<PollStart?>(null);
     final location = useState<LocationMessageContent?>(null);
-    final botCommandProvider = BotCommandDraftController.provider(roomId);
+    final ComposerParams composer = (roomId: roomId, threadRoot: threadRoot);
+    final botCommandProvider = BotCommandDraftController.provider(composer);
+    final attachmentProvider = AttachmentController.provider(composer);
     final botCommand = ref.watch(botCommandProvider);
     useEffect(() {
       sticker.value = null;
@@ -150,8 +154,6 @@ class const Composer(
     final isEditing = relationType == .edit && relatedEvent != null;
 
     useEffect(() {
-      final attachmentProvider = AttachmentController.provider(roomId);
-
       if (relationType == .edit && relatedEvent != null) {
         textBefore.value ??= controller.text;
         attachmentBefore.value ??= (ref.read(attachmentProvider),);
@@ -247,13 +249,11 @@ class const Composer(
       };
     }, [roomId]);
 
-    final attachment = ref.watch(AttachmentController.provider(roomId));
+    final attachment = ref.watch(attachmentProvider);
 
     Future<void> attach(Future<XFile?> pick) async {
       if (await pick case final file?) {
-        await ref
-            .read(AttachmentController.provider(roomId).notifier)
-            .add(file);
+        await ref.read(attachmentProvider.notifier).add(file);
       }
     }
 
@@ -266,9 +266,7 @@ class const Composer(
       final file = await File(join(directory.path, filename))
           .writeAsBytes(bytes);
 
-      await ref
-          .read(AttachmentController.provider(roomId).notifier)
-          .add(.new(file.path));
+      await ref.read(attachmentProvider.notifier).add(.new(file.path));
     }
 
     /// Attaches the first file on the clipboard, or the image on it if there
@@ -283,7 +281,7 @@ class const Composer(
       final files = await Pasteboard.files().onError((_, _) => const []);
       if (files.firstOrNull case final path?) {
         ref
-            .read(AttachmentController.provider(roomId).notifier)
+            .read(attachmentProvider.notifier)
             .add(XFile(path))
             .onError(showError);
         return true;
@@ -338,7 +336,9 @@ class const Composer(
       if (hasReplacement) {
         if (botCommand != null) {
           if (ref
-              .read(BotArgumentSuggestionsController.provider(roomId).notifier)
+              .read(
+                BotArgumentSuggestionsController.provider(composer).notifier,
+              )
               .pickTop()) {
             return;
           }
@@ -432,8 +432,7 @@ class const Composer(
                     : Icon(Icons.file_copy),
                 title: Text(attachment.$1),
                 trailing: IconButton(
-                  onPressed: () =>
-                      ref.invalidate(AttachmentController.provider(roomId)),
+                  onPressed: () => ref.invalidate(attachmentProvider),
                   icon: Icon(Icons.close),
                 ),
               ),
@@ -442,7 +441,7 @@ class const Composer(
             duration: Durations.short4,
             alignment: .bottomCenter,
             child: BotCommandPanel(
-              roomId,
+              composer,
               commands: botCommands,
               controller: controller,
               onPick: pickBotCommand,

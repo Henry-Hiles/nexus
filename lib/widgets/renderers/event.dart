@@ -44,6 +44,7 @@ import "package:nexus/widgets/renderers/power_levels_diff.dart";
 import "package:nexus/widgets/renderers/pinned_events_diff.dart";
 import "package:nexus/widgets/renderers/server_acl_diff.dart";
 import "package:nexus/widgets/swipe_to_reply.dart";
+import "package:nexus/widgets/thread_summary.dart";
 import "package:nexus/widgets/timestamp.dart";
 import "package:nexus/widgets/user_span.dart";
 
@@ -54,6 +55,7 @@ class const EventRenderer(
   final bool textOnly = false,
   final int? maxLines,
   final JumpToEvent? jumpToEvent,
+  final void Function(String threadRoot)? onOpenThread,
   final IList<PopupMenuEntry> Function(Event event)? getEventOptions,
 
   /// If set, events can be swiped, calling this
@@ -106,18 +108,18 @@ class const EventRenderer(
               (settings.hideMembershipEvents, settings.hideServerAclEvents),
         );
 
-    // Knocks and their outcomes stay visible, as moderators need to act on them
-    if (hideMembershipEvents &&
-        event.content is MembershipContent &&
-        ![event.content, event.previousContent].any(
-          (content) => content is MembershipContent && content.status == .knock,
-        )) {
-      return SizedBox.shrink();
-    }
+    final isHidden =
+        // Knocks and their outcomes stay visible, as moderators need to act
+        // on them
+        (hideMembershipEvents &&
+            event.content is MembershipContent &&
+            ![event.content, event.previousContent].any(
+              (content) =>
+                  content is MembershipContent && content.status == .knock,
+            )) ||
+        (hideServerAclEvents && event.content is ServerACLContent);
 
-    if (hideServerAclEvents && event.content is ServerACLContent) {
-      return SizedBox.shrink();
-    }
+    if (isHidden && !textOnly) return SizedBox.shrink();
 
     final isGrouped =
         (previousEvent?.isShownAsMessage ?? false) &&
@@ -170,15 +172,18 @@ class const EventRenderer(
             onTapReply: jumpToEvent == null
                 ? null
                 : () async {
-                    final replyEvent = await ref.read(
+                    final replyRowId = await ref.read(
                       EventController.provider(
                         .new(roomId: roomId, eventId: event.replyTo!),
                       ).future,
                     );
-                    if (replyEvent != null) {
-                      await jumpToEvent!(replyEvent.rowId);
+                    if (replyRowId != null) {
+                      await jumpToEvent!(replyRowId);
                     }
                   },
+            onTapThread: onOpenThread == null
+                ? null
+                : () => onOpenThread!(event.eventId),
             isGrouped: isGrouped,
             maxLines: maxLines,
             textOnly: textOnly,
@@ -236,11 +241,11 @@ class const EventRenderer(
                     ),
                   )
                   .value) {
-                final poll?
+                final pollRowId?
                     when ref
                             .watch(
                               PollVotesController.provider(
-                                .new(roomId: roomId, eventRowId: poll.rowId),
+                                .new(roomId: roomId, eventRowId: pollRowId),
                               ),
                             )
                             .value
@@ -430,6 +435,15 @@ class const EventRenderer(
             globalPosition: details.globalPosition,
           );
 
+    final threadSummary = switch (onOpenThread) {
+      final onOpenThread? when !textOnly && child is! MessageRenderer =>
+        ThreadSummary(event, onTap: () => onOpenThread(event.eventId)),
+      _ => null,
+    };
+    final belowIndent = child is MessageRenderer
+        ? 4.0
+        : 8 + GenericEventRenderer.textIndent(context);
+
     return Column(
       crossAxisAlignment: .start,
       children: [
@@ -492,6 +506,7 @@ class const EventRenderer(
 
             ...[
               if (child is! MessageRenderer) ReactionRow(event),
+              ?threadSummary,
 
               // Outside the message itself, so it doesn't move when swiped
               if (readReceiptsChat case final chat? when event.isShownAsMessage)
@@ -523,6 +538,7 @@ class const EventRenderer(
                               RoomChatController.provider((
                                 roomId: roomId,
                                 contextualEvent: null,
+                                threadRoot: null,
                               )).notifier,
                             )
                             .hideClientSticky(event.rowId),
@@ -530,13 +546,20 @@ class const EventRenderer(
                     ],
                   ),
                 ),
-            ].map((child) => Padding(padding: .only(left: 4), child: child)),
+            ].map(
+              (child) => Padding(
+                padding: .only(left: belowIndent),
+                child: child,
+              ),
+            ),
           ]
         else if (textOnly)
           Text(
             event.redactedBy == null ? "Unknown event type" : "Redacted event",
             style: errorStyle,
-          ),
+          )
+        else if (threadSummary != null)
+          Padding(padding: .only(left: 4), child: threadSummary),
       ],
     );
   }

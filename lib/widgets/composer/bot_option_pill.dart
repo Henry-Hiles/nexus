@@ -2,12 +2,13 @@ import "package:flutter/services.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:material_ui/material_ui.dart";
+import "package:nexus/models/composer_params.dart";
 import "package:nexus/controllers/bot_command_draft.dart";
 import "package:nexus/models/content/bot_command_description.dart";
 
 class const BotOptionPill(
   final BotParameter parameter, {
-  required final String roomId,
+  required final ComposerParams composer,
 
   /// Called on backspace while empty, to remove the parameter or command.
   final VoidCallback? onRemove,
@@ -17,7 +18,7 @@ class const BotOptionPill(
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
-    final provider = BotCommandDraftController.provider(roomId);
+    final provider = BotCommandDraftController.provider(composer);
     final (:text, :isFocused, :error, :isLast) = ref.watch(
       provider.select(
         (draft) => (

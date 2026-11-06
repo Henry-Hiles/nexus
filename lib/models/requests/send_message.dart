@@ -38,11 +38,18 @@ class const Mentions({
 class const Relation({
   required final String eventId,
   required final RelationType relationType,
+  final String? threadRoot,
+  final bool isFallingBack = false,
 }) with _$Relation {
   Map<String, dynamic> toJson() {
     switch (relationType) {
       case RelationType.reply:
         return {
+          if (threadRoot != null) ...{
+            "rel_type": "m.thread",
+            "event_id": threadRoot,
+            "is_falling_back": isFallingBack,
+          },
           "m.in_reply_to": {"event_id": eventId},
         };
 

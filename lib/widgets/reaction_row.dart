@@ -73,6 +73,7 @@ class const ReactionRow(final Event event, {super.key}) extends ConsumerWidget {
                                     RoomChatController.provider((
                                       roomId: event.roomId,
                                       contextualEvent: null,
+                                      threadRoot: null,
                                     )).notifier,
                                   );
 

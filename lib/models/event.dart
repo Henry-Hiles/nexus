@@ -29,12 +29,16 @@ class const Event({
   final String? sendError,
   final IMap<String, int> reactions = const .empty(),
   @JsonKey(name: "last_edit_rowid") final int lastEditRowId = 0,
+  final int threadCount = 0,
+  @JsonKey(name: "thread_latest_rowid") final int threadLatestRowId = 0,
   final UnreadType? unreadType,
   final Profile? pmp,
   required final Content content,
   required final Content? previousContent,
 }) with _$Event {
   Map<String, Object?> toJson() => _$EventToJson(this);
+
+  String? get threadRoot => relationType == "m.thread" ? relatesTo : null;
 
   static String typeJsonFromJson(Map<dynamic, dynamic> json, _) =>
       json["decrypted_type"] ?? json["type"];
@@ -47,7 +51,15 @@ class const Event({
 
   static String? replyToFromJson(Map<dynamic, dynamic> json) {
     try {
-      return json["m.relates_to"]?["m.in_reply_to"]?["event_id"];
+      final relatesTo = json["m.relates_to"];
+
+      // Thread fallbacks are only for clients without thread support
+      if (relatesTo?["rel_type"] == "m.thread" &&
+          relatesTo?["is_falling_back"] == true) {
+        return null;
+      }
+
+      return relatesTo?["m.in_reply_to"]?["event_id"];
     } catch (_) {
       return null;
     }

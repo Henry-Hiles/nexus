@@ -12,6 +12,7 @@ import "package:nexus/controllers/active_account.dart";
 import "package:nexus/controllers/client_state.dart";
 import "package:nexus/controllers/settings.dart";
 import "package:nexus/helpers/extensions/gomuks_buffer.dart";
+import "package:nexus/helpers/extensions/thread_events.dart";
 import "package:nexus/main.dart";
 import "package:nexus/models/content/bot_command_description.dart";
 import "package:nexus/models/account.dart";
@@ -37,6 +38,7 @@ import "package:nexus/models/requests/get_room_state.dart";
 import "package:nexus/models/requests/get_specific_room_state.dart";
 import "package:nexus/models/requests/get_space_hierarchy.dart";
 import "package:nexus/models/requests/get_room_directory.dart";
+import "package:nexus/models/requests/get_threads.dart";
 import "package:nexus/models/requests/join_room.dart";
 import "package:nexus/models/profile_response.dart";
 import "package:nexus/models/push_notification.dart";
@@ -367,6 +369,9 @@ class ClientController(final String? accountId) extends AsyncNotifier<int> {
   Future<Paginate> paginate(PaginateRequest request) async =>
       .fromJson(await _sendCommand("paginate", request.toJson()));
 
+  Future<PaginateManual> getThreads(GetThreadsRequest request) async =>
+      .fromJson(await _sendCommand("get_threads", request.toJson()));
+
   Future<PaginateManual> paginateManual(PaginateManualRequest request) async =>
       .fromJson(await _sendCommand("paginate_manual", request.toJson()));
 
@@ -438,10 +443,16 @@ class ClientController(final String? accountId) extends AsyncNotifier<int> {
     {"room_id": roomId, "timeout": timeout.inMilliseconds},
   );
 
-  Future<void> markRead(Room room) async {
-    if (room.timeline.isEmpty || room.metadata == null) return;
-    final eventRowId = room.timeline[room.timeline.keys.reduce(max)];
-    final event = eventRowId == null ? null : room.events[eventRowId];
+  Future<void> markRead(Room room, {String? threadRoot}) async {
+    if (room.metadata == null) return;
+    final event = switch (threadRoot) {
+      final threadRoot? => room.latestThreadEvent(threadRoot),
+      null when room.timeline.isEmpty => null,
+      null => switch (room.timeline[room.timeline.keys.reduce(max)]) {
+        final rowId? => room.events[rowId],
+        null => null,
+      },
+    };
 
     if (event == null) return;
 
@@ -454,6 +465,7 @@ class ClientController(final String? accountId) extends AsyncNotifier<int> {
       "room_id": room.metadata!.id,
       "receipt_type": sendPublic ? "m.read" : "m.read.private",
       "event_id": event.eventId,
+      "thread_id": ?threadRoot,
     });
   }
 

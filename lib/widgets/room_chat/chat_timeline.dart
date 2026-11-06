@@ -12,12 +12,12 @@ class const ChatTimeline({
   required final ChatScroll scroll,
   required final JumpToEvent jumpToEvent,
   required final IList<PopupMenuEntry> Function(Event) getEventOptions,
-  required final int? highlightedEvent,
   required final double composerHeight,
 
   /// The typing indicator's height, or zero while it's hidden.
   required final double typingIndicatorHeight,
   final void Function(int rowId)? onSwipe,
+  final void Function(String threadRoot)? onOpenThread,
   super.key,
 }) extends StatelessWidget {
   Widget eventRow(
@@ -30,58 +30,62 @@ class const ChatTimeline({
       previousEventRowId: previousEventRowId,
       roomId: chat.roomId,
       jumpToEvent: jumpToEvent,
+      onOpenThread: onOpenThread,
       getEventOptions: getEventOptions,
       onSwipe: onSwipe == null ? null : () => onSwipe!(eventRowId),
       readReceiptsChat: chat,
     ),
     key: key,
-    isHighlighted: highlightedEvent == eventRowId,
+    isHighlighted: scroll.highlightedEvent == eventRowId,
   );
 
   @override
-  Widget build(BuildContext context) => CustomScrollView(
-    reverse: true,
-    center: scroll.centerKey,
-    keyboardDismissBehavior: .onDrag,
-    controller: scroll.scrollController,
-    slivers: [
-      SliverToBoxAdapter(
-        child: Column(
-          children: [
-            // Makes room for the typing indicator, with a small gap above it,
-            // so it doesn't cover messages
-            AnimatedContainer(
-              duration: Durations.medium2,
-              curve: Curves.easeInOutCubicEmphasized,
-              height: typingIndicatorHeight == 0
-                  ? 0
-                  : typingIndicatorHeight + 4,
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, constraints) => TweenAnimationBuilder(
+      // Makes room for the typing indicator, with a small gap above it, so it
+      // doesn't cover messages
+      tween: Tween(
+        end: typingIndicatorHeight == 0 ? 0.0 : typingIndicatorHeight + 4,
+      ),
+      duration: Durations.medium2,
+      curve: Curves.easeInOutCubicEmphasized,
+      builder: (context, typingIndicatorGap, _) {
+        final bottomPadding = composerHeight + typingIndicatorGap;
+
+        return CustomScrollView(
+          reverse: true,
+          center: scroll.centerKey,
+          // Offset 0 is the newest event above the padding, so short
+          // timelines can't be scrolled past either end
+          anchor: (bottomPadding / constraints.maxHeight).clamp(0, 1),
+          keyboardDismissBehavior: .onDrag,
+          controller: scroll.scrollController,
+          slivers: [
+            SliverToBoxAdapter(child: SizedBox(height: bottomPadding)),
+
+            SuperSliverList.builder(
+              itemCount: scroll.liveRows.length,
+              itemBuilder: (_, index) => eventRow(
+                scroll.liveRows[index],
+                index > 0
+                    ? scroll.liveRows.getOrNull(index - 1)
+                    : scroll.historyRows.firstOrNull,
+                key: scroll.keyFor(scroll.liveRows[index]),
+              ),
             ),
-            SizedBox(height: composerHeight),
+
+            SuperSliverList.builder(
+              key: scroll.centerKey,
+              itemCount: scroll.historyRows.length,
+              itemBuilder: (_, index) => eventRow(
+                scroll.historyRows[index],
+                scroll.historyRows.getOrNull(index + 1),
+                key: scroll.keyFor(scroll.historyRows[index]),
+              ),
+            ),
           ],
-        ),
-      ),
-
-      SuperSliverList.builder(
-        itemCount: scroll.liveRows.length,
-        itemBuilder: (_, index) => eventRow(
-          scroll.liveRows[index],
-          index > 0
-              ? scroll.liveRows.getOrNull(index - 1)
-              : scroll.historyRows.firstOrNull,
-          key: scroll.keyFor(scroll.liveRows[index]),
-        ),
-      ),
-
-      SuperSliverList.builder(
-        key: scroll.centerKey,
-        itemCount: scroll.historyRows.length,
-        itemBuilder: (_, index) => eventRow(
-          scroll.historyRows[index],
-          scroll.historyRows.getOrNull(index + 1),
-          key: scroll.keyFor(scroll.historyRows[index]),
-        ),
-      ),
-    ],
+        );
+      },
+    ),
   );
 }

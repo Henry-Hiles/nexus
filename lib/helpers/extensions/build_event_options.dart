@@ -26,6 +26,7 @@ extension BuildEventOptions on Event {
     required String roomId,
     required String userId,
     required void Function(int, RelationType) onRelation,
+    void Function(String threadRoot)? onStartThread,
   }) {
     final theme = Theme.of(context);
     final danger = theme.colorScheme.error;
@@ -34,11 +35,15 @@ extension BuildEventOptions on Event {
     final notifier = RoomChatController.provider((
       roomId: roomId,
       contextualEvent: null,
+      threadRoot: null,
     )).notifier;
 
     final isPinned = ref
         .read(PinnedIdsController.provider(roomId))
         .contains(eventId);
+    final canSend = ref.read(
+      PowerLevelController.provider(.new(eventType: .message, roomId: roomId)),
+    );
 
     void showReasonSheet({
       required String title,
@@ -170,16 +175,24 @@ extension BuildEventOptions on Event {
           ),
         ),
 
-      if (ref.read(
-        PowerLevelController.provider(
-          .new(eventType: .message, roomId: roomId),
-        ),
-      ))
+      if (canSend)
         PopupMenuItem(
           onTap: () => onRelation(rowId, .reply),
           child: const ListTile(
             leading: Icon(Icons.reply),
             title: Text("Reply"),
+          ),
+        ),
+
+      if (onStartThread != null &&
+          threadCount == 0 &&
+          canSend &&
+          relatesTo == null)
+        PopupMenuItem(
+          onTap: () => onStartThread(eventId),
+          child: const ListTile(
+            leading: Icon(Icons.forum),
+            title: Text("Start Thread"),
           ),
         ),
 

@@ -13,6 +13,14 @@ class const GenericEventRenderer(
   final List<Widget> details = const [],
   super.key,
 }) extends StatelessWidget {
+  static const _iconPadding = 4.0;
+  static const _spacing = 8.0;
+
+  /// How far the text is from the start, past the icon, so what's shown under
+  /// the event can line up with it.
+  static double textIndent(BuildContext context) =>
+      (IconTheme.of(context).size ?? 24) + _iconPadding * 2 + _spacing;
+
   @override
   Widget build(BuildContext context) {
     // Only previewing the event, so it should stay short
@@ -22,12 +30,15 @@ class const GenericEventRenderer(
     return Padding(
       padding: .symmetric(vertical: 4),
       child: Row(
-        spacing: 8,
+        spacing: _spacing,
         mainAxisSize: .min,
         // At the top, by the text, rather than the middle of any details
         crossAxisAlignment: .start,
         children: [
-          Padding(padding: .symmetric(horizontal: 4), child: Icon(icon)),
+          Padding(
+            padding: .symmetric(horizontal: _iconPadding),
+            child: Icon(icon),
+          ),
           Flexible(
             child: Column(
               mainAxisSize: .min,

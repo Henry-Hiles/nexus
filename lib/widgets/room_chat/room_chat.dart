@@ -1,32 +1,23 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:material_ui/material_ui.dart";
-import "package:flutter/services.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
-import "package:measure_size/measure_size.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/client_state.dart";
 import "package:nexus/controllers/member_list_opened.dart";
-import "package:nexus/controllers/power_level.dart";
-import "package:nexus/controllers/settings.dart";
-import "package:nexus/controllers/tombstone.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/controllers/room_chat.dart";
+import "package:nexus/helpers/hooks/chat_composer.dart";
 import "package:nexus/helpers/hooks/chat_scroll.dart";
 import "package:nexus/models/event.dart";
-import "package:nexus/models/relation_type.dart";
-import "package:nexus/widgets/composer/composer.dart";
-import "package:nexus/widgets/composer/typing_indicator.dart";
-import "package:nexus/widgets/error_dialog.dart";
-import "package:nexus/widgets/loading.dart";
 import "package:nexus/widgets/pinned_events_drawer.dart";
 import "package:nexus/widgets/member_list.dart";
 import "package:nexus/widgets/room_appbar.dart";
 import "package:nexus/widgets/search_drawer.dart";
 import "package:nexus/widgets/sync_status_banner.dart";
-import "package:nexus/widgets/tombstone_banner.dart";
-import "package:nexus/main.dart";
-import "package:nexus/widgets/room_chat/chat_timeline.dart";
+import "package:nexus/widgets/thread_drawer.dart";
+import "package:nexus/widgets/threads_drawer.dart";
+import "package:nexus/widgets/room_chat/chat_body.dart";
 import "package:nexus/helpers/extensions/build_event_options.dart";
 import "package:nexus/controllers/jump_request.dart";
 
@@ -38,21 +29,23 @@ final class const RoomChat({
 }) extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final relatedEvent = useState<int?>(null);
-    final relationType = useState(RelationType.reply);
-    final repliedEventRowId = relationType.value == .reply
-        ? relatedEvent.value
-        : null;
+    final composer = ChatComposer.use();
     final pendingJump = ref.read(JumpRequestController.provider);
-    final contextualEvent = useState<int?>(
-      pendingJump != null && pendingJump.roomId == this.roomId
-          ? pendingJump.rowId
-          : null,
-    );
-    final highlightedEvent = useState<int?>(null);
+    final contextualEvent = useState<int?>(switch (pendingJump) {
+      // Threaded events open their thread instead, leaving the timeline
+      (:final roomId, :final rowId)
+          when roomId == this.roomId &&
+              ref
+                      .read(RoomsController.provider)[roomId]
+                      ?.events[rowId]
+                      ?.threadRoot ==
+                  null =>
+        rowId,
+      _ => null,
+    });
 
-    final composerSize = useState<double>(64);
-    final typingIndicatorSize = useState<double>(0);
+    final thread = useState<({String root, int? event})?>(null);
+    final threadScaffold = useMemoized(GlobalKey<ScaffoldState>.new);
 
     final userId = ref.watch(ClientStateController.provider)?.userId;
     final memberListOpened = ref
@@ -93,6 +86,7 @@ final class const RoomChat({
     final ChatParams chat = (
       roomId: roomId,
       contextualEvent: contextualEvent.value,
+      threadRoot: null,
     );
     final controllerProvider = RoomChatController.provider(chat);
     final notifier = ref.watch(controllerProvider.notifier);
@@ -116,49 +110,24 @@ final class const RoomChat({
       },
     );
 
-    final lastComposerHeight = useRef(composerSize.value);
+    void openThread(String root, {int? event}) {
+      thread.value = (root: root, event: event);
 
-    useEffect(() {
-      final delta = composerSize.value - lastComposerHeight.value;
-      lastComposerHeight.value = composerSize.value;
+      // The drawer is only there once rebuilt with the thread
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => threadScaffold.currentState?.openEndDrawer(),
+      );
+    }
 
-      if (delta != 0) {
-        final wasAtBottom = scroll.atBottom;
-
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          final controller = scroll.scrollController;
-          if (!controller.hasClients) return;
-
-          final position = controller.position;
-          controller.jumpTo(
-            wasAtBottom ? position.minScrollExtent : position.pixels - delta,
-          );
-        });
-      }
-
-      return null;
-    }, [composerSize.value]);
-
-    final composerNode = useFocusNode(
-      onKeyEvent: (_, event) {
-        if (event is KeyDownEvent && event.logicalKey == .escape) {
-          relatedEvent.value = null;
-          return .handled;
-        }
-
-        return .ignored;
-      },
-    );
-
+    // Threaded events aren't in the timeline, only their thread
     Future<void> jumpToEvent(int rowId) async {
-      highlightedEvent.value = rowId;
+      final threadRoot = ref
+          .read(RoomsController.provider)[roomId]
+          ?.events[rowId]
+          ?.threadRoot;
 
-      await scroll.jumpToEvent(rowId);
-      await Future.delayed(Durations.extralong1, () {
-        if (highlightedEvent.value == rowId) {
-          highlightedEvent.value = null;
-        }
-      });
+      if (threadRoot == null) return scroll.jumpToEvent(rowId);
+      openThread(threadRoot, event: rowId);
     }
 
     useEffect(() {
@@ -182,226 +151,93 @@ final class const RoomChat({
       return null;
     }, [jumpRowId]);
 
-    void onRelation(int rowId, RelationType type) {
-      relatedEvent.value = rowId;
-      relationType.value = type;
-      composerNode.requestFocus();
-    }
-
     IList<PopupMenuEntry> getEventOptions(Event event) =>
         event.buildEventOptions(
           context: context,
           ref: ref,
           roomId: roomId,
           userId: userId,
-          onRelation: onRelation,
-        );
-
-    final swipeToReply = ref.watch(
-      SettingsController.provider.select(
-        (settings) => settings.value?.swipeToReply ?? false,
-      ),
-    );
-    final tombstone = ref.watch(TombstoneController.provider(roomId));
-    final canReply =
-        tombstone == null &&
-        ref.watch(
-          PowerLevelController.provider(
-            .new(eventType: .message, roomId: roomId),
-          ),
+          onRelation: composer.relate,
+          onStartThread: openThread,
         );
 
     return Scaffold(
+      key: threadScaffold,
       endDrawerEnableOpenDragGesture: false,
-      endDrawer: SearchDrawer(
-        roomId,
-        getEventOptions: getEventOptions,
-        jumpToEvent: jumpToEvent,
-      ),
-      body: Builder(
-        builder: (searchContext) => Scaffold(
-          endDrawerEnableOpenDragGesture: false,
-          endDrawer: PinnedEventsDrawer(
-            roomId,
-            getEventOptions: getEventOptions,
-            jumpToEvent: jumpToEvent,
-          ),
-          body: Builder(
-            builder: (middleContext) => Scaffold(
-              endDrawer: showMembersByDefault ? null : MemberList(roomId),
-              appBar: RoomAppbar(
-                roomId: roomId,
-                isDesktop: isDesktop,
-                onOpenDrawer: Scaffold.of(context).openDrawer,
-                onOpenMemberList: (thisContext) {
-                  ref
-                      .read(MemberListOpenedController.provider.notifier)
-                      .set(!memberListOpened);
-                  Scaffold.of(thisContext).openEndDrawer();
-                },
-                onOpenPinnedMessagesList: Scaffold.of(middleContext)
-                    .openEndDrawer,
-                onOpenSearch: Scaffold.of(searchContext).openEndDrawer,
-              ),
-              body: Column(
-                children: [
-                  const SyncStatusBanner(),
-                  Expanded(
-                    child: Row(
+      endDrawer: switch (thread.value) {
+        (:final root, :final event) => ThreadDrawer(
+          roomId,
+          threadRoot: root,
+          initialEvent: event,
+          jumpToRoomEvent: jumpToEvent,
+          userId: userId,
+          key: ValueKey((roomId, root, event)),
+        ),
+        null => null,
+      },
+      body: Scaffold(
+        endDrawerEnableOpenDragGesture: false,
+        endDrawer: SearchDrawer(
+          roomId,
+          getEventOptions: getEventOptions,
+          jumpToEvent: jumpToEvent,
+        ),
+        body: Builder(
+          builder: (searchContext) => Scaffold(
+            endDrawerEnableOpenDragGesture: false,
+            endDrawer: ThreadsDrawer(roomId, onOpenThread: openThread),
+            body: Builder(
+              builder: (threadsContext) => Scaffold(
+                endDrawerEnableOpenDragGesture: false,
+                endDrawer: PinnedEventsDrawer(
+                  roomId,
+                  getEventOptions: getEventOptions,
+                  jumpToEvent: jumpToEvent,
+                ),
+                body: Builder(
+                  builder: (middleContext) => Scaffold(
+                    endDrawer: showMembersByDefault ? null : MemberList(roomId),
+                    appBar: RoomAppbar(
+                      roomId: roomId,
+                      isDesktop: isDesktop,
+                      onOpenDrawer: Scaffold.of(context).openDrawer,
+                      onOpenMemberList: (thisContext) {
+                        ref
+                            .read(MemberListOpenedController.provider.notifier)
+                            .set(!memberListOpened);
+                        Scaffold.of(thisContext).openEndDrawer();
+                      },
+                      onOpenPinnedMessagesList: Scaffold.of(middleContext)
+                          .openEndDrawer,
+                      onOpenSearch: Scaffold.of(searchContext).openEndDrawer,
+                      onOpenThreads: Scaffold.of(threadsContext).openEndDrawer,
+                    ),
+                    body: Column(
                       children: [
+                        const SyncStatusBanner(),
                         Expanded(
-                          child: Stack(
+                          child: Row(
                             children: [
-                              Positioned.fill(
-                                child: Padding(
-                                  padding: .symmetric(horizontal: 4),
-                                  child: switch (controllerData) {
-                                    AsyncLoading(value: _?) ||
-                                    AsyncData(value: _) => ChatTimeline(
-                                      scroll: scroll,
-                                      chat: chat,
-                                      jumpToEvent: jumpToEvent,
-                                      getEventOptions: getEventOptions,
-                                      onSwipe: swipeToReply && canReply
-                                          ? (rowId) => onRelation(rowId, .reply)
-                                          : null,
-                                      highlightedEvent: highlightedEvent.value,
-                                      composerHeight: composerSize.value,
-                                      typingIndicatorHeight:
-                                          typingIndicatorSize.value,
-                                    ),
-                                    AsyncLoading _ => Loading(),
-                                    AsyncError(
-                                      :final error,
-                                      :final stackTrace,
-                                    ) =>
-                                      ErrorDialog(error, stackTrace),
-                                  },
+                              Expanded(
+                                child: ChatBody(
+                                  chat: chat,
+                                  scroll: scroll,
+                                  jumpToEvent: jumpToEvent,
+                                  getEventOptions: getEventOptions,
+                                  composer: composer,
+                                  onOpenThread: openThread,
                                 ),
                               ),
-                              AnimatedPositioned(
-                                duration: Durations.short4,
-                                bottom: composerSize.value,
-                                left: 12,
-                                // Leaves room for the jump to bottom button when it's shown
-                                right: scroll.atBottom ? 12 : 72,
-                                child: MeasureSize(
-                                  onChange: (size) =>
-                                      typingIndicatorSize.value = size.height,
-                                  child: TypingIndicator(roomId),
-                                ),
-                              ),
-                              Positioned(
-                                right: 16,
-                                bottom: composerSize.value,
-                                child: IgnorePointer(
-                                  ignoring: scroll.atBottom,
-                                  child: AnimatedOpacity(
-                                    opacity: scroll.atBottom ? 0 : 1,
-                                    duration: Durations.short4,
-                                    child: FloatingActionButton.small(
-                                      onPressed: scroll.jumpToBottom,
-                                      child: const Icon(
-                                        Icons.keyboard_arrow_down,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                bottom: 0,
-                                left: 0,
-                                right: 0,
-                                child: MeasureSize(
-                                  onChange: (size) =>
-                                      composerSize.value = size.height,
-                                  child: switch (tombstone) {
-                                    final tombstone? => TombstoneBanner(
-                                      tombstone,
-                                    ),
-                                    null => Composer(
-                                      roomId,
-                                      node: composerNode,
-                                      onSend:
-                                          (
-                                            text, {
-                                            required shouldMention,
-                                            required tags,
-                                          }) => notifier
-                                              .send(
-                                                text,
-                                                tags: tags,
-                                                relationType:
-                                                    relationType.value,
-                                                shouldMention: shouldMention,
-                                                relatedEventRowId:
-                                                    relatedEvent.value,
-                                              )
-                                              .onError(showError),
-                                      onSendSticker:
-                                          (
-                                            shortcode,
-                                            image, {
-                                            required shouldMention,
-                                          }) => notifier
-                                              .sendSticker(
-                                                shortcode,
-                                                image,
-                                                shouldMention: shouldMention,
-                                                repliedEventRowId:
-                                                    repliedEventRowId,
-                                              )
-                                              .onError(showError),
-                                      onSendPoll:
-                                          (poll, {required shouldMention}) =>
-                                              notifier
-                                                  .sendPoll(
-                                                    poll,
-                                                    shouldMention:
-                                                        shouldMention,
-                                                    repliedEventRowId:
-                                                        repliedEventRowId,
-                                                  )
-                                                  .onError(showError),
-                                      onSendLocation:
-                                          (
-                                            location, {
-                                            required shouldMention,
-                                          }) => notifier
-                                              .sendLocation(
-                                                location,
-                                                shouldMention: shouldMention,
-                                                repliedEventRowId:
-                                                    repliedEventRowId,
-                                              )
-                                              .onError(showError),
-                                      onSendBotCommand: (draft) => notifier
-                                          .sendBotCommand(
-                                            draft,
-                                            repliedEventRowId:
-                                                repliedEventRowId,
-                                          )
-                                          .onError(showError),
-                                      relationType: relationType.value,
-                                      relatedEvent: relatedEvent.value,
-                                      onDismiss: () {
-                                        relatedEvent.value = null;
-                                        composerNode.requestFocus();
-                                      },
-                                    ),
-                                  },
-                                ),
-                              ),
+
+                              if (memberListOpened && showMembersByDefault)
+                                MemberList(roomId),
                             ],
                           ),
                         ),
-
-                        if (memberListOpened && showMembersByDefault)
-                          MemberList(roomId),
                       ],
                     ),
                   ),
-                ],
+                ),
               ),
             ),
           ),

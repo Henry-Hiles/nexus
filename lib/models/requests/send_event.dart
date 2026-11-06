@@ -14,7 +14,7 @@ class const SendEventRequest({
   // Merged into the content by toJson, as gomuks doesn't take these
   @JsonKey(includeToJson: false) final String? relatesTo,
   @JsonKey(includeToJson: false) final String? relationType,
-  @JsonKey(includeToJson: false) final String? replyTo,
+  @JsonKey(includeToJson: false) final Relation? reply,
   @JsonKey(includeToJson: false) final Mentions? mentions,
   final bool synchronous = false,
   final bool disableEncryption = false,
@@ -27,14 +27,14 @@ class const SendEventRequest({
       "content": {
         ...content,
         "m.mentions": ?mentions?.toJson(),
-        if (relatesTo != null || replyTo != null)
+        if (relatesTo != null || reply != null)
           "m.relates_to": {
             ...((content["m.relates_to"] as Map<String, dynamic>?) ?? {}),
             if (relatesTo != null) ...{
               "event_id": relatesTo,
               "rel_type": relationType,
             },
-            if (replyTo != null) "m.in_reply_to": {"event_id": replyTo},
+            ...?reply?.toJson(),
           },
       },
     };
