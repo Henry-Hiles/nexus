@@ -100,16 +100,27 @@ final class const ThreadsDrawer(
                                   color: theme.colorScheme.primary,
                                 ),
                               ),
-                              Spacer(),
-                              if (info.latest case final latest?) ...[
-                                Text(
-                                  "Last active",
-                                  style: theme.textTheme.labelSmall?.copyWith(
-                                    color: Colors.grey,
+                              if (info.latest case final latest?)
+                                Expanded(
+                                  child: Row(
+                                    mainAxisAlignment: .end,
+                                    spacing: 4,
+                                    children: [
+                                      Flexible(
+                                        child: Text(
+                                          "Last active:",
+                                          maxLines: 1,
+                                          overflow: .ellipsis,
+                                          style: theme.textTheme.labelSmall
+                                              ?.copyWith(color: Colors.grey),
+                                        ),
+                                      ),
+                                      Timestamp(latest.timestamp),
+                                    ],
                                   ),
-                                ),
-                                Timestamp(latest.timestamp),
-                              ],
+                                )
+                              else
+                                Spacer(),
                               Icon(
                                 Icons.chevron_right,
                                 size: 16,
