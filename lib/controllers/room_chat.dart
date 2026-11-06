@@ -404,7 +404,10 @@ class RoomChatController(final ChatParams info)
       roomId: info.roomId,
       threadRoot: info.threadRoot,
     );
-    final attachmentProvider = AttachmentController.provider(composer);
+    final attachmentProvider = AttachmentController.provider((
+      composer: composer,
+      editingRowId: relationType == .edit ? relatedEventRowId : null,
+    ));
     final attachment = ref.read(attachmentProvider)?.$2;
     ref.invalidate(attachmentProvider);
 
@@ -418,11 +421,13 @@ class RoomChatController(final ChatParams info)
             ? latestContent
             : null);
 
-    // Replaces each formatted tag, like "@id#name#", with its ID
+    // Replaces each formatted tag, like ":id#name#", with its ID
     final taggedMessage = tags.fold(
       text,
       (message, tag) => message.replaceAllMapped(
-        RegExp(r"@+(" + RegExp.escape(tag.id) + r")(#[^#]*#)?"),
+        RegExp(
+          "${RegExp.escape(tag.triggerCharacter)}(${RegExp.escape(tag.id)})(#[^#]*#)?",
+        ),
         (match) => match.group(1)!,
       ),
     );

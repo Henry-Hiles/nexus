@@ -7,7 +7,9 @@ import "package:nexus/models/content/message.dart";
 import "package:nexus/models/composer_params.dart";
 import "package:path/path.dart";
 
-class AttachmentController(final ComposerParams composer)
+typedef AttachmentParams = ({ComposerParams composer, int? editingRowId});
+
+class AttachmentController(final AttachmentParams params)
     extends Notifier<(String, MessageContent?)?> {
   @override
   Null build() => null;
@@ -19,7 +21,7 @@ class AttachmentController(final ComposerParams composer)
     final isEncrypted = ref.read(
       RoomsController.provider.select(
         (value) =>
-            value[composer.roomId]
+            value[params.composer.roomId]
                 ?.state[EventType.encryption.type]
                 ?.isNotEmpty ==
             true,
@@ -35,10 +37,10 @@ class AttachmentController(final ComposerParams composer)
 
   void set((String, MessageContent?)? attachment) => state = attachment;
 
-  static final provider = NotifierProvider.family
-      .autoDispose<
+  static final provider =
+      NotifierProvider.family<
         AttachmentController,
         (String, MessageContent?)?,
-        ComposerParams
+        AttachmentParams
       >(AttachmentController.new);
 }

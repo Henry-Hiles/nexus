@@ -29,7 +29,6 @@ final class const RoomChat({
 }) extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final composer = ChatComposer.use();
     final pendingJump = ref.read(JumpRequestController.provider);
     final contextualEvent = useState<int?>(switch (pendingJump) {
       // Threaded events open their thread instead, leaving the timeline
@@ -76,6 +75,7 @@ final class const RoomChat({
     }
 
     final roomId = this.roomId!;
+    final composer = ChatComposer.use(ref, (roomId: roomId, threadRoot: null));
 
     final jumpRowId = ref.watch(
       JumpRequestController.provider.select(

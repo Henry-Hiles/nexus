@@ -24,7 +24,10 @@ final class const ThreadDrawer(
 }) extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final composer = ChatComposer.use();
+    final composer = ChatComposer.use(ref, (
+      roomId: roomId,
+      threadRoot: threadRoot,
+    ));
     final contextualEvent = useState(initialEvent);
 
     final ChatParams chat = (

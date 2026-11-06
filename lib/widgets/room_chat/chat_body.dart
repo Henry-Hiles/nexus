@@ -122,9 +122,9 @@ final class const ChatBody({
                         .send(
                           text,
                           tags: tags,
-                          relationType: composer.relationType.value,
+                          relationType: composer.relationType,
                           shouldMention: shouldMention,
-                          relatedEventRowId: composer.relatedEvent.value,
+                          relatedEventRowId: composer.relatedEvent,
                         )
                         .onError(showError),
                 onSendSticker: (shortcode, image, {required shouldMention}) =>
@@ -153,12 +153,6 @@ final class const ChatBody({
                 onSendBotCommand: (draft) => notifier
                     .sendBotCommand(draft, repliedEventRowId: repliedEventRowId)
                     .onError(showError),
-                relationType: composer.relationType.value,
-                relatedEvent: composer.relatedEvent.value,
-                onDismiss: () {
-                  composer.relatedEvent.value = null;
-                  composer.node.requestFocus();
-                },
               ),
             },
           ),

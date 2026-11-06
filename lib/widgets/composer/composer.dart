@@ -6,16 +6,16 @@ import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
 import "package:nexus/controllers/bot_argument_suggestions.dart";
 import "package:nexus/controllers/bot_command_draft.dart";
 import "package:nexus/controllers/bot_commands.dart";
+import "package:nexus/controllers/composer_draft.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/helpers/extensions/show_error_snack_bar.dart";
+import "package:nexus/helpers/extensions/with_latest_edit.dart";
 import "package:nexus/models/bot_command.dart";
 import "package:nexus/models/bot_command_draft.dart";
 import "package:nexus/models/composer_params.dart";
 import "package:nexus/widgets/composer/bot_command_form.dart";
 import "package:nexus/widgets/composer/bot_command_panel.dart";
 import "package:nexus/widgets/emoji_picker.dart";
-import "package:nexus/helpers/extensions/get_filename.dart";
-import "package:nexus/helpers/extensions/is_media.dart";
 import "package:material_ui/material_ui.dart";
 import "package:flutter/services.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
@@ -38,7 +38,6 @@ import "package:nexus/widgets/sticker_picker.dart";
 import "package:nexus/widgets/create_poll_sheet.dart";
 import "package:nexus/widgets/location_picker_sheet.dart";
 import "package:nexus/models/location.dart";
-import "package:nexus/models/relation_type.dart";
 import "package:nexus/widgets/composer/overlays/tagger_overlay.dart";
 import "package:nexus/widgets/composer/paste_files_action.dart";
 import "package:pasteboard/pasteboard.dart";
@@ -50,9 +49,6 @@ import "package:nexus/main.dart";
 
 class const Composer(
   final String roomId, {
-  required final int? relatedEvent,
-  required final RelationType relationType,
-  required final VoidCallback onDismiss,
   required final Future<void> Function(
     String text, {
     required bool shouldMention,
@@ -83,7 +79,76 @@ class const Composer(
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final controller = useMemoized(FlutterTaggerController.new);
+    final ComposerParams composer = (roomId: roomId, threadRoot: threadRoot);
+    final draftProvider = ComposerDraftController.provider(composer);
+    final draftNotifier = ref.watch(draftProvider.notifier);
+    final (
+      :relatedEventRowId,
+      :relationType,
+      :editingEvent,
+      :sticker,
+      :poll,
+      :location,
+    ) = ref.watch(
+      draftProvider.select(
+        (draft) => (
+          relatedEventRowId: draft.relatedEvent,
+          relationType: draft.relationType,
+          editingEvent: draft.isEditing ? draft.relatedEvent : null,
+          sticker: draft.sticker,
+          poll: draft.poll,
+          location: draft.location,
+        ),
+      ),
+    );
+    final isEditing = editingEvent != null;
+
+    final botCommandProvider = BotCommandDraftController.provider(composer);
+    final attachmentProvider = AttachmentController.provider((
+      composer: composer,
+      editingRowId: editingEvent,
+    ));
+    final botCommand = ref.watch(botCommandProvider);
+
+    final hasReplacement =
+        sticker != null ||
+        poll != null ||
+        location != null ||
+        botCommand != null;
+
+    final controller = useMemoized(() {
+      final draft = ref.read(draftProvider);
+      final ids = IMap.fromEntries(
+        draft.tags
+            .map((tag) => MapEntry("${tag.triggerCharacter}${tag.id}#", tag.id))
+            .sortedBy<num>((entry) => -entry.key.length),
+      );
+
+      return FlutterTaggerController(text: draft.text)..formatTags(
+        // Matches tags formatted by tagTextFormatter, like ":id#name#"
+        pattern: RegExp(
+          ids.isEmpty
+              ? "(?!)"
+              : "((?:${ids.keys.map(RegExp.escape).join("|")})[^#]*#)",
+        ),
+        parser: (formatted) {
+          final prefix = ids.keys.firstWhere(formatted.startsWith);
+          return [
+            ids[prefix]!,
+            formatted.substring(prefix.length, formatted.length - 1),
+          ];
+        },
+      );
+    }, [composer, editingEvent, hasReplacement]);
+    useEffect(
+      // After the frame, as FlutterTagger and TextField still use it until then
+      () =>
+          () => WidgetsBinding.instance.addPostFrameCallback(
+            (_) => controller.dispose(),
+          ),
+      [controller],
+    );
+
     final triggerCharacter = useState("");
     final shouldMention = useState(true);
     final query = useState("");
@@ -103,151 +168,59 @@ class const Composer(
         .new(eventType: .pollStart, roomId: roomId),
       ),
     );
-    final relatedEvent = this.relatedEvent == null
+    final relatedEvent = relatedEventRowId == null
         ? null
         : ref.watch(
-            RoomsController.provider.select((rooms) {
-              final event = rooms[roomId]?.events[this.relatedEvent!];
-              if (event == null) return null;
-
-              final edited = event.lastEditRowId == 0
-                  ? null
-                  : rooms[roomId]?.events[event.lastEditRowId];
-
-              return edited == null
-                  ? event
-                  : event.copyWith(
-                      content: edited.content,
-                      localContent: edited.localContent,
-                    );
-            }),
+            RoomsController.provider.select(
+              (rooms) => rooms[roomId]?.withLatestEdit(relatedEventRowId),
+            ),
           );
 
-    final textBefore = useState<String?>(null);
-    // Wrapped, since no attachment is a draft too
-    final attachmentBefore = useState<((String, MessageContent?)?,)?>(null);
-
-    /// The sticker to send, which replaces the text field until it is sent or
-    /// removed, as stickers can't have a caption
-    final sticker = useState<(String, PackImage)?>(null);
-
-    final poll = useState<PollStart?>(null);
-    final location = useState<LocationMessageContent?>(null);
-    final ComposerParams composer = (roomId: roomId, threadRoot: threadRoot);
-    final botCommandProvider = BotCommandDraftController.provider(composer);
-    final attachmentProvider = AttachmentController.provider(composer);
-    final botCommand = ref.watch(botCommandProvider);
-    useEffect(() {
-      sticker.value = null;
-      poll.value = null;
-      location.value = null;
-      return null;
-    }, [roomId]);
-
-    final hasReplacement =
-        sticker.value != null ||
-        poll.value != null ||
-        location.value != null ||
-        botCommand != null;
-
-    // The relation type stays as edit after cancelling an edit
-    final isEditing = relationType == .edit && relatedEvent != null;
-
-    useEffect(() {
-      if (relationType == .edit && relatedEvent != null) {
-        textBefore.value ??= controller.text;
-        attachmentBefore.value ??= (ref.read(attachmentProvider),);
-        sticker.value = null;
-        poll.value = null;
-        location.value = null;
-        Future.microtask(ref.read(botCommandProvider.notifier).clear);
-
-        final content = relatedEvent.content;
-        final text =
-            relatedEvent.localContent?.editSource ??
-            switch (content) {
-              TextMessageContent(:final body) ||
-              ImageMessageContent(:final body) ||
-              VideoMessageContent(:final body) ||
-              AudioMessageContent(:final body) ||
-              FileMessageContent(:final body) => body,
-              _ => "",
-            };
-
-        controller.value = .new(
-          text: text,
-          selection: .collapsed(offset: text.length),
-        );
-
-        Future.microtask(
-          () => ref
-              .read(attachmentProvider.notifier)
-              .set(
-                content is MessageContent && content.isMedia
-                    ? (
-                        content.filename ?? content.body ?? "Attachment",
-                        content,
-                      )
-                    : null,
-              ),
-        );
-      } else {
-        if (textBefore.value case final draft?) {
-          controller.value = .new(
-            text: draft,
-            selection: .collapsed(offset: draft.length),
-          );
-          textBefore.value = null;
-        }
-
-        if (attachmentBefore.value case (final draft,)) {
-          Future.microtask(
-            () => ref.read(attachmentProvider.notifier).set(draft),
-          );
-          attachmentBefore.value = null;
-        }
-      }
-
-      return null;
-    }, [relationType, relatedEvent == null]);
+    void dismiss() {
+      draftNotifier.dismiss();
+      // Ending an edit replaces the text field, losing its focus
+      WidgetsBinding.instance.addPostFrameCallback((_) => node?.requestFocus());
+    }
 
     final sinceTypingSent = useMemoized(Stopwatch.new);
+    final client = ref.watch(ClientController.provider.notifier);
 
-    useEffect(() {
-      final client = ref.read(ClientController.provider.notifier);
+    void stopTyping() {
+      if (!sinceTypingSent.isRunning) return;
+      sinceTypingSent
+        ..stop()
+        ..reset();
+      client.setTyping(roomId, .zero).ignore();
+    }
 
-      void stopTyping() {
-        if (!sinceTypingSent.isRunning) return;
-        sinceTypingSent
-          ..stop()
-          ..reset();
-        client.setTyping(roomId, .zero).ignore();
+    // Stops typing in the previous room, or the message before an edit
+    useEffect(() => stopTyping, [controller]);
+
+    // Called by FlutterTagger for changes once attached, unlike a listener on
+    // the controller, which is also told about the draft being restored
+    // during the build
+    void onFormattedTextChanged(String text) {
+      if (text == ref.read(draftProvider).text) return;
+      draftNotifier.update(
+        (draft) => draft.copyWith(text: text, tags: controller.tags.toIList()),
+      );
+
+      final shouldSend =
+          ref.read(SettingsController.provider).value?.typingIndicators ==
+          .showAndSend;
+
+      if (!shouldSend || controller.text.isEmpty) return stopTyping();
+
+      if (sinceTypingSent.isRunning &&
+          sinceTypingSent.elapsed < const .new(seconds: 5)) {
+        return;
       }
 
-      void onChanged() {
-        final shouldSend =
-            ref.read(SettingsController.provider).value?.typingIndicators ==
-            .showAndSend;
-
-        if (!shouldSend || controller.text.isEmpty) return stopTyping();
-
-        if (sinceTypingSent.isRunning &&
-            sinceTypingSent.elapsed < const .new(seconds: 5)) {
-          return;
-        }
-
-        sinceTypingSent
-          ..reset()
-          ..start();
-        client.setTyping(roomId, const .new(seconds: 10)).ignore();
-      }
-
-      controller.addListener(onChanged);
-      return () {
-        controller.removeListener(onChanged);
-        stopTyping();
-      };
-    }, [roomId]);
+      sinceTypingSent
+        ..reset()
+        ..start();
+      client.setTyping(roomId, const .new(seconds: 10)).ignore();
+    }
 
     final attachment = ref.watch(attachmentProvider);
 
@@ -322,10 +295,10 @@ class const Composer(
     }
 
     void removeBotCommand({required bool keepText}) {
+      // The text field gets a new controller from the draft once it's back
       if (botCommand?.command.prefix case final prefix? when keepText) {
-        controller.value = .new(
-          text: prefix,
-          selection: .collapsed(offset: prefix.length),
+        draftNotifier.update(
+          (draft) => draft.copyWith(text: prefix, tags: const .empty()),
         );
       }
       ref.read(botCommandProvider.notifier).clear();
@@ -355,20 +328,20 @@ class const Composer(
           }
         }
 
-        if (sticker.value case (final shortcode, final image)?) {
+        if (sticker case (final shortcode, final image)?) {
           onSendSticker(shortcode, image, shouldMention: shouldMention.value);
-        } else if (poll.value case final draft?) {
+        } else if (poll case final draft?) {
           onSendPoll(draft, shouldMention: shouldMention.value);
-        } else if (location.value case final draft?) {
+        } else if (location case final draft?) {
           onSendLocation(draft, shouldMention: shouldMention.value);
         } else if (botCommand != null) {
           onSendBotCommand(botCommand);
         }
-        onDismiss();
+        dismiss();
         // The draft is kept, so it can still be sent after the replacement
-        sticker.value = null;
-        poll.value = null;
-        location.value = null;
+        draftNotifier.update(
+          (draft) => draft.copyWith(sticker: null, poll: null, location: null),
+        );
         ref.read(botCommandProvider.notifier).clear();
         // Once the text field is back
         WidgetsBinding.instance.addPostFrameCallback(
@@ -395,8 +368,9 @@ class const Composer(
         tags: .new(controller.tags),
       );
 
-      onDismiss();
+      // Before dismissing, which restores the draft from before an edit
       controller.text = "";
+      dismiss();
     }
 
     KeyEventResult sendOnEnter(FocusNode _, KeyEvent event) {
@@ -457,7 +431,7 @@ class const Composer(
                   toggleShouldMention: () =>
                       shouldMention.value = !shouldMention.value,
                   relationType: relationType,
-                  onDismiss: onDismiss,
+                  onDismiss: dismiss,
                 ),
                 Container(
                   color: theme.colorScheme.surfaceContainerHighest,
@@ -560,7 +534,11 @@ class const Composer(
                                         roomId: roomId,
                                         onSelection: (shortcode, image) {
                                           Navigator.of(context).pop();
-                                          sticker.value = (shortcode, image);
+                                          draftNotifier.update(
+                                            (draft) => draft.copyWith(
+                                              sticker: (shortcode, image),
+                                            ),
+                                          );
                                         },
                                       ),
                                     ),
@@ -576,7 +554,10 @@ class const Composer(
                                       (context) => CreatePollSheet(
                                         onCreate: (created) {
                                           Navigator.of(context).pop();
-                                          poll.value = created;
+                                          draftNotifier.update(
+                                            (draft) =>
+                                                draft.copyWith(poll: created),
+                                          );
                                         },
                                       ),
                                     ),
@@ -592,7 +573,10 @@ class const Composer(
                                     (context) => LocationPickerSheet(
                                       onPick: (picked) {
                                         Navigator.of(context).pop();
-                                        location.value = picked;
+                                        draftNotifier.update(
+                                          (draft) =>
+                                              draft.copyWith(location: picked),
+                                        );
                                       },
                                     ),
                                   ),
@@ -610,16 +594,18 @@ class const Composer(
                                 duration: Durations.short4,
                                 alignment: .bottomCenter,
                                 child: switch ((
-                                  sticker.value,
-                                  poll.value,
-                                  location.value,
+                                  sticker,
+                                  poll,
+                                  location,
                                   botCommand,
                                 )) {
                                   (_, final draft?, _, _) =>
                                     ComposerReplacement(
                                       removeTooltip: "Remove poll",
                                       onRemove: () {
-                                        poll.value = null;
+                                        draftNotifier.update(
+                                          (draft) => draft.copyWith(poll: null),
+                                        );
                                         node?.requestFocus();
                                       },
                                       onKeyEvent: sendOnEnter,
@@ -642,7 +628,10 @@ class const Composer(
                                     ComposerReplacement(
                                       removeTooltip: "Remove sticker",
                                       onRemove: () {
-                                        sticker.value = null;
+                                        draftNotifier.update(
+                                          (draft) =>
+                                              draft.copyWith(sticker: null),
+                                        );
                                         node?.requestFocus();
                                       },
                                       onKeyEvent: sendOnEnter,
@@ -661,7 +650,10 @@ class const Composer(
                                     ComposerReplacement(
                                       removeTooltip: "Remove location",
                                       onRemove: () {
-                                        location.value = null;
+                                        draftNotifier.update(
+                                          (draft) =>
+                                              draft.copyWith(location: null),
+                                        );
                                         node?.requestFocus();
                                       },
                                       onKeyEvent: sendOnEnter,
@@ -701,7 +693,18 @@ class const Composer(
                                       ),
                                     ),
                                   (null, null, null, null) => FlutterTagger(
+                                    // Attaches each new controller
+                                    key: ObjectKey(controller),
                                     triggerStrategy: .eager,
+                                    onFormattedTextChanged:
+                                        onFormattedTextChanged,
+                                    // Keeps the trigger character, so tags
+                                    // can be restored from drafts
+                                    tagTextFormatter: (
+                                      id,
+                                      tag,
+                                      triggerCharacter,
+                                    ) => "$triggerCharacter$id#$tag#",
                                     // Characters that continue a search, for
                                     // e.g. :+1, :custom_emoji or @user:server
                                     searchRegex: .new(r"^[\w.:+-]*$"),

@@ -95,10 +95,14 @@ class BotCommandDraftController(final ComposerParams composer)
     }
   }
 
+  void set(BotCommandDraft? draft) => state = draft;
+
   void clear() => state = null;
 
-  static final provider = NotifierProvider.autoDispose
-      .family<BotCommandDraftController, BotCommandDraft?, ComposerParams>(
-        BotCommandDraftController.new,
-      );
+  static final provider =
+      NotifierProvider.family<
+        BotCommandDraftController,
+        BotCommandDraft?,
+        ComposerParams
+      >(BotCommandDraftController.new);
 }
