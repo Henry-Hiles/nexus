@@ -95,7 +95,7 @@ void main(List<String> args) async {
       WindowManager.instance.getCurrent()
         ?..titleBarStyle = .hidden
         ..isWindowControlButtonsVisible = false
-        ..minimumSize = Size.square(300).toNative();
+        ..minimumSize = Size.square(320).toNative();
     }
 
     runApp(
