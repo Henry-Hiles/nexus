@@ -1,3 +1,5 @@
+import "dart:math";
+
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:material_ui/material_ui.dart";
 import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
@@ -44,7 +46,7 @@ class const ReadReceiptsRow(
                   // If they don't all fit, the last spot shows how many more there are
                   final shown = receipts.length <= fits
                       ? receipts.length
-                      : fits - 1;
+                      : max(0, fits - 1);
 
                   return Align(
                     alignment: .centerRight,
