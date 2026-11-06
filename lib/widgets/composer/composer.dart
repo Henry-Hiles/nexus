@@ -8,6 +8,7 @@ import "package:nexus/controllers/bot_command_draft.dart";
 import "package:nexus/controllers/bot_commands.dart";
 import "package:nexus/controllers/composer_draft.dart";
 import "package:nexus/controllers/rooms.dart";
+import "package:nexus/helpers/extensions/refocus_after_rebuild.dart";
 import "package:nexus/helpers/extensions/show_error_snack_bar.dart";
 import "package:nexus/helpers/extensions/with_latest_edit.dart";
 import "package:nexus/models/bot_command.dart";
@@ -178,8 +179,8 @@ class const Composer(
 
     void dismiss() {
       draftNotifier.dismiss();
-      // Ending an edit replaces the text field, losing its focus
-      WidgetsBinding.instance.addPostFrameCallback((_) => node?.requestFocus());
+      // Ending an edit replaces the text field
+      if (isEditing && (node?.hasFocus ?? false)) node?.refocusAfterRebuild();
     }
 
     final sinceTypingSent = useMemoized(Stopwatch.new);
@@ -302,7 +303,8 @@ class const Composer(
         );
       }
       ref.read(botCommandProvider.notifier).clear();
-      WidgetsBinding.instance.addPostFrameCallback((_) => node?.requestFocus());
+      // The text field replaces the command form
+      node?.refocusAfterRebuild();
     }
 
     void send() {

@@ -3,6 +3,7 @@ import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:material_ui/material_ui.dart";
 import "package:nexus/controllers/composer_draft.dart";
+import "package:nexus/helpers/extensions/refocus_after_rebuild.dart";
 import "package:nexus/models/composer_params.dart";
 import "package:nexus/models/relation_type.dart";
 
@@ -17,11 +18,10 @@ final class ChatComposer({
     final node = useFocusNode(
       onKeyEvent: (node, event) {
         if (event is KeyDownEvent && event.logicalKey == .escape) {
+          final isEditing = ref.read(provider).isEditing;
           ref.read(provider.notifier).dismiss();
-          // Ending an edit replaces the text field, losing its focus
-          WidgetsBinding.instance.addPostFrameCallback(
-            (_) => node.requestFocus(),
-          );
+          // Ending an edit replaces the text field
+          if (isEditing) node.refocusAfterRebuild();
           return .handled;
         }
 
@@ -44,7 +44,11 @@ final class ChatComposer({
 
   void relate(int rowId, RelationType type) {
     notifier.relate(rowId, type);
-    // Starting an edit replaces the text field, losing its focus
-    WidgetsBinding.instance.addPostFrameCallback((_) => node.requestFocus());
+    // Starting or ending an edit replaces the text field
+    if (type == .edit || relationType == .edit) {
+      node.refocusAfterRebuild();
+    } else {
+      node.requestFocus();
+    }
   }
 }
