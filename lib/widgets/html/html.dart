@@ -2,6 +2,7 @@ import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:material_ui/material_ui.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart";
+import "package:html/dom.dart" as dom;
 import "package:nexus/helpers/extensions/get_link_info.dart";
 import "package:nexus/helpers/launch_helper.dart";
 import "package:nexus/helpers/mxc_image.dart";
@@ -63,6 +64,20 @@ class const Html(
 
         "blockquote" => Quoted(
           Html(element.innerHtml, textStyle: textStyle, roomId: roomId),
+        ),
+
+        "font" => InlineCustomWidget(
+          child: Html(
+            (dom.Element.tag("span")
+                  ..attributes.addAll({
+                    "data-mx-color": ?element.attributes["color"],
+                    ...element.attributes,
+                  })
+                  ..innerHtml = element.innerHtml)
+                .outerHtml,
+            textStyle: textStyle,
+            roomId: roomId,
+          ),
         ),
 
         "a" =>

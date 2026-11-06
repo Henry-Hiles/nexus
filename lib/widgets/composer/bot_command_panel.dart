@@ -8,13 +8,16 @@ import "package:nexus/controllers/bot_argument_suggestions.dart";
 import "package:nexus/controllers/bot_command_draft.dart";
 import "package:nexus/models/bot_argument_suggestion.dart";
 import "package:nexus/models/bot_command.dart";
+import "package:nexus/models/text_command.dart";
 import "package:nexus/widgets/avatar_or_hash.dart";
 
 class const BotCommandPanel(
   final ComposerParams composer, {
   required final IList<BotCommand> commands,
+  required final IList<TextCommand> textCommands,
   required final TextEditingController controller,
   required final void Function(BotCommand command) onPick,
+  required final void Function(TextCommand command) onPickText,
   super.key,
 }) extends HookConsumerWidget {
   @override
@@ -49,13 +52,27 @@ class const BotCommandPanel(
     );
 
     final children = switch (ref.watch(draftProvider)) {
-      null =>
-        commands
+      null => [
+        ...textCommands
+            .where((command) => command.completes(text.value))
+            .map(
+              (command) => ListTile(
+                leading: AvatarOrHash(null, "gomuks", dimension: 32),
+                title: Text(command.prefix),
+                subtitle: Text(
+                  "gomuks · ${command.description}",
+                  maxLines: 1,
+                  overflow: .ellipsis,
+                ),
+                onTap: () => onPickText(command),
+              ),
+            ),
+        ...commands
             .where((command) => command.completes(text.value))
             .map(
               (command) => commandTile(command, onTap: () => onPick(command)),
-            )
-            .toList(),
+            ),
+      ],
       final draft => [
         commandTile(draft.command),
         if (draft.focusedParameter case final parameter?)

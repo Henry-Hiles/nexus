@@ -9,6 +9,7 @@ import "package:nexus/models/composer_draft.dart";
 import "package:nexus/models/composer_params.dart";
 import "package:nexus/models/content/message.dart";
 import "package:nexus/models/relation_type.dart";
+import "package:nexus/models/text_command.dart";
 
 class ComposerDraftController(final ComposerParams composer)
     extends Notifier<ComposerDraft> {
@@ -35,19 +36,22 @@ class ComposerDraftController(final ComposerParams composer)
         .read(RoomsController.provider)[composer.roomId]
         ?.withLatestEdit(rowId);
     final content = event?.content;
-    final text =
-        event?.localContent?.editSource ??
-        switch (content) {
-          TextMessageContent(:final body) ||
-          ImageMessageContent(:final body) ||
-          VideoMessageContent(:final body) ||
-          AudioMessageContent(:final body) ||
-          FileMessageContent(:final body) => body,
-          _ => "",
-        };
+    // Edit sources start with text commands, like "/me "
+    final (:commands, :text) = TextCommand.parse(
+      event?.localContent?.editSource ??
+          switch (content) {
+            TextMessageContent(:final body) ||
+            ImageMessageContent(:final body) ||
+            VideoMessageContent(:final body) ||
+            AudioMessageContent(:final body) ||
+            FileMessageContent(:final body) => body,
+            _ => "",
+          },
+    );
 
     state = ComposerDraft(
       text: text,
+      textCommands: commands,
       relatedEvent: rowId,
       relationType: .edit,
       beforeEdit:

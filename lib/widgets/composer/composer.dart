@@ -14,6 +14,7 @@ import "package:nexus/helpers/extensions/with_latest_edit.dart";
 import "package:nexus/models/bot_command.dart";
 import "package:nexus/models/bot_command_draft.dart";
 import "package:nexus/models/composer_params.dart";
+import "package:nexus/models/text_command.dart";
 import "package:nexus/widgets/composer/bot_command_form.dart";
 import "package:nexus/widgets/composer/bot_command_panel.dart";
 import "package:nexus/widgets/emoji_picker.dart";
@@ -90,6 +91,7 @@ class const Composer(
       :sticker,
       :poll,
       :location,
+      :textCommands,
     ) = ref.watch(
       draftProvider.select(
         (draft) => (
@@ -99,6 +101,7 @@ class const Composer(
           sticker: draft.sticker,
           poll: draft.poll,
           location: draft.location,
+          textCommands: draft.textCommands,
         ),
       ),
     );
@@ -269,10 +272,56 @@ class const Composer(
       return false;
     }
 
-    final botCommands = isEditing || hasReplacement || attachment != null
+    // Bot commands can't follow text commands, which gomuks sends as text
+    final botCommands =
+        isEditing ||
+            hasReplacement ||
+            attachment != null ||
+            textCommands.isNotEmpty
         ? const IList<BotCommand>.empty()
         : ref.watch(BotCommandsController.provider(roomId)).value ??
               const .empty();
+
+    final availableTextCommands = hasReplacement || attachment != null
+        ? const IList<TextCommand>.empty()
+        : TextCommand.values
+              .where((command) => !textCommands.contains(command))
+              .toIList();
+
+    void setTextCommands(IList<TextCommand> commands) =>
+        draftNotifier.update((draft) => draft.copyWith(textCommands: commands));
+
+    void pickTextCommand(TextCommand command) {
+      setTextCommands(command.addTo(textCommands));
+      controller.text = "";
+      node?.requestFocus();
+    }
+
+    void removeTextCommand(TextCommand command) {
+      setTextCommands(textCommands.remove(command));
+      node?.requestFocus();
+    }
+
+    /// Turns text commands typed at the start, like "/me ", into chips.
+    /// Returns whether there were any.
+    bool pickTypedTextCommands(String text) {
+      if (availableTextCommands.isEmpty) return false;
+      final parsed = TextCommand.parse(text, textCommands);
+      if (parsed.text == text) return false;
+
+      setTextCommands(parsed.commands);
+      final removed = text.length - parsed.text.length;
+      controller.value = .new(
+        text: parsed.text,
+        selection: .collapsed(
+          offset: (controller.selection.baseOffset - removed).clamp(
+            0,
+            parsed.text.length,
+          ),
+        ),
+      );
+      return true;
+    }
 
     void pickBotCommand(BotCommand command) {
       ref
@@ -290,7 +339,8 @@ class const Composer(
       [] => null,
     };
 
-    void pickTypedBotCommand(String text) {
+    void pickTypedCommand(String text) {
+      if (pickTypedTextCommands(text)) return;
       if (botCommands.any((command) => command.prefix.startsWith(text))) return;
       if (typedBotCommand(text) case final command?) pickBotCommand(command);
     }
@@ -352,10 +402,19 @@ class const Composer(
         return;
       }
 
-      if (typedBotCommand(controller.text) ??
-              botCommands.firstWhereOrNull(
-                (command) => command.completes(controller.text),
-              )
+      // In the order the command panel shows them
+      if (typedBotCommand(controller.text) case final command?) {
+        return pickBotCommand(command);
+      }
+      if (availableTextCommands.firstWhereOrNull(
+            (command) => command.completes(controller.text),
+          )
+          case final command?) {
+        return pickTextCommand(command);
+      }
+      if (botCommands.firstWhereOrNull(
+            (command) => command.completes(controller.text),
+          )
           case final command?) {
         return pickBotCommand(command);
       }
@@ -365,13 +424,14 @@ class const Composer(
         return;
       }
       onSend(
-        controller.formattedText,
+        "${TextCommand.prefixOf(textCommands)}${controller.formattedText}",
         shouldMention: shouldMention.value,
         tags: .new(controller.tags),
       );
 
       // Before dismissing, which restores the draft from before an edit
       controller.text = "";
+      setTextCommands(const .empty());
       dismiss();
     }
 
@@ -384,6 +444,25 @@ class const Composer(
       }
 
       return .ignored;
+    }
+
+    KeyEventResult onTextFieldKeyEvent(FocusNode node, KeyEvent event) {
+      if (textCommands.lastOrNull case final command?
+          when event is KeyDownEvent &&
+              event.logicalKey == .backspace &&
+              controller.selection.isCollapsed &&
+              controller.selection.baseOffset == 0) {
+        setTextCommands(textCommands.removeLast());
+        if (controller.text.isEmpty) {
+          controller.value = .new(
+            text: command.prefix,
+            selection: .collapsed(offset: command.prefix.length),
+          );
+        }
+        return .handled;
+      }
+
+      return sendOnEnter(node, event);
     }
 
     final style = TextStyle(
@@ -419,8 +498,10 @@ class const Composer(
             child: BotCommandPanel(
               composer,
               commands: botCommands,
+              textCommands: availableTextCommands,
               controller: controller,
               onPick: pickBotCommand,
+              onPickText: pickTextCommand,
             ),
           ),
           ClipRRect(
@@ -731,7 +812,7 @@ class const Composer(
                                       ":": style,
                                     },
                                     builder: (context, key) => Focus(
-                                      onKeyEvent: sendOnEnter,
+                                      onKeyEvent: onTextFieldKeyEvent,
                                       // Overrides the keyboard shortcut for pasting
                                       child: Actions(
                                         actions: {
@@ -739,60 +820,85 @@ class const Composer(
                                             pasteFiles,
                                           ),
                                         },
-                                        child: TextField(
-                                          maxLines: 12,
-                                          minLines: 1,
-                                          textCapitalization: .sentences,
-                                          onChanged: pickTypedBotCommand,
-                                          autofocus:
-                                              (Platform.isLinux ||
-                                              Platform.isMacOS ||
-                                              Platform.isWindows),
-                                          decoration: .new(
-                                            hintText: "Your message here...",
-                                            border: .none,
-                                          ),
-                                          controller: controller,
-                                          key: key,
-                                          focusNode: node,
-                                          // The toolbar's paste button doesn't use the shortcut's action, so replace it too
-                                          contextMenuBuilder: (_, editableText) =>
-                                              AdaptiveTextSelectionToolbar.buttonItems(
-                                                anchors: editableText
-                                                    .contextMenuAnchors,
-                                                buttonItems: editableText
-                                                    .contextMenuButtonItems
-                                                    .map(
-                                                      (item) =>
-                                                          item.type == .paste
-                                                          ? item.copyWith(
-                                                              onPressed: () async {
-                                                                editableText
-                                                                    .hideToolbar();
-                                                                if (!await pasteFiles()) {
-                                                                  item.onPressed
-                                                                      ?.call();
-                                                                }
-                                                              },
-                                                            )
-                                                          : item,
-                                                    )
-                                                    .toList(),
+                                        child: Row(
+                                          spacing: 4,
+                                          children: [
+                                            ...textCommands.map(
+                                              (command) => InputChip(
+                                                label: Text(command.prefix),
+                                                tooltip: command.description,
+                                                visualDensity: .compact,
+                                                materialTapTargetSize:
+                                                    .shrinkWrap,
+                                                onDeleted: () =>
+                                                    removeTextCommand(command),
                                               ),
-                                          // Images pasted from Android keyboards' clipboards are inserted as content
-                                          contentInsertionConfiguration: .new(
-                                            onContentInserted: (content) {
-                                              if (attachment != null) return;
+                                            ),
+                                            Expanded(
+                                              child: TextField(
+                                                maxLines: 12,
+                                                minLines: 1,
+                                                textCapitalization: .sentences,
+                                                onChanged: pickTypedCommand,
+                                                autofocus:
+                                                    (Platform.isLinux ||
+                                                    Platform.isMacOS ||
+                                                    Platform.isWindows),
+                                                decoration: .new(
+                                                  hintText:
+                                                      "Your message here...",
+                                                  border: .none,
+                                                ),
+                                                controller: controller,
+                                                key: key,
+                                                focusNode: node,
+                                                // The toolbar's paste button doesn't use the shortcut's action, so replace it too
+                                                contextMenuBuilder:
+                                                    (
+                                                      _,
+                                                      editableText,
+                                                    ) => AdaptiveTextSelectionToolbar.buttonItems(
+                                                      anchors: editableText
+                                                          .contextMenuAnchors,
+                                                      buttonItems: editableText
+                                                          .contextMenuButtonItems
+                                                          .map(
+                                                            (item) =>
+                                                                item.type ==
+                                                                    .paste
+                                                                ? item.copyWith(
+                                                                    onPressed: () async {
+                                                                      editableText
+                                                                          .hideToolbar();
+                                                                      if (!await pasteFiles()) {
+                                                                        item.onPressed
+                                                                            ?.call();
+                                                                      }
+                                                                    },
+                                                                  )
+                                                                : item,
+                                                          )
+                                                          .toList(),
+                                                    ),
+                                                // Images pasted from Android keyboards' clipboards are inserted as content
+                                                contentInsertionConfiguration: .new(
+                                                  onContentInserted: (content) {
+                                                    if (attachment != null) {
+                                                      return;
+                                                    }
 
-                                              if (content.data
-                                                  case final data?) {
-                                                attachBytes(
-                                                  data,
-                                                  "image.${content.mimeType.split("/").last}",
-                                                ).onError(showError);
-                                              }
-                                            },
-                                          ),
+                                                    if (content.data
+                                                        case final data?) {
+                                                      attachBytes(
+                                                        data,
+                                                        "image.${content.mimeType.split("/").last}",
+                                                      ).onError(showError);
+                                                    }
+                                                  },
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ),
