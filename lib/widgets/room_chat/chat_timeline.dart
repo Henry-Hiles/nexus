@@ -34,6 +34,7 @@ class const ChatTimeline({
       getEventOptions: getEventOptions,
       onSwipe: onSwipe == null ? null : () => onSwipe!(eventRowId),
       readReceiptsChat: chat,
+      threadRoot: chat.threadRoot,
     ),
     key: key,
     isHighlighted: scroll.highlightedEvent == eventRowId,

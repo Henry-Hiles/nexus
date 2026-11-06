@@ -64,6 +64,10 @@ class const EventRenderer(
   /// If set, shows who in this chat has read up to this event, e.g. in the
   /// timeline.
   final ChatParams? readReceiptsChat,
+
+  /// The root of the thread this is shown in, if any, to set it apart from the
+  /// replies.
+  final String? threadRoot,
   super.key,
 }) extends HookConsumerWidget {
   @override
@@ -121,7 +125,9 @@ class const EventRenderer(
 
     if (isHidden && !textOnly) return SizedBox.shrink();
 
+    final isThreadRoot = threadRoot != null && event.eventId == threadRoot;
     final isGrouped =
+        (threadRoot == null || previousEvent?.eventId != threadRoot) &&
         (previousEvent?.isShownAsMessage ?? false) &&
         event.sender == previousEvent?.sender &&
         event.pmp?.id == previousEvent?.pmp?.id;
@@ -166,7 +172,8 @@ class const EventRenderer(
       ),
     );
 
-    final child = event.isShownAsMessage
+    final child =
+        event.isShownAsMessage || (isThreadRoot && event.redactedBy != null)
         ? MessageRenderer(
             event,
             onTapReply: jumpToEvent == null
@@ -560,6 +567,8 @@ class const EventRenderer(
           )
         else if (threadSummary != null)
           Padding(padding: .only(left: 4), child: threadSummary),
+
+        if (isThreadRoot && !textOnly) Divider(height: 16),
       ],
     );
   }

@@ -55,6 +55,10 @@ class const MessageRenderer(
     );
 
     final rendered = switch (event.content) {
+      _ when event.redactedBy != null => Text(
+        "Redacted event",
+        style: errorStyle,
+      ),
       EncryptedContent() => Text("Unable to decrypt event", style: errorStyle),
       StickerContent(:final body, :final url, :final info) =>
         textOnly
