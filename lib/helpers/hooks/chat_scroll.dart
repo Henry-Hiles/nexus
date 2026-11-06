@@ -150,9 +150,9 @@ final class ChatScroll({
             await paginate(.backward);
           } else if (isHistorical && position.extentBefore <= loadThreshold) {
             await paginate(.forward);
-          } else if (position.extentBefore <= 0) {
-            await markRead();
           }
+
+          if (!isHistorical && position.extentBefore <= 0) await markRead();
 
           if (controllerData.isLoading == false &&
               position.extentBefore <= 0 &&

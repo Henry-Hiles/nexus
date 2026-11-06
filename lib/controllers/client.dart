@@ -1,7 +1,6 @@
 import "dart:async";
 import "dart:ffi";
 import "dart:io";
-import "dart:math";
 
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:ffi/ffi.dart";
@@ -12,6 +11,7 @@ import "package:nexus/controllers/active_account.dart";
 import "package:nexus/controllers/client_state.dart";
 import "package:nexus/controllers/settings.dart";
 import "package:nexus/helpers/extensions/gomuks_buffer.dart";
+import "package:nexus/helpers/extensions/event_id_is_fake.dart";
 import "package:nexus/helpers/extensions/thread_events.dart";
 import "package:nexus/main.dart";
 import "package:nexus/models/content/bot_command_description.dart";
@@ -441,13 +441,19 @@ class ClientController(final String? accountId) extends AsyncNotifier<int> {
   Future<void> markRead(Room room, {String? threadRoot}) async {
     if (room.metadata == null) return;
     final event = switch (threadRoot) {
-      final threadRoot? => room.latestThreadEvent(threadRoot),
-      null when room.timeline.isEmpty => null,
-      null => switch (room.timeline[room.timeline.keys.reduce(max)]) {
-        final rowId? => room.events[rowId],
-        null => null,
-      },
-    };
+      final threadRoot? => [
+        ?room.latestThreadEvent(threadRoot),
+        ...room.threadEvents(threadRoot).reversed,
+      ],
+      null =>
+        room.timeline.entries
+            .toIList()
+            .sort((a, b) => b.key.compareTo(a.key))
+            .map((entry) => entry.value)
+            .nonNulls
+            .map((rowId) => room.events[rowId])
+            .nonNulls,
+    }.where((event) => !event.eventId.isFake).firstOrNull;
 
     if (event == null) return;
 
