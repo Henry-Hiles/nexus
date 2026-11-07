@@ -3,7 +3,6 @@ import "dart:math";
 
 import "package:collection/collection.dart";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
-import "package:flutter/foundation.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:fluttertagger/fluttertagger.dart";
 import "package:nexus/controllers/attachment.dart";
@@ -83,14 +82,6 @@ class RoomChatController(final ChatParams info)
           // Threads are shown from their root instead
           .where((rowId) => room.events[rowId]?.threadRoot == null)
           .toIList();
-
-      // TODO: remove, debugging replies not showing
-      debugPrint(
-        "[timeline] build ${info.roomId}: "
-        "syncedTail=${room.timeline.entries.sortedBy<num>((entry) => entry.key).reversed.take(5).map((entry) => "${entry.key}:${entry.value}").toList()} "
-        "clientSticky=${room.clientSticky.toList()} "
-        "chatTail=${timeline.reversed.take(5).toList()}",
-      );
 
       if (info.contextualEvent == null ||
           timeline.contains(info.contextualEvent)) {
@@ -465,11 +456,6 @@ class RoomChatController(final ChatParams info)
 
   /// Shows [event], which was just sent, until it comes down sync.
   void addSent(Event? event) {
-    // TODO: remove, debugging replies not showing
-    debugPrint(
-      "[timeline] addSent: rowId=${event?.rowId} eventId=${event?.eventId} "
-      "alreadySynced=${ref.read(RoomsController.provider)[info.roomId]?.timeline.values.contains(event?.rowId)}",
-    );
     if (event case final event?) {
       ref
           .read(RoomsController.provider.notifier)
