@@ -1,0 +1,28 @@
+name: "End-to-end tests"
+
+on:
+    push:
+        branches: ["main"]
+    pull_request:
+    workflow_dispatch:
+
+jobs:
+    e2e:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v6
+              with:
+                  submodules: recursive
+
+            - name: Lix GHA Installer Action
+              uses: samueldr/lix-gha-installer-action@v2026-02-22
+              with:
+                  extra_nix_config: experimental-features = nix-command flakes flake-self-attrs
+
+            - name: Generate code
+              run: nix develop --command bash -c "flutter pub get && dart scripts/generate.dart && flutter pub run build_runner build"
+
+            - name: Run end-to-end tests
+              run: nix run .#e2e-headless

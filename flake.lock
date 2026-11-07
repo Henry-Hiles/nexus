@@ -27,11 +27,11 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1794004794,
-        "narHash": "sha256-fNmKraRLE963JuV3K4giays4KcOVCGpjvFuEG2E0hmE=",
+        "lastModified": 1794063651,
+        "narHash": "sha256-EXBj8a1aBO99CpMZWGqf6z6D/LFdsW/aB2xfDDrJuHw=",
         "ref": "refs/heads/quad/fix/latest-event-in-thread-aggregation",
-        "rev": "35813f52748c31b0b10cc72e69dabef6a838c46a",
-        "revCount": 8067,
+        "rev": "40a4100ec8734d18f8baf8b0dcfea80b6944e90e",
+        "revCount": 8068,
         "type": "git",
         "url": "file:///home/quadradical/Documents/Code/continuwuity"
       },
