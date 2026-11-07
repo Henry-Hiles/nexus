@@ -100,6 +100,13 @@ final class ChatScroll({
       final anchorIndex = items.indexOf(anchor);
 
       final historyLength = anchorIndex == -1 ? items.length : anchorIndex + 1;
+      // TODO: remove, debugging replies not showing
+      debugPrint(
+        "[timeline] split: anchor=$anchor anchorIndex=$anchorIndex "
+        "length=${items.length} "
+        "historyTail=${items.take(historyLength).toList().reversed.take(3).toList()} "
+        "live=${items.skip(historyLength).toList()}",
+      );
       return (
         history: items.take(historyLength).toIList().reversed.toIList(),
         live: items.skip(historyLength).toIList(),
@@ -112,6 +119,11 @@ final class ChatScroll({
     useEffect(() {
       final previous = previousLastRowId.value;
       previousLastRowId.value = lastRowId;
+      // TODO: remove, debugging replies not showing
+      debugPrint(
+        "[timeline] lastRowId: previous=$previous last=$lastRowId "
+        "atBottom=${atBottom.value} contextualEvent=${contextualEvent.value}",
+      );
 
       if (previous == null || lastRowId == null || previous == lastRowId) {
         return null;
@@ -119,6 +131,11 @@ final class ChatScroll({
       if (!atBottom.value || contextualEvent.value != null) return null;
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
+        // TODO: remove, debugging replies not showing
+        debugPrint(
+          "[timeline] re-anchoring to $lastRowId "
+          "hasClients=${scrollController.hasClients}",
+        );
         if (!scrollController.hasClients) return;
 
         anchorId.value = lastRowId;
