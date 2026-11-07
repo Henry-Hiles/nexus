@@ -8,13 +8,22 @@
   libclang,
   flutter,
   stdenv,
+  runCommand,
+  yq,
   src,
   commit ? "dev",
 }:
 
+let
+  pubspec = lib.importJSON (
+    runCommand "pubspec.json" { nativeBuildInputs = [ yq ]; } ''
+      yq . ${src}/pubspec.yaml > $out
+    ''
+  );
+in
 flutter.buildFlutterApplication {
   pname = "nexus";
-  version = "1.0.0";
+  version = lib.head (lib.splitString "+" pubspec.version);
   inherit src;
 
   preBuild = ''
