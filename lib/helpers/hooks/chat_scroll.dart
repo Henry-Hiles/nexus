@@ -14,6 +14,7 @@ final class ChatScroll({
   required final IList<int> liveRows,
   required final GlobalKey centerKey,
   required final ScrollController scrollController,
+
   required final bool atBottom,
   required final int? highlightedEvent,
 
@@ -225,7 +226,7 @@ final class ChatScroll({
       liveRows: split.live,
       centerKey: centerKey,
       scrollController: scrollController,
-      atBottom: atBottom.value,
+      atBottom: atBottom.value && contextualEvent.value == null,
       highlightedEvent: highlightedEvent.value,
       keyFor: keyFor,
       jumpToEvent: (int rowId) async {
