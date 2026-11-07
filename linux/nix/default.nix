@@ -54,6 +54,29 @@
         };
 
       devShells.default = pkgs.callPackage ./devshell.nix { };
+
+      apps.e2e =
+        let
+          buildEnv = import ./build_env.nix { inherit pkgs lib; };
+        in
+        {
+          type = "app";
+          program = lib.getExe (
+            pkgs.writeShellApplication {
+              name = "nexus-e2e";
+              runtimeInputs =
+                buildEnv.packages
+                ++ (with pkgs; [
+                  # TEMPORARY: matrix-continuwuity, once the local fixes are released
+                  inputs.continuwuity.packages.${system}.default
+                  curl
+                  dbus
+                ]);
+              runtimeEnv = buildEnv.env;
+              text = builtins.readFile ./e2e.sh;
+            }
+          );
+        };
     };
 
   flake.nixosModules.default = import ./module.nix self;

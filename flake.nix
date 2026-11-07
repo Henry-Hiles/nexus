@@ -6,6 +6,8 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     flake-parts.url = "github:hercules-ci/flake-parts";
     nix2flatpak.url = "github:neobrain/nix2flatpak";
+    # TEMPORARY: the e2e tests against a local Continuwuity checkout
+    continuwuity.url = "git+file:///home/quadradical/Documents/Code/continuwuity";
   };
 
   outputs =
