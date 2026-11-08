@@ -63,7 +63,7 @@ class const PlayerControls(
             icon: Icon(playing ? Icons.pause_circle : Icons.play_circle),
           );
 
-    Slider slider({EdgeInsetsGeometry? padding}) => Slider(
+    Slider slider({EdgeInsetsGeometry? padding}) => .new(
       padding: padding,
       max: max,
       value: min(position.inMilliseconds.toDouble(), max),
