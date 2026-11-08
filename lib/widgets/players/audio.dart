@@ -36,29 +36,26 @@ class const AudioPlayer(
       return player.dispose;
     }, []);
 
-    return SizedBox(
-      height: 60,
-      child: Card(
-        color: Theme.of(context).colorScheme.surfaceContainer,
-        child: Padding(
-          padding: .symmetric(horizontal: 8),
-          child: PlayerControls(
-            player,
-            loading: !loaded.value,
-            actions: .new([
-              SizedBox(width: 4),
-              IconButton(
-                onPressed: () => context.saveAttachment(
-                  ref,
-                  uri,
-                  encrypted: encrypted,
-                  filename: filename,
-                ),
-                tooltip: "Download",
-                icon: Icon(Icons.download),
+    return Card(
+      color: Theme.of(context).colorScheme.surfaceContainerHigh,
+      child: Padding(
+        padding: .symmetric(horizontal: 8),
+        child: PlayerControls(
+          player,
+          loading: !loaded.value,
+          actions: .new([
+            SizedBox(width: 4),
+            IconButton(
+              onPressed: () => context.saveAttachment(
+                ref,
+                uri,
+                encrypted: encrypted,
+                filename: filename,
               ),
-            ]),
-          ),
+              tooltip: "Download",
+              icon: Icon(Icons.download),
+            ),
+          ]),
         ),
       ),
     );

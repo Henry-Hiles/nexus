@@ -77,7 +77,8 @@ class const PlayerControls(
           ? Column(
               mainAxisSize: .min,
               children: [
-                slider(padding: const .symmetric(horizontal: 12)),
+                SizedBox(height: 12),
+                slider(padding: const .symmetric(horizontal: 16)),
                 Row(
                   children: [
                     playButton,
@@ -94,15 +95,17 @@ class const PlayerControls(
                 ),
               ],
             )
-          : Row(
-              children: [
-                playButton,
-                SizedBox(width: 8),
-                Text(format(position), style: textStyle),
-                Expanded(child: slider()),
-                Text(format(duration), style: textStyle),
-                ...actions,
-              ],
+          : IntrinsicHeight(
+              child: Row(
+                children: [
+                  playButton,
+                  SizedBox(width: 8),
+                  Text(format(position), style: textStyle),
+                  Expanded(child: slider()),
+                  Text(format(duration), style: textStyle),
+                  ...actions,
+                ],
+              ),
             ),
     );
   }
