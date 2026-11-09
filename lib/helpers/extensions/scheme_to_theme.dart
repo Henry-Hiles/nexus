@@ -20,6 +20,8 @@ extension SchemeToTheme on ColorScheme {
         shape: RoundedRectangleBorder(borderRadius: .circular(16)),
         color: surfaceContainerHigh,
       ),
+      // So ink at the edges of a sheet doesn't spill past its rounded corners
+      bottomSheetTheme: .new(clipBehavior: .antiAlias),
       appBarTheme: AppBarTheme(
         titleSpacing: 0,
         backgroundColor: surfaceContainerLow,
