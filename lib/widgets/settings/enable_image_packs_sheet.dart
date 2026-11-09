@@ -8,8 +8,8 @@ import "package:nexus/controllers/room_image_packs.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
 import "package:nexus/models/account_data.dart";
-import "package:nexus/widgets/avatar_or_hash.dart";
-import "package:nexus/widgets/image_pack_avatar.dart";
+import "package:nexus/widgets/avatars/avatar_or_hash.dart";
+import "package:nexus/widgets/avatars/image_pack_avatar.dart";
 
 /// Chooses a room, then which of its image packs to use in every room.
 class const EnableImagePacksSheet({

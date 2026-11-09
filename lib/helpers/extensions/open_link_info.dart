@@ -7,7 +7,7 @@ import "package:nexus/helpers/extensions/focus_room.dart";
 import "package:nexus/helpers/extensions/get_link_info.dart";
 import "package:nexus/helpers/extensions/show_user_popover.dart";
 import "package:nexus/models/room_summary.dart";
-import "package:nexus/widgets/room_summary_sheet.dart";
+import "package:nexus/widgets/rooms/room_summary_sheet.dart";
 
 extension OpenLinkInfo on WidgetRef {
   Future<void> openLinkInfo(

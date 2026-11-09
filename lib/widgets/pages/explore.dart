@@ -14,14 +14,14 @@ import "package:nexus/controllers/settings.dart";
 import "package:nexus/helpers/extensions/get_localpart.dart";
 import "package:nexus/main.dart";
 import "package:nexus/helpers/extensions/room_summary_display.dart";
-import "package:nexus/widgets/add_directory_server_sheet.dart";
-import "package:nexus/widgets/avatar_or_hash.dart";
-import "package:nexus/widgets/room_summary_sheet.dart";
-import "package:nexus/widgets/divider_text.dart";
-import "package:nexus/widgets/error_dialog.dart";
-import "package:nexus/widgets/loading.dart";
-import "package:nexus/widgets/m3e_rail_theme.dart";
-import "package:nexus/widgets/room_directory_card.dart";
+import "package:nexus/widgets/rooms/add_directory_server_sheet.dart";
+import "package:nexus/widgets/avatars/avatar_or_hash.dart";
+import "package:nexus/widgets/rooms/room_summary_sheet.dart";
+import "package:nexus/widgets/common/divider_text.dart";
+import "package:nexus/widgets/common/error_dialog.dart";
+import "package:nexus/widgets/common/loading.dart";
+import "package:nexus/widgets/common/m3e_rail_theme.dart";
+import "package:nexus/widgets/rooms/room_directory_card.dart";
 
 class const ExplorePage({super.key}) extends HookConsumerWidget {
   @override

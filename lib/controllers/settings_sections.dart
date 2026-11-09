@@ -35,15 +35,15 @@ import "package:nexus/models/settings.dart";
 import "package:nexus/models/settings_category.dart";
 import "package:nexus/models/show_and_send.dart";
 import "package:nexus/main.dart";
-import "package:nexus/widgets/avatar_or_hash.dart";
-import "package:nexus/widgets/divider_text.dart";
-import "package:nexus/widgets/image_pack_avatar.dart";
+import "package:nexus/widgets/avatars/avatar_or_hash.dart";
+import "package:nexus/widgets/common/divider_text.dart";
+import "package:nexus/widgets/avatars/image_pack_avatar.dart";
 import "package:nexus/widgets/settings/block_user_field.dart";
 import "package:nexus/widgets/settings/dialog_list_tile.dart";
 import "package:nexus/widgets/settings/enable_image_packs_sheet.dart";
 import "package:nexus/widgets/settings/keyword_field.dart";
-import "package:nexus/widgets/user_bottom_sheet.dart";
-import "package:nexus/widgets/reset_encryption_sheet.dart";
+import "package:nexus/widgets/users/user_bottom_sheet.dart";
+import "package:nexus/widgets/encryption/reset_encryption_sheet.dart";
 
 class SettingsSectionsController
     extends AsyncNotifier<IMap<String, IList<SettingsCategory>>> {

@@ -3,7 +3,7 @@ import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/widgets/composer/overlays/room_overlay.dart";
 import "package:nexus/widgets/composer/overlays/user_overlay.dart";
 import "package:nexus/widgets/composer/overlays/emoji_overlay.dart";
-import "package:nexus/widgets/loading.dart";
+import "package:nexus/widgets/common/loading.dart";
 
 class const TaggerOverlay(
   final String query, {

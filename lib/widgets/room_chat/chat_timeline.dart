@@ -4,7 +4,7 @@ import "package:nexus/controllers/room_chat.dart";
 import "package:nexus/helpers/hooks/chat_scroll.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/widgets/renderers/event.dart";
-import "package:nexus/widgets/highlight_wrapper.dart";
+import "package:nexus/widgets/common/highlight_wrapper.dart";
 import "package:super_sliver_list/super_sliver_list.dart";
 
 class const ChatTimeline({

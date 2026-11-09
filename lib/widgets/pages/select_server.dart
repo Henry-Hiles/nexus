@@ -13,9 +13,9 @@ import "package:nexus/models/gomuks_exception.dart";
 import "package:nexus/models/homeserver.dart";
 import "package:nexus/models/oauth_auth_code_response.dart";
 import "package:nexus/widgets/pages/settings.dart";
-import "package:nexus/widgets/account_switcher.dart";
-import "package:nexus/widgets/appbar.dart";
-import "package:nexus/widgets/divider_text.dart";
+import "package:nexus/widgets/common/account_switcher.dart";
+import "package:nexus/widgets/common/appbar.dart";
+import "package:nexus/widgets/common/divider_text.dart";
 
 class const SelectServerPage({super.key}) extends HookConsumerWidget {
   @override

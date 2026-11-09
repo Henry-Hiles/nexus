@@ -1,0 +1,181 @@
+import "package:fast_immutable_collections/fast_immutable_collections.dart";
+import "package:material_ui/material_ui.dart";
+import "package:flutter_hooks/flutter_hooks.dart";
+import "package:hooks_riverpod/hooks_riverpod.dart";
+import "package:m3e_buttons/m3e_buttons.dart";
+import "package:m3e_card_list/m3e_card_list.dart";
+import "package:nexus/controllers/members_by_status.dart";
+import "package:nexus/controllers/members_grouped.dart";
+import "package:nexus/helpers/extensions/get_localpart.dart";
+import "package:nexus/helpers/extensions/show_user_popover.dart";
+import "package:nexus/helpers/extensions/displayname_color.dart";
+import "package:nexus/models/content/membership.dart";
+import "package:nexus/models/membership_status.dart";
+import "package:nexus/widgets/avatars/avatar_or_hash.dart";
+import "package:nexus/widgets/common/divider_text.dart";
+import "package:nexus/widgets/common/error_dialog.dart";
+import "package:nexus/widgets/common/loading.dart";
+
+class const MemberList(final String roomId, {super.key})
+    extends HookConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final statusIndex = useState(0);
+
+    final options = <String, MembershipStatus>{
+      "Joined": .join,
+      "Invited": .invite,
+      "Knocked": .knock,
+      "Banned": .ban,
+    };
+    final status = options.values.toIList()[statusIndex.value];
+
+    return Drawer(
+      shape: Border(),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Column(
+          children: [
+            Padding(
+              padding: .all(8),
+              child: M3EToggleButtonGroup(
+                selectedIndex: statusIndex.value,
+                onSelectedIndexChanged: (index) =>
+                    statusIndex.value = index ?? statusIndex.value,
+                actions: options
+                    .mapTo(
+                      (name, value) => M3EToggleButtonGroupAction(
+                        checkedLabel: Text(
+                          "$name${switch (ref.watch(MembersByStatusController.provider(.new(roomId: roomId, status: value)))) {
+                            AsyncData(:final value) || AsyncLoading(:final value?) => " (${value.length})",
+                            _ => "",
+                          }}",
+                        ),
+                        label: Text(name),
+                      ),
+                    )
+                    .toList(),
+              ),
+            ),
+
+            switch (ref.watch(
+              MembersGroupedController.provider(
+                .new(roomId: roomId, status: status),
+              ),
+            )) {
+              AsyncError(:final error, :final stackTrace) => ErrorDialog(
+                error,
+                stackTrace,
+              ),
+              AsyncData(:final value) || AsyncLoading(:final value?) =>
+                value.isEmpty
+                    ? Center(
+                        child: Padding(
+                          padding: .symmetric(vertical: 18),
+                          child: Text(
+                            "No ${options.keys.toIList()[statusIndex.value]} Members",
+                            style: Theme.of(context).textTheme.headlineSmall,
+                          ),
+                        ),
+                      )
+                    : Expanded(
+                        child: CustomScrollView(
+                          slivers: value.expand((group) {
+                            final MapEntry(key: powerLevel, value: members) =
+                                group;
+
+                            return [
+                              SliverToBoxAdapter(
+                                child: Padding(
+                                  padding: .symmetric(horizontal: 16),
+                                  child: DividerText(
+                                    powerLevel == null
+                                        ? "Creators"
+                                        : "Power Level $powerLevel",
+                                  ),
+                                ),
+                              ),
+                              SliverM3ECardList(
+                                padding: .all(4),
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .surfaceContainerHigh,
+                                margin: .symmetric(horizontal: 12, vertical: 4),
+                                itemCount: members.length,
+                                itemBuilder: (context, index) =>
+                                    switch (members[index].content) {
+                                      MembershipContent(
+                                        :final avatarUrl,
+                                        :final displayName,
+                                      ) =>
+                                        Consumer(
+                                          builder: (context, ref, _) =>
+                                              ListTile(
+                                                onTap: () =>
+                                                    context.showUserPopover(
+                                                      members[index].stateKey!,
+                                                      roomId: roomId,
+                                                    ),
+                                                title: Text(
+                                                  displayName ??
+                                                      members[index]
+                                                          .stateKey!
+                                                          .localpart,
+                                                  overflow: .ellipsis,
+                                                  style: .new(
+                                                    color: ref.displaynameColor(
+                                                      roomId,
+                                                      members[index].stateKey!,
+                                                    ),
+                                                    fontWeight: .bold,
+                                                  ),
+                                                ),
+                                                subtitle: Text(
+                                                  members[index].stateKey!,
+                                                  overflow: .ellipsis,
+                                                ),
+                                                leading: Transform.translate(
+                                                  offset: .new(0, 2),
+                                                  child: AvatarOrHash(
+                                                    avatarUrl,
+                                                    dimension: 40,
+                                                    displayName ??
+                                                        members[index]
+                                                            .stateKey!
+                                                            .localpart,
+                                                  ),
+                                                ),
+                                              ),
+                                        ),
+                                      _ => throw Exception(
+                                        "Member content was not MembershipContent",
+                                      ),
+                                    },
+                              ),
+                            ];
+                          }).toList(),
+                        ),
+                      ),
+              AsyncLoading _ => Loading(),
+            },
+          ],
+        ),
+        appBar: Scaffold.of(context).hasEndDrawer
+            ? AppBar(
+                scrolledUnderElevation: 0,
+                leading: Icon(Icons.people),
+                title: Text("Members"),
+                actionsPadding: .only(right: 4),
+                actions: [
+                  IconButton(
+                    onPressed: Scaffold.of(context).closeEndDrawer,
+                    icon: Icon(Icons.close),
+                    tooltip: "Close member list",
+                  ),
+                ],
+              )
+            : null,
+      ),
+    );
+  }
+}

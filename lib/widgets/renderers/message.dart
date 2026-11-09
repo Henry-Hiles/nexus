@@ -12,22 +12,22 @@ import "package:nexus/models/location.dart";
 import "package:nexus/models/content/poll_start.dart";
 import "package:nexus/models/content/sticker.dart";
 import "package:nexus/models/event.dart";
-import "package:nexus/widgets/file_card.dart";
+import "package:nexus/widgets/renderers/file_card.dart";
 import "package:nexus/widgets/html/html.dart";
 import "package:nexus/widgets/lazy_loading/message_avatar.dart";
 import "package:nexus/widgets/lazy_loading/message_displayname.dart";
-import "package:nexus/widgets/linkified_text.dart";
-import "package:nexus/widgets/location_message.dart";
-import "package:nexus/widgets/loading.dart";
-import "package:nexus/widgets/message_image.dart";
-import "package:nexus/widgets/reaction_row.dart";
-import "package:nexus/widgets/timestamp.dart";
-import "package:nexus/widgets/url_preview.dart";
-import "package:nexus/widgets/event_preview.dart";
+import "package:nexus/widgets/common/linkified_text.dart";
+import "package:nexus/widgets/location/location_message.dart";
+import "package:nexus/widgets/common/loading.dart";
+import "package:nexus/widgets/renderers/message_image.dart";
+import "package:nexus/widgets/reactions/reaction_row.dart";
+import "package:nexus/widgets/common/timestamp.dart";
+import "package:nexus/widgets/renderers/url_preview.dart";
+import "package:nexus/widgets/renderers/event_preview.dart";
 import "package:nexus/widgets/players/video.dart";
 import "package:nexus/widgets/players/audio.dart";
 import "package:nexus/widgets/renderers/poll.dart";
-import "package:nexus/widgets/thread_summary.dart";
+import "package:nexus/widgets/threads/thread_summary.dart";
 
 class const MessageRenderer(
   final Event event, {

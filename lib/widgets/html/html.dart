@@ -6,7 +6,7 @@ import "package:html/dom.dart" as dom;
 import "package:nexus/helpers/extensions/get_link_info.dart";
 import "package:nexus/helpers/launch_helper.dart";
 import "package:nexus/helpers/mxc_image.dart";
-import "package:nexus/widgets/expandable_image.dart";
+import "package:nexus/widgets/common/expandable_image.dart";
 import "package:nexus/widgets/html/mention_chip.dart";
 import "package:nexus/widgets/html/spoiler_text.dart";
 import "package:nexus/widgets/html/code_block.dart";

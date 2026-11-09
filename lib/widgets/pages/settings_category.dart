@@ -8,7 +8,7 @@ import "package:hooks_riverpod/misc.dart";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:nexus/models/settings_category.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
-import "package:nexus/widgets/highlight_wrapper.dart";
+import "package:nexus/widgets/common/highlight_wrapper.dart";
 import "package:super_sliver_list/super_sliver_list.dart";
 
 class const SettingsCategoryPage(

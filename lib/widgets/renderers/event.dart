@@ -32,21 +32,21 @@ import "package:nexus/models/content/server_acl.dart";
 import "package:nexus/models/content/tombstone.dart";
 import "package:nexus/models/content/topic.dart";
 import "package:nexus/models/event.dart";
-import "package:nexus/widgets/error_dialog.dart";
+import "package:nexus/widgets/common/error_dialog.dart";
 import "package:nexus/widgets/renderers/message.dart";
-import "package:nexus/widgets/reaction_row.dart";
-import "package:nexus/widgets/read_receipts_row.dart";
+import "package:nexus/widgets/reactions/reaction_row.dart";
+import "package:nexus/widgets/read_receipts/read_receipts_row.dart";
 import "package:nexus/widgets/renderers/membership.dart";
-import "package:nexus/widgets/renderers/change_line.dart";
+import "package:nexus/widgets/renderers/diffs/change_line.dart";
 import "package:nexus/widgets/renderers/generic_event.dart";
-import "package:nexus/widgets/renderers/join_rules_diff.dart";
-import "package:nexus/widgets/renderers/power_levels_diff.dart";
-import "package:nexus/widgets/renderers/pinned_events_diff.dart";
-import "package:nexus/widgets/renderers/server_acl_diff.dart";
-import "package:nexus/widgets/swipe_to_reply.dart";
-import "package:nexus/widgets/thread_summary.dart";
-import "package:nexus/widgets/timestamp.dart";
-import "package:nexus/widgets/user_span.dart";
+import "package:nexus/widgets/renderers/diffs/join_rules_diff.dart";
+import "package:nexus/widgets/renderers/diffs/power_levels_diff.dart";
+import "package:nexus/widgets/renderers/diffs/pinned_events_diff.dart";
+import "package:nexus/widgets/renderers/diffs/server_acl_diff.dart";
+import "package:nexus/widgets/renderers/swipe_to_reply.dart";
+import "package:nexus/widgets/threads/thread_summary.dart";
+import "package:nexus/widgets/common/timestamp.dart";
+import "package:nexus/widgets/users/user_span.dart";
 
 class const EventRenderer(
   final int eventRowId, {

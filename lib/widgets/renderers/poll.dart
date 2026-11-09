@@ -15,7 +15,7 @@ import "package:nexus/helpers/extensions/event_id_is_fake.dart";
 import "package:nexus/main.dart";
 import "package:nexus/models/content/poll_start.dart";
 import "package:nexus/models/event.dart";
-import "package:nexus/widgets/poll_option.dart";
+import "package:nexus/widgets/renderers/poll_option.dart";
 
 class const PollRenderer(final Event event, final PollStart poll, {super.key})
     extends HookConsumerWidget {

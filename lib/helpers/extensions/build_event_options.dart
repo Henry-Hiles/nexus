@@ -15,8 +15,8 @@ import "package:nexus/helpers/extensions/event_id_is_fake.dart";
 import "package:nexus/models/content/message.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/models/relation_type.dart";
-import "package:nexus/widgets/emoji_picker.dart";
-import "package:nexus/widgets/mxc_emoji.dart";
+import "package:nexus/widgets/emoji/emoji_picker.dart";
+import "package:nexus/widgets/emoji/mxc_emoji.dart";
 import "package:nexus/main.dart";
 
 extension BuildEventOptions on Event {

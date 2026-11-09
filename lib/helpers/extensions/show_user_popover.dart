@@ -1,6 +1,6 @@
 import "package:material_ui/material_ui.dart";
 import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
-import "package:nexus/widgets/user_bottom_sheet.dart";
+import "package:nexus/widgets/users/user_bottom_sheet.dart";
 
 extension ShowUserPopover on BuildContext {
   void showUserPopover(String userId, {String? roomId, Rect? anchor}) =>

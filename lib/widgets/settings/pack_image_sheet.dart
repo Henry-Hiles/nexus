@@ -3,7 +3,7 @@ import "package:flutter_hooks/flutter_hooks.dart";
 import "package:material_ui/material_ui.dart";
 import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
 import "package:nexus/models/content/image_pack.dart";
-import "package:nexus/widgets/mxc_emoji.dart";
+import "package:nexus/widgets/emoji/mxc_emoji.dart";
 import "package:nexus/widgets/settings/image_usage_chips.dart";
 
 /// Edits an image in a pack, or only shows it if [onSave] is null.

@@ -2,7 +2,7 @@ import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:material_ui/material_ui.dart";
 import "package:navigation_rail_m3e/navigation_rail_m3e.dart";
 import "package:nexus/models/room.dart";
-import "package:nexus/widgets/avatar_or_hash.dart";
+import "package:nexus/widgets/avatars/avatar_or_hash.dart";
 
 extension RoomDestination on Room {
   NavigationRailM3EDestination toDestination({

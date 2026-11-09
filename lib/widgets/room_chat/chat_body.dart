@@ -13,10 +13,10 @@ import "package:nexus/main.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/widgets/composer/composer.dart";
 import "package:nexus/widgets/composer/typing_indicator.dart";
-import "package:nexus/widgets/error_dialog.dart";
-import "package:nexus/widgets/loading.dart";
+import "package:nexus/widgets/common/error_dialog.dart";
+import "package:nexus/widgets/common/loading.dart";
 import "package:nexus/widgets/room_chat/chat_timeline.dart";
-import "package:nexus/widgets/tombstone_banner.dart";
+import "package:nexus/widgets/room_chat/tombstone_banner.dart";
 
 final class const ChatBody({
   required final ChatParams chat,

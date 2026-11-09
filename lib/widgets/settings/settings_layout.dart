@@ -10,9 +10,9 @@ import "package:nexus/helpers/extensions/better_when.dart";
 import "package:nexus/helpers/extensions/weighted_search.dart";
 import "package:nexus/models/settings_category.dart";
 import "package:nexus/widgets/pages/settings_category.dart";
-import "package:nexus/widgets/divider_text.dart";
-import "package:nexus/widgets/highlight_wrapper.dart";
-import "package:nexus/widgets/m3e_rail_theme.dart";
+import "package:nexus/widgets/common/divider_text.dart";
+import "package:nexus/widgets/common/highlight_wrapper.dart";
+import "package:nexus/widgets/common/m3e_rail_theme.dart";
 import "package:super_sliver_list/super_sliver_list.dart";
 
 /// A settings screen split into categories: a list of them that opens each

@@ -2,7 +2,7 @@ import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:material_emoji_picker/material_emoji_picker.dart";
 import "package:nexus/models/content/image_pack.dart";
 import "package:nexus/models/image_pack.dart";
-import "package:nexus/widgets/mxc_emoji.dart";
+import "package:nexus/widgets/emoji/mxc_emoji.dart";
 
 extension ImagePackEmoji on ImagePack {
   EmojiCategory? get emojiCategory => _category(emoticons);

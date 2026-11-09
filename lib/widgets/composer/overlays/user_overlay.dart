@@ -5,7 +5,7 @@ import "package:nexus/helpers/extensions/better_when.dart";
 import "package:nexus/helpers/extensions/get_localpart.dart";
 import "package:nexus/helpers/extensions/weighted_search.dart";
 import "package:nexus/models/content/membership.dart";
-import "package:nexus/widgets/avatar_or_hash.dart";
+import "package:nexus/widgets/avatars/avatar_or_hash.dart";
 
 class const UserOverlay(
   final String query, {

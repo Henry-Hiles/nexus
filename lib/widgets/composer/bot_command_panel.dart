@@ -9,7 +9,7 @@ import "package:nexus/controllers/bot_command_draft.dart";
 import "package:nexus/models/bot_argument_suggestion.dart";
 import "package:nexus/models/bot_command.dart";
 import "package:nexus/models/text_command.dart";
-import "package:nexus/widgets/avatar_or_hash.dart";
+import "package:nexus/widgets/avatars/avatar_or_hash.dart";
 
 class const BotCommandPanel(
   final ComposerParams composer, {

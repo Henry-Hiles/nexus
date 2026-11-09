@@ -9,8 +9,8 @@ import "package:nexus/helpers/hooks/saving.dart";
 import "package:nexus/main.dart";
 import "package:nexus/models/content/image_pack.dart";
 import "package:nexus/models/content/message.dart";
-import "package:nexus/widgets/image_pack_avatar.dart";
-import "package:nexus/widgets/mxc_emoji.dart";
+import "package:nexus/widgets/avatars/image_pack_avatar.dart";
+import "package:nexus/widgets/emoji/mxc_emoji.dart";
 import "package:nexus/widgets/settings/image_usage_chips.dart";
 import "package:nexus/widgets/settings/pack_image_sheet.dart";
 

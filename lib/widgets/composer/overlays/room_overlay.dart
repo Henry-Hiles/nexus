@@ -3,7 +3,7 @@ import "package:material_ui/material_ui.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/controllers/via.dart";
 import "package:nexus/helpers/extensions/weighted_search.dart";
-import "package:nexus/widgets/avatar_or_hash.dart";
+import "package:nexus/widgets/avatars/avatar_or_hash.dart";
 
 class const RoomOverlay(
   final String query, {

@@ -6,7 +6,7 @@ import "package:material_ui/material_ui.dart";
 import "package:nexus/controllers/members.dart";
 import "package:nexus/helpers/extensions/get_localpart.dart";
 import "package:nexus/models/content/membership.dart";
-import "package:nexus/widgets/avatar_or_hash.dart";
+import "package:nexus/widgets/avatars/avatar_or_hash.dart";
 import "package:nexus/widgets/settings/search_chooser.dart";
 
 /// The [chosen] users, above a field searching [roomId]'s members, or taking a user ID, to choose more.

@@ -7,7 +7,7 @@ import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/main.dart";
-import "package:nexus/widgets/avatar_or_hash.dart";
+import "package:nexus/widgets/avatars/avatar_or_hash.dart";
 import "package:nexus/widgets/settings/search_chooser.dart";
 
 /// Chooses the rooms whose members can join [roomId] without an invite.

@@ -6,7 +6,7 @@ import "package:nexus/helpers/hooks/tap_recognizer.dart";
 import "package:nexus/models/content/membership.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/widgets/renderers/generic_event.dart";
-import "package:nexus/widgets/user_span.dart";
+import "package:nexus/widgets/users/user_span.dart";
 
 class const MembershipRenderer(
   final Event event, {

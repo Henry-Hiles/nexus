@@ -5,8 +5,8 @@ import "package:nexus/controllers/room_typing.dart";
 import "package:nexus/controllers/user.dart";
 import "package:nexus/helpers/extensions/get_localpart.dart";
 import "package:nexus/helpers/hooks/tap_recognizer.dart";
-import "package:nexus/widgets/bouncing_dots.dart";
-import "package:nexus/widgets/user_span.dart";
+import "package:nexus/widgets/common/bouncing_dots.dart";
+import "package:nexus/widgets/users/user_span.dart";
 
 class const TypingIndicator(final String roomId, {super.key})
     extends HookConsumerWidget {

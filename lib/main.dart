@@ -22,9 +22,9 @@ import "package:nexus/widgets/pages/select_server.dart";
 import "package:nexus/widgets/pages/settings.dart";
 import "package:nexus/widgets/pages/verify.dart";
 import "package:nexus/widgets/account_scope.dart";
-import "package:nexus/widgets/appbar.dart";
-import "package:nexus/widgets/error_dialog.dart";
-import "package:nexus/widgets/loading.dart";
+import "package:nexus/widgets/common/appbar.dart";
+import "package:nexus/widgets/common/error_dialog.dart";
+import "package:nexus/widgets/common/loading.dart";
 import "package:window_manager/window_manager.dart";
 import "package:material_ui/material_ui.dart";
 

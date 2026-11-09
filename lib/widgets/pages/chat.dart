@@ -8,11 +8,11 @@ import "package:nexus/helpers/extensions/open_link_info.dart";
 import "package:nexus/main.dart";
 import "package:nexus/controllers/selected_room.dart";
 import "package:nexus/controllers/notification_request.dart";
-import "package:nexus/widgets/appbar.dart";
-import "package:nexus/widgets/sidebar.dart";
-import "package:nexus/widgets/sync_status_banner.dart";
+import "package:nexus/widgets/common/appbar.dart";
+import "package:nexus/widgets/sidebar/sidebar.dart";
+import "package:nexus/widgets/common/sync_status_banner.dart";
 import "package:nexus/widgets/room_chat/room_chat.dart";
-import "package:nexus/widgets/loading.dart";
+import "package:nexus/widgets/common/loading.dart";
 
 class const ChatPage({super.key}) extends HookConsumerWidget {
   @override

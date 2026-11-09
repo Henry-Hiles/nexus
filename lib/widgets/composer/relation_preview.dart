@@ -2,7 +2,7 @@ import "package:material_ui/material_ui.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/models/relation_type.dart";
-import "package:nexus/widgets/event_preview.dart";
+import "package:nexus/widgets/renderers/event_preview.dart";
 
 class const RelationPreview(
   final Event? relatedEvent, {

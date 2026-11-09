@@ -5,12 +5,12 @@ import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/client_state.dart";
 import "package:nexus/models/client_state.dart";
-import "package:nexus/widgets/loading.dart";
+import "package:nexus/widgets/common/loading.dart";
 import "package:nexus/widgets/pages/settings.dart";
-import "package:nexus/widgets/account_switcher.dart";
-import "package:nexus/widgets/appbar.dart";
+import "package:nexus/widgets/common/account_switcher.dart";
+import "package:nexus/widgets/common/appbar.dart";
 import "package:nexus/helpers/required_validator_helper.dart";
-import "package:nexus/widgets/reset_encryption_sheet.dart";
+import "package:nexus/widgets/encryption/reset_encryption_sheet.dart";
 
 class const VerifyPage({super.key}) extends HookConsumerWidget {
   @override

@@ -5,7 +5,7 @@ import "package:nexus/helpers/extensions/save_attachment.dart";
 import "package:nexus/helpers/extensions/size_to_string.dart";
 import "package:nexus/helpers/mxc_image.dart";
 import "package:nexus/models/requests/download_media.dart";
-import "package:nexus/widgets/error_dialog.dart";
+import "package:nexus/widgets/common/error_dialog.dart";
 
 extension ShowImageViewer on BuildContext {
   /// Shows the image from [request] fullscreen, zoomable.
