@@ -155,27 +155,32 @@ class const RoomSummarySheet(
                 title: const Text("Invite reason"),
                 subtitle: SelectableText(reason),
               ),
-            // Invite state never includes the member count
-            if (summary.joinedMembers != null || !isInvite)
+
+            if (summary.joinedMembers != null)
               ListTile(
                 title: Text(
                   "${summary.joinedMembers ?? "Unknown number of"} members",
                 ),
                 leading: Icon(Icons.people),
               ),
+
+            if (summary.canonicalAlias case final canonicalAlias?)
+              ListTile(
+                title: Text("Canonical Alias"),
+                subtitle: SelectableText(canonicalAlias),
+                leading: Icon(Icons.numbers),
+              ),
+
             ListTile(
-              title: Text(
-                summary.canonicalAlias == null ? "Room ID" : "Canonical Alias",
-              ),
-              subtitle: SelectableText(
-                summary.canonicalAlias ?? summary.roomId,
-              ),
-              leading: Icon(Icons.numbers),
+              title: Text("Room ID"),
+              subtitle: SelectableText(summary.roomId),
+              leading: Icon(Icons.badge),
             ),
-            if (summary.topic != null)
+
+            if (summary.topic case final topic?)
               ListTile(
                 title: Text("Topic"),
-                subtitle: LinkifiedText(summary.topic!, roomId: summary.roomId),
+                subtitle: LinkifiedText(topic, roomId: summary.roomId),
                 leading: Icon(Icons.info),
               ),
             if (isKnocking)
