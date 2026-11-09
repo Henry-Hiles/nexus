@@ -4,12 +4,14 @@ import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:material_ui/material_ui.dart";
 import "package:media_kit/media_kit.dart";
+import "package:nexus/helpers/extensions/size_to_string.dart";
 
 /// Play/pause, position and seeking controls for a media_kit [Player].
 class const PlayerControls(
   final Player player, {
   final bool loading = false,
   final Color? color,
+  final int? size,
   final IList<Widget> actions = const .empty(),
   super.key,
 }) extends HookWidget {
@@ -44,6 +46,8 @@ class const PlayerControls(
 
       return "$minutes:$seconds";
     }
+
+    final sizeSuffix = size == null ? "" : " (${size!.sizeAsString})";
 
     final textStyle = Theme.of(context).textTheme.bodySmall
         ?.copyWith(color: color);
@@ -84,7 +88,7 @@ class const PlayerControls(
                     playButton,
                     Expanded(
                       child: Text(
-                        "${format(position)} / ${format(duration)}",
+                        "${format(position)} / ${format(duration)}$sizeSuffix",
                         style: textStyle,
                         maxLines: 1,
                         overflow: .ellipsis,
@@ -102,7 +106,7 @@ class const PlayerControls(
                   SizedBox(width: 8),
                   Text(format(position), style: textStyle),
                   Expanded(child: slider()),
-                  Text(format(duration), style: textStyle),
+                  Text("${format(duration)}$sizeSuffix", style: textStyle),
                   ...actions,
                 ],
               ),

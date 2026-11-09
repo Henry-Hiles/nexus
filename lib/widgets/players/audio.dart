@@ -43,6 +43,7 @@ class const AudioPlayer(
         child: PlayerControls(
           player,
           loading: !loaded.value,
+          size: info?.size,
           actions: .new([
             SizedBox(width: 4),
             IconButton(

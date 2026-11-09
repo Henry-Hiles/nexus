@@ -99,6 +99,7 @@ class const VideoPlayer(
                             child: PlayerControls(
                               player,
                               loading: !loaded.value,
+                              size: info?.size,
                               color: Colors.white,
                               actions: .new([
                                 Builder(
