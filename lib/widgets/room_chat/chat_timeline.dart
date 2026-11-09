@@ -25,30 +25,24 @@ class const ChatTimeline({
     int? previousEventRowId, {
     required Key key,
   }) => HighlightWrapper(
-    EventRenderer(
-      eventRowId,
-      previousEventRowId: previousEventRowId,
-      roomId: chat.roomId,
-      jumpToEvent: jumpToEvent,
-      onOpenThread: onOpenThread,
-      getEventOptions: getEventOptions,
-      onSwipe: onSwipe == null ? null : () => onSwipe!(eventRowId),
-      readReceiptsChat: chat,
-      threadRoot: chat.threadRoot,
+    // To work around an AWFUL SuperSliverList bug
+    ConstrainedBox(
+      constraints: const BoxConstraints(minHeight: 0.01),
+      child: EventRenderer(
+        eventRowId,
+        previousEventRowId: previousEventRowId,
+        roomId: chat.roomId,
+        jumpToEvent: jumpToEvent,
+        onOpenThread: onOpenThread,
+        getEventOptions: getEventOptions,
+        onSwipe: onSwipe == null ? null : () => onSwipe!(eventRowId),
+        readReceiptsChat: chat,
+        threadRoot: chat.threadRoot,
+      ),
     ),
     key: key,
     isHighlighted: scroll.highlightedEvent == eventRowId,
   );
-
-  /// Where the row with [key] now is in [rows], so its element moves with it
-  /// when rows are added before it, rather than being rebuilt by index.
-  int? indexOf(IList<int> rows, Key key) => switch (key) {
-    EventRowKey(:final rowId) => switch (rows.indexOf(rowId)) {
-      -1 => null,
-      final index => index,
-    },
-    _ => null,
-  };
 
   @override
   Widget build(BuildContext context) => LayoutBuilder(
@@ -76,7 +70,6 @@ class const ChatTimeline({
 
             SuperSliverList.builder(
               itemCount: scroll.liveRows.length,
-              findChildIndexCallback: (key) => indexOf(scroll.liveRows, key),
               itemBuilder: (_, index) => eventRow(
                 scroll.liveRows[index],
                 index > 0
@@ -89,8 +82,6 @@ class const ChatTimeline({
             SuperSliverList.builder(
               key: scroll.centerKey,
               itemCount: scroll.historyRows.length,
-              findChildIndexCallback: (key) =>
-                  indexOf(scroll.historyRows, key),
               itemBuilder: (_, index) => eventRow(
                 scroll.historyRows[index],
                 scroll.historyRows.getOrNull(index + 1),

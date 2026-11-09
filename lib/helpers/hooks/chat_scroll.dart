@@ -9,14 +9,6 @@ import "package:nexus/models/room_chat.dart";
 
 typedef JumpToEvent = Future<void> Function(int rowId);
 
-/// Identifies the row for the event with [rowId], so it can be found to
-/// scroll to it, and keeps its element when rows are added before it.
-final class EventRowKey extends GlobalKey {
-  EventRowKey(this.rowId) : super.constructor();
-
-  final int rowId;
-}
-
 final class ChatScroll({
   required final IList<int> historyRows,
   required final IList<int> liveRows,
@@ -28,7 +20,7 @@ final class ChatScroll({
 
   required final JumpToEvent jumpToEvent,
   required final Future<void> Function() jumpToBottom,
-  required final EventRowKey Function(int eventRowId) keyFor,
+  required final GlobalKey Function(int eventRowId) keyFor,
 }) {
   factory use({
     required AsyncValue<RoomChat?> controllerData,
@@ -50,9 +42,9 @@ final class ChatScroll({
     final scrollController = useScrollController();
     final centerKey = useMemoized(GlobalKey.new);
 
-    final itemKeys = useMemoized(() => <int, EventRowKey>{}, []);
-    EventRowKey keyFor(int eventRowId) =>
-        itemKeys.putIfAbsent(eventRowId, () => EventRowKey(eventRowId));
+    final itemKeys = useMemoized(() => <int, GlobalKey>{}, []);
+    GlobalKey keyFor(int eventRowId) =>
+        itemKeys.putIfAbsent(eventRowId, GlobalKey.new);
 
     useEffect(() {
       if (anchorId.value == null) {
@@ -109,13 +101,6 @@ final class ChatScroll({
       final anchorIndex = items.indexOf(anchor);
 
       final historyLength = anchorIndex == -1 ? items.length : anchorIndex + 1;
-      // TODO: remove, debugging replies not showing
-      debugPrint(
-        "[timeline] split: anchor=$anchor anchorIndex=$anchorIndex "
-        "length=${items.length} "
-        "historyTail=${items.take(historyLength).toList().reversed.take(3).toList()} "
-        "live=${items.skip(historyLength).toList()}",
-      );
       return (
         history: items.take(historyLength).toIList().reversed.toIList(),
         live: items.skip(historyLength).toIList(),
@@ -128,27 +113,13 @@ final class ChatScroll({
     void updateAtBottom() {
       if (!hookContext.mounted || !scrollController.hasClients) return;
 
-      final position = scrollController.position;
-      final isAtBottom = position.extentBefore <= 0;
-      if (isAtBottom != atBottom.value) {
-        // TODO: remove, debugging replies not showing
-        debugPrint(
-          "[timeline] atBottom: $isAtBottom pixels=${position.pixels} "
-          "min=${position.minScrollExtent} anchor=${anchorId.value} "
-          "live=${split.live.length}",
-        );
-        atBottom.value = isAtBottom;
-      }
+      final isAtBottom = scrollController.position.extentBefore <= 0;
+      if (isAtBottom != atBottom.value) atBottom.value = isAtBottom;
     }
 
     useEffect(() {
       final previous = previousLastRowId.value;
       previousLastRowId.value = lastRowId;
-      // TODO: remove, debugging replies not showing
-      debugPrint(
-        "[timeline] lastRowId: previous=$previous last=$lastRowId "
-        "atBottom=${atBottom.value} contextualEvent=${contextualEvent.value}",
-      );
 
       if (previous == null || lastRowId == null || previous == lastRowId) {
         return null;
@@ -156,11 +127,6 @@ final class ChatScroll({
       if (!atBottom.value || contextualEvent.value != null) return null;
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        // TODO: remove, debugging replies not showing
-        debugPrint(
-          "[timeline] re-anchoring to $lastRowId "
-          "hasClients=${scrollController.hasClients}",
-        );
         if (!scrollController.hasClients) return;
 
         anchorId.value = lastRowId;
