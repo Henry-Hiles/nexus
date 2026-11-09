@@ -55,6 +55,8 @@ class const ReactionRow(final Event event, {super.key}) extends ConsumerWidget {
                       onSecondaryTapUp: showReactions,
                       onLongPressStart: showReactions,
                       child: Tooltip(
+                        // Long press opens the reactions popover instead
+                        triggerMode: .manual,
                         message: reactors?[reaction]?.shortcode ?? reaction,
                         child: ChoiceChip(
                           showCheckmark: false,
