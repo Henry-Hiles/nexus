@@ -20,6 +20,7 @@ final class const MessageImage(
     return ExpandableImage(
       request,
       downloadFilename: filename,
+      size: info?.size,
       child: ClipRRect(
         borderRadius: .all(.circular(8)),
         child: AspectRatio(

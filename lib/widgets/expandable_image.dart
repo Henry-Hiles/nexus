@@ -2,6 +2,7 @@ import "package:material_ui/material_ui.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:m3e_buttons/m3e_buttons.dart";
 import "package:nexus/helpers/extensions/save_attachment.dart";
+import "package:nexus/helpers/extensions/size_to_string.dart";
 import "package:nexus/helpers/mxc_image.dart";
 import "package:nexus/models/requests/download_media.dart";
 import "package:nexus/widgets/error_dialog.dart";
@@ -12,6 +13,7 @@ final class const ExpandableImage(
 
   /// If set, a download button is shown, suggesting this filename
   final String? downloadFilename,
+  final int? size,
   super.key,
 }) extends ConsumerWidget {
   @override
@@ -38,6 +40,20 @@ final class const ExpandableImage(
                       ),
                     ),
                   ),
+                  if (size != null)
+                    Align(
+                      alignment: .topLeft,
+                      child: Padding(
+                        padding: .all(32),
+                        child: Card(
+                          margin: .zero,
+                          child: Padding(
+                            padding: .symmetric(horizontal: 12, vertical: 8),
+                            child: Text(size!.sizeAsString),
+                          ),
+                        ),
+                      ),
+                    ),
                   Align(
                     alignment: .topRight,
                     child: Padding(
