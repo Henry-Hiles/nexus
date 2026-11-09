@@ -9,6 +9,14 @@ import "package:nexus/models/room_chat.dart";
 
 typedef JumpToEvent = Future<void> Function(int rowId);
 
+/// Identifies the row for the event with [rowId], so it can be found to
+/// scroll to it, and keeps its element when rows are added before it.
+final class EventRowKey extends GlobalKey {
+  EventRowKey(this.rowId) : super.constructor();
+
+  final int rowId;
+}
+
 final class ChatScroll({
   required final IList<int> historyRows,
   required final IList<int> liveRows,
@@ -20,7 +28,7 @@ final class ChatScroll({
 
   required final JumpToEvent jumpToEvent,
   required final Future<void> Function() jumpToBottom,
-  required final GlobalKey Function(int eventRowId) keyFor,
+  required final EventRowKey Function(int eventRowId) keyFor,
 }) {
   factory use({
     required AsyncValue<RoomChat?> controllerData,
@@ -42,9 +50,9 @@ final class ChatScroll({
     final scrollController = useScrollController();
     final centerKey = useMemoized(GlobalKey.new);
 
-    final itemKeys = useMemoized(() => <int, GlobalKey>{}, []);
-    GlobalKey keyFor(int eventRowId) =>
-        itemKeys.putIfAbsent(eventRowId, GlobalKey.new);
+    final itemKeys = useMemoized(() => <int, EventRowKey>{}, []);
+    EventRowKey keyFor(int eventRowId) =>
+        itemKeys.putIfAbsent(eventRowId, () => EventRowKey(eventRowId));
 
     useEffect(() {
       if (anchorId.value == null) {
@@ -117,6 +125,22 @@ final class ChatScroll({
     final lastRowId = controllerData.value?.timeline.lastOrNull;
     final previousLastRowId = useRef<int?>(null);
 
+    void updateAtBottom() {
+      if (!hookContext.mounted || !scrollController.hasClients) return;
+
+      final position = scrollController.position;
+      final isAtBottom = position.extentBefore <= 0;
+      if (isAtBottom != atBottom.value) {
+        // TODO: remove, debugging replies not showing
+        debugPrint(
+          "[timeline] atBottom: $isAtBottom pixels=${position.pixels} "
+          "min=${position.minScrollExtent} anchor=${anchorId.value} "
+          "live=${split.live.length}",
+        );
+        atBottom.value = isAtBottom;
+      }
+    }
+
     useEffect(() {
       final previous = previousLastRowId.value;
       previousLastRowId.value = lastRowId;
@@ -141,6 +165,10 @@ final class ChatScroll({
 
         anchorId.value = lastRowId;
         scrollController.position.correctPixels(0);
+
+        // Other callbacks this frame still see the new event below the old
+        // anchor, so they think it isn't at the bottom until the next frame
+        WidgetsBinding.instance.addPostFrameCallback((_) => updateAtBottom());
       });
 
       return null;
@@ -154,9 +182,7 @@ final class ChatScroll({
           if (!scrollController.hasClients) return;
 
           final position = scrollController.position;
-
-          final isAtBottom = position.extentBefore <= 0;
-          if (isAtBottom != atBottom.value) atBottom.value = isAtBottom;
+          updateAtBottom();
 
           // contextualEvent updates immediately when jumping, but
           // controllerData is only for the historical timeline once it loads
