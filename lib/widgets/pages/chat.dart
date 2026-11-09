@@ -45,10 +45,10 @@ class const ChatPage({super.key}) extends HookConsumerWidget {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ref.read(LinkRequestController.provider.notifier).consume();
         navigatorKey.currentState?.popUntil((route) => route.isFirst);
-        final navigatorContext = navigatorKey.currentContext;
-        if (navigatorContext == null) return;
+        final scaffoldContext = scaffoldKey.currentContext;
+        if (scaffoldContext == null) return;
 
-        ref.openLinkInfo(navigatorContext, linkRequest).onError(showError);
+        ref.openLinkInfo(scaffoldContext, linkRequest).onError(showError);
       });
       return null;
     }, [linkRequest, initComplete]);
