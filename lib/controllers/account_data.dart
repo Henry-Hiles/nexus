@@ -8,6 +8,7 @@ import "package:nexus/controllers/client.dart";
 import "package:nexus/models/account_data.dart";
 import "package:nexus/models/push_rules.dart";
 import "package:nexus/models/requests/update_push_rule.dart";
+import "package:nexus/models/room_notification_level.dart";
 import "package:nexus/models/sync_data.dart";
 
 class AccountDataController extends Notifier<AccountData> {
@@ -97,6 +98,27 @@ class AccountDataController extends Notifier<AccountData> {
         .new([.new(kind: kind, ruleId: ruleId, action: .delete)]),
         (rules) => rules.find(kind, ruleId) == null,
       );
+
+  /// Replaces the push rules for the room with [roomId] with those [level]
+  /// needs, deleting them first so disabled ones don't stay disabled.
+  Future<void> setRoomNotificationLevel(
+    String roomId,
+    RoomNotificationLevel level,
+  ) async {
+    final rules = state.pushRules.global;
+    if (RoomNotificationLevel.of(rules, roomId) == level) return;
+
+    return _updatePushRules(
+      .new([
+        ...[PushRuleKind.override, PushRuleKind.room]
+            .where((kind) => rules.find(kind, roomId) != null)
+            .map((kind) => .new(kind: kind, ruleId: roomId, action: .delete)),
+        if (level.ruleFor(roomId) case (:final kind, :final rule))
+          .new(kind: kind, ruleId: roomId, action: .put, newContent: rule),
+      ]),
+      (rules) => RoomNotificationLevel.of(rules, roomId) == level,
+    );
+  }
 
   /// Sends [requests] in order, then waits until [arrived] is true for the
   /// synced push rules.

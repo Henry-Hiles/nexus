@@ -15,18 +15,20 @@ class const PushRules({final PushRuleset global = const .new()})
       _$PushRulesFromJson(json);
 }
 
-/// Push rules by kind, apart from room and sender rules, which Nexus doesn't
-/// use. The first rule that matches decides what happens.
+/// Push rules by kind, apart from sender rules, which Nexus doesn't use. The
+/// first rule that matches decides what happens.
 @Freezed(toJson: false, fromJson: false)
 @JsonSerializable()
 class const PushRuleset({
   final IList<PushRule> override = const .empty(),
   final IList<PushRule> content = const .empty(),
+  final IList<PushRule> room = const .empty(),
   final IList<PushRule> underride = const .empty(),
 }) with _$PushRuleset {
   IList<PushRule> ofKind(PushRuleKind kind) => switch (kind) {
     .override => override,
     .content => content,
+    .room => room,
     .underride => underride,
   };
 
@@ -46,7 +48,7 @@ class const PushRuleset({
       _$PushRulesetFromJson(json);
 }
 
-enum PushRuleKind { override, content, underride }
+enum PushRuleKind { override, content, room, underride }
 
 @Freezed(toJson: false, fromJson: false)
 @JsonSerializable()
@@ -60,11 +62,32 @@ class const PushRule({
 
   /// What content rules match in messages' bodies.
   final String? pattern,
+
+  /// What override and underride rules match.
+  final IList<PushCondition> conditions = const .empty(),
 }) with _$PushRule {
   Map<String, Object?> toJson() => _$PushRuleToJson(this);
 
   factory PushRule.fromJson(Map<String, Object?> json) =>
       _$PushRuleFromJson(json);
+}
+
+/// Only the fields of event_match conditions are kept.
+@Freezed(toJson: false, fromJson: false)
+@JsonSerializable()
+class const PushCondition({
+  required final String kind,
+  final String? key,
+  final String? pattern,
+}) with _$PushCondition {
+  /// Matches events in the room with [roomId].
+  factory PushCondition.inRoom(String roomId) =>
+      .new(kind: "event_match", key: "room_id", pattern: roomId);
+
+  Map<String, Object?> toJson() => _$PushConditionToJson(this);
+
+  factory PushCondition.fromJson(Map<String, Object?> json) =>
+      _$PushConditionFromJson(json);
 }
 
 /// What happens when a push rule matches. Actions Nexus doesn't support are

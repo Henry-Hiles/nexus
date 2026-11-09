@@ -5,7 +5,9 @@ import "package:nexus/helpers/extensions/get_localpart.dart";
 import "package:nexus/helpers/extensions/show_leave_room_sheet.dart";
 import "package:flutter/services.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
+import "package:nexus/controllers/account_data.dart";
 import "package:nexus/controllers/client.dart";
+import "package:nexus/models/room_notification_level.dart";
 import "package:nexus/controllers/room_settings_sections.dart";
 import "package:nexus/widgets/settings/settings_layout.dart";
 import "package:nexus/controllers/via.dart";
@@ -44,6 +46,44 @@ final class const RoomMenuButton(
           ),
         ),
         if (room != null) ...[
+          PopupMenuItem(
+            onTap: () async {
+              final roomId = room!.metadata!.id;
+              final accountData = ref.read(
+                AccountDataController.provider.notifier,
+              );
+              final current = RoomNotificationLevel.of(
+                ref.read(AccountDataController.provider).pushRules.global,
+                roomId,
+              );
+
+              final level = await context.showAdaptiveMenu(
+                RoomNotificationLevel.values
+                    .map(
+                      (level) => PopupMenuItem(
+                        value: level,
+                        child: ListTile(
+                          selected: level == current,
+                          leading: Icon(level.icon),
+                          title: Text(level.title),
+                          subtitle: Text(level.description),
+                          trailing: level == current ? Icon(Icons.check) : null,
+                        ),
+                      ),
+                    )
+                    .toList(),
+              );
+              if (level == null) return;
+              await accountData
+                  .setRoomNotificationLevel(roomId, level)
+                  .onError(showError);
+            },
+            child: ListTile(
+              leading: Icon(Icons.notifications),
+              title: Text("Notifications"),
+              trailing: Icon(Icons.expand_more),
+            ),
+          ),
           PopupMenuItem(
             onTap: () async {
               final vias = ref.read(ViaController.provider(room!)).viaQuery;
