@@ -1,14 +1,18 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client.dart";
+import "package:nexus/controllers/emoji_shortcodes.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/models/configs/event.dart";
 import "package:nexus/models/content/reaction.dart";
+import "package:nexus/models/reaction_group.dart";
 
 class ReactionsController(final EventConfig config)
-    extends AsyncNotifier<IMap<String, IList<String>>> {
+    extends AsyncNotifier<IMap<String, ReactionGroup>> {
   @override
-  Future<IMap<String, IList<String>>> build() async {
+  Future<IMap<String, ReactionGroup>> build() async {
+    final unicodeShortcodes = ref.watch(EmojiShortcodesController.provider);
+
     final eventInfo = ref.watch(
       RoomsController.provider.select((value) {
         final event = value[config.roomId]?.events[config.eventRowId];
@@ -30,12 +34,25 @@ class ReactionsController(final EventConfig config)
 
     return reactionEvents
             ?.where((event) => event.redactedBy == null)
-            .fold<IMap<String, IList<String>>>(.new(), (acc, event) {
-              if (event.content case ReactionContent(:final key?)) {
+            .fold<IMap<String, ReactionGroup>>(.new(), (acc, event) {
+              if (event.content case ReactionContent(
+                :final key?,
+                :final shortcode,
+              )) {
                 return acc.update(
                   key,
-                  (list) => list.add(event.sender),
-                  ifAbsent: () => .new([event.sender]),
+                  (group) => group.copyWith(
+                    senders: group.senders.add(event.sender),
+                    shortcode: group.shortcode ?? shortcode,
+                  ),
+                  ifAbsent: () => .new(
+                    senders: .new([event.sender]),
+                    shortcode:
+                        shortcode ??
+                        unicodeShortcodes[EmojiShortcodesController.normalize(
+                          key,
+                        )],
+                  ),
                 );
               }
 
@@ -47,7 +64,7 @@ class ReactionsController(final EventConfig config)
   static final provider =
       AsyncNotifierProvider.family<
         ReactionsController,
-        IMap<String, IList<String>>,
+        IMap<String, ReactionGroup>,
         EventConfig
       >(ReactionsController.new);
 }

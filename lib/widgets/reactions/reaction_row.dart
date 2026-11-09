@@ -7,6 +7,7 @@ import "package:nexus/controllers/reactions.dart";
 import "package:nexus/controllers/room_chat.dart";
 import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
 import "package:nexus/models/event.dart";
+import "package:nexus/models/reaction_group.dart";
 import "package:nexus/widgets/common/error_dialog.dart";
 import "package:nexus/widgets/reactions/reaction_key.dart";
 import "package:nexus/widgets/reactions/reactions_popover.dart";
@@ -25,7 +26,7 @@ class const ReactionRow(final Event event, {super.key}) extends ConsumerWidget {
           .new(roomId: event.roomId, eventRowId: event.rowId),
         ),
       )) {
-        AsyncData(value: final IMap<String, IList<String>>? reactors) ||
+        AsyncData(value: final IMap<String, ReactionGroup>? reactors) ||
         AsyncLoading(value: final reactors) => Wrap(
           spacing: 4,
           runSpacing: 4,
@@ -37,7 +38,9 @@ class const ReactionRow(final Event event, {super.key}) extends ConsumerWidget {
                     final enabled = useState(true);
 
                     final selected =
-                        reactors?[reaction]?.contains(clientState!.userId) ??
+                        reactors?[reaction]?.senders.contains(
+                          clientState!.userId,
+                        ) ??
                         false;
                     void showReactions(PositionedGestureDetails details) =>
                         context.showAdaptivePopover(
@@ -52,7 +55,7 @@ class const ReactionRow(final Event event, {super.key}) extends ConsumerWidget {
                       onSecondaryTapUp: showReactions,
                       onLongPressStart: showReactions,
                       child: Tooltip(
-                        message: reactors?[reaction]?.join(", ") ?? "",
+                        message: reactors?[reaction]?.shortcode ?? reaction,
                         child: ChoiceChip(
                           showCheckmark: false,
                           selected: selected,

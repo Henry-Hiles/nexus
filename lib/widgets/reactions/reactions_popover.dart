@@ -81,7 +81,7 @@ class const ReactionsPopover(
                       spacing: 8,
                       children: [
                         ReactionKey(reaction, height: 20),
-                        Text(reactions[reaction]!.length.toString()),
+                        Text(reactions[reaction]!.senders.length.toString()),
                       ],
                     ),
                   ),
@@ -98,7 +98,7 @@ class const ReactionsPopover(
                   padding: .symmetric(vertical: 8),
                   child: Column(
                     crossAxisAlignment: .stretch,
-                    children: reactions[reaction]!
+                    children: reactions[reaction]!.senders
                         .map(
                           (userId) => Consumer(
                             builder: (context, ref, _) {
