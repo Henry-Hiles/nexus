@@ -20,41 +20,20 @@ let
     includeNDK = true;
     ndkVersions = [ "28.2.13676358" ];
   };
+  buildEnv = import ./build_env.nix { inherit pkgs lib; };
 in
 pkgs.mkShell {
-  packages =
-    with pkgs;
-    [
-      go
-      git
+  packages = buildEnv.packages ++ [ android.platform-tools ];
 
-      libGL
-      (flutter.override {
-        extraPkgConfigPackages = [
-          mpv-unwrapped
-          libass
-        ];
-      })
-      android.platform-tools
-    ]
-    ++ lib.optionals pkgs.stdenv.isLinux [
-      wayland
-      # nativeapi includes XInput2.h, which needs these, but xi.pc only lists them privately
-      libxext
-      libxfixes
-      (callPackage ./pkg/hook_pkg_config.nix { })
-    ];
+  env =
+    rec {
+      LIBCLANG_PATH = lib.makeLibraryPath [ pkgs.libclang ];
 
-  env = rec {
-    LIBCLANG_PATH = lib.makeLibraryPath [ pkgs.libclang ];
+      ANDROID_HOME = "${android.androidsdk}/libexec/android-sdk";
+      ANDROID_SDK_ROOT = ANDROID_HOME;
+      JAVA_HOME = pkgs.jdk21;
 
-    ANDROID_HOME = "${android.androidsdk}/libexec/android-sdk";
-    ANDROID_SDK_ROOT = ANDROID_HOME;
-    JAVA_HOME = pkgs.jdk21;
-
-    GRADLE_OPTS = "-Dorg.gradle.project.android.aapt2FromMavenOverride=${ANDROID_HOME}/build-tools/36.0.0/aapt2";
-  }
-  // lib.optionalAttrs pkgs.stdenv.isLinux {
-    LD_LIBRARY_PATH = "./build/native_assets/linux:${lib.makeLibraryPath [ pkgs.zlib ]}";
-  };
+      GRADLE_OPTS = "-Dorg.gradle.project.android.aapt2FromMavenOverride=${ANDROID_HOME}/build-tools/36.0.0/aapt2";
+    }
+    // buildEnv.env;
 }
