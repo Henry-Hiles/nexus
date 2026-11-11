@@ -155,5 +155,7 @@ Join the [Nexus Client Matrix room](https://matrix.to/#/#nexus:federated.nexus) 
 
 ## Credits
 
-Thank you Hylke Bons (https://planetpeanut.studio) for making the amazing icon for Nexus! The icon is licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+Thank you Hylke Bons (https://planetpeanut.studio) for making the amazing icon for Nexus!
 Thank you Tulir Asokan for making [Gomuks](https://github.com/gomuks/gomuks), and helping us integrate it into Nexus!
+
+The Nexus icon, including its source files in `assets/` and the platform app icons generated from them, is © Hylke Bons. The screenshots are © Henry Hiles. Both are licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
