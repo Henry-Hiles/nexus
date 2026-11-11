@@ -2,7 +2,7 @@ import "dart:async";
 import "dart:io";
 
 import "package:flutter_riverpod/flutter_riverpod.dart";
-import "package:geolocator/geolocator.dart";
+import "package:location/location.dart";
 import "package:latlong2/latlong.dart";
 import "package:nexus/controllers/portal.dart";
 import "package:nexus/models/location_exception.dart";
@@ -13,7 +13,7 @@ class CurrentLocationHelper(final Ref ref) {
   /// The user's location and its accuracy in meters, or null if [askPermission]
   /// is off and they haven't allowed it.
   Future<(LatLng, double?)?> get({required bool askPermission}) async {
-    // geolocator talks to GeoClue directly, which Flatpak's sandbox blocks, so
+    // location talks to GeoClue directly, which Flatpak's sandbox blocks, so
     // Linux uses the location portal, which also asks the user for permission
     if (Platform.isLinux) {
       // The portal can't say whether it's allowed without asking
@@ -40,40 +40,36 @@ class CurrentLocationHelper(final Ref ref) {
       }
     }
 
-    if (!await Geolocator.isLocationServiceEnabled()) {
+    final location = Location.instance;
+    if (!await location.serviceEnabled()) {
       if (!askPermission) return null;
       throw LocationException.servicesOff;
     }
 
-    var permission = await Geolocator.checkPermission();
+    var permission = await location.hasPermission();
     if (permission == .denied && askPermission) {
-      permission = await Geolocator.requestPermission();
+      permission = await location.requestPermission();
     }
     if (permission == .denied || permission == .deniedForever) {
       if (!askPermission) return null;
       throw LocationException.denied;
     }
 
-    Position? position;
+    LocationData? data;
     try {
-      position = await Geolocator.getCurrentPosition(
-        locationSettings: Platform.isAndroid
-            // Play services' location can hang without Google, like on microG,
-            // so this uses Android's own, as other apps do
-            ? AndroidSettings(forceLocationManager: true, timeLimit: _timeLimit)
-            : const LocationSettings(timeLimit: _timeLimit),
-      );
+      data = await location.getLocation().timeout(_timeLimit);
     } on TimeoutException {
       // A fix can take long indoors, but another app may have a recent one
-      position = await Geolocator.getLastKnownPosition(
-        forceAndroidLocationManager: true,
+      data = await location.getLastKnownLocation().onError(
+        (_, _) => throw LocationException.failed,
       );
     } catch (_) {
       throw LocationException.failed;
     }
-    if (position == null) throw LocationException.timedOut;
 
-    return (LatLng(position.latitude, position.longitude), position.accuracy);
+    if (data == null) throw LocationException.timedOut;
+
+    return (LatLng(data.latitude, data.longitude), data.accuracy);
   }
 
   static final provider = Provider<CurrentLocationHelper>(

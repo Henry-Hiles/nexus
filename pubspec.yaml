@@ -119,7 +119,11 @@ dependencies:
     avif_native: 0.2.0
     flutter_map: 8.3.2
     latlong2: 0.10.1
-    geolocator: 14.1.2
+    location:
+        git:
+            url: https://github.com/Henry-Hiles/flutterlocation # Adds an option to leave out proprietary Google Play services, unreleased
+            ref: feat/optional-play-services
+            path: packages/location
 dev_dependencies:
     flutter_test:
         sdk: flutter
