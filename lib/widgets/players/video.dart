@@ -38,6 +38,89 @@ class const VideoPlayer(
       return player.dispose;
     }, []);
 
+    final controls = useCallback(
+      (VideoState _) =>
+          // Until media_kit moves to material_ui, this Material is needed.
+          Material(
+            type: .transparency,
+            child: ValueListenableBuilder(
+              valueListenable: loaded,
+              builder: (_, loaded, _) => Stack(
+                children: [
+                  Positioned.fill(
+                    child: GestureDetector(
+                      behavior: .opaque,
+                      onTap: loaded ? player.playOrPause : null,
+                    ),
+                  ),
+                  Positioned(
+                    top: 4,
+                    right: 4,
+                    child: IconButton(
+                      onPressed: () => context.saveAttachment(
+                        ref,
+                        uri,
+                        encrypted: encrypted,
+                        filename: filename,
+                      ),
+                      color: Colors.white,
+                      style: IconButton.styleFrom(
+                        backgroundColor: Colors.black38,
+                      ),
+                      tooltip: "Download",
+                      icon: Icon(Icons.download),
+                    ),
+                  ),
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    child: DecoratedBox(
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: .bottomCenter,
+                          end: .topCenter,
+                          colors: [Colors.black54, Colors.transparent],
+                        ),
+                      ),
+                      child: Padding(
+                        padding: const .only(left: 4, right: 4, top: 16),
+                        child: PlayerControls(
+                          player,
+                          loading: !loaded,
+                          size: info?.size,
+                          color: Colors.white,
+                          actions: .new([
+                            Builder(
+                              builder: (context) {
+                                final fullscreen = isFullscreen(context);
+
+                                return IconButton(
+                                  onPressed: () => toggleFullscreen(context),
+                                  color: Colors.white,
+                                  tooltip: fullscreen
+                                      ? "Exit fullscreen"
+                                      : "Fullscreen",
+                                  icon: Icon(
+                                    fullscreen
+                                        ? Icons.fullscreen_exit
+                                        : Icons.fullscreen,
+                                  ),
+                                );
+                              },
+                            ),
+                          ]),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+      [uri, encrypted, filename, info],
+    );
+
     final aspectRatio = switch (info) {
       VideoInfo(:final width?, :final height?) when width > 0 && height > 0 =>
         width / height,
@@ -50,86 +133,7 @@ class const VideoPlayer(
         aspectRatio: aspectRatio,
         child: ClipRRect(
           borderRadius: .circular(12),
-          child: Video(
-            controller: controller,
-            controls: (_) =>
-                // Until media_kit moves to material_ui, this Material is needed.
-                Material(
-                  type: .transparency,
-                  child: Stack(
-                    children: [
-                      Positioned.fill(
-                        child: GestureDetector(
-                          behavior: .opaque,
-                          onTap: loaded.value ? player.playOrPause : null,
-                        ),
-                      ),
-                      Positioned(
-                        top: 4,
-                        right: 4,
-                        child: IconButton(
-                          onPressed: () => context.saveAttachment(
-                            ref,
-                            uri,
-                            encrypted: encrypted,
-                            filename: filename,
-                          ),
-                          color: Colors.white,
-                          style: IconButton.styleFrom(
-                            backgroundColor: Colors.black38,
-                          ),
-                          tooltip: "Download",
-                          icon: Icon(Icons.download),
-                        ),
-                      ),
-                      Positioned(
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        child: DecoratedBox(
-                          decoration: const BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: .bottomCenter,
-                              end: .topCenter,
-                              colors: [Colors.black54, Colors.transparent],
-                            ),
-                          ),
-                          child: Padding(
-                            padding: const .only(left: 4, right: 4, top: 16),
-                            child: PlayerControls(
-                              player,
-                              loading: !loaded.value,
-                              size: info?.size,
-                              color: Colors.white,
-                              actions: .new([
-                                Builder(
-                                  builder: (context) {
-                                    final fullscreen = isFullscreen(context);
-
-                                    return IconButton(
-                                      onPressed: () =>
-                                          toggleFullscreen(context),
-                                      color: Colors.white,
-                                      tooltip: fullscreen
-                                          ? "Exit fullscreen"
-                                          : "Fullscreen",
-                                      icon: Icon(
-                                        fullscreen
-                                            ? Icons.fullscreen_exit
-                                            : Icons.fullscreen,
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ]),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-          ),
+          child: Video(controller: controller, controls: controls),
         ),
       ),
     );
