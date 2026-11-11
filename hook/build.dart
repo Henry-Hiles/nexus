@@ -120,6 +120,7 @@ Future<void> main(List<String> args) => build(args, (input, output) async {
 
     final tags = [
       "sqlite_fts5",
+      "goolm",
       // goheif/dav1d is not supported on Android or iOS, would need to be fixed upstream
       "noheic",
     ].join(",");
