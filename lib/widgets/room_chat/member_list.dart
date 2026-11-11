@@ -4,6 +4,7 @@ import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:m3e_buttons/m3e_buttons.dart";
 import "package:m3e_card_list/m3e_card_list.dart";
+import "package:nexus/controllers/banned_warning_dismissed.dart";
 import "package:nexus/controllers/members_by_status.dart";
 import "package:nexus/controllers/members_grouped.dart";
 import "package:nexus/helpers/extensions/get_localpart.dart";
@@ -13,6 +14,7 @@ import "package:nexus/models/content/membership.dart";
 import "package:nexus/models/membership_status.dart";
 import "package:nexus/widgets/avatars/avatar_or_hash.dart";
 import "package:nexus/widgets/common/divider_text.dart";
+import "package:nexus/widgets/room_chat/banned_warning_dialog.dart";
 import "package:nexus/widgets/common/error_dialog.dart";
 import "package:nexus/widgets/common/loading.dart";
 
@@ -40,8 +42,26 @@ class const MemberList(final String roomId, {super.key})
               padding: .all(8),
               child: M3EToggleButtonGroup(
                 selectedIndex: statusIndex.value,
-                onSelectedIndexChanged: (index) =>
-                    statusIndex.value = index ?? statusIndex.value,
+                onSelectedIndexChanged: (index) async {
+                  if (index == null) return;
+                  if (options.values.toIList()[index] == .ban &&
+                      !await ref.read(
+                        BannedWarningDismissedController.provider.future,
+                      )) {
+                    if (!context.mounted) return;
+                    final confirmed = await showDialog<bool>(
+                      context: context,
+                      builder: (_) => BannedWarningDialog(),
+                    );
+                    if (confirmed != true) return;
+                    await ref
+                        .read(
+                          BannedWarningDismissedController.provider.notifier,
+                        )
+                        .set(true);
+                  }
+                  statusIndex.value = index;
+                },
                 actions: options
                     .mapTo(
                       (name, value) => M3EToggleButtonGroupAction(
