@@ -33,6 +33,8 @@ import "package:nexus/controllers/power_level.dart";
 import "package:nexus/controllers/image_packs.dart";
 import "package:nexus/models/content/image_pack.dart";
 import "package:nexus/models/content/message.dart";
+import "package:nexus/widgets/renderers/message_media.dart";
+import "package:nexus/helpers/extensions/is_media.dart";
 import "package:nexus/models/content/poll_start.dart";
 import "package:nexus/models/image_pack.dart";
 import "package:nexus/widgets/emoji/mxc_emoji.dart";
@@ -482,19 +484,47 @@ class const Composer(
           if (attachment != null)
             Card(
               margin: .only(bottom: 8),
-              child: ListTile(
-                leading: attachment.$2 == null
-                    ? SizedBox(
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: switch (attachment.$2) {
+                      null => SizedBox(
                         width: 16,
                         height: 16,
                         child: CircularProgressIndicator(),
-                      )
-                    : Icon(Icons.file_copy),
-                title: Text(attachment.$1),
-                trailing: IconButton(
-                  onPressed: () => ref.invalidate(attachmentProvider),
-                  icon: Icon(Icons.close),
-                ),
+                      ),
+                      ImageMessageContent() => Icon(Icons.image),
+                      VideoMessageContent() => Icon(Icons.movie),
+                      AudioMessageContent() => Icon(Icons.audiotrack),
+                      _ => Icon(Icons.file_copy),
+                    },
+                    title: Text(attachment.$1),
+                    trailing: IconButton(
+                      onPressed: () => ref.invalidate(attachmentProvider),
+                      icon: Icon(Icons.close),
+                    ),
+                  ),
+                  AnimatedSize(
+                    duration: Durations.short4,
+                    alignment: .topCenter,
+                    child: switch (attachment.$2) {
+                      final content?
+                          when content is! FileMessageContent &&
+                              content.isMedia =>
+                        Padding(
+                          padding: EdgeInsets.all(12).copyWith(top: 0),
+                          child: Align(
+                            alignment: .centerLeft,
+                            child: ConstrainedBox(
+                              constraints: .loose(.square(300)),
+                              child: MessageMedia(content),
+                            ),
+                          ),
+                        ),
+                      _ => SizedBox(width: .infinity),
+                    },
+                  ),
+                ],
               ),
             ),
           AnimatedSize(

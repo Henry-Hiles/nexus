@@ -12,7 +12,6 @@ import "package:nexus/models/location.dart";
 import "package:nexus/models/content/poll_start.dart";
 import "package:nexus/models/content/sticker.dart";
 import "package:nexus/models/event.dart";
-import "package:nexus/widgets/renderers/file_card.dart";
 import "package:nexus/widgets/html/html.dart";
 import "package:nexus/widgets/lazy_loading/message_avatar.dart";
 import "package:nexus/widgets/lazy_loading/message_displayname.dart";
@@ -24,8 +23,8 @@ import "package:nexus/widgets/reactions/reaction_row.dart";
 import "package:nexus/widgets/common/timestamp.dart";
 import "package:nexus/widgets/renderers/url_preview.dart";
 import "package:nexus/widgets/renderers/event_preview.dart";
-import "package:nexus/widgets/players/video.dart";
-import "package:nexus/widgets/players/audio.dart";
+import "package:nexus/widgets/renderers/message_media.dart";
+import "package:nexus/helpers/extensions/is_media.dart";
 import "package:nexus/widgets/renderers/poll.dart";
 import "package:nexus/widgets/threads/thread_summary.dart";
 
@@ -125,63 +124,10 @@ class const MessageRenderer(
                   ),
 
             if (!textOnly) ...[
-              if (event.content
-                  case ImageMessageContent(:final url) ||
-                      FileMessageContent(:final url) ||
-                      VideoMessageContent(:final url) ||
-                      AudioMessageContent(:final url))
+              if (content.isMedia)
                 ConstrainedBox(
                   constraints: .loose(.square(500)),
-                  child: switch (event.content) {
-                    VideoMessageContent(
-                      :final info,
-                      :final file,
-                      :final filename,
-                      :final body,
-                    ) =>
-                      VideoPlayer(
-                        url,
-                        info,
-                        encrypted: file != null,
-                        filename: filename ?? body,
-                      ),
-                    AudioMessageContent(
-                      :final info,
-                      :final file,
-                      :final filename,
-                      :final body,
-                    ) =>
-                      AudioPlayer(
-                        url,
-                        info,
-                        encrypted: file != null,
-                        filename: filename ?? body,
-                      ),
-                    FileMessageContent(
-                      :final info,
-                      :final filename,
-                      :final file,
-                    ) =>
-                      FileCard(
-                        url,
-                        info,
-                        filename: filename,
-                        encrypted: file != null,
-                      ),
-                    ImageMessageContent(
-                      :final info,
-                      :final file,
-                      :final filename,
-                      :final body,
-                    ) =>
-                      MessageImage(
-                        url,
-                        info: info,
-                        encrypted: file != null,
-                        filename: filename ?? body,
-                      ),
-                    _ => SizedBox.shrink(),
-                  },
+                  child: MessageMedia(content),
                 ),
 
               if (event.lastEditRowId != 0)
