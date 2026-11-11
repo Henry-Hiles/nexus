@@ -8,7 +8,7 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
 
 |                                                                                  Dark Mode                                                                                   |                                    Light Mode                                    |
 | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------: |
-| ![Screenshot of Nexus Client in dark mode, showing users talking, with a sidebar showing rooms and spaces, and another sidebar showing members](./assets/screenshotDark.png) | ![The same screenshot as above, but in light mode](./assets/screenshotLight.png) |
+| ![Screenshot of Nexus Client in dark mode, showing users talking, with a sidebar showing rooms and spaces, and another sidebar showing members](./assets/screenshotDark.avif) | ![The same screenshot as above, but in light mode](./assets/screenshotLight.avif) |
 
 ## Try it out
 
