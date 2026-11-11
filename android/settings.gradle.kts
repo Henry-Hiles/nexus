@@ -24,3 +24,15 @@ plugins {
 }
 
 include(":app")
+
+// Flutter's plugin loader includes dev dependency plugins like integration_test as projects even in
+// release builds (where they're never linked in). integration_test lives in the Flutter SDK, which
+// is read-only under Nix, and Gradle 9+ refuses to configure a project whose directory isn't writable.
+findProject(":integration_test")?.let { project ->
+    if (!project.projectDir.canWrite()) {
+        val copy = file("../build/integration_test_android")
+        copy.deleteRecursively()
+        project.projectDir.copyRecursively(copy)
+        project.projectDir = copy
+    }
+}
