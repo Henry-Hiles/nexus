@@ -10,28 +10,32 @@ import "package:nexus/models/event.dart";
 
 /// A user's [name] in text, opening their popover when tapped. Unlike a widget
 /// in text, it wraps and ellipsizes with the rest of it.
-class UserSpan extends TextSpan {
-  UserSpan(
-    BuildContext context,
-    String name, {
-    required String userId,
-    required TapGestureRecognizer recognizer,
-    String? roomId,
-    super.style,
-    super.children,
-  }) : super(
-         text: name,
-         recognizer: recognizer
-           ..onTapUp = (details) {
-             if (!context.mounted) return;
 
-             context.showUserPopover(
-               userId,
-               roomId: roomId,
-               anchor: context.globalRectAt(details.globalPosition),
-             );
-           },
-       );
+// Can't be const, since it sets the recognizer's onTapUp
+// ignore: prefer_const_constructors_in_immutables
+class UserSpan(
+  BuildContext context,
+  String name, {
+  required String userId,
+  required TapGestureRecognizer recognizer,
+  String? roomId,
+  super.style,
+  super.children,
+}) extends TextSpan {
+  this
+    : super(
+        text: name,
+        recognizer: recognizer
+          ..onTapUp = (details) {
+            if (!context.mounted) return;
+
+            context.showUserPopover(
+              userId,
+              roomId: roomId,
+              anchor: context.globalRectAt(details.globalPosition),
+            );
+          },
+      );
 
   factory UserSpan.sender(
     BuildContext context,

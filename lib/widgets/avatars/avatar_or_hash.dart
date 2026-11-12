@@ -12,9 +12,18 @@ final class const AvatarOrHash(
 }) extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final color = ColorHash(title).color;
     final box = ColoredBox(
-      color: ColorHash(title).color,
-      child: Center(child: Icon(Icons.person, size: dimension / 2)),
+      color: color,
+      child: Center(
+        child: Icon(
+          Icons.person,
+          size: dimension / 2,
+          color: ThemeData.estimateBrightnessForColor(color) == .dark
+              ? Colors.white
+              : Colors.black,
+        ),
+      ),
     );
 
     return SizedBox(

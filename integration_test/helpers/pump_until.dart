@@ -10,9 +10,23 @@ extension PumpUntil on WidgetTester {
   Future<void> pumpUntil(Finder finder) async {
     const timeout = Duration(seconds: 30);
 
-    String textsIn(Finder finder) => widgetList<Text>(
-      find.descendant(of: finder, matching: find.byType(Text)),
-    ).map((text) => text.data).nonNulls.join("\n");
+    String textsIn(Finder finder) =>
+        widgetList(
+              find.descendant(
+                of: finder,
+                matching: find.byWidgetPredicate(
+                  (widget) => widget is Text || widget is SelectableText,
+                ),
+              ),
+            )
+            .map(
+              (widget) => switch (widget) {
+                Text(:final data) || SelectableText(:final data) => data,
+                _ => null,
+              },
+            )
+            .nonNulls
+            .join("\n");
 
     final stopwatch = Stopwatch()..start();
     while (stopwatch.elapsed < timeout) {

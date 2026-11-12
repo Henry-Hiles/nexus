@@ -221,7 +221,10 @@ class ClientController(final String? accountId) extends AsyncNotifier<int> {
         : .fromJson(response["notification"]);
   }
 
-  Future<dynamic> _sendCommand(
+  /// Sends [command] to gomuks, returning its decoded response. Overridable so
+  /// that tests can answer commands without gomuks.
+  @protected
+  Future<dynamic> sendCommand(
     String command, [
     Map<String, dynamic> data = const {},
   ]) => callGomuksMethod(data, (handle, data, callback) {
@@ -238,18 +241,18 @@ class ClientController(final String? accountId) extends AsyncNotifier<int> {
   });
 
   Future<void> redactEvent(RedactEventRequest report) =>
-      _sendCommand("redact_event", report.toJson());
+      sendCommand("redact_event", report.toJson());
 
   /// Null for gomuks' own commands that don't reply.
   Future<Event?> sendMessage(SendMessageRequest request) async =>
-      switch (await _sendCommand("send_message", request.toJson())) {
+      switch (await sendCommand("send_message", request.toJson())) {
         final Map<String, dynamic> json => .fromJson(json),
         _ => null,
       };
 
   /// The MSC4391 definitions of gomuks' own commands.
   Future<IList<BotCommandDescriptionContent>> getCommandDefinitions() async =>
-      switch (await _sendCommand("get_command_definitions")) {
+      switch (await sendCommand("get_command_definitions")) {
         final List definitions => .new(
           definitions.whereType<Map<String, dynamic>>().map(
             BotCommandDescriptionContent.fromJson,
@@ -259,27 +262,27 @@ class ClientController(final String? accountId) extends AsyncNotifier<int> {
       };
 
   Future<Event> sendEvent(SendEventRequest request) async =>
-      Event.fromJson(await _sendCommand("send_event", request.toJson()));
+      Event.fromJson(await sendCommand("send_event", request.toJson()));
 
   Future<String?> setState(SetStateRequest request) async =>
-      await _sendCommand("set_state", request.toJson());
+      await sendCommand("set_state", request.toJson());
 
-  Future<void> pauseSync() => _sendCommand("pause_sync");
-  Future<void> resumeSync() => _sendCommand("resume_sync");
+  Future<void> pauseSync() => sendCommand("pause_sync");
+  Future<void> resumeSync() => sendCommand("resume_sync");
 
   Future<void> verify(String recoveryKey) =>
-      _sendCommand("verify", {"recovery_key": recoveryKey});
+      sendCommand("verify", {"recovery_key": recoveryKey});
 
   Future<RecoveryKey> generateRecoveryKey(String passphrase) async => .fromJson(
-    await _sendCommand("generate_recovery_key", {"passphrase": passphrase}),
+    await sendCommand("generate_recovery_key", {"passphrase": passphrase}),
   );
 
   Future<void> resetEncryption(RecoveryKey key) =>
-      _sendCommand("reset_encryption", key.toJson());
+      sendCommand("reset_encryption", key.toJson());
 
   Future<Uri?> getCrossSigningResetUrl(Uri homeserver) async {
     const action = "org.matrix.cross_signing_reset";
-    final oauth = (await _sendCommand("get_login_flows", {
+    final oauth = (await sendCommand("get_login_flows", {
       "homeserver_url": homeserver.toString(),
     }))["oauth"];
 
@@ -297,33 +300,33 @@ class ClientController(final String? accountId) extends AsyncNotifier<int> {
   }
 
   Future<String> joinRoom(JoinRoomRequest request) async =>
-      (await _sendCommand("join_room", request.toJson()))["room_id"];
+      (await sendCommand("join_room", request.toJson()))["room_id"];
 
   Future<String> knockRoom(JoinRoomRequest request) async =>
-      (await _sendCommand("knock_room", request.toJson()))["room_id"];
+      (await sendCommand("knock_room", request.toJson()))["room_id"];
 
   Future<String> createRoom(CreateRoomRequest request) async =>
-      (await _sendCommand("create_room", request.toJson()))["room_id"];
+      (await sendCommand("create_room", request.toJson()))["room_id"];
 
   Future<SpaceHierarchy> getSpaceHierarchy(
     GetSpaceHierarchyRequest request,
   ) async =>
-      .fromJson(await _sendCommand("get_space_hierarchy", request.toJson()));
+      .fromJson(await sendCommand("get_space_hierarchy", request.toJson()));
 
   Future<RoomDirectory> getRoomDirectory(
     GetRoomDirectoryRequest request,
   ) async =>
-      .fromJson(await _sendCommand("get_room_directory", request.toJson()));
+      .fromJson(await sendCommand("get_room_directory", request.toJson()));
 
   Future<RoomSummary> getRoomSummary(JoinRoomRequest request) async =>
-      .fromJson(await _sendCommand("get_room_summary", request.toJson()));
+      .fromJson(await sendCommand("get_room_summary", request.toJson()));
 
   Future<void> leaveRoom(String roomId) =>
-      _sendCommand("leave_room", {"room_id": roomId});
+      sendCommand("leave_room", {"room_id": roomId});
 
   Future<IList<Event>> getRoomState(GetRoomStateRequest request) async {
     Future<List?> getState(GetRoomStateRequest request) async =>
-        (await _sendCommand("get_room_state", request.toJson())) as List?;
+        (await sendCommand("get_room_state", request.toJson())) as List?;
     final response = await getState(request);
 
     return .new(
@@ -336,7 +339,7 @@ class ClientController(final String? accountId) extends AsyncNotifier<int> {
   Future<IList<Event>> getSpecificRoomState(
     GetSpecificRoomStateRequest request,
   ) async => .new(
-    ((await _sendCommand("get_specific_room_state", request.toJson()))
+    ((await sendCommand("get_specific_room_state", request.toJson()))
                 as List? ??
             [])
         .map((event) => .fromJson(event)),
@@ -346,48 +349,48 @@ class ClientController(final String? accountId) extends AsyncNotifier<int> {
     GetRelatedEventsRequest request,
   ) async {
     final response =
-        (await _sendCommand("get_related_events", request.toJson())) as List?;
+        (await sendCommand("get_related_events", request.toJson())) as List?;
     return .new(response?.map((event) => .fromJson(event)));
   }
 
   Future<MentionsResponse> getMentions(GetMentionsRequest request) async =>
-      .fromJson(await _sendCommand("get_mentions", request.toJson()));
+      .fromJson(await sendCommand("get_mentions", request.toJson()));
 
   Future<Event?> getEvent(GetEventRequest request) async {
-    final json = await _sendCommand("get_event", request.toJson());
+    final json = await sendCommand("get_event", request.toJson());
     return json == null ? null : .fromJson(json);
   }
 
   Future<OpenGraphData> getUrlPreview(Uri url) async =>
-      .fromJson(await _sendCommand("get_url_preview", {"url": url.toString()}));
+      .fromJson(await sendCommand("get_url_preview", {"url": url.toString()}));
 
   Future<Paginate> paginate(PaginateRequest request) async =>
-      .fromJson(await _sendCommand("paginate", request.toJson()));
+      .fromJson(await sendCommand("paginate", request.toJson()));
 
   Future<PaginateManual> getThreads(GetThreadsRequest request) async =>
-      .fromJson(await _sendCommand("get_threads", request.toJson()));
+      .fromJson(await sendCommand("get_threads", request.toJson()));
 
   Future<PaginateManual> paginateManual(PaginateManualRequest request) async =>
-      .fromJson(await _sendCommand("paginate_manual", request.toJson()));
+      .fromJson(await sendCommand("paginate_manual", request.toJson()));
 
   Future<PaginateManual> searchLocal(SearchRequest request) async =>
-      .fromJson(await _sendCommand("search_local", request.toJson()));
+      .fromJson(await sendCommand("search_local", request.toJson()));
 
   Future<PaginateManual> searchServer(SearchRequest request) async =>
-      .fromJson(await _sendCommand("search_server", request.toJson()));
+      .fromJson(await sendCommand("search_server", request.toJson()));
 
   Future<EventContext> getEventContext(GetEventContextRequest request) async =>
-      .fromJson(await _sendCommand("get_event_context", request.toJson()));
+      .fromJson(await sendCommand("get_event_context", request.toJson()));
 
   Future<ProfileResponse> getProfile(String userId) async {
     try {
-      return .fromJson(await _sendCommand("get_profile", {"user_id": userId}));
+      return .fromJson(await sendCommand("get_profile", {"user_id": userId}));
     } catch (_) {
       return .new(profile: .new(id: userId));
     }
   }
 
-  Future<void> setProfileField(String field, Object? value) => _sendCommand(
+  Future<void> setProfileField(String field, Object? value) => sendCommand(
     "set_profile_field",
     {
       "field": field,
@@ -397,28 +400,28 @@ class ClientController(final String? accountId) extends AsyncNotifier<int> {
   );
 
   Future<void> reportEvent(ReportRequest request) =>
-      _sendCommand("report_event", request.toJson());
+      sendCommand("report_event", request.toJson());
 
   Future<void> setMembership(SetMembershipRequest request) =>
-      _sendCommand("set_membership", request.toJson());
+      sendCommand("set_membership", request.toJson());
 
   Future<void> setAccountData(SetAccountDataRequest request) =>
-      _sendCommand("set_account_data", request.toJson());
+      sendCommand("set_account_data", request.toJson());
 
   Future<void> updatePushRule(UpdatePushRuleRequest request) =>
-      _sendCommand("update_push_rule", request.toJson());
+      sendCommand("update_push_rule", request.toJson());
 
   Future<void> registerPusher(RegisterPusherRequest request) =>
-      _sendCommand("register_homeserver_push", request.toJson());
+      sendCommand("register_homeserver_push", request.toJson());
 
   Future<void> deregisterPusher(DeregisterPusherRequest request) =>
-      _sendCommand("register_homeserver_push", {
+      sendCommand("register_homeserver_push", {
         ...request.toJson(),
         "kind": null,
       });
 
   Future<MessageContent> uploadMedia(UploadMediaRequest request) async =>
-      .fromJson(await _sendCommand("upload_media", request.toJson()));
+      .fromJson(await sendCommand("upload_media", request.toJson()));
 
   Future<File> downloadMedia(DownloadMediaRequest request) async {
     if (accountId == null &&
@@ -427,13 +430,13 @@ class ClientController(final String? accountId) extends AsyncNotifier<int> {
     }
 
     return .new(
-      (await _sendCommand("download_media", request.toJson()))["path"],
+      (await sendCommand("download_media", request.toJson()))["path"],
     );
   }
 
-  Future<void> logout() => _sendCommand("logout");
+  Future<void> logout() => sendCommand("logout");
 
-  Future<void> setTyping(String roomId, Duration timeout) => _sendCommand(
+  Future<void> setTyping(String roomId, Duration timeout) => sendCommand(
     "set_typing",
     {"room_id": roomId, "timeout": timeout.inMilliseconds},
   );
@@ -462,7 +465,7 @@ class ClientController(final String? accountId) extends AsyncNotifier<int> {
         ref.read(SettingsController.provider).value?.readReceipts ==
         .showAndSend;
 
-    await _sendCommand("mark_read", {
+    await sendCommand("mark_read", {
       "room_id": room.metadata!.id,
       "receipt_type": sendPublic ? "m.read" : "m.read.private",
       "event_id": event.eventId,
@@ -471,44 +474,44 @@ class ClientController(final String? accountId) extends AsyncNotifier<int> {
   }
 
   Future<String> registerClient(OAuthRegisterClientRequest request) async =>
-      (await _sendCommand(
+      (await sendCommand(
         "oauth_register_client",
         request.toJson(),
       ))["client_id"];
 
   Future<OAuthAuthCodeResponse> getAuthUrl(OAuthGetAuthUrl request) async =>
       .fromJson(
-        await _sendCommand("oauth_get_authorization_url", request.toJson()),
+        await sendCommand("oauth_get_authorization_url", request.toJson()),
       );
 
   Future<void> exchangeToken(OAuthExchangeTokenRequest request) async =>
-      await _sendCommand("oauth_exchange_token", request.toJson());
+      await sendCommand("oauth_exchange_token", request.toJson());
 
   Future<IList<String>> getMutualRooms(String userId) async => IList(
-    ((await _sendCommand("get_mutual_rooms", {"user_id": userId}))["joined"]
+    ((await sendCommand("get_mutual_rooms", {"user_id": userId}))["joined"]
             as List?)
         ?.cast<String>(),
   );
 
   Future<IList<String>> getLocalAliases(String roomId) async => IList(
-    ((await _sendCommand("get_local_aliases", {"room_id": roomId}))["aliases"]
+    ((await sendCommand("get_local_aliases", {"room_id": roomId}))["aliases"]
             as List?)
         ?.cast<String>(),
   );
 
   Future<void> createAlias(String roomId, String alias) =>
-      _sendCommand("create_alias", {"room_id": roomId, "alias": alias});
+      sendCommand("create_alias", {"room_id": roomId, "alias": alias});
 
   Future<void> deleteAlias(String alias) =>
-      _sendCommand("delete_alias", {"alias": alias});
+      sendCommand("delete_alias", {"alias": alias});
 
   Future<bool> getRoomPublished(String roomId) async =>
-      (await _sendCommand("get_room_visibility", {
+      (await sendCommand("get_room_visibility", {
         "room_id": roomId,
       }))["visibility"] ==
       "public";
 
-  Future<void> setRoomPublished(String roomId, bool published) => _sendCommand(
+  Future<void> setRoomPublished(String roomId, bool published) => sendCommand(
     "publish_room",
     {"room_id": roomId, "visibility": published ? "public" : "private"},
   );
@@ -517,7 +520,7 @@ class ClientController(final String? accountId) extends AsyncNotifier<int> {
     String roomId,
     String version, {
     ISet<String> additionalCreators = const .empty(),
-  }) async => (await _sendCommand("upgrade_room", {
+  }) async => (await sendCommand("upgrade_room", {
     "room_id": roomId,
     "new_version": version,
     if (additionalCreators.isNotEmpty)
@@ -527,7 +530,7 @@ class ClientController(final String? accountId) extends AsyncNotifier<int> {
   /// The room [alias] points to, or null if it doesn't exist.
   Future<String?> resolveAlias(String alias) async {
     try {
-      return (await _sendCommand("resolve_alias", {"alias": alias}))["room_id"];
+      return (await sendCommand("resolve_alias", {"alias": alias}))["room_id"];
     } on GomuksException catch (error) {
       if (error.statusCode == 404) return null;
       rethrow;
@@ -535,14 +538,14 @@ class ClientController(final String? accountId) extends AsyncNotifier<int> {
   }
 
   Future<SpecVersionsResponse> getSpecVersions() async =>
-      .fromJson(await _sendCommand("get_versions"));
+      .fromJson(await sendCommand("get_versions"));
 
   Future<Capabilities> getCapabilities() async =>
-      .fromJson((await _sendCommand("get_capabilities"))["capabilities"]);
+      .fromJson((await sendCommand("get_capabilities"))["capabilities"]);
 
   Future<Uri?> discoverHomeserver(Uri homeserver) async {
     try {
-      final response = await _sendCommand("discover_homeserver", {
+      final response = await sendCommand("discover_homeserver", {
         "user_id": "@fake-user:${homeserver.authority}",
       });
       return Uri.parse(response["m.homeserver"]?["base_url"]);

@@ -1,0 +1,10 @@
+<p>Nexus is a simple and user-friendly client for Matrix, the open and decentralized chat network. It's made with Flutter, with gomuks handling the Matrix side.</p>
+
+<p>Features include:</p>
+<ul>
+<li>Spaces, threads, replies and reactions</li>
+<li>End-to-end encryption, with verification and recovery keys</li>
+<li>Polls, location sharing, and custom emoji and sticker packs</li>
+<li>Multiple accounts</li>
+<li>Notifications through UnifiedPush, or Firebase Cloud Messaging</li>
+</ul>

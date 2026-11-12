@@ -1,5 +1,6 @@
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
+import "package:flutter_riverpod/misc.dart";
 import "package:material_ui/material_ui.dart";
 import "package:nexus/controllers/active_account.dart";
 import "package:nexus/controllers/notification_request.dart";
@@ -11,6 +12,9 @@ class const AccountScope({
   required final Widget child,
   final List<ProviderObserver>? observers,
   final Duration? Function(int retryCount, Object error)? retry,
+
+  /// Applied to each account's scope, after its own, e.g. for test fakes
+  final List<Override> overrides = const [],
   super.key,
 }) extends HookWidget {
   @override
@@ -34,6 +38,7 @@ class const AccountScope({
         NotificationRequestController.provider.overrideWithBuild(
           (_, _) => active.value.notificationRowId,
         ),
+        ...overrides,
       ],
       child: child,
     );

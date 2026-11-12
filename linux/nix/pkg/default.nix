@@ -70,6 +70,7 @@ flutter.buildFlutterApplication {
   postInstall = ''
     install -D assets/bundled/icon.svg $out/share/icons/hicolor/scalable/apps/nexus.svg
     install -Dm755 linux/*.desktop -t $out/share/applications
+    install -Dm644 linux/*.metainfo.xml -t $out/share/metainfo
     install -Dm644 linux/*.service -t $out/share/dbus-1/services
     # better_player loads libmpv at runtime to play videos, and audioplayers
     # needs GStreamer's plugins to decode audio
@@ -93,6 +94,7 @@ flutter.buildFlutterApplication {
 
   meta = {
     description = "A simple and user-friendly Matrix client";
+    license = lib.licenses.gpl3Only;
     mainProgram = "nexus";
     platforms = lib.platforms.unix;
 

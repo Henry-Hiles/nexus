@@ -128,6 +128,7 @@ dev_dependencies:
         sdk: flutter
     app_links_platform_interface: 2.0.4
     url_launcher_platform_interface: 2.3.2
+    shared_preferences_platform_interface: 2.4.2
     build_runner: 2.17.1
     flutter_lints: 6.0.0
     freezed: 4.0.3

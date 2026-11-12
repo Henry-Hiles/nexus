@@ -71,6 +71,39 @@
             runtimeEnv = buildEnv.env;
             text = builtins.readFile ./e2e.sh;
           };
+          screenshots = pkgs.writeShellApplication {
+            name = "nexus-screenshots";
+            runtimeInputs =
+              buildEnv.packages
+              ++ (with pkgs; [
+                dbus
+                oxipng
+                pngquant
+              ]);
+            runtimeEnv = buildEnv.env;
+            text = builtins.readFile ./screenshots.sh;
+          };
+
+          headless =
+            program:
+            lib.getExe (
+              pkgs.writeShellApplication {
+                name = "${lib.getName program}-headless";
+                runtimeInputs = [ pkgs.cage ];
+                runtimeEnv = {
+                  WLR_BACKENDS = "headless";
+                  __EGL_VENDOR_LIBRARY_FILENAMES = "${pkgs.mesa}/share/glvnd/egl_vendor.d/50_mesa.json";
+                };
+                text = ''
+                  unset DISPLAY WAYLAND_DISPLAY
+                  # Wayland needs one, which CI may not have
+                  XDG_RUNTIME_DIR="''${XDG_RUNTIME_DIR:-$(mktemp -d)}"
+                  export XDG_RUNTIME_DIR
+
+                  exec cage -- ${lib.getExe program} "$@"
+                '';
+              }
+            );
         in
         {
           e2e = {
@@ -98,24 +131,12 @@
 
           e2e-headless = {
             type = "app";
-            program = lib.getExe (
-              pkgs.writeShellApplication {
-                name = "nexus-e2e-headless";
-                runtimeInputs = [ pkgs.cage ];
-                runtimeEnv = {
-                  WLR_BACKENDS = "headless";
-                  __EGL_VENDOR_LIBRARY_FILENAMES = "${pkgs.mesa}/share/glvnd/egl_vendor.d/50_mesa.json";
-                };
-                text = ''
-                  unset DISPLAY WAYLAND_DISPLAY
-                  # Wayland needs one, which CI may not have
-                  XDG_RUNTIME_DIR="''${XDG_RUNTIME_DIR:-$(mktemp -d)}"
-                  export XDG_RUNTIME_DIR
+            program = headless e2e;
+          };
 
-                  exec cage -- ${lib.getExe e2e} "$@"
-                '';
-              }
-            );
+          screenshots = {
+            type = "app";
+            program = headless screenshots;
           };
         };
     };
