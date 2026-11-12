@@ -55,6 +55,9 @@ flutter.buildFlutterApplication {
   customSourceBuilders.avif_native = callPackage ./avif_native.nix { };
 
   gitHashes = {
+    better_player = "sha256-7OoRdtbswGcP97Vn+Jkj3lBU8h2slJ/KPz98G3XOyNQ=";
+    better_player_ios = "sha256-7OoRdtbswGcP97Vn+Jkj3lBU8h2slJ/KPz98G3XOyNQ=";
+    better_player_macos = "sha256-7OoRdtbswGcP97Vn+Jkj3lBU8h2slJ/KPz98G3XOyNQ=";
     linkify = "sha256-TpMD6+0zyY6i9l+6d8ErnVufmepCv362rCtnbOht/z4=";
     location = "sha256-zWnffXiK1LD4Ln23coPozBjYfTlhZmBhC5Z8mCdAgwQ=";
     fab_m3e = "sha256-5V9m6yY0jimx2gh7lQHYg4HDKQ4Wrl0ATmBhw5DkQMI=";

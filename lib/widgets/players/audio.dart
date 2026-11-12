@@ -32,7 +32,7 @@ class const AudioPlayer(
         // Keeps the audio loaded after it finishes, so it can be replayed
         await player.setReleaseMode(.stop);
         try {
-          // AVFoundation infers the format from the extension, which the cached file lacks
+          // AVFoundation needs the format, since gomuks caches files without an extension
           await player.setSource(
             audioplayers.DeviceFileSource(audio.path, mimeType: info?.mimeType),
           );

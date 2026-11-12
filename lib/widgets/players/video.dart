@@ -5,7 +5,9 @@ import "package:material_ui/material_ui.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/helpers/extensions/save_attachment.dart";
+import "package:mime/mime.dart";
 import "package:nexus/models/info/video.dart";
+import "package:nexus/widgets/common/error_dialog.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:nexus/widgets/players/player_controls.dart";
 
@@ -43,6 +45,8 @@ class const VideoPlayer(
                 }, [controller]);
 
                 final playing = value.value?.isPlaying ?? false;
+                final ready = isLoaded && (value.value?.initialized ?? false);
+                final error = value.value?.errorDescription;
 
                 // better_player doesn't use material_ui, so this Material is needed.
                 return Material(
@@ -52,13 +56,55 @@ class const VideoPlayer(
                       Positioned.fill(
                         child: GestureDetector(
                           behavior: .opaque,
-                          onTap: isLoaded
+                          onTap: ready
                               ? playing
                                     ? controller.pause
                                     : controller.play
                               : null,
                         ),
                       ),
+                      if (error != null)
+                        Positioned.fill(
+                          child: ColoredBox(
+                            color: Colors.black54,
+                            child: Center(
+                              child: Column(
+                                mainAxisSize: .min,
+                                children: [
+                                  Padding(
+                                    padding: .all(12),
+                                    child: Icon(
+                                      Icons.videocam_off,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .error,
+                                    ),
+                                  ),
+                                  Flexible(
+                                    child: Text(
+                                      "Can't play this video",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .error,
+                                          ),
+                                    ),
+                                  ),
+                                  TextButton(
+                                    onPressed: () => showDialog(
+                                      context: context,
+                                      builder: (_) => ErrorDialog(error, null),
+                                    ),
+                                    child: Text("Show Error"),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
                       Positioned(
                         top: 4,
                         right: 4,
@@ -77,50 +123,51 @@ class const VideoPlayer(
                           icon: Icon(Icons.download),
                         ),
                       ),
-                      Positioned(
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        child: DecoratedBox(
-                          decoration: const BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: .bottomCenter,
-                              end: .topCenter,
-                              colors: [Colors.black54, Colors.transparent],
+                      if (error == null)
+                        Positioned(
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          child: DecoratedBox(
+                            decoration: const BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: .bottomCenter,
+                                end: .topCenter,
+                                colors: [Colors.black54, Colors.transparent],
+                              ),
                             ),
-                          ),
-                          child: Padding(
-                            padding: const .only(left: 4, right: 4, top: 16),
-                            child: PlayerControls(
-                              playing: playing,
-                              buffering: value.value?.isBuffering ?? false,
-                              position: value.value?.position ?? .zero,
-                              duration: value.value?.duration ?? .zero,
-                              onPlayPause: playing
-                                  ? controller.pause
-                                  : controller.play,
-                              onSeek: controller.seekTo,
-                              loading: !isLoaded,
-                              size: info?.size,
-                              color: Colors.white,
-                              actions: .new([
-                                IconButton(
-                                  onPressed: controller.toggleFullScreen,
-                                  color: Colors.white,
-                                  tooltip: controller.isFullScreen
-                                      ? "Exit fullscreen"
-                                      : "Fullscreen",
-                                  icon: Icon(
-                                    controller.isFullScreen
-                                        ? Icons.fullscreen_exit
-                                        : Icons.fullscreen,
+                            child: Padding(
+                              padding: const .only(left: 4, right: 4, top: 16),
+                              child: PlayerControls(
+                                playing: playing,
+                                buffering: value.value?.isBuffering ?? false,
+                                position: value.value?.position ?? .zero,
+                                duration: value.value?.duration ?? .zero,
+                                onPlayPause: playing
+                                    ? controller.pause
+                                    : controller.play,
+                                onSeek: controller.seekTo,
+                                loading: !ready,
+                                size: info?.size,
+                                color: Colors.white,
+                                actions: .new([
+                                  IconButton(
+                                    onPressed: controller.toggleFullScreen,
+                                    color: Colors.white,
+                                    tooltip: controller.isFullScreen
+                                        ? "Exit fullscreen"
+                                        : "Fullscreen",
+                                    icon: Icon(
+                                      controller.isFullScreen
+                                          ? Icons.fullscreen_exit
+                                          : Icons.fullscreen,
+                                    ),
                                   ),
-                                ),
-                              ]),
+                                ]),
+                              ),
                             ),
                           ),
                         ),
-                      ),
                     ],
                   ),
                 );
@@ -137,7 +184,15 @@ class const VideoPlayer(
             .read(ClientController.provider.notifier)
             .downloadMedia(.new(mxc: uri, encrypted: encrypted));
         if (!context.mounted) return;
-        await controller.setupDataSource(.file(video.path));
+        await controller.setupDataSource(
+          .file(
+            video.path,
+            videoExtension: switch (info?.mimeType) {
+              final mimeType? => extensionFromMime(mimeType),
+              null => null,
+            },
+          ),
+        );
         // better_player's mpv backend (Linux and Windows) starts playing as
         // soon as it loads a file, despite autoPlay being off
         await controller.pause();

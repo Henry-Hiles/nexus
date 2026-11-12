@@ -164,43 +164,46 @@ packages:
   better_player:
     dependency: "direct main"
     description:
-      name: better_player
-      sha256: bde9cc4c35f8ccca5e75465934b51ac11db5cbfca7b221f2122d546bb5c5b324
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.36.0"
+      path: "packages/better_player"
+      ref: "quad/feat/mimetypes"
+      resolved-ref: "0f9d7f391973cf1e2096fd7f9a7c9d3c0586a687"
+      url: "https://github.com/Henry-Hiles/betterplayer"
+    source: git
+    version: "1.37.0"
   better_player_android:
     dependency: transitive
     description:
       name: better_player_android
-      sha256: "2a1eb33ff1f67155f8840224836a6c90e95b335263986bcce78e89bf837be04e"
+      sha256: "24d3ce6c357186e0ec1eed63519e47a552bdc497ad48556f32593f5d6b406672"
       url: "https://pub.dev"
     source: hosted
-    version: "1.13.0"
+    version: "1.13.1"
   better_player_ios:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
-      name: better_player_ios
-      sha256: d26bc4b7d6d8c8047772f498fcdfe7cd896aecf156842d0fca9072d13eb4864b
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.13.0"
+      path: "packages/better_player_ios"
+      ref: "quad/feat/mimetypes"
+      resolved-ref: "0f9d7f391973cf1e2096fd7f9a7c9d3c0586a687"
+      url: "https://github.com/Henry-Hiles/betterplayer"
+    source: git
+    version: "1.14.0"
   better_player_linux:
     dependency: transitive
     description:
       name: better_player_linux
-      sha256: "0e73f56852f7bb16b35b059f1ee40cc1b9cb84c9883dccd1e7766fcd26b3f40f"
+      sha256: "97d9eb16a587df4d714c1906ef2c49b825c1483e7d4c9050d63e696e26998f6e"
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.0"
+    version: "1.1.1"
   better_player_macos:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
-      name: better_player_macos
-      sha256: "9e5154bc33c1b1af22da851829b658eab7d318a33c9037c4da98bc37091dc7b7"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.8.0"
+      path: "packages/better_player_macos"
+      ref: "quad/feat/mimetypes"
+      resolved-ref: "0f9d7f391973cf1e2096fd7f9a7c9d3c0586a687"
+      url: "https://github.com/Henry-Hiles/betterplayer"
+    source: git
+    version: "1.9.0"
   better_player_platform_interface:
     dependency: transitive
     description:
@@ -213,18 +216,18 @@ packages:
     dependency: transitive
     description:
       name: better_player_web
-      sha256: "2faf05dc31ec9082dbd5f90cee7777887c282c2af17bb54efab4ebceae9c25f4"
+      sha256: d7b365221f7724f22d3fef7840e45af2493a784e2429a30e980f807bcb7c9539
       url: "https://pub.dev"
     source: hosted
-    version: "1.6.0"
+    version: "1.6.1"
   better_player_windows:
     dependency: transitive
     description:
       name: better_player_windows
-      sha256: "4bfdce8c0f9c55c362b2f931edfb2cd7cebdac757217ad09d4804ea21ec95f35"
+      sha256: eddc817dce6af08e74de456ad711ffd987a641c45f73998cbe9ccbf6ab5ebf22
       url: "https://pub.dev"
     source: hosted
-    version: "1.5.0"
+    version: "1.5.1"
   boolean_selector:
     dependency: transitive
     description:

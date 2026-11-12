@@ -47,6 +47,21 @@ dependency_overrides:
         git:
             url: https://github.com/appelladev/linkify
             ref: fix/consecutive-periods-loose-url
+    better_player:
+        git:
+            url: https://github.com/Henry-Hiles/betterplayer
+            ref: quad/feat/mimetypes
+            path: packages/better_player
+    better_player_ios:
+        git:
+            url: https://github.com/Henry-Hiles/betterplayer
+            ref: quad/feat/mimetypes
+            path: packages/better_player_ios
+    better_player_macos:
+        git:
+            url: https://github.com/Henry-Hiles/betterplayer
+            ref: quad/feat/mimetypes
+            path: packages/better_player_macos
 
 dependencies:
     flutter:
@@ -119,7 +134,7 @@ dependencies:
             url: https://github.com/Henry-Hiles/flutterlocation # Adds an option to leave out proprietary Google Play services, unreleased
             ref: feat/optional-play-services
             path: packages/location
-    better_player: 1.36.0
+    better_player: 1.37.0
     audioplayers: 6.8.1
 dev_dependencies:
     flutter_test:
