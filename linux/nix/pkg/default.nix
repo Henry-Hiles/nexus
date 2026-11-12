@@ -64,7 +64,6 @@ flutter.buildFlutterApplication {
     navigation_rail_m3e = "sha256-5V9m6yY0jimx2gh7lQHYg4HDKQ4Wrl0ATmBhw5DkQMI=";
     unifiedpush_linux = "sha256-KQKyBPL2ORK9O89C4K3RHGve/lvFaU1vIjSDnj6+bj4=";
     unifiedpush_platform_interface = "sha256-KQKyBPL2ORK9O89C4K3RHGve/lvFaU1vIjSDnj6+bj4=";
-    webcrypto = "sha256-YHyCMVmroxj047r6KLrk5gMbAGwZ5fZvCSOaX5p49uI=";
     xdg_desktop_portal = "sha256-8GgiXHGv+wy6hJgj/rZxbymMitNVmdDLAnedZm9STSc=";
   };
 

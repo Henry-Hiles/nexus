@@ -1869,12 +1869,11 @@ packages:
   webcrypto:
     dependency: "direct overridden"
     description:
-      path: "."
-      ref: HEAD
-      resolved-ref: "0e9924f1ff0f485af87da12e7d0f259e41f3cbc5"
-      url: "https://github.com/google/webcrypto.dart"
-    source: git
-    version: "0.6.2-wip"
+      name: webcrypto
+      sha256: bdfa2b11696f2bac02834649d9e07d24a5154e527feec21ed1bdf81b31f982df
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.6.2"
   webdriver:
     dependency: transitive
     description:

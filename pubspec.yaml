@@ -21,9 +21,7 @@ environment:
 dependency_overrides:
     dynamic_color: 2.1.0
     code_assets: 2.1.0 # webcrypto requires ^1.0.0, but works with 2.x
-    webcrypto:
-        git:
-            url: https://github.com/google/webcrypto.dart # Uses build hooks and fixes macOS x86_64, unreleased
+    webcrypto: 0.6.2
     native_toolchain_cmake:
         git:
             url: https://github.com/rainyl/native_toolchain_cmake # Fixes native aarch64 linux builds, unreleased
