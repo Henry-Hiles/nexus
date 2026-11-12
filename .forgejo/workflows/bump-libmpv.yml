@@ -1,0 +1,24 @@
+name: "Bump the Windows build's libmpv"
+
+on:
+    schedule:
+        - cron: "0 6 * * 1"
+    workflow_dispatch:
+
+jobs:
+    bump-libmpv:
+        runs-on: ["small", "debian-13-x86_64"]
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v6
+
+            - name: Lix GHA Installer Action
+              uses: samueldr/lix-gha-installer-action@v2026-02-22
+              with:
+                  extra_nix_config: experimental-features = nix-command flakes flake-self-attrs
+
+            - name: Open a PR if there's a newer libmpv build
+              env:
+                  TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: nix run .#bump-libmpv

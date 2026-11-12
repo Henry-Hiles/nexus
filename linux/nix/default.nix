@@ -78,6 +78,24 @@
             program = lib.getExe e2e;
           };
 
+          bump-libmpv = {
+            type = "app";
+            program = lib.getExe (
+              pkgs.writeShellApplication {
+                name = "nexus-bump-libmpv";
+                runtimeInputs = with pkgs; [
+                  coreutils
+                  curl
+                  git
+                  gnugrep
+                  gnused
+                  jq
+                ];
+                text = builtins.readFile ./bump_libmpv.sh;
+              }
+            );
+          };
+
           e2e-headless = {
             type = "app";
             program = lib.getExe (
