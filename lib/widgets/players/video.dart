@@ -138,6 +138,9 @@ class const VideoPlayer(
             .downloadMedia(.new(mxc: uri, encrypted: encrypted));
         if (!context.mounted) return;
         await controller.setupDataSource(.file(video.path));
+        // better_player's mpv backend (Linux and Windows) starts playing as
+        // soon as it loads a file, despite autoPlay being off
+        await controller.pause();
         if (context.mounted) loaded.value = true;
       });
 
