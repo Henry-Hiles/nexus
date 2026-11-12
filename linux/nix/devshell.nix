@@ -12,6 +12,7 @@ let
       "34"
       "35"
       "36"
+      "37.0"
     ];
     abiVersions = [
       "armeabi-v7a"
