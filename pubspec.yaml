@@ -20,7 +20,7 @@ environment:
 
 dependency_overrides:
     dynamic_color: 2.1.0
-    code_assets: 2.1.0 # webcrypto requires ^1.0.0, but works with 2.x
+    code_assets: 2.2.0 # webcrypto requires ^1.0.0, but works with 2.x
     webcrypto: 0.6.2
     native_toolchain_cmake:
         git:
@@ -91,7 +91,7 @@ dependencies:
     flutter_hooks: 0.21.4
     ffi: 2.2.0
     hooks: 2.2.0
-    code_assets: 2.1.0
+    code_assets: 2.2.0
     ffigen: 23.0.0
     timeago: 3.7.1
     http: 1.6.0
