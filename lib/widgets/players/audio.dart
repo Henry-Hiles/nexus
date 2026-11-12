@@ -1,6 +1,7 @@
 import "dart:async";
 
 import "package:audioplayers/audioplayers.dart" as audioplayers;
+import "package:flutter/services.dart";
 import "package:material_ui/material_ui.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
@@ -20,6 +21,7 @@ class const AudioPlayer(
   Widget build(BuildContext context, WidgetRef ref) {
     final player = useMemoized(audioplayers.AudioPlayer.new);
     final loaded = useState(false);
+    final unsupported = useState(false);
 
     useEffect(() {
       scheduleMicrotask(() async {
@@ -29,7 +31,16 @@ class const AudioPlayer(
         if (!context.mounted) return;
         // Keeps the audio loaded after it finishes, so it can be replayed
         await player.setReleaseMode(.stop);
-        await player.setSource(audioplayers.DeviceFileSource(audio.path));
+        try {
+          // AVFoundation infers the format from the extension, which the cached file lacks
+          await player.setSource(
+            audioplayers.DeviceFileSource(audio.path, mimeType: info?.mimeType),
+          );
+        } on PlatformException catch (_) {
+          // The platform can't play this format, like Ogg on Apple platforms
+          if (context.mounted) unsupported.value = true;
+          return;
+        }
         if (context.mounted) loaded.value = true;
       });
 
@@ -50,32 +61,52 @@ class const AudioPlayer(
     ).requireData;
     final playing = state == .playing;
 
+    final downloadButton = IconButton(
+      onPressed: () => context.saveAttachment(
+        ref,
+        uri,
+        encrypted: encrypted,
+        filename: filename,
+      ),
+      tooltip: "Download",
+      icon: Icon(Icons.download),
+    );
+
     return Card(
       color: Theme.of(context).colorScheme.surfaceContainerHigh,
       child: Padding(
         padding: .symmetric(horizontal: 8),
-        child: PlayerControls(
-          playing: playing,
-          position: position,
-          duration: duration,
-          onPlayPause: playing ? player.pause : player.resume,
-          onSeek: player.seek,
-          loading: !loaded.value,
-          size: info?.size,
-          actions: .new([
-            SizedBox(width: 4),
-            IconButton(
-              onPressed: () => context.saveAttachment(
-                ref,
-                uri,
-                encrypted: encrypted,
-                filename: filename,
+        child: unsupported.value
+            ? Row(
+                children: [
+                  Padding(
+                    padding: .all(12),
+                    child: Icon(
+                      Icons.music_off,
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      "Can't play this audio format",
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                    ),
+                  ),
+                  downloadButton,
+                ],
+              )
+            : PlayerControls(
+                playing: playing,
+                position: position,
+                duration: duration,
+                onPlayPause: playing ? player.pause : player.resume,
+                onSeek: player.seek,
+                loading: !loaded.value,
+                size: info?.size,
+                actions: .new([SizedBox(width: 4), downloadButton]),
               ),
-              tooltip: "Download",
-              icon: Icon(Icons.download),
-            ),
-          ]),
-        ),
       ),
     );
   }
