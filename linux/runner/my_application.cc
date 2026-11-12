@@ -1,5 +1,6 @@
 #include "my_application.h"
 
+#include <clocale>
 #include <cstdlib>
 
 #include <flutter_linux/flutter_linux.h>
@@ -301,6 +302,9 @@ static void my_application_startup(
   G_APPLICATION_CLASS(
       my_application_parent_class)
       ->startup(application);
+
+  // mpv hates normal locales
+  setlocale(LC_NUMERIC, "C");
 }
 
 static void my_application_shutdown(

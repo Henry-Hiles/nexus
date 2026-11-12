@@ -1,13 +1,12 @@
 import "dart:async";
 
+import "package:better_player/better_player.dart";
 import "package:material_ui/material_ui.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/helpers/extensions/save_attachment.dart";
 import "package:nexus/models/info/video.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
-import "package:media_kit/media_kit.dart";
-import "package:media_kit_video/media_kit_video.dart";
 import "package:nexus/widgets/players/player_controls.dart";
 
 class const VideoPlayer(
@@ -19,11 +18,118 @@ class const VideoPlayer(
 }) extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final player = useMemoized(
-      () => Player(configuration: .new(bufferSize: 128 * 1024 * 1024)),
-    );
-    final controller = useMemoized(() => VideoController(player));
+    final aspectRatio = switch (info) {
+      VideoInfo(:final width?, :final height?) when width > 0 && height > 0 =>
+        width / height,
+      _ => 16 / 9,
+    };
+
     final loaded = useState(false);
+    final controller = useMemoized(
+      () => BetterPlayerController(
+        PlayerConfiguration(
+          aspectRatio: aspectRatio,
+          fit: .contain,
+          controlsConfiguration: PlayerControlsConfiguration(
+            playerTheme: .custom,
+            customControlsBuilder: (controller, _) => HookBuilder(
+              builder: (context) {
+                final isLoaded = useValueListenable(loaded);
+                final value = useState(controller.videoPlayerValue);
+                useEffect(() {
+                  void listener() => value.value = controller.videoPlayerValue;
+                  controller.addVideoListener(listener);
+                  return () => controller.removeVideoListener(listener);
+                }, [controller]);
+
+                final playing = value.value?.isPlaying ?? false;
+
+                // better_player doesn't use material_ui, so this Material is needed.
+                return Material(
+                  type: .transparency,
+                  child: Stack(
+                    children: [
+                      Positioned.fill(
+                        child: GestureDetector(
+                          behavior: .opaque,
+                          onTap: isLoaded
+                              ? playing
+                                    ? controller.pause
+                                    : controller.play
+                              : null,
+                        ),
+                      ),
+                      Positioned(
+                        top: 4,
+                        right: 4,
+                        child: IconButton(
+                          onPressed: () => context.saveAttachment(
+                            ref,
+                            uri,
+                            encrypted: encrypted,
+                            filename: filename,
+                          ),
+                          color: Colors.white,
+                          style: IconButton.styleFrom(
+                            backgroundColor: Colors.black38,
+                          ),
+                          tooltip: "Download",
+                          icon: Icon(Icons.download),
+                        ),
+                      ),
+                      Positioned(
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        child: DecoratedBox(
+                          decoration: const BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: .bottomCenter,
+                              end: .topCenter,
+                              colors: [Colors.black54, Colors.transparent],
+                            ),
+                          ),
+                          child: Padding(
+                            padding: const .only(left: 4, right: 4, top: 16),
+                            child: PlayerControls(
+                              playing: playing,
+                              buffering: value.value?.isBuffering ?? false,
+                              position: value.value?.position ?? .zero,
+                              duration: value.value?.duration ?? .zero,
+                              onPlayPause: playing
+                                  ? controller.pause
+                                  : controller.play,
+                              onSeek: controller.seekTo,
+                              loading: !isLoaded,
+                              size: info?.size,
+                              color: Colors.white,
+                              actions: .new([
+                                IconButton(
+                                  onPressed: controller.toggleFullScreen,
+                                  color: Colors.white,
+                                  tooltip: controller.isFullScreen
+                                      ? "Exit fullscreen"
+                                      : "Fullscreen",
+                                  icon: Icon(
+                                    controller.isFullScreen
+                                        ? Icons.fullscreen_exit
+                                        : Icons.fullscreen,
+                                  ),
+                                ),
+                              ]),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+      ),
+    );
 
     useEffect(() {
       scheduleMicrotask(() async {
@@ -31,101 +137,12 @@ class const VideoPlayer(
             .read(ClientController.provider.notifier)
             .downloadMedia(.new(mxc: uri, encrypted: encrypted));
         if (!context.mounted) return;
-        await player.open(Media(video.path), play: false);
+        await controller.setupDataSource(.file(video.path));
         if (context.mounted) loaded.value = true;
       });
 
-      return player.dispose;
+      return null;
     }, []);
-
-    final controls = useCallback(
-      (VideoState _) =>
-          // Until media_kit moves to material_ui, this Material is needed.
-          Material(
-            type: .transparency,
-            child: ValueListenableBuilder(
-              valueListenable: loaded,
-              builder: (_, loaded, _) => Stack(
-                children: [
-                  Positioned.fill(
-                    child: GestureDetector(
-                      behavior: .opaque,
-                      onTap: loaded ? player.playOrPause : null,
-                    ),
-                  ),
-                  Positioned(
-                    top: 4,
-                    right: 4,
-                    child: IconButton(
-                      onPressed: () => context.saveAttachment(
-                        ref,
-                        uri,
-                        encrypted: encrypted,
-                        filename: filename,
-                      ),
-                      color: Colors.white,
-                      style: IconButton.styleFrom(
-                        backgroundColor: Colors.black38,
-                      ),
-                      tooltip: "Download",
-                      icon: Icon(Icons.download),
-                    ),
-                  ),
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    child: DecoratedBox(
-                      decoration: const BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: .bottomCenter,
-                          end: .topCenter,
-                          colors: [Colors.black54, Colors.transparent],
-                        ),
-                      ),
-                      child: Padding(
-                        padding: const .only(left: 4, right: 4, top: 16),
-                        child: PlayerControls(
-                          player,
-                          loading: !loaded,
-                          size: info?.size,
-                          color: Colors.white,
-                          actions: .new([
-                            Builder(
-                              builder: (context) {
-                                final fullscreen = isFullscreen(context);
-
-                                return IconButton(
-                                  onPressed: () => toggleFullscreen(context),
-                                  color: Colors.white,
-                                  tooltip: fullscreen
-                                      ? "Exit fullscreen"
-                                      : "Fullscreen",
-                                  icon: Icon(
-                                    fullscreen
-                                        ? Icons.fullscreen_exit
-                                        : Icons.fullscreen,
-                                  ),
-                                );
-                              },
-                            ),
-                          ]),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-      [uri, encrypted, filename, info],
-    );
-
-    final aspectRatio = switch (info) {
-      VideoInfo(:final width?, :final height?) when width > 0 && height > 0 =>
-        width / height,
-      _ => 16 / 9,
-    };
 
     return ConstrainedBox(
       constraints: const .new(maxHeight: 300),
@@ -133,7 +150,7 @@ class const VideoPlayer(
         aspectRatio: aspectRatio,
         child: ClipRRect(
           borderRadius: .circular(12),
-          child: Video(controller: controller, controls: controls),
+          child: BetterPlayer(controller: controller),
         ),
       ),
     );

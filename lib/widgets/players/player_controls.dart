@@ -1,39 +1,25 @@
 import "dart:math";
 
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
-import "package:flutter_hooks/flutter_hooks.dart";
 import "package:material_ui/material_ui.dart";
-import "package:media_kit/media_kit.dart";
 import "package:nexus/helpers/extensions/size_to_string.dart";
 
-/// Play/pause, position and seeking controls for a media_kit [Player].
-class const PlayerControls(
-  final Player player, {
+/// Play/pause, position and seeking controls, for any player.
+class const PlayerControls({
+  required final bool playing,
+  required final Duration position,
+  required final Duration duration,
+  required final VoidCallback onPlayPause,
+  required final ValueChanged<Duration> onSeek,
   final bool loading = false,
+  final bool buffering = false,
   final Color? color,
   final int? size,
   final IList<Widget> actions = const .empty(),
   super.key,
-}) extends HookWidget {
+}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final playing = useStream(
-      player.stream.playing,
-      initialData: player.state.playing,
-    ).requireData;
-    final buffering = useStream(
-      player.stream.buffering,
-      initialData: player.state.buffering,
-    ).requireData;
-    final position = useStream(
-      player.stream.position,
-      initialData: player.state.position,
-    ).requireData;
-    final duration = useStream(
-      player.stream.duration,
-      initialData: player.state.duration,
-    ).requireData;
-
     String format(Duration duration) {
       final minutes = duration.inMinutes
           .remainder(60)
@@ -61,7 +47,7 @@ class const PlayerControls(
             child: CircularProgressIndicator(padding: .all(12), color: color),
           )
         : IconButton(
-            onPressed: player.playOrPause,
+            onPressed: onPlayPause,
             color: color,
             tooltip: playing ? "Pause" : "Play",
             icon: Icon(playing ? Icons.pause_circle : Icons.play_circle),
@@ -73,7 +59,7 @@ class const PlayerControls(
       value: min(position.inMilliseconds.toDouble(), max),
       onChanged: loading
           ? null
-          : (value) => player.seek(.new(milliseconds: value.toInt())),
+          : (value) => onSeek(.new(milliseconds: value.toInt())),
     );
 
     return LayoutBuilder(

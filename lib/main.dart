@@ -4,7 +4,6 @@ import "package:dynamic_color/dynamic_color.dart";
 import "package:flutter/foundation.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:material_emoji_picker/material_emoji_picker.dart";
-import "package:media_kit/media_kit.dart";
 import "package:nexus/controllers/active_account.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/client_state.dart";
@@ -65,7 +64,6 @@ void showError(Object error, [StackTrace? stackTrace]) {
 
 void main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
-  MediaKit.ensureInitialized();
 
   LicenseRegistry.addLicense(() => .fromIterable(fontLicenses));
 

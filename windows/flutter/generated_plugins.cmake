@@ -4,11 +4,11 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   app_links
+  audioplayers_windows
+  better_player_windows
   dynamic_color
   file_selector_windows
   location
-  media_kit_libs_windows_video
-  media_kit_video
   pasteboard
   url_launcher_windows
 )

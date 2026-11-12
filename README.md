@@ -75,7 +75,7 @@ This installs Nexus system-wide. With `enableNotifications`, it also installs KU
 #### Linux
 
 - On NixOS: Either use direnv and `direnv allow`, or `nix develop`
-- On other distros: Install Flutter, Go, Git, Libclang, Libass, MPV, and Glibc. Do not use any Snap packages, they cause various compilation issues.
+- On other distros: Install Flutter, Go, Git, Libclang, MPV, GStreamer (with its base, good and libav plugins), and Glibc. Do not use any Snap packages, they cause various compilation issues.
 
 #### Windows
 
@@ -83,12 +83,11 @@ You will need:
 
 - Flutter
 - Git
-- Libass
-- MPV
 - Go
 - Visual Studio 2022 (Desktop development with C++)
 - [MSYS2/MinGW-w64 GCC](https://www.msys2.org/) (for CGO)
 - [LLVM/Clang + libclang](https://clang.llvm.org/get_started.html) (for `ffigen`)
+- `libmpv-2.dll`, for playing videos, next to `nexus.exe` (CI uses a build from [mpv-winbuild-cmake](https://github.com/shinchiro/mpv-winbuild-cmake/releases))
 
 On Windows, make sure these are available in your shell `PATH`:
 

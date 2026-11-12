@@ -4,11 +4,11 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   app_links_linux
+  audioplayers_linux
+  better_player_linux
   dynamic_color
   file_selector_linux
   location
-  media_kit_libs_linux
-  media_kit_video
   pasteboard
   url_launcher_linux
 )

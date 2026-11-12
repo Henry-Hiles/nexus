@@ -86,9 +86,6 @@ dependencies:
     html: 0.15.7
     flutter_blurhash: 0.9.1
     super_sliver_list: 0.4.1
-    media_kit: 1.2.6
-    media_kit_video: 2.0.1
-    media_kit_libs_video: 1.0.7
     measure_size: 5.0.2
     m3e_buttons: 1.0.4
     m3e_design: 0.2.1
@@ -124,6 +121,8 @@ dependencies:
             url: https://github.com/Henry-Hiles/flutterlocation # Adds an option to leave out proprietary Google Play services, unreleased
             ref: feat/optional-play-services
             path: packages/location
+    better_player: 1.36.0
+    audioplayers: 6.8.1
 dev_dependencies:
     flutter_test:
         sdk: flutter

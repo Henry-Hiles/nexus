@@ -2,7 +2,8 @@
   lib,
   callPackage,
   mpv-unwrapped,
-  libass,
+  gst_all_1,
+  ffmpeg-headless,
   libxext,
   libxfixes,
   libclang,
@@ -39,8 +40,9 @@ flutter.buildFlutterApplication {
   nativeBuildInputs = [ (callPackage ./hook_pkg_config.nix { }) ];
 
   buildInputs = [
-    mpv-unwrapped
-    libass
+    # audioplayers plays audio through GStreamer
+    gst_all_1.gstreamer
+    gst_all_1.gst-plugins-base
     # nativeapi includes XInput2.h, which needs these, but xi.pc only lists them privately
     libxext
     libxfixes
@@ -54,6 +56,7 @@ flutter.buildFlutterApplication {
 
   gitHashes = {
     linkify = "sha256-TpMD6+0zyY6i9l+6d8ErnVufmepCv362rCtnbOht/z4=";
+    location = "sha256-zWnffXiK1LD4Ln23coPozBjYfTlhZmBhC5Z8mCdAgwQ=";
     fab_m3e = "sha256-5V9m6yY0jimx2gh7lQHYg4HDKQ4Wrl0ATmBhw5DkQMI=";
     fluttertagger = "sha256-tHUNU2+fBPkq5UK5YRi3SWs1zF2PIPz6RgSbwignU/I=";
     m3e_design = "sha256-5V9m6yY0jimx2gh7lQHYg4HDKQ4Wrl0ATmBhw5DkQMI=";
@@ -69,8 +72,24 @@ flutter.buildFlutterApplication {
     install -D assets/bundled/icon.svg $out/share/icons/hicolor/scalable/apps/nexus.svg
     install -Dm755 linux/*.desktop -t $out/share/applications
     install -Dm644 linux/*.service -t $out/share/dbus-1/services
+    # better_player loads libmpv at runtime to play videos, and audioplayers
+    # needs GStreamer's plugins to decode audio
+    # gomuks uses ffmpeg and ffprobe for video thumbnails and metadata
     wrapProgram $out/bin/nexus \
-      --suffix LD_LIBRARY_PATH : $out/app/nexus/lib
+      --suffix LD_LIBRARY_PATH : $out/app/nexus/lib \
+      --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath [ mpv-unwrapped ]} \
+      --prefix PATH : ${lib.makeBinPath [ ffmpeg-headless ]} \
+      --prefix GST_PLUGIN_SYSTEM_PATH_1_0 : ${
+        lib.makeSearchPathOutput "lib" "lib/gstreamer-1.0" (
+          with gst_all_1;
+          [
+            gstreamer
+            gst-plugins-base
+            gst-plugins-good
+            gst-libav
+          ]
+        )
+      }
   '';
 
   meta = {
