@@ -1,7 +1,6 @@
 import "package:app_links_platform_interface/app_links_platform_interface.dart";
 import "package:flutter_test/flutter_test.dart";
 import "package:material_ui/material_ui.dart";
-import "package:media_kit/media_kit.dart";
 import "package:nexus/controllers/active_account.dart";
 import "package:nexus/main.dart" as nexus;
 import "package:nexus/widgets/account_scope.dart";
@@ -22,7 +21,6 @@ class TestApp(final String username, final String password) {
 
   void setUp() {
     nexus.isInBackground = false;
-    MediaKit.ensureInitialized();
     AppLinksPlatform.instance = fakes.links;
     UrlLauncherPlatform.instance = fakes.launcher;
 
