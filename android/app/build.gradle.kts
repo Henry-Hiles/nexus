@@ -66,7 +66,8 @@ android {
 
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("release")
+            // Unsigned without a keystore, e.g. for F-Droid, which signs it itself
+            signingConfig = signingConfigs.getByName("release").takeIf { it.storeFile != null }
         }
 
         debug {
