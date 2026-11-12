@@ -6,8 +6,8 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
 
 ## Screenshots
 
-|                                                                                  Dark Mode                                                                                   |                                    Light Mode                                    |
-| :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------: |
+|                                                                                   Dark Mode                                                                                   |                                    Light Mode                                     |
+| :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------: |
 | ![Screenshot of Nexus Client in dark mode, showing users talking, with a sidebar showing rooms and spaces, and another sidebar showing members](./assets/screenshotDark.avif) | ![The same screenshot as above, but in light mode](./assets/screenshotLight.avif) |
 
 ## Try it out
@@ -156,5 +156,6 @@ Join the [Nexus Client Matrix room](https://matrix.to/#/#nexus:federated.nexus) 
 
 Thank you Hylke Bons (https://planetpeanut.studio) for making the amazing icon for Nexus!
 Thank you Tulir Asokan for making [Gomuks](https://github.com/gomuks/gomuks), and helping us integrate it into Nexus!
+Thank you [Feline Build Services](https://felinebuildservices.org/) for providing CI for the Nexus Forgejo repo!
 
 The Nexus icon, including its source files in `assets/` and the platform app icons generated from them, is © Hylke Bons. The screenshots are © Henry Hiles. Both are licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
