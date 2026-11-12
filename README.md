@@ -6,8 +6,8 @@ A simple and user-friendly Matrix client made with Flutter and a Gomuks backend.
 
 ## Screenshots
 
-|                                                                                   Dark Mode                                                                                   |                                    Light Mode                                     |
-| :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------: |
+|                                                                                       Dark Mode                                                                                        |                                         Light Mode                                         |
+| :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------: |
 | ![Screenshot of Nexus Client in dark mode, showing users talking, with a sidebar showing rooms and spaces, and another sidebar showing members](./assets/screenshots/desktop-dark.png) | ![The same screenshot as above, but in light mode](./assets/screenshots/desktop-light.png) |
 
 ## Try it out
@@ -49,7 +49,7 @@ nexus = {
 This tracks the latest commit on `main`. To stay on a release instead, pin the input to its tag:
 
 ```nix
-url = "git+https://git.federated.nexus/Nexus/nexus?ref=refs/tags/v1.1.0";
+url = "git+https://git.federated.nexus/Nexus/nexus?ref=refs/tags/v1.1.1";
 ```
 
 Then import the module and enable it in your NixOS configuration:
