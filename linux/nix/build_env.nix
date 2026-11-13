@@ -5,6 +5,8 @@
     with pkgs;
     [
       stdenv.cc
+      # webcrypto's build hook runs CMake with the Unix Makefiles generator
+      gnumake
       go
       git
       ffmpeg-headless
