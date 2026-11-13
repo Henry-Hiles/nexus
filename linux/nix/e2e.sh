@@ -69,7 +69,7 @@ for file in "${files[@]}"; do
     name="$(basename "$file" .dart)"
     mkdir -p "$work/$name/data" "$work/$name/cache"
     XDG_DATA_HOME="$work/$name/data" XDG_CACHE_HOME="$work/$name/cache" \
-        dbus-run-session -- \
+        dbus-run-session --config-file="$DBUS_SESSION_CONFIG" -- \
         flutter test "$file" -d linux \
         --dart-define="NEXUS_E2E_HOMESERVER=$homeserver" "${flutter_args[@]}" ||
         status=$?

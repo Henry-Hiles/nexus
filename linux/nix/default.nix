@@ -65,6 +65,9 @@
       apps =
         let
           buildEnv = import ./build_env.nix { inherit pkgs lib; };
+          testEnv = buildEnv.env // {
+            DBUS_SESSION_CONFIG = "${pkgs.dbus}/share/dbus-1/session.conf";
+          };
           e2e = pkgs.writeShellApplication {
             name = "nexus-e2e";
             runtimeInputs =
@@ -75,7 +78,7 @@
                 curl
                 dbus
               ]);
-            runtimeEnv = buildEnv.env;
+            runtimeEnv = testEnv;
             text = builtins.readFile ./e2e.sh;
           };
           screenshots = pkgs.writeShellApplication {
@@ -87,7 +90,7 @@
                 oxipng
                 pngquant
               ]);
-            runtimeEnv = buildEnv.env;
+            runtimeEnv = testEnv;
             text = builtins.readFile ./screenshots.sh;
           };
 

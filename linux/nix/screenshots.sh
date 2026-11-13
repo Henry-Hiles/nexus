@@ -12,7 +12,7 @@ GOCACHE="$(go env GOCACHE)"
 export GOCACHE
 
 XDG_DATA_HOME="$work/data" XDG_CACHE_HOME="$work/cache" \
-    dbus-run-session -- \
+    dbus-run-session --config-file="$DBUS_SESSION_CONFIG" -- \
     flutter test integration_test/screenshots/screenshots_test.dart -d linux \
     --dart-define="SCREENSHOTS_DIR=$work/out" "$@"
 
