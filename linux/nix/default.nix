@@ -30,7 +30,14 @@
             appName = "Nexus";
             developer = "QuadRadical";
             appId = "nexus.federated.nexus";
-            package = default;
+            # The runtime's GStreamer gets loaded instead of ours, and it can't
+            # load our plugins, so keep wrapGAppsHook from pointing it at them
+            package = default.overrideAttrs (old: {
+              postInstall = ''
+                unset GST_PLUGIN_SYSTEM_PATH_1_0
+              ''
+              + old.postInstall;
+            });
             runtime = "org.gnome.Platform/51";
             permissions = {
               share = [ "network" ];

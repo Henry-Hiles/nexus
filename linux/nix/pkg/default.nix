@@ -40,9 +40,12 @@ flutter.buildFlutterApplication {
   nativeBuildInputs = [ (callPackage ./hook_pkg_config.nix { }) ];
 
   buildInputs = [
-    # audioplayers plays audio through GStreamer
+    # audioplayers plays audio through GStreamer, and wrapGAppsHook adds
+    # these plugins to the wrapper's GST_PLUGIN_SYSTEM_PATH_1_0
     gst_all_1.gstreamer
     gst_all_1.gst-plugins-base
+    gst_all_1.gst-plugins-good
+    gst_all_1.gst-libav
     # nativeapi includes XInput2.h, which needs these, but xi.pc only lists them privately
     libxext
     libxfixes
@@ -75,24 +78,12 @@ flutter.buildFlutterApplication {
     install -Dm755 linux/*.desktop -t $out/share/applications
     install -Dm644 linux/*.metainfo.xml -t $out/share/metainfo
     install -Dm644 linux/*.service -t $out/share/dbus-1/services
-    # better_player loads libmpv at runtime to play videos, and audioplayers
-    # needs GStreamer's plugins to decode audio
+    # better_player loads libmpv at runtime to play videos
     # gomuks uses ffmpeg and ffprobe for video thumbnails and metadata
     wrapProgram $out/bin/nexus \
       --suffix LD_LIBRARY_PATH : $out/app/nexus/lib \
       --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath [ mpv-unwrapped ]} \
-      --prefix PATH : ${lib.makeBinPath [ ffmpeg-headless ]} \
-      --prefix GST_PLUGIN_SYSTEM_PATH_1_0 : ${
-        lib.makeSearchPathOutput "lib" "lib/gstreamer-1.0" (
-          with gst_all_1;
-          [
-            gstreamer
-            gst-plugins-base
-            gst-plugins-good
-            gst-libav
-          ]
-        )
-      }
+      --prefix PATH : ${lib.makeBinPath [ ffmpeg-headless ]}
   '';
 
   meta = {
