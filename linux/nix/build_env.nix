@@ -26,14 +26,16 @@
   env = lib.optionalAttrs pkgs.stdenv.isLinux {
     # nativeapi includes XInput2.h and GTK's Wayland headers, which need these, but xi.pc and gdk-3.0.pc
     # only list them privately, so its hook's pkg-config doesn't return them. Hooks only get NIX_ variables.
-    NIX_CFLAGS_COMPILE = lib.concatMapStringsSep " " (pkg: "-isystem ${lib.getDev pkg}/include") (
-      with pkgs;
-      [
-        libxext
-        libxfixes
-        wayland
-      ]
-    );
+    "NIX_CFLAGS_COMPILE_${pkgs.stdenv.cc.suffixSalt}" =
+      lib.concatMapStringsSep " " (pkg: "-isystem ${lib.getDev pkg}/include")
+        (
+          with pkgs;
+          [
+            libxext
+            libxfixes
+            wayland
+          ]
+        );
     # better_player loads libmpv at runtime to play videos
     LD_LIBRARY_PATH = "./build/native_assets/linux:${
       lib.makeLibraryPath [
