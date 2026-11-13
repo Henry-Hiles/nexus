@@ -23,7 +23,7 @@ fun versionCodeOf(versionName: String): Int {
 
 android {
     namespace = "nexus.federated.nexus"
-    compileSdk = 36
+    compileSdk = 37
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
