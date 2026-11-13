@@ -295,6 +295,7 @@ class RoomChatController(final ChatParams info)
                 : null,
           ),
         );
+        if (!ref.mounted) return;
 
         if (response.events.isEmpty) {
           state = .data(chat);
@@ -333,6 +334,7 @@ class RoomChatController(final ChatParams info)
                 : chat!.historicalData!.start,
           ),
         );
+        if (!ref.mounted) return;
 
         ref
             .read(RoomsController.provider.notifier)
@@ -345,6 +347,7 @@ class RoomChatController(final ChatParams info)
         final rootRowId = direction == .backward
             ? await threadRootBefore(paginationResponse)
             : null;
+        if (!ref.mounted) return;
         final eventRowIds = [
           ?rootRowId,
           ...(direction == .forward
@@ -383,6 +386,7 @@ class RoomChatController(final ChatParams info)
         );
       }
     } catch (_) {
+      if (!ref.mounted) return;
       state = .data(chat);
       rethrow;
     }
