@@ -64,10 +64,14 @@ Future<void> main(List<String> args) => build(args, (input, output) async {
 
       final targetNdkApi = codeConfig.android.targetNdkApi;
 
+      // Treats empty variables as unset, since e.g. F-Droid sets ANDROID_NDK_HOME to "" without an NDK
+      String? env(String name) => switch (Platform.environment[name]) {
+        "" => null,
+        final value => value,
+      };
+
       Future<String?> findNdkFromSdk() async {
-        final androidHome =
-            Platform.environment["ANDROID_HOME"] ??
-            Platform.environment["ANDROID_SDK_ROOT"];
+        final androidHome = env("ANDROID_HOME") ?? env("ANDROID_SDK_ROOT");
         if (androidHome == null) return null;
 
         final ndkDir = Directory(join(androidHome, "ndk"));
@@ -78,9 +82,9 @@ Future<void> main(List<String> args) => build(args, (input, output) async {
       }
 
       final ndkHome =
-          Platform.environment["ANDROID_NDK_HOME"] ??
-          Platform.environment["ANDROID_NDK_ROOT"] ??
-          Platform.environment["NDK_HOME"] ??
+          env("ANDROID_NDK_HOME") ??
+          env("ANDROID_NDK_ROOT") ??
+          env("NDK_HOME") ??
           await findNdkFromSdk();
 
       if (ndkHome == null) {
@@ -91,8 +95,7 @@ Future<void> main(List<String> args) => build(args, (input, output) async {
 
       // TODO: Someone please give me a way to detect host architecture so I can change this
       final hostTag =
-          Platform.environment["ANDROID_HOST_TAG"] ??
-          "${Platform.operatingSystem}-x86_64";
+          env("ANDROID_HOST_TAG") ?? "${Platform.operatingSystem}-x86_64";
       final ccTriple = switch (targetArch) {
         Architecture.arm64 => "aarch64-linux-android",
         Architecture.arm => "armv7a-linux-androideabi",
