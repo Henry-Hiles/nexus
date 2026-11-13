@@ -14,13 +14,6 @@ if (keystorePropertiesFile.exists()) {
     }
 }
 
-fun versionCodeOf(versionName: String): Int {
-    val parts = versionName.split("-", limit = 2)
-    val (major, minor, patch) = parts[0].split(".").map(String::toInt)
-    val preRelease = parts.getOrNull(1)?.let { Regex("\\d+").find(it)?.value?.toInt() ?: 0 } ?: 999
-    return major * 100_000_000 + minor * 1_000_000 + patch * 10_000 + preRelease
-}
-
 android {
     namespace = "nexus.federated.nexus"
     compileSdk = 37
@@ -38,7 +31,7 @@ android {
 		minSdk = 29
         targetSdk = flutter.targetSdkVersion
 
-        versionCode = versionCodeOf(flutter.versionName!!)
+        versionCode = flutter.versionCode
         versionName = flutter.versionName
 
 		multiDexEnabled = true
