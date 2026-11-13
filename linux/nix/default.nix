@@ -71,7 +71,7 @@
               buildEnv.packages
               ++ (with pkgs; [
                 # TEMPORARY: matrix-continuwuity, once the local fixes are released
-                inputs.continuwuity.packages.${system}.default
+                (inputs.continuwuity.packages.${system}.default.overrideAttrs { doCheck = false; })
                 curl
                 dbus
               ]);
