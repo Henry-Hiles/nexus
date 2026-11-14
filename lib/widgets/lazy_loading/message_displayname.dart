@@ -18,7 +18,7 @@ class const MessageDisplayname(
   Widget build(BuildContext context, WidgetRef ref) {
     final color = ref.displaynameColor(event.roomId, event.sender);
 
-    return switch (ref.watch(AuthorController.provider(event))) {
+    return switch (ref.watch(AuthorController.provider(.fromEvent(event)))) {
       AsyncData(:final MembershipContent? value) ||
       AsyncLoading(:final value) ||
       AsyncError(:final value) => InkWell(

@@ -13,7 +13,7 @@ class const MessageAvatar(
 }) extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) =>
-      switch (ref.watch(AuthorController.provider(event))) {
+      switch (ref.watch(AuthorController.provider(.fromEvent(event)))) {
         AsyncData(:final value) || AsyncLoading(:final value?) => InkWell(
           onTap: () =>
               context.showUserPopover(event.sender, roomId: event.roomId),

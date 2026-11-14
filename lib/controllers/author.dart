@@ -2,27 +2,30 @@ import "dart:async";
 
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/user.dart";
+import "package:nexus/models/configs/author.dart";
 import "package:nexus/models/content/membership.dart";
-import "package:nexus/models/event.dart";
 
-class AuthorController(final Event event)
+class AuthorController(final AuthorConfig config)
     extends AsyncNotifier<MembershipContent> {
   @override
   Future<MembershipContent> build() async {
     final member = await ref.watch(
-      UserController.provider(.new(roomId: event.roomId, userId: event.sender))
-          .future,
+      UserController.provider(
+        .new(roomId: config.roomId, userId: config.userId),
+      ).future,
     );
 
     return .new(
       status: member.status,
-      avatarUrl: event.pmp?.avatarUrl ?? member.avatarUrl,
-      displayName: event.pmp?.displayName ?? member.displayName,
+      avatarUrl: config.avatarUrl ?? member.avatarUrl,
+      displayName: config.displayName ?? member.displayName,
     );
   }
 
   static final provider =
-      AsyncNotifierProvider.family<AuthorController, MembershipContent, Event>(
-        AuthorController.new,
-      );
+      AsyncNotifierProvider.family<
+        AuthorController,
+        MembershipContent,
+        AuthorConfig
+      >(AuthorController.new);
 }
