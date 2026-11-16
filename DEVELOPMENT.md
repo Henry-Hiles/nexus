@@ -12,6 +12,16 @@ You can run the following command to update the Gomuks submodule:
 git submodule update --remote
 ```
 
+## Releasing
+
+To make a release, run the following command with the new version, either `X.Y.Z` or a pre-release like `X.Y.Z-alpha1`:
+
+```sh
+scripts/release.sh 1.2.0
+```
+
+This sets the version in `pubspec.yaml` (along with the Android version code), the Windows installer, the AppStream metainfo and the README, then commits and tags it. Push it with the command it prints, then attach the artifacts from the tag's CI run to the release.
+
 ## Code Style
 
 See [Effective Dart: Style](https://dart.dev/effective-dart/style) for general rules. There are some extra rules detailed below:
