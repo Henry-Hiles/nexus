@@ -57,6 +57,10 @@ android {
         }
     }
 
+    dependenciesInfo {
+        includeInApk = false
+    }
+
     buildTypes {
         release {
             // Unsigned without a keystore, e.g. for F-Droid, which signs it itself
