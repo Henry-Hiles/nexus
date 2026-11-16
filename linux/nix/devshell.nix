@@ -1,5 +1,6 @@
 { pkgs, lib }:
 let
+  ndkVersion = "28.2.13676358";
   android = pkgs.androidenv.composeAndroidPackages {
     toolsVersion = "26.1.1";
     platformToolsVersion = "37.0.1";
@@ -19,12 +20,22 @@ let
       "arm64-v8a"
     ];
     includeNDK = true;
-    ndkVersions = [ "28.2.13676358" ];
+    ndkVersions = [ ndkVersion ];
   };
   buildEnv = import ./build_env.nix { inherit pkgs lib; };
 in
 pkgs.mkShell {
-  packages = buildEnv.packages ++ [ android.platform-tools ];
+  packages =
+    buildEnv.packages
+    ++ [ android.platform-tools ]
+    # For scripts/build_avif_native.sh
+    ++ (with pkgs; [
+      cmake
+      jq
+      meson
+      ninja
+      python3
+    ]);
 
   env =
     rec {
@@ -32,6 +43,7 @@ pkgs.mkShell {
 
       ANDROID_HOME = "${android.androidsdk}/libexec/android-sdk";
       ANDROID_SDK_ROOT = ANDROID_HOME;
+      ANDROID_NDK_HOME = "${ANDROID_HOME}/ndk/${ndkVersion}";
       JAVA_HOME = pkgs.jdk21;
 
       GRADLE_OPTS = "-Dorg.gradle.project.android.aapt2FromMavenOverride=${ANDROID_HOME}/build-tools/36.0.0/aapt2";

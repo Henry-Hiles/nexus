@@ -27,7 +27,10 @@ jobs:
                   KEYSTORE_CONTENT: ${{ secrets.KEYSTORE_CONTENT }}
 
             - name: Build app
-              run: nix develop --command bash -c "flutter pub get && dart scripts/generate.dart && flutter pub run build_runner build && flutter build apk --target-platform android-arm64 --split-per-abi --dart-define=GIT_COMMIT=${{ github.sha }}"
+              run: |
+                  export PUB_CACHE=$PWD/.pub-cache
+                  export GOTOOLCHAIN=go$(sed -n -E 's/^toolchain go([0-9.]+)$/\1/p' gomuks/go.mod)
+                  nix develop --command bash -c "flutter pub get --enforce-lockfile && bash scripts/build_avif_native.sh && dart scripts/generate.dart && flutter pub run build_runner build && flutter build apk --target-platform android-arm64 --split-per-abi --dart-define=GIT_COMMIT=${{ github.sha }}"
               env:
                   KEYSTORE_PATH: ../../keystore.jks
                   KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
