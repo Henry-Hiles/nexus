@@ -162,6 +162,8 @@ final class ChatScroll({
             await paginate(.forward);
           }
 
+          if (!hookContext.mounted || !scrollController.hasClients) return;
+
           if (!isHistorical && position.extentBefore <= 0) await markRead();
 
           if (controllerData.isLoading == false &&
