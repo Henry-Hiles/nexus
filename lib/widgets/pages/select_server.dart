@@ -48,7 +48,7 @@ class const SelectServerPage({super.key}) extends HookConsumerWidget {
           Future<void> tryLogin(Uri url) async {
             final OAuthAuthCodeResponse codeResponse;
             try {
-              codeResponse = await ref.watch(
+              codeResponse = await ref.read(
                 AuthUrlController.provider(url).future,
               );
             } on GomuksException catch (error) {
