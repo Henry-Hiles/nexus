@@ -190,31 +190,34 @@ class const SelectServerPage({super.key}) extends HookConsumerWidget {
                     name: "Matrix.org",
                     description: "The Matrix.org Foundation offers the matrix.org homeserver as an easy entry point for anyone wanting to try out Matrix.",
                     url: .https("matrix.org"),
-                    iconUrl:
-                        "https://raw.githubusercontent.com/element-hq/logos/refs/heads/master/matrix/matrix-favicon${Theme.brightnessOf(context) == Brightness.dark ? "-white" : ""}.png",
+                    icon: SvgPicture.asset(
+                      "assets/bundled/matrix.svg",
+                      colorFilter: .mode(theme.colorScheme.onSurface, .srcIn),
+                    ),
                   ),
                   .new(
                     name: "Federated Nexus",
                     description: "Federated Nexus is a community resource hosting multiple FOSS (especially federated) services, including Matrix and Forgejo. By the same developers who made Nexus client.",
                     url: .https("federated.nexus"),
-                    iconUrl: "https://federated.nexus/images/icon.png",
+                    icon: SvgPicture.asset(
+                      "assets/bundled/federated_nexus.svg",
+                    ),
                   ),
                   // TODO: Add back unredacted when they have MAS, find where new favicon is
                   // .new(
                   //   name: "Unredacted",
                   //   description: "Unredacted is a 501(c)(3) non-profit organization that builds Internet infrastructure and services to help people evade censorship and protect their right to privacy.",
                   //   url: .https("unredacted.org", "services/si/matrix"),
-                  //   iconUrl: "https://unredacted.org/favicon.ico",
+                  //   icon: Image.network("https://unredacted.org/favicon.ico"),
                   // ),
                 ].map(
                   (homeserver) => Card(
                     child: ListTile(
                       enabled: !isLoading.value,
                       title: Text(homeserver.name),
-                      leading: Image.network(
-                        homeserver.iconUrl,
-                        errorBuilder: (_, _, _) => SizedBox.shrink(),
-                        height: 32,
+                      leading: SizedBox.square(
+                        dimension: 32,
+                        child: homeserver.icon,
                       ),
                       subtitle: Text(homeserver.description),
                       onTap: isLoading.value
