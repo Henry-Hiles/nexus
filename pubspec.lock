@@ -1249,11 +1249,12 @@ packages:
   pasteboard:
     dependency: "direct main"
     description:
-      name: pasteboard
-      sha256: e0535da36124e6f2ca9d17424102ce5de34e72acc39f05a1d942b974b48e5eea
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.6.0"
+      path: "packages/pasteboard"
+      ref: HEAD
+      resolved-ref: b5427767c5da1d9bba4c7227dd66ba2b108e9555
+      url: "https://github.com/Henry-Hiles/flutter-plugins"
+    source: git
+    version: "0.6.1"
   path:
     dependency: "direct main"
     description:

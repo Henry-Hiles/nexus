@@ -44,6 +44,10 @@ dependency_overrides:
             url: https://codeberg.org/Henry-Hiles/flutter-connector
             ref: quad/nexus
             path: unifiedpush_platform_interface
+    pasteboard:
+        git:
+            url: https://github.com/Henry-Hiles/flutter-plugins # FileTransfer portal support on Linux, unreleased
+            path: packages/pasteboard
     linkify:
         git:
             url: https://github.com/appelladev/linkify
