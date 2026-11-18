@@ -1,5 +1,6 @@
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:material_ui/material_ui.dart";
+import "package:nexus/controllers/clock.dart";
 import "package:nexus/controllers/sync_status.dart";
 import "package:nexus/widgets/common/error_dialog.dart";
 import "package:timeago/timeago.dart";
@@ -38,7 +39,7 @@ class const SyncStatusBanner({super.key}) extends ConsumerWidget {
             ?status.error,
             if (status.errorCount > 0) "Failed attempts: ${status.errorCount}.",
             if (status.lastSync case final lastSync?)
-              "Last synced ${format(lastSync)}.",
+              "Last synced ${format(lastSync, clock: ref.watch(ClockController.provider))}.",
           ];
 
     return AnimatedSize(
