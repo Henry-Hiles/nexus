@@ -68,7 +68,7 @@ flutter.buildFlutterApplication {
     m3e_design = "sha256-5V9m6yY0jimx2gh7lQHYg4HDKQ4Wrl0ATmBhw5DkQMI=";
     native_toolchain_cmake = "sha256-/drnHZebmTnsCnHgC1xmlAe+U4PSrjw5Sm9axicuTrY=";
     navigation_rail_m3e = "sha256-5V9m6yY0jimx2gh7lQHYg4HDKQ4Wrl0ATmBhw5DkQMI=";
-    pasteboard = "sha256-7c8fkNBrvJuWar58aS0z657cP7pCZ+az4XPi1/o0ynY=";
+    pasteboard = "sha256-J3yray5n7XwVXMcOsvQ5+OvADEK2lPMeYniGg+yR704=";
     unifiedpush_linux = "sha256-KQKyBPL2ORK9O89C4K3RHGve/lvFaU1vIjSDnj6+bj4=";
     unifiedpush_platform_interface = "sha256-KQKyBPL2ORK9O89C4K3RHGve/lvFaU1vIjSDnj6+bj4=";
     xdg_desktop_portal = "sha256-8GgiXHGv+wy6hJgj/rZxbymMitNVmdDLAnedZm9STSc=";

@@ -1251,7 +1251,7 @@ packages:
     description:
       path: "packages/pasteboard"
       ref: HEAD
-      resolved-ref: b5427767c5da1d9bba4c7227dd66ba2b108e9555
+      resolved-ref: e79a0ecc741b80575f38465c02eba9c553e12479
       url: "https://github.com/Henry-Hiles/flutter-plugins"
     source: git
     version: "0.6.1"
