@@ -41,7 +41,7 @@ class const UserOverlay(
                       title: Text(displayName ?? member.stateKey!.localpart),
                       subtitle: Text(member.stateKey!),
                       onTap: () => addTag(
-                        id: "[@$displayName](matrix:u/${member.stateKey!.substring(1)})",
+                        id: "[@${displayName ?? member.stateKey!.localpart}](matrix:u/${member.stateKey!.substring(1)})",
                         name: member.stateKey!.localpart,
                       ),
                     ),
