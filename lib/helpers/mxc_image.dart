@@ -20,18 +20,23 @@ class MxcImage(final WidgetRef ref, final DownloadMediaRequest request)
       MultiFrameImageStreamCompleter(codec: _loadAsync(decode), scale: 1.0);
 
   Future<ui.Codec> _loadAsync(ImageDecoderCallback decode) async {
-    final file = await ref
-        .read(ClientController.provider.notifier)
-        .downloadMedia(request);
-    final bytes = await File(file.path).readAsBytes();
+    try {
+      final file = await ref
+          .read(ClientController.provider.notifier)
+          .downloadMedia(request);
+      final bytes = await File(file.path).readAsBytes();
 
-    // Flutter can't decode AVIF on Linux/Windows (or older Android/iOS), so we do it ourselves
-    if (String.fromCharCodes(bytes.skip(4).take(8))
-        case "ftypavif" || "ftypavis") {
-      return AvifCodec(await Isolate.run(() => decodeAvif(bytes)));
+      // Flutter can't decode AVIF on Linux/Windows (or older Android/iOS), so we do it ourselves
+      if (String.fromCharCodes(bytes.skip(4).take(8))
+          case "ftypavif" || "ftypavis") {
+        return AvifCodec(await Isolate.run(() => decodeAvif(bytes)));
+      }
+
+      return await decode(await .fromUint8List(bytes));
+    } catch (_) {
+      scheduleMicrotask(() => PaintingBinding.instance.imageCache.evict(this));
+      rethrow;
     }
-
-    return decode(await .fromUint8List(bytes));
   }
 
   @override
