@@ -1,7 +1,6 @@
 import "dart:async";
 
 import "package:audioplayers/audioplayers.dart" as audioplayers;
-import "package:flutter/services.dart";
 import "package:material_ui/material_ui.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
@@ -36,8 +35,8 @@ class const AudioPlayer(
           await player.setSource(
             audioplayers.DeviceFileSource(audio.path, mimeType: info?.mimeType),
           );
-        } on PlatformException catch (_) {
-          // The platform can't play this format, like Ogg on Apple platforms
+        } on Exception catch (_) {
+          // The platform can't play this format, like Ogg on Apple platforms or MIDI on Linux
           if (context.mounted) unsupported.value = true;
           return;
         }
@@ -47,18 +46,18 @@ class const AudioPlayer(
       return player.dispose;
     }, []);
 
-    final state = useStream(
-      player.onPlayerStateChanged,
-      initialData: player.state,
-    ).requireData;
-    final position = useStream(
-      player.onPositionChanged,
-      initialData: Duration.zero,
-    ).requireData;
-    final duration = useStream(
-      player.onDurationChanged,
-      initialData: Duration.zero,
-    ).requireData;
+    final state =
+        useStream(
+          player.onPlayerStateChanged,
+          initialData: player.state,
+        ).data ??
+        player.state;
+    final position =
+        useStream(player.onPositionChanged, initialData: Duration.zero).data ??
+        Duration.zero;
+    final duration =
+        useStream(player.onDurationChanged, initialData: Duration.zero).data ??
+        Duration.zero;
     final playing = state == .playing;
 
     final downloadButton = IconButton(
