@@ -1,6 +1,7 @@
 import "dart:async";
 import "dart:io";
 import "dart:isolate";
+import "dart:typed_data";
 import "dart:ui" as ui;
 
 import "package:avif_native/avif_native.dart";
@@ -29,7 +30,7 @@ class MxcImage(final WidgetRef ref, final DownloadMediaRequest request)
       // Flutter can't decode AVIF on Linux/Windows (or older Android/iOS), so we do it ourselves
       if (String.fromCharCodes(bytes.skip(4).take(8))
           case "ftypavif" || "ftypavis") {
-        return AvifCodec(await Isolate.run(() => decodeAvif(bytes)));
+        return AvifCodec(await _decodeAvifInIsolate(bytes));
       }
 
       return await decode(await .fromUint8List(bytes));
@@ -38,6 +39,9 @@ class MxcImage(final WidgetRef ref, final DownloadMediaRequest request)
       rethrow;
     }
   }
+
+  static Future<AvifImageData> _decodeAvifInIsolate(Uint8List bytes) =>
+      Isolate.run(() => decodeAvif(bytes));
 
   @override
   bool operator ==(Object other) =>
