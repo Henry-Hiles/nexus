@@ -525,10 +525,12 @@ class const EventRenderer(
                   child: Row(
                     spacing: 4,
                     children: [
-                      Text(
-                        event.sendError!,
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: theme.colorScheme.error,
+                      Flexible(
+                        child: Text(
+                          event.sendError!,
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: theme.colorScheme.error,
+                          ),
                         ),
                       ),
                       InkWell(
