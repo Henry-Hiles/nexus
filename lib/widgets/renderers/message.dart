@@ -143,12 +143,18 @@ class const MessageRenderer(
         UnknownMessageContent(:final body) =>
           body == null
               ? Text("This message is redacted", style: errorStyle)
-              : Wrap(
-                  spacing: 8,
-                  children: [
-                    Text("Unknown message type:", style: errorStyle),
-                    Text(body),
-                  ],
+              : Text.rich(
+                  TextSpan(
+                    children: [
+                      TextSpan(
+                        text: "Unknown message type: ",
+                        style: errorStyle,
+                      ),
+                      TextSpan(text: body),
+                    ],
+                  ),
+                  maxLines: maxLines,
+                  overflow: maxLines == null ? null : .ellipsis,
                 ),
       },
       _ => throw Exception("This is impossible"),
