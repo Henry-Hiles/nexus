@@ -35,6 +35,6 @@ class MainActivity: FlutterActivity() {
     // Posted so it runs after Flutter has applied any insets it deferred.
     private fun reapplyInsets() {
         val view = findViewById<View>(FLUTTER_VIEW_ID) ?: return
-        view.post { view.rootWindowInsets?.let(view::onApplyWindowInsets) }
+        view.post { view.requestApplyInsets() }
     }
 }
