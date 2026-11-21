@@ -59,7 +59,7 @@ flutter.buildFlutterApplication {
 
   gitHashes = {
     linkify = "sha256-TpMD6+0zyY6i9l+6d8ErnVufmepCv362rCtnbOht/z4=";
-    location = "sha256-zWnffXiK1LD4Ln23coPozBjYfTlhZmBhC5Z8mCdAgwQ=";
+    location = "sha256-RL+l46pBhv75xP7ASJuazyYoi9vI35TSYAV11mkjAwY=";
     fab_m3e = "sha256-5V9m6yY0jimx2gh7lQHYg4HDKQ4Wrl0ATmBhw5DkQMI=";
     fluttertagger = "sha256-tHUNU2+fBPkq5UK5YRi3SWs1zF2PIPz6RgSbwignU/I=";
     m3e_design = "sha256-5V9m6yY0jimx2gh7lQHYg4HDKQ4Wrl0ATmBhw5DkQMI=";
