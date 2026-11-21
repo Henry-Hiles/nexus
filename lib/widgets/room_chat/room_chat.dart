@@ -20,6 +20,7 @@ import "package:nexus/widgets/threads/threads_drawer.dart";
 import "package:nexus/widgets/room_chat/chat_body.dart";
 import "package:nexus/helpers/extensions/build_event_options.dart";
 import "package:nexus/controllers/jump_request.dart";
+import "package:nexus/main.dart";
 
 final class const RoomChat({
   required final String? roomId,
@@ -202,10 +203,14 @@ final class const RoomChat({
                       isDesktop: isDesktop,
                       onOpenDrawer: Scaffold.of(context).openDrawer,
                       onOpenMemberList: (thisContext) {
+                        if (!showMembersByDefault) {
+                          return Scaffold.of(thisContext).openEndDrawer();
+                        }
+
                         ref
                             .read(MemberListOpenedController.provider.notifier)
-                            .set(!memberListOpened);
-                        Scaffold.of(thisContext).openEndDrawer();
+                            .set(!memberListOpened)
+                            .onError(showError);
                       },
                       onOpenPinnedMessagesList: Scaffold.of(middleContext)
                           .openEndDrawer,
