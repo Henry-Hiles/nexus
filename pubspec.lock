@@ -77,10 +77,10 @@ packages:
     dependency: transitive
     description:
       name: archive
-      sha256: de5ac590b8155e4e676088d714bd41ea620449a6adc0f7950c5073874b287ddb
+      sha256: "2fda90592c0afd219c5e285618a98da835cd10df38372666093d25dfe457a2d0"
       url: "https://pub.dev"
     source: hosted
-    version: "4.6.0"
+    version: "4.7.1"
   args:
     dependency: transitive
     description:
@@ -164,29 +164,27 @@ packages:
   better_player:
     dependency: "direct main"
     description:
-      path: "packages/better_player"
-      ref: "quad/feat/mimetypes"
-      resolved-ref: c4753aa81b368c0b025a80cbab01424462d64794
-      url: "https://github.com/Henry-Hiles/betterplayer"
-    source: git
-    version: "1.37.0"
+      name: better_player
+      sha256: f9b928eec81622f33457a5019a02c79d102dffe54b432baa43bb3400d31439e1
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.38.0"
   better_player_android:
     dependency: transitive
     description:
       name: better_player_android
-      sha256: "24d3ce6c357186e0ec1eed63519e47a552bdc497ad48556f32593f5d6b406672"
+      sha256: "2c7df9bfb1e7fa69c86d3bb91a1825bba30292968307724fa51869bc3a0bb75d"
       url: "https://pub.dev"
     source: hosted
-    version: "1.13.1"
+    version: "1.13.2"
   better_player_ios:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
-      path: "packages/better_player_ios"
-      ref: "quad/feat/mimetypes"
-      resolved-ref: c4753aa81b368c0b025a80cbab01424462d64794
-      url: "https://github.com/Henry-Hiles/betterplayer"
-    source: git
-    version: "1.14.0"
+      name: better_player_ios
+      sha256: "4b9c08690374aa84b15ba88ab5d6b695cda618fb895b445a6a4186c220599c84"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.15.0"
   better_player_linux:
     dependency: transitive
     description:
@@ -196,14 +194,13 @@ packages:
     source: hosted
     version: "1.1.1"
   better_player_macos:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
-      path: "packages/better_player_macos"
-      ref: "quad/feat/mimetypes"
-      resolved-ref: c4753aa81b368c0b025a80cbab01424462d64794
-      url: "https://github.com/Henry-Hiles/betterplayer"
-    source: git
-    version: "1.9.0"
+      name: better_player_macos
+      sha256: "90f6fc0e354b034043850661a7c4e39ac34261ff7cc21c2895ea7bded126d15c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.10.0"
   better_player_platform_interface:
     dependency: transitive
     description:
@@ -643,10 +640,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_local_notifications
-      sha256: "58f9ea245d7194363c05f7a012bbc73291736c2d8b5f555a8e0ea3f9121868b4"
+      sha256: "7d37d69ded3028af4f22531a0097a3baa478a384dff2e23e873707c93df3b704"
       url: "https://pub.dev"
     source: hosted
-    version: "23.0.1"
+    version: "23.0.3"
   flutter_local_notifications_linux:
     dependency: transitive
     description:
@@ -712,10 +709,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_svg
-      sha256: bce4a000275c0d0ac42f3fdcf0a6162fb95ac30983ba7ee6cffcf60f6ad33611
+      sha256: "4565a66f0a968f2e1ab4197854686990258aadab9572eb80a7655053a01dc302"
       url: "https://pub.dev"
     source: hosted
-    version: "2.3.4"
+    version: "2.5.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -840,10 +837,10 @@ packages:
     dependency: transitive
     description:
       name: image
-      sha256: "89ed75b2f8231fe676808c5564f9590d728024ded7ac782a7ed8474f1c95b72a"
+      sha256: bc13f61f0f5cb77936e78ae5dae3800f442718dac5d2bc4654f03c239230ed0c
       url: "https://pub.dev"
     source: hosted
-    version: "4.12.0"
+    version: "4.13.1"
   image_picker:
     dependency: "direct main"
     description:
@@ -872,10 +869,10 @@ packages:
     dependency: transitive
     description:
       name: image_picker_ios
-      sha256: f4e5650a81b268af3886bc789216ff6d56bdfa79934f93f1a5a8a303b8f60f77
+      sha256: a4aeafbe049ad99882059f186862de6fd5296c708c5805277f6f684165268af1
       url: "https://pub.dev"
     source: hosted
-    version: "0.8.13+15"
+    version: "0.8.13+16"
   image_picker_linux:
     dependency: transitive
     description:
@@ -933,18 +930,18 @@ packages:
     dependency: transitive
     description:
       name: jni
-      sha256: "2e91e6087291affd10b31b6c872f3e3ac7dc5d93b51b5ba485d930c8f08bde6c"
+      sha256: "19764f78f6b9e0d40f6395b04649d1046eb57f5ccf05afce50cc63e5a82777b0"
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.2"
+    version: "1.2.1"
   jni_flutter:
     dependency: transitive
     description:
       name: jni_flutter
-      sha256: "0dd33d67797560f66e961a6053882d4df54bd345bf063b8fe7ea133f7ad8b191"
+      sha256: "586594ad345b403bda8a794b0b8a9e34298238b86c2a7d7f15160b092fe9ef3d"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.4+1"
+    version: "1.1.0"
   jni_util:
     dependency: transitive
     description:
@@ -1031,10 +1028,10 @@ packages:
     description:
       path: "packages/location"
       ref: "feat/optional-play-services"
-      resolved-ref: "70e2fbe87a4a8769de08f1692412d731063dcfc0"
+      resolved-ref: "1a2602a9f7b07906a1191730d5435f4b695547d3"
       url: "https://github.com/Henry-Hiles/flutterlocation"
     source: git
-    version: "10.1.0"
+    version: "10.2.0"
   location_platform_interface:
     dependency: transitive
     description:
@@ -1120,10 +1117,10 @@ packages:
     dependency: "direct main"
     description:
       name: material_ui
-      sha256: "474c135fd46b56ff1d35ca982155e8863d28fbc6464d1192acf4ee53a738680e"
+      sha256: a6b19012df437a356cbc01f8ea22a105e07194c47c9a6009da0032a0ce35c4ab
       url: "https://pub.dev"
     source: hosted
-    version: "1.11.0"
+    version: "1.11.1"
   measure_size:
     dependency: "direct main"
     description:
@@ -1714,10 +1711,10 @@ packages:
     dependency: transitive
     description:
       name: url_launcher_android
-      sha256: "611e87fb320b70d1dd721dc46af89c98aceccea9b31fde49e084591414e0c610"
+      sha256: b8073b1e5173d63afe1a18985a75896d72f759d3bc1817eb1ae8d26e8527cceb
       url: "https://pub.dev"
     source: hosted
-    version: "6.3.33"
+    version: "6.3.35"
   url_launcher_ios:
     dependency: transitive
     description:
