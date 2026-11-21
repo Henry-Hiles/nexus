@@ -22,7 +22,7 @@ buildGoModule (
     buildPhase = ''
       runHook preBuild
 
-      go build -buildmode=c-shared -o ${filename} -tags goolm,noheic,sqlite_fts5 ./pkg/ffi 
+      go build -buildmode=c-shared -o ${filename} -tags noheic,sqlite_fts5 ./pkg/ffi 
 
       runHook postBuild
     '';
