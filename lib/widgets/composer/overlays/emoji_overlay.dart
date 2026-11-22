@@ -12,6 +12,7 @@ class const EmojiOverlay(
   required final String roomId,
   required final void Function({required String id, required String name})
   addTag,
+  required final void Function(String text) insertText,
   super.key,
 }) extends ConsumerWidget {
   @override
@@ -38,19 +39,19 @@ class const EmojiOverlay(
                   ),
                   title: Text(emoji.aliases.first),
                   subtitle: Text(emoji.description),
-                  onTap: () => addTag(
-                    id: emoji.value.startsWith("mxc://")
-                        ? ImagePack.emojiMarkdown(
+                  onTap: () => emoji.value.startsWith("mxc://")
+                      ? addTag(
+                          id: ImagePack.emojiMarkdown(
                             emoji.aliases.first,
                             emoji.value,
                             description: switch (emoji.data) {
                               PackImage(:final body) => body,
                               _ => null,
                             },
-                          )
-                        : emoji.value,
-                    name: emoji.aliases.first,
-                  ),
+                          ),
+                          name: emoji.aliases.first,
+                        )
+                      : insertText(emoji.value),
                 ),
               )
               .toList(),

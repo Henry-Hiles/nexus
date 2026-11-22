@@ -834,6 +834,21 @@ class const Composer(
                                         controller.addTag(id: id, name: name);
                                         node?.requestFocus();
                                       },
+                                      insertText: (text) {
+                                        final end =
+                                            controller.selection.baseOffset;
+                                        controller
+                                          ..dismissOverlay()
+                                          ..value = controller.value.replaced(
+                                            .new(
+                                              start:
+                                                  end - query.value.length - 1,
+                                              end: end,
+                                            ),
+                                            "$text ",
+                                          );
+                                        node?.requestFocus();
+                                      },
                                     ),
                                     controller: controller,
                                     onSearch: (newQuery, newTriggerCharacter) {

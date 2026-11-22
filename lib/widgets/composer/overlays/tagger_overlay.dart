@@ -10,6 +10,7 @@ class const TaggerOverlay(
   required final String roomId,
   required final void Function({required String id, required String name})
   addTag,
+  required final void Function(String text) insertText,
   required final String? triggerCharacter,
   super.key,
 }) extends ConsumerWidget {
@@ -27,7 +28,12 @@ class const TaggerOverlay(
             child: switch (triggerCharacter) {
               "@" => UserOverlay(query, roomId: roomId, addTag: addTag),
               "#" => RoomOverlay(query, addTag: addTag),
-              ":" => EmojiOverlay(query, roomId: roomId, addTag: addTag),
+              ":" => EmojiOverlay(
+                query,
+                roomId: roomId,
+                addTag: addTag,
+                insertText: insertText,
+              ),
 
               _ => Loading(),
             },
