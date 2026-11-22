@@ -11,7 +11,7 @@
     };
     # TEMPORARY: the e2e tests against Continuwuity from the forge, till there's a new full release in nixpkgs
     continuwuity = {
-      url = "git+https://forgejo.ellis.link/Continuwuation/Continuwuity";
+      url = "git+https://forgejo.ellis.link/Continuwuation/Continuwuity?ref=ea3beb628a3cab6fbc4142b725c9edb043846eb6";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };

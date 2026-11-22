@@ -173,18 +173,18 @@ packages:
     dependency: transitive
     description:
       name: better_player_android
-      sha256: "9e074251038a087c31683d371ee573c39f200d3e6f85454ea612320dba65688f"
+      sha256: "2c7df9bfb1e7fa69c86d3bb91a1825bba30292968307724fa51869bc3a0bb75d"
       url: "https://pub.dev"
     source: hosted
-    version: "1.14.0"
+    version: "1.13.2"
   better_player_ios:
     dependency: transitive
     description:
       name: better_player_ios
-      sha256: "03186ef3ecdeb37a120486cf988b005e0b46cdc52308037e7f4aee36bfee6f8d"
+      sha256: "4b9c08690374aa84b15ba88ab5d6b695cda618fb895b445a6a4186c220599c84"
       url: "https://pub.dev"
     source: hosted
-    version: "1.16.0"
+    version: "1.15.0"
   better_player_linux:
     dependency: transitive
     description:
@@ -205,18 +205,18 @@ packages:
     dependency: transitive
     description:
       name: better_player_platform_interface
-      sha256: "9ee3301e17e3a2a937760bfdd8c4b70800cd01bcc636c85c45a4be71bbaa1a45"
+      sha256: e5218199dd12ffe6f43c01d5cdeecad0b53125926f8da8c3f4b90136d8b55ec1
       url: "https://pub.dev"
     source: hosted
-    version: "1.8.1"
+    version: "1.8.0"
   better_player_web:
     dependency: transitive
     description:
       name: better_player_web
-      sha256: e365a08e8041d56980fb87e577274e255543fcf377124c40880f189f00b6cf4b
+      sha256: d7b365221f7724f22d3fef7840e45af2493a784e2429a30e980f807bcb7c9539
       url: "https://pub.dev"
     source: hosted
-    version: "1.7.0"
+    version: "1.6.1"
   better_player_windows:
     dependency: transitive
     description:
@@ -333,10 +333,10 @@ packages:
     dependency: transitive
     description:
       name: cnativeapi
-      sha256: "49662734cdf3dd1707b1ee35102ac1754e0ab3d450a2d30b066730f219dacc86"
+      sha256: c43703998995e132b0656d2b8a95ed2bedc6b22ccee2c827bcdc075e0330e319
       url: "https://pub.dev"
     source: hosted
-    version: "0.6.2"
+    version: "0.5.10"
   code_assets:
     dependency: "direct main"
     description:
@@ -1178,29 +1178,30 @@ packages:
     source: hosted
     version: "0.19.6"
   native_toolchain_cmake:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
-      name: native_toolchain_cmake
-      sha256: b3501c56fa20328d57586317fdbbcfa2051a498175130ecd21c4a922de6a2c8d
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.3.3"
+      path: "."
+      ref: HEAD
+      resolved-ref: d77984a36a16be22e911850de2cd2050610ff4ed
+      url: "https://github.com/rainyl/native_toolchain_cmake"
+    source: git
+    version: "0.3.2"
   nativeapi:
     dependency: transitive
     description:
       name: nativeapi
-      sha256: "339b7a91a27ce5c33659cab92cf8e76736142985433652f91a63cc5348135bfb"
+      sha256: "118045bb549cb6fabad472a3a22a537e7310bbf20097350f5027808b4a5853ce"
       url: "https://pub.dev"
     source: hosted
-    version: "0.6.2"
+    version: "0.5.10"
   nativeapi_flutter:
     dependency: transitive
     description:
       name: nativeapi_flutter
-      sha256: b0507253748ba9690a295bc162208a91d348809185409e5aee7b09e77ab5d8a3
+      sha256: "357a405c69212f5157da1bd3be183a53c2b841d0de0eb51f4a3947913712aec4"
       url: "https://pub.dev"
     source: hosted
-    version: "0.6.2"
+    version: "0.5.10"
   navigation_rail_m3e:
     dependency: "direct main"
     description:
@@ -1245,11 +1246,12 @@ packages:
   pasteboard:
     dependency: "direct main"
     description:
-      name: pasteboard
-      sha256: "7b1c7ed83b4ff27acced26e96b87c16ac37fb6c57d7886eb3130faccb28b2cc2"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.6.2"
+      path: "packages/pasteboard"
+      ref: HEAD
+      resolved-ref: e79a0ecc741b80575f38465c02eba9c553e12479
+      url: "https://github.com/Henry-Hiles/flutter-plugins"
+    source: git
+    version: "0.6.1"
   path:
     dependency: "direct main"
     description:
@@ -1611,10 +1613,10 @@ packages:
     dependency: transitive
     description:
       name: test_api
-      sha256: "0a10344e901e5b2e63819567951cb6a06673ed6b84f40462188ff5a0c41f371f"
+      sha256: "2a122cbe059f8b610d3a5415f42e255b6c17b1f21eee1d960f31080237fb4f11"
       url: "https://pub.dev"
     source: hosted
-    version: "0.7.14"
+    version: "0.7.12"
   timeago:
     dependency: "direct main"
     description:
@@ -1901,10 +1903,10 @@ packages:
     dependency: "direct main"
     description:
       name: window_manager
-      sha256: "9504ae37e618d31524e337ad3cf9600d252acf11fffa3ddb9b0b5ced634542d9"
+      sha256: bdd6b1a2c1ce50f3bba7ffbaa0d5dc5feb6b6a24fd20269da4de90244f77a471
       url: "https://pub.dev"
     source: hosted
-    version: "0.7.1"
+    version: "0.6.0"
   wkt_parser:
     dependency: transitive
     description:
@@ -1955,5 +1957,5 @@ packages:
     source: hosted
     version: "2.2.4"
 sdks:
-  dart: "3.14.0"
-  flutter: "3.50.1"
+  dart: "3.13.3"
+  flutter: "3.47.4"
