@@ -16,16 +16,14 @@ flutter:
     uses-material-design: true
 
 environment:
-    sdk: 3.13.3
-    flutter: 3.47.4
+    sdk: 3.14.0
+    flutter: 3.50.1
 
 dependency_overrides:
     dynamic_color: 2.1.0
     code_assets: 2.2.0 # webcrypto requires ^1.0.0, but works with 2.x
     webcrypto: 0.6.2
-    native_toolchain_cmake:
-        git:
-            url: https://github.com/rainyl/native_toolchain_cmake # Fixes native aarch64 linux builds, unreleased
+    window_manager: 0.7.1 # unifiedpush_linux requires ^0.6.0, 0.7 has the Dart 3.14 nativeapi fix
     m3e_design:
         git:
             url: https://github.com/Henry-Hiles/material_3_expressive
@@ -44,10 +42,6 @@ dependency_overrides:
             url: https://codeberg.org/Henry-Hiles/flutter-connector
             ref: quad/nexus
             path: unifiedpush_platform_interface
-    pasteboard:
-        git:
-            url: https://github.com/Henry-Hiles/flutter-plugins # FileTransfer portal support on Linux, unreleased
-            path: packages/pasteboard
     linkify:
         git:
             url: https://github.com/appelladev/linkify
@@ -69,7 +63,7 @@ dependencies:
     path: 1.9.1
     dynamic_color: 2.1.0
     collection: 1.19.1
-    window_manager: 0.6.0
+    window_manager: 0.7.1
     color_hash: 1.0.1
     flutter_widget_from_html_core: 0.18.0-beta.1
     flutter_svg: 2.5.0
@@ -113,7 +107,7 @@ dependencies:
         git:
             url: https://github.com/Henry-Hiles/xdg_desktop_portal.dart
             ref: quad/nexus
-    pasteboard: 0.6.0
+    pasteboard: 0.6.2
     flutter_file_dialog: 3.3.6
     mime: 2.1.0
     avif_native: 0.2.0
