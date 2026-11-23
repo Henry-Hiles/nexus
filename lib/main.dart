@@ -45,6 +45,14 @@ New Value: ${newValue is AsyncData ? newValue.value : newValue}
 }
 
 void showError(Object error, [StackTrace? stackTrace]) {
+  // Harmless Flutter race in animated images (the assert in debug, a null check in release)
+  if (error.toString().contains("'_nextFrame != null': is not true.") ||
+      stackTrace.toString().contains(
+        "MultiFrameImageStreamCompleter._handleAppFrame",
+      )) {
+    return;
+  }
+
   debugPrintStack(stackTrace: stackTrace, label: error.toString());
   if (navigatorKey.currentContext != null) {
     Future.delayed(

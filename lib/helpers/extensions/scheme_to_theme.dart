@@ -4,7 +4,13 @@ extension SchemeToTheme on ColorScheme {
   ThemeData get theme {
     final textTheme = ThemeData(
       fontFamily: "bundled-sans",
-      fontFamilyFallback: ["emoji"],
+      fontFamilyFallback: [
+        "emoji",
+        // TODO: Remove once on Flutter 3.50, whose Linux arm64 engine uses
+        // fontconfig and so understands the "emoji" alias
+        "Noto Color Emoji",
+        "Twemoji",
+      ],
       brightness: brightness,
     ).textTheme;
     return .from(colorScheme: this).copyWith(
