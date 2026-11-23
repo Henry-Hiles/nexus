@@ -1,6 +1,6 @@
 [Setup]
 AppName=Nexus
-AppVersion=1.1.3
+AppVersion=1.1.4
 DefaultDirName={pf}\Nexus
 DefaultGroupName=Nexus
 OutputDir=dist
