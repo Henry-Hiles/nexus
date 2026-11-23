@@ -477,513 +477,538 @@ class const Composer(
       fontWeight: .bold,
     );
 
-    return Padding(
-      padding: .all(12),
-      child: Column(
-        children: [
-          if (attachment != null)
-            Card(
-              margin: .only(bottom: 8),
-              child: Column(
-                children: [
-                  ListTile(
-                    leading: switch (attachment.$2) {
-                      null => SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(),
+    return TextFieldTapRegion(
+      child: Padding(
+        padding: .all(12),
+        child: Column(
+          children: [
+            if (attachment != null)
+              Card(
+                margin: .only(bottom: 8),
+                child: Column(
+                  children: [
+                    ListTile(
+                      leading: switch (attachment.$2) {
+                        null => SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(),
+                        ),
+                        ImageMessageContent() => Icon(Icons.image),
+                        VideoMessageContent() => Icon(Icons.movie),
+                        AudioMessageContent() => Icon(Icons.audiotrack),
+                        _ => Icon(Icons.file_copy),
+                      },
+                      title: Text(attachment.$1),
+                      trailing: IconButton(
+                        onPressed: () => ref.invalidate(attachmentProvider),
+                        icon: Icon(Icons.close),
                       ),
-                      ImageMessageContent() => Icon(Icons.image),
-                      VideoMessageContent() => Icon(Icons.movie),
-                      AudioMessageContent() => Icon(Icons.audiotrack),
-                      _ => Icon(Icons.file_copy),
-                    },
-                    title: Text(attachment.$1),
-                    trailing: IconButton(
-                      onPressed: () => ref.invalidate(attachmentProvider),
-                      icon: Icon(Icons.close),
                     ),
-                  ),
-                  AnimatedSize(
-                    duration: Durations.short4,
-                    alignment: .topCenter,
-                    child: switch (attachment.$2) {
-                      final content?
-                          when content is! FileMessageContent &&
-                              content.isMedia =>
-                        Padding(
-                          padding: EdgeInsets.all(12).copyWith(top: 0),
-                          child: Align(
-                            alignment: .centerLeft,
-                            child: ConstrainedBox(
-                              constraints: .loose(.square(300)),
-                              child: MessageMedia(content),
+                    AnimatedSize(
+                      duration: Durations.short4,
+                      alignment: .topCenter,
+                      child: switch (attachment.$2) {
+                        final content?
+                            when content is! FileMessageContent &&
+                                content.isMedia =>
+                          Padding(
+                            padding: EdgeInsets.all(12).copyWith(top: 0),
+                            child: Align(
+                              alignment: .centerLeft,
+                              child: ConstrainedBox(
+                                constraints: .loose(.square(300)),
+                                child: MessageMedia(content),
+                              ),
                             ),
                           ),
-                        ),
-                      _ => SizedBox(width: .infinity),
-                    },
+                        _ => SizedBox(width: .infinity),
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            AnimatedSize(
+              duration: Durations.short4,
+              alignment: .bottomCenter,
+              child: BotCommandPanel(
+                composer,
+                commands: botCommands,
+                textCommands: availableTextCommands,
+                controller: controller,
+                onPick: pickBotCommand,
+                onPickText: pickTextCommand,
+              ),
+            ),
+            ClipRRect(
+              borderRadius: .all(.circular(12)),
+              child: Column(
+                children: [
+                  RelationPreview(
+                    relatedEvent,
+                    shouldMention: shouldMention.value,
+                    toggleShouldMention: () =>
+                        shouldMention.value = !shouldMention.value,
+                    relationType: relationType,
+                    onDismiss: dismiss,
+                  ),
+                  Container(
+                    color: theme.colorScheme.surfaceContainerHighest,
+                    child: Row(
+                      mainAxisAlignment: .center,
+                      children:
+                          ref.watch(
+                            PowerLevelController.provider(
+                              .new(eventType: .message, roomId: roomId),
+                            ),
+                          )
+                          ? [
+                              IconButton(
+                                onPressed: hasReplacement
+                                    ? null
+                                    : () => context.showAdaptiveSheet(
+                                        (context) => EmojiPicker(
+                                          roomId: roomId,
+                                          onSelection:
+                                              (
+                                                value, {
+                                                shortcode,
+                                                description,
+                                              }) {
+                                                Navigator.of(context).pop();
+                                                if (shortcode == null) {
+                                                  controller.text += value;
+                                                } else {
+                                                  final text =
+                                                      "${controller.text}:";
+                                                  controller.value = .new(
+                                                    text: text,
+                                                    selection: .collapsed(
+                                                      offset: text.length,
+                                                    ),
+                                                  );
+                                                  controller.addTag(
+                                                    id: ImagePack.emojiMarkdown(
+                                                      shortcode,
+                                                      value,
+                                                      description: description,
+                                                    ),
+                                                    name: shortcode,
+                                                  );
+                                                }
+                                                node?.requestFocus();
+                                              },
+                                        ),
+                                      ),
+                                icon: Icon(Icons.emoji_emotions),
+                              ),
+                              AdaptiveMenuButton(
+                                tooltip: "Add media",
+                                enabled: attachment == null && !hasReplacement,
+                                itemBuilder: (context) => [
+                                  for (final (source, title, icon) in [
+                                    if (Platform.isAndroid || Platform.isIOS)
+                                      (
+                                        ImageSource.camera,
+                                        "Camera",
+                                        Icons.add_a_photo,
+                                      ),
+                                    (
+                                      ImageSource.gallery,
+                                      "Gallery",
+                                      Icons.add_photo_alternate,
+                                    ),
+                                  ])
+                                    PopupMenuItem(
+                                      child: ListTile(
+                                        title: Text(title),
+                                        leading: Icon(icon),
+                                      ),
+                                      onTap: () => attach(
+                                        source == .gallery
+                                            ? ref
+                                                  .read(
+                                                    FileDialogHelper.provider,
+                                                  )
+                                                  .pickFile(images: true)
+                                            : ref
+                                                  .read(
+                                                    ImagePickerController
+                                                        .provider,
+                                                  )
+                                                  .pickImage(source: source),
+                                      ).onError(showError),
+                                    ),
+                                  PopupMenuItem(
+                                    onTap: () => attach(
+                                      ref
+                                          .read(FileDialogHelper.provider)
+                                          .pickFile(),
+                                    ).onError(showError),
+                                    child: ListTile(
+                                      title: Text("Files"),
+                                      leading: Icon(Icons.attachment),
+                                    ),
+                                  ),
+                                  if (canSendStickers)
+                                    PopupMenuItem(
+                                      // Stickers can't replace messages
+                                      enabled: !isEditing,
+                                      onTap: () => context.showAdaptiveSheet(
+                                        (context) => StickerPicker(
+                                          roomId: roomId,
+                                          onSelection: (shortcode, image) {
+                                            Navigator.of(context).pop();
+                                            draftNotifier.update(
+                                              (draft) => draft.copyWith(
+                                                sticker: (shortcode, image),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                      child: ListTile(
+                                        title: Text("Sticker"),
+                                        leading: Icon(Icons.sticky_note_2),
+                                      ),
+                                    ),
+                                  if (canSendPolls)
+                                    PopupMenuItem(
+                                      enabled: !isEditing,
+                                      onTap: () => context.showAdaptiveSheet(
+                                        (context) => CreatePollSheet(
+                                          onCreate: (created) {
+                                            Navigator.of(context).pop();
+                                            draftNotifier.update(
+                                              (draft) =>
+                                                  draft.copyWith(poll: created),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                      child: ListTile(
+                                        title: Text("Poll"),
+                                        leading: Icon(Icons.poll),
+                                      ),
+                                    ),
+                                  PopupMenuItem(
+                                    enabled: !isEditing,
+                                    onTap: () => context.showAdaptiveSheet(
+                                      enableDrag: false,
+                                      (context) => LocationPickerSheet(
+                                        onPick: (picked) {
+                                          Navigator.of(context).pop();
+                                          draftNotifier.update(
+                                            (draft) => draft.copyWith(
+                                              location: picked,
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                    child: ListTile(
+                                      title: Text("Location"),
+                                      leading: Icon(Icons.location_on),
+                                    ),
+                                  ),
+                                ],
+                                icon: Icon(Icons.add),
+                              ),
+                              SizedBox(width: 8),
+                              Expanded(
+                                child: AnimatedSize(
+                                  duration: Durations.short4,
+                                  alignment: .bottomCenter,
+                                  child: switch ((
+                                    sticker,
+                                    poll,
+                                    location,
+                                    botCommand,
+                                  )) {
+                                    (_, final draft?, _, _) =>
+                                      ComposerReplacement(
+                                        removeTooltip: "Remove poll",
+                                        onRemove: () {
+                                          draftNotifier.update(
+                                            (draft) =>
+                                                draft.copyWith(poll: null),
+                                          );
+                                          node?.requestFocus();
+                                        },
+                                        onKeyEvent: sendOnEnter,
+                                        ListTile(
+                                          leading: Icon(
+                                            Icons.poll,
+                                            color: theme.colorScheme.primary,
+                                          ),
+                                          title: Text(draft.question),
+                                          subtitle: Text(
+                                            draft.answers
+                                                .map((answer) => answer.text)
+                                                .join(" · "),
+                                            maxLines: 1,
+                                            overflow: .ellipsis,
+                                          ),
+                                        ),
+                                      ),
+                                    (
+                                      (final shortcode, final image)?,
+                                      _,
+                                      _,
+                                      _,
+                                    ) =>
+                                      ComposerReplacement(
+                                        removeTooltip: "Remove sticker",
+                                        onRemove: () {
+                                          draftNotifier.update(
+                                            (draft) =>
+                                                draft.copyWith(sticker: null),
+                                          );
+                                          node?.requestFocus();
+                                        },
+                                        onKeyEvent: sendOnEnter,
+                                        Align(
+                                          alignment: .centerLeft,
+                                          child: ConstrainedBox(
+                                            constraints: .loose(.square(128)),
+                                            child: MxcEmoji(
+                                              image.url,
+                                              label: image.body ?? shortcode,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    (_, _, final draft?, _) =>
+                                      ComposerReplacement(
+                                        removeTooltip: "Remove location",
+                                        onRemove: () {
+                                          draftNotifier.update(
+                                            (draft) =>
+                                                draft.copyWith(location: null),
+                                          );
+                                          node?.requestFocus();
+                                        },
+                                        onKeyEvent: sendOnEnter,
+                                        ListTile(
+                                          leading: Icon(
+                                            draft.assetType == .pin
+                                                ? Icons.location_pin
+                                                : Icons.my_location,
+                                            color: theme.colorScheme.primary,
+                                          ),
+                                          title: Text(
+                                            draft.description ??
+                                                (draft.assetType == .pin
+                                                    ? "Location"
+                                                    : "My location"),
+                                          ),
+                                          subtitle: Text(
+                                            draft.point?.formatted ??
+                                                draft.geoUri.toString(),
+                                            maxLines: 1,
+                                            overflow: .ellipsis,
+                                          ),
+                                        ),
+                                      ),
+                                    (_, _, _, final draft?) =>
+                                      ComposerReplacement(
+                                        removeTooltip: "Remove command",
+                                        onRemove: () =>
+                                            removeBotCommand(keepText: false),
+                                        onKeyEvent: sendOnEnter,
+                                        BotCommandForm(
+                                          draft,
+                                          key: ValueKey(draft.command),
+                                          onSubmit: send,
+                                          onRemove: () =>
+                                              removeBotCommand(keepText: true),
+                                        ),
+                                      ),
+                                    (null, null, null, null) => FlutterTagger(
+                                      // Attaches each new controller
+                                      key: ObjectKey(controller),
+                                      triggerStrategy: .eager,
+                                      onFormattedTextChanged:
+                                          onFormattedTextChanged,
+                                      // Keeps the trigger character, so tags
+                                      // can be restored from drafts
+                                      tagTextFormatter: (
+                                        id,
+                                        tag,
+                                        triggerCharacter,
+                                      ) => "$triggerCharacter$id#$tag#",
+                                      // Characters that continue a search, for
+                                      // e.g. :+1, :custom_emoji or @user:server
+                                      searchRegex: .new(r"^[\w.:+-]*$"),
+                                      overlay: TaggerOverlay(
+                                        query.value,
+                                        roomId: roomId,
+                                        triggerCharacter:
+                                            triggerCharacter.value,
+                                        addTag: ({required id, required name}) {
+                                          controller.addTag(id: id, name: name);
+                                          node?.requestFocus();
+                                        },
+                                        insertText: (text) {
+                                          final end =
+                                              controller.selection.baseOffset;
+                                          controller
+                                            ..dismissOverlay()
+                                            ..value = controller.value.replaced(
+                                              .new(
+                                                start:
+                                                    end -
+                                                    query.value.length -
+                                                    1,
+                                                end: end,
+                                              ),
+                                              "$text ",
+                                            );
+                                          node?.requestFocus();
+                                        },
+                                      ),
+                                      controller: controller,
+                                      onSearch:
+                                          (newQuery, newTriggerCharacter) {
+                                            triggerCharacter.value =
+                                                newTriggerCharacter;
+                                            query.value = newQuery;
+                                          },
+                                      triggerCharacterAndStyles: {
+                                        "@": style,
+                                        "#": style,
+                                        ":": style,
+                                      },
+                                      builder: (context, key) => Focus(
+                                        onKeyEvent: onTextFieldKeyEvent,
+                                        // Overrides the keyboard shortcut for pasting
+                                        child: Actions(
+                                          actions: {
+                                            PasteTextIntent: PasteFilesAction(
+                                              pasteFiles,
+                                            ),
+                                          },
+                                          child: Row(
+                                            spacing: 4,
+                                            children: [
+                                              ...textCommands.map(
+                                                (command) => InputChip(
+                                                  label: Text(command.prefix),
+                                                  tooltip: command.description,
+                                                  visualDensity: .compact,
+                                                  materialTapTargetSize:
+                                                      .shrinkWrap,
+                                                  onDeleted: () =>
+                                                      removeTextCommand(
+                                                        command,
+                                                      ),
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: TextField(
+                                                  maxLines: 12,
+                                                  minLines: 1,
+                                                  textCapitalization:
+                                                      .sentences,
+                                                  onChanged: pickTypedCommand,
+                                                  autofocus:
+                                                      (Platform.isLinux ||
+                                                      Platform.isMacOS ||
+                                                      Platform.isWindows),
+                                                  decoration: .new(
+                                                    hintText:
+                                                        "Your message here...",
+                                                    border: .none,
+                                                  ),
+                                                  controller: controller,
+                                                  key: key,
+                                                  focusNode: node,
+                                                  // Touch taps outside don't unfocus on mobile by default
+                                                  onTapOutside: (_) =>
+                                                      node?.unfocus(),
+                                                  // The toolbar's paste button doesn't use the shortcut's action, so replace it too
+                                                  contextMenuBuilder:
+                                                      (
+                                                        _,
+                                                        editableText,
+                                                      ) => AdaptiveTextSelectionToolbar.buttonItems(
+                                                        anchors: editableText
+                                                            .contextMenuAnchors,
+                                                        buttonItems: editableText
+                                                            .contextMenuButtonItems
+                                                            .map(
+                                                              (item) =>
+                                                                  item.type ==
+                                                                      .paste
+                                                                  ? item.copyWith(
+                                                                      onPressed: () async {
+                                                                        editableText
+                                                                            .hideToolbar();
+                                                                        if (!await pasteFiles()) {
+                                                                          item.onPressed
+                                                                              ?.call();
+                                                                        }
+                                                                      },
+                                                                    )
+                                                                  : item,
+                                                            )
+                                                            .toList(),
+                                                      ),
+                                                  // Images pasted from Android keyboards' clipboards are inserted as content
+                                                  contentInsertionConfiguration: .new(
+                                                    onContentInserted: (content) {
+                                                      if (attachment != null) {
+                                                        return;
+                                                      }
+
+                                                      if (content.data
+                                                          case final data?) {
+                                                        attachBytes(
+                                                          data,
+                                                          "image.${content.mimeType.split("/").last}",
+                                                        ).onError(showError);
+                                                      }
+                                                    },
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  },
+                                ),
+                              ),
+                              IconButton(
+                                onPressed:
+                                    attachment != null && attachment.$2 == null
+                                    ? null
+                                    : send,
+                                icon: Icon(Icons.send),
+                                tooltip: "Send message",
+                              ),
+                            ]
+                          : [
+                              Expanded(
+                                child: Padding(
+                                  padding: .symmetric(
+                                    horizontal: 8,
+                                    vertical: 12,
+                                  ),
+                                  child: Text(
+                                    "You don't have permission to send messages in this room...",
+                                  ),
+                                ),
+                              ),
+                            ],
+                    ),
                   ),
                 ],
               ),
             ),
-          AnimatedSize(
-            duration: Durations.short4,
-            alignment: .bottomCenter,
-            child: BotCommandPanel(
-              composer,
-              commands: botCommands,
-              textCommands: availableTextCommands,
-              controller: controller,
-              onPick: pickBotCommand,
-              onPickText: pickTextCommand,
-            ),
-          ),
-          ClipRRect(
-            borderRadius: .all(.circular(12)),
-            child: Column(
-              children: [
-                RelationPreview(
-                  relatedEvent,
-                  shouldMention: shouldMention.value,
-                  toggleShouldMention: () =>
-                      shouldMention.value = !shouldMention.value,
-                  relationType: relationType,
-                  onDismiss: dismiss,
-                ),
-                Container(
-                  color: theme.colorScheme.surfaceContainerHighest,
-                  child: Row(
-                    mainAxisAlignment: .center,
-                    children:
-                        ref.watch(
-                          PowerLevelController.provider(
-                            .new(eventType: .message, roomId: roomId),
-                          ),
-                        )
-                        ? [
-                            IconButton(
-                              onPressed: hasReplacement
-                                  ? null
-                                  : () => context.showAdaptiveSheet(
-                                      (context) => EmojiPicker(
-                                        roomId: roomId,
-                                        onSelection:
-                                            (value, {shortcode, description}) {
-                                              Navigator.of(context).pop();
-                                              if (shortcode == null) {
-                                                controller.text += value;
-                                              } else {
-                                                final text =
-                                                    "${controller.text}:";
-                                                controller.value = .new(
-                                                  text: text,
-                                                  selection: .collapsed(
-                                                    offset: text.length,
-                                                  ),
-                                                );
-                                                controller.addTag(
-                                                  id: ImagePack.emojiMarkdown(
-                                                    shortcode,
-                                                    value,
-                                                    description: description,
-                                                  ),
-                                                  name: shortcode,
-                                                );
-                                              }
-                                              node?.requestFocus();
-                                            },
-                                      ),
-                                    ),
-                              icon: Icon(Icons.emoji_emotions),
-                            ),
-                            AdaptiveMenuButton(
-                              tooltip: "Add media",
-                              enabled: attachment == null && !hasReplacement,
-                              itemBuilder: (context) => [
-                                for (final (source, title, icon) in [
-                                  if (Platform.isAndroid || Platform.isIOS)
-                                    (
-                                      ImageSource.camera,
-                                      "Camera",
-                                      Icons.add_a_photo,
-                                    ),
-                                  (
-                                    ImageSource.gallery,
-                                    "Gallery",
-                                    Icons.add_photo_alternate,
-                                  ),
-                                ])
-                                  PopupMenuItem(
-                                    child: ListTile(
-                                      title: Text(title),
-                                      leading: Icon(icon),
-                                    ),
-                                    onTap: () => attach(
-                                      source == .gallery
-                                          ? ref
-                                                .read(FileDialogHelper.provider)
-                                                .pickFile(images: true)
-                                          : ref
-                                                .read(
-                                                  ImagePickerController
-                                                      .provider,
-                                                )
-                                                .pickImage(source: source),
-                                    ).onError(showError),
-                                  ),
-                                PopupMenuItem(
-                                  onTap: () => attach(
-                                    ref
-                                        .read(FileDialogHelper.provider)
-                                        .pickFile(),
-                                  ).onError(showError),
-                                  child: ListTile(
-                                    title: Text("Files"),
-                                    leading: Icon(Icons.attachment),
-                                  ),
-                                ),
-                                if (canSendStickers)
-                                  PopupMenuItem(
-                                    // Stickers can't replace messages
-                                    enabled: !isEditing,
-                                    onTap: () => context.showAdaptiveSheet(
-                                      (context) => StickerPicker(
-                                        roomId: roomId,
-                                        onSelection: (shortcode, image) {
-                                          Navigator.of(context).pop();
-                                          draftNotifier.update(
-                                            (draft) => draft.copyWith(
-                                              sticker: (shortcode, image),
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                    child: ListTile(
-                                      title: Text("Sticker"),
-                                      leading: Icon(Icons.sticky_note_2),
-                                    ),
-                                  ),
-                                if (canSendPolls)
-                                  PopupMenuItem(
-                                    enabled: !isEditing,
-                                    onTap: () => context.showAdaptiveSheet(
-                                      (context) => CreatePollSheet(
-                                        onCreate: (created) {
-                                          Navigator.of(context).pop();
-                                          draftNotifier.update(
-                                            (draft) =>
-                                                draft.copyWith(poll: created),
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                    child: ListTile(
-                                      title: Text("Poll"),
-                                      leading: Icon(Icons.poll),
-                                    ),
-                                  ),
-                                PopupMenuItem(
-                                  enabled: !isEditing,
-                                  onTap: () => context.showAdaptiveSheet(
-                                    enableDrag: false,
-                                    (context) => LocationPickerSheet(
-                                      onPick: (picked) {
-                                        Navigator.of(context).pop();
-                                        draftNotifier.update(
-                                          (draft) =>
-                                              draft.copyWith(location: picked),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                  child: ListTile(
-                                    title: Text("Location"),
-                                    leading: Icon(Icons.location_on),
-                                  ),
-                                ),
-                              ],
-                              icon: Icon(Icons.add),
-                            ),
-                            SizedBox(width: 8),
-                            Expanded(
-                              child: AnimatedSize(
-                                duration: Durations.short4,
-                                alignment: .bottomCenter,
-                                child: switch ((
-                                  sticker,
-                                  poll,
-                                  location,
-                                  botCommand,
-                                )) {
-                                  (_, final draft?, _, _) =>
-                                    ComposerReplacement(
-                                      removeTooltip: "Remove poll",
-                                      onRemove: () {
-                                        draftNotifier.update(
-                                          (draft) => draft.copyWith(poll: null),
-                                        );
-                                        node?.requestFocus();
-                                      },
-                                      onKeyEvent: sendOnEnter,
-                                      ListTile(
-                                        leading: Icon(
-                                          Icons.poll,
-                                          color: theme.colorScheme.primary,
-                                        ),
-                                        title: Text(draft.question),
-                                        subtitle: Text(
-                                          draft.answers
-                                              .map((answer) => answer.text)
-                                              .join(" · "),
-                                          maxLines: 1,
-                                          overflow: .ellipsis,
-                                        ),
-                                      ),
-                                    ),
-                                  ((final shortcode, final image)?, _, _, _) =>
-                                    ComposerReplacement(
-                                      removeTooltip: "Remove sticker",
-                                      onRemove: () {
-                                        draftNotifier.update(
-                                          (draft) =>
-                                              draft.copyWith(sticker: null),
-                                        );
-                                        node?.requestFocus();
-                                      },
-                                      onKeyEvent: sendOnEnter,
-                                      Align(
-                                        alignment: .centerLeft,
-                                        child: ConstrainedBox(
-                                          constraints: .loose(.square(128)),
-                                          child: MxcEmoji(
-                                            image.url,
-                                            label: image.body ?? shortcode,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  (_, _, final draft?, _) =>
-                                    ComposerReplacement(
-                                      removeTooltip: "Remove location",
-                                      onRemove: () {
-                                        draftNotifier.update(
-                                          (draft) =>
-                                              draft.copyWith(location: null),
-                                        );
-                                        node?.requestFocus();
-                                      },
-                                      onKeyEvent: sendOnEnter,
-                                      ListTile(
-                                        leading: Icon(
-                                          draft.assetType == .pin
-                                              ? Icons.location_pin
-                                              : Icons.my_location,
-                                          color: theme.colorScheme.primary,
-                                        ),
-                                        title: Text(
-                                          draft.description ??
-                                              (draft.assetType == .pin
-                                                  ? "Location"
-                                                  : "My location"),
-                                        ),
-                                        subtitle: Text(
-                                          draft.point?.formatted ??
-                                              draft.geoUri.toString(),
-                                          maxLines: 1,
-                                          overflow: .ellipsis,
-                                        ),
-                                      ),
-                                    ),
-                                  (_, _, _, final draft?) =>
-                                    ComposerReplacement(
-                                      removeTooltip: "Remove command",
-                                      onRemove: () =>
-                                          removeBotCommand(keepText: false),
-                                      onKeyEvent: sendOnEnter,
-                                      BotCommandForm(
-                                        draft,
-                                        key: ValueKey(draft.command),
-                                        onSubmit: send,
-                                        onRemove: () =>
-                                            removeBotCommand(keepText: true),
-                                      ),
-                                    ),
-                                  (null, null, null, null) => FlutterTagger(
-                                    // Attaches each new controller
-                                    key: ObjectKey(controller),
-                                    triggerStrategy: .eager,
-                                    onFormattedTextChanged:
-                                        onFormattedTextChanged,
-                                    // Keeps the trigger character, so tags
-                                    // can be restored from drafts
-                                    tagTextFormatter: (
-                                      id,
-                                      tag,
-                                      triggerCharacter,
-                                    ) => "$triggerCharacter$id#$tag#",
-                                    // Characters that continue a search, for
-                                    // e.g. :+1, :custom_emoji or @user:server
-                                    searchRegex: .new(r"^[\w.:+-]*$"),
-                                    overlay: TaggerOverlay(
-                                      query.value,
-                                      roomId: roomId,
-                                      triggerCharacter: triggerCharacter.value,
-                                      addTag: ({required id, required name}) {
-                                        controller.addTag(id: id, name: name);
-                                        node?.requestFocus();
-                                      },
-                                      insertText: (text) {
-                                        final end =
-                                            controller.selection.baseOffset;
-                                        controller
-                                          ..dismissOverlay()
-                                          ..value = controller.value.replaced(
-                                            .new(
-                                              start:
-                                                  end - query.value.length - 1,
-                                              end: end,
-                                            ),
-                                            "$text ",
-                                          );
-                                        node?.requestFocus();
-                                      },
-                                    ),
-                                    controller: controller,
-                                    onSearch: (newQuery, newTriggerCharacter) {
-                                      triggerCharacter.value =
-                                          newTriggerCharacter;
-                                      query.value = newQuery;
-                                    },
-                                    triggerCharacterAndStyles: {
-                                      "@": style,
-                                      "#": style,
-                                      ":": style,
-                                    },
-                                    builder: (context, key) => Focus(
-                                      onKeyEvent: onTextFieldKeyEvent,
-                                      // Overrides the keyboard shortcut for pasting
-                                      child: Actions(
-                                        actions: {
-                                          PasteTextIntent: PasteFilesAction(
-                                            pasteFiles,
-                                          ),
-                                        },
-                                        child: Row(
-                                          spacing: 4,
-                                          children: [
-                                            ...textCommands.map(
-                                              (command) => InputChip(
-                                                label: Text(command.prefix),
-                                                tooltip: command.description,
-                                                visualDensity: .compact,
-                                                materialTapTargetSize:
-                                                    .shrinkWrap,
-                                                onDeleted: () =>
-                                                    removeTextCommand(command),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: TextField(
-                                                maxLines: 12,
-                                                minLines: 1,
-                                                textCapitalization: .sentences,
-                                                onChanged: pickTypedCommand,
-                                                autofocus:
-                                                    (Platform.isLinux ||
-                                                    Platform.isMacOS ||
-                                                    Platform.isWindows),
-                                                decoration: .new(
-                                                  hintText:
-                                                      "Your message here...",
-                                                  border: .none,
-                                                ),
-                                                controller: controller,
-                                                key: key,
-                                                focusNode: node,
-                                                // The toolbar's paste button doesn't use the shortcut's action, so replace it too
-                                                contextMenuBuilder:
-                                                    (
-                                                      _,
-                                                      editableText,
-                                                    ) => AdaptiveTextSelectionToolbar.buttonItems(
-                                                      anchors: editableText
-                                                          .contextMenuAnchors,
-                                                      buttonItems: editableText
-                                                          .contextMenuButtonItems
-                                                          .map(
-                                                            (item) =>
-                                                                item.type ==
-                                                                    .paste
-                                                                ? item.copyWith(
-                                                                    onPressed: () async {
-                                                                      editableText
-                                                                          .hideToolbar();
-                                                                      if (!await pasteFiles()) {
-                                                                        item.onPressed
-                                                                            ?.call();
-                                                                      }
-                                                                    },
-                                                                  )
-                                                                : item,
-                                                          )
-                                                          .toList(),
-                                                    ),
-                                                // Images pasted from Android keyboards' clipboards are inserted as content
-                                                contentInsertionConfiguration: .new(
-                                                  onContentInserted: (content) {
-                                                    if (attachment != null) {
-                                                      return;
-                                                    }
-
-                                                    if (content.data
-                                                        case final data?) {
-                                                      attachBytes(
-                                                        data,
-                                                        "image.${content.mimeType.split("/").last}",
-                                                      ).onError(showError);
-                                                    }
-                                                  },
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                },
-                              ),
-                            ),
-                            IconButton(
-                              onPressed:
-                                  attachment != null && attachment.$2 == null
-                                  ? null
-                                  : send,
-                              icon: Icon(Icons.send),
-                              tooltip: "Send message",
-                            ),
-                          ]
-                        : [
-                            Expanded(
-                              child: Padding(
-                                padding: .symmetric(
-                                  horizontal: 8,
-                                  vertical: 12,
-                                ),
-                                child: Text(
-                                  "You don't have permission to send messages in this room...",
-                                ),
-                              ),
-                            ),
-                          ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

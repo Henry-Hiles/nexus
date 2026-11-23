@@ -16,27 +16,30 @@ class const TaggerOverlay(
 }) extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Padding(
-      padding: .all(8),
-      child: ClipRRect(
-        borderRadius: .all(.circular(12)),
-        child: Container(
-          color: Theme.of(context).colorScheme.surfaceContainerHigh,
-          padding: .all(8),
-          child: Material(
-            color: Colors.transparent,
-            child: switch (triggerCharacter) {
-              "@" => UserOverlay(query, roomId: roomId, addTag: addTag),
-              "#" => RoomOverlay(query, addTag: addTag),
-              ":" => EmojiOverlay(
-                query,
-                roomId: roomId,
-                addTag: addTag,
-                insertText: insertText,
-              ),
+    // Lives in an overlay, so taps on it would otherwise unfocus the composer
+    return TextFieldTapRegion(
+      child: Padding(
+        padding: .all(8),
+        child: ClipRRect(
+          borderRadius: .all(.circular(12)),
+          child: Container(
+            color: Theme.of(context).colorScheme.surfaceContainerHigh,
+            padding: .all(8),
+            child: Material(
+              color: Colors.transparent,
+              child: switch (triggerCharacter) {
+                "@" => UserOverlay(query, roomId: roomId, addTag: addTag),
+                "#" => RoomOverlay(query, addTag: addTag),
+                ":" => EmojiOverlay(
+                  query,
+                  roomId: roomId,
+                  addTag: addTag,
+                  insertText: insertText,
+                ),
 
-              _ => Loading(),
-            },
+                _ => Loading(),
+              },
+            ),
           ),
         ),
       ),
