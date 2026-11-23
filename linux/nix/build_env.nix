@@ -12,7 +12,7 @@
       ffmpeg-headless
 
       libGL
-      (flutter.override {
+      (flutter347.override {
         # audioplayers plays audio through GStreamer
         extraPkgConfigPackages = [
           gst_all_1.gstreamer

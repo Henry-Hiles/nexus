@@ -7,7 +7,7 @@
   libxext,
   libxfixes,
   libclang,
-  flutter,
+  flutter347,
   stdenv,
   runCommand,
   yq,
@@ -22,7 +22,7 @@ let
     ''
   );
 in
-flutter.buildFlutterApplication {
+flutter347.buildFlutterApplication {
   pname = "nexus";
   version = lib.head (lib.splitString "+" pubspec.version);
   inherit src;
