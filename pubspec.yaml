@@ -23,7 +23,7 @@ dependency_overrides:
     dynamic_color: 2.1.0
     code_assets: 2.2.0 # webcrypto requires ^1.0.0, but works with 2.x
     webcrypto: 0.6.2
-    window_manager: 0.7.1 # unifiedpush_linux requires ^0.6.0, 0.7 has the Dart 3.14 nativeapi fix
+    window_manager: 0.6.0 # unifiedpush_linux requires ^0.6.0, 0.7 has the Dart 3.14 nativeapi fix
     m3e_design:
         git:
             url: https://github.com/Henry-Hiles/material_3_expressive

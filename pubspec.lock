@@ -333,10 +333,10 @@ packages:
     dependency: transitive
     description:
       name: cnativeapi
-      sha256: "49662734cdf3dd1707b1ee35102ac1754e0ab3d450a2d30b066730f219dacc86"
+      sha256: c43703998995e132b0656d2b8a95ed2bedc6b22ccee2c827bcdc075e0330e319
       url: "https://pub.dev"
     source: hosted
-    version: "0.6.2"
+    version: "0.5.10"
   code_assets:
     dependency: "direct main"
     description:
@@ -1189,18 +1189,18 @@ packages:
     dependency: transitive
     description:
       name: nativeapi
-      sha256: "339b7a91a27ce5c33659cab92cf8e76736142985433652f91a63cc5348135bfb"
+      sha256: "118045bb549cb6fabad472a3a22a537e7310bbf20097350f5027808b4a5853ce"
       url: "https://pub.dev"
     source: hosted
-    version: "0.6.2"
+    version: "0.5.10"
   nativeapi_flutter:
     dependency: transitive
     description:
       name: nativeapi_flutter
-      sha256: b0507253748ba9690a295bc162208a91d348809185409e5aee7b09e77ab5d8a3
+      sha256: "357a405c69212f5157da1bd3be183a53c2b841d0de0eb51f4a3947913712aec4"
       url: "https://pub.dev"
     source: hosted
-    version: "0.6.2"
+    version: "0.5.10"
   navigation_rail_m3e:
     dependency: "direct main"
     description:
@@ -1611,10 +1611,10 @@ packages:
     dependency: transitive
     description:
       name: test_api
-      sha256: "0a10344e901e5b2e63819567951cb6a06673ed6b84f40462188ff5a0c41f371f"
+      sha256: "2a122cbe059f8b610d3a5415f42e255b6c17b1f21eee1d960f31080237fb4f11"
       url: "https://pub.dev"
     source: hosted
-    version: "0.7.14"
+    version: "0.7.12"
   timeago:
     dependency: "direct main"
     description:
@@ -1901,10 +1901,10 @@ packages:
     dependency: "direct main"
     description:
       name: window_manager
-      sha256: "9504ae37e618d31524e337ad3cf9600d252acf11fffa3ddb9b0b5ced634542d9"
+      sha256: bdd6b1a2c1ce50f3bba7ffbaa0d5dc5feb6b6a24fd20269da4de90244f77a471
       url: "https://pub.dev"
     source: hosted
-    version: "0.7.1"
+    version: "0.6.0"
   wkt_parser:
     dependency: transitive
     description:
@@ -1955,5 +1955,5 @@ packages:
     source: hosted
     version: "2.2.4"
 sdks:
-  dart: "3.14.0"
-  flutter: "3.50.1"
+  dart: "3.13.3"
+  flutter: "3.47.4"
