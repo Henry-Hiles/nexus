@@ -94,12 +94,15 @@ class const RoomsPane({super.key}) extends ConsumerWidget {
                     ),
                   ],
                 ),
-              .new(
-                header: selectedSpace.room == null
-                    ? null
-                    : const DividerWidget(Text("Rooms")),
-                destinations: selectedSpace.children.toDestinations(isDm: isDm),
-              ),
+              if (selectedSpace.children.isNotEmpty)
+                .new(
+                  header: selectedSpace.room == null
+                      ? null
+                      : const DividerWidget(Text("Rooms")),
+                  destinations: selectedSpace.children.toDestinations(
+                    isDm: isDm,
+                  ),
+                ),
               ...selectedSpace.subSpaces.map(
                 (subSpace) => NavigationRailM3ESection(
                   header: DividerWidget(
