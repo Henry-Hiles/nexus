@@ -19,10 +19,10 @@ class const MessageAvatar(
               context.showUserPopover(event.sender, roomId: event.roomId),
           child: AvatarOrHash(
             value.avatarUrl,
-            value.displayName ?? event.sender.localpart,
+            value.displayName ?? event.sender.localpart!,
             dimension: height,
           ),
         ),
-        _ => AvatarOrHash(null, event.sender.localpart, dimension: height),
+        _ => AvatarOrHash(null, event.sender.localpart!, dimension: height),
       };
 }

@@ -37,7 +37,7 @@ class const TypingIndicator(final String roomId, {super.key})
                       )
                       .value
                       ?.displayName ??
-                  typingUserId.localpart,
+                  typingUserId.localpart!,
               userId: typingUserId,
               roomId: roomId,
               recognizer: recognizers[index],

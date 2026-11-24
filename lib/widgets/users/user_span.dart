@@ -47,8 +47,11 @@ class UserSpan(
 
     return UserSpan(
       context,
-      ref.watch(AuthorController.provider(.fromEvent(event))).value?.displayName ??
-          event.sender.localpart,
+      ref
+              .watch(AuthorController.provider(.fromEvent(event)))
+              .value
+              ?.displayName ??
+          event.sender.localpart!,
       userId: event.sender,
       roomId: event.roomId,
       recognizer: recognizer,

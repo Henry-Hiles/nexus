@@ -756,7 +756,7 @@ class SettingsSectionsController
 
                       return ListTile(
                         enabled: !saving.active,
-                        leading: AvatarOrHash(profile?.avatarUrl, name),
+                        leading: AvatarOrHash(profile?.avatarUrl, name!),
                         title: Text(name, overflow: .ellipsis),
                         subtitle: Text(userId, overflow: .ellipsis),
                         onTap: () => context.showAdaptiveSheet(

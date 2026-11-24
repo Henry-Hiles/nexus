@@ -2,6 +2,7 @@ import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:material_ui/material_ui.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/controllers/via.dart";
+import "package:nexus/helpers/extensions/get_localpart.dart";
 import "package:nexus/helpers/extensions/weighted_search.dart";
 import "package:nexus/widgets/avatars/avatar_or_hash.dart";
 
@@ -45,11 +46,9 @@ class const RoomOverlay(
                 addTag(
                   id: "[#$name](matrix:roomid/${room.metadata?.id.substring(1)}$vias)",
                   name:
-                      (room.metadata?.canonicalAlias ?? room.metadata?.id)
-                          ?.substring(1)
-                          .split(":")
-                          .first ??
-                      "",
+                      room.metadata?.canonicalAlias?.localpart ??
+                      room.metadata?.id ??
+                      "Unknown Room",
                 );
               },
             );

@@ -104,7 +104,7 @@ class const PowerLevelsDiff(
                           )
                           .value
                           ?.displayName ??
-                      change.$1.localpart,
+                      change.$1.localpart!,
                   style: style?.copyWith(
                     fontWeight: .bold,
                     color: ref.displaynameColorAt(

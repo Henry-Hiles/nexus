@@ -141,7 +141,7 @@ class const RoomSummarySheet(
               ListTile(
                 leading: AvatarOrHash(
                   summary.inviterProfile?.avatarUrl,
-                  summary.inviterProfile?.displayName ?? invitedBy.localpart,
+                  summary.inviterProfile?.displayName ?? invitedBy.localpart!,
                 ),
                 title: Text(
                   "${summary.isDirect ? "Direct message from" : "Invited by"} ${summary.inviterProfile?.displayName ?? invitedBy.localpart}",

@@ -73,7 +73,7 @@ class const ReadReceiptsRow(
                                       receipt.userId.localpart;
 
                                   return AvatarRing(
-                                    tooltip: name,
+                                    tooltip: name!,
                                     onTap: () => context.showUserPopover(
                                       receipt.userId,
                                       roomId: chat.roomId,

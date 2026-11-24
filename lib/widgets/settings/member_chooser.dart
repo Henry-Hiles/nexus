@@ -46,7 +46,7 @@ class const MemberChooser({
           .nonNulls,
     );
 
-    String nameOf(String id) => members[id]?.displayName ?? id.localpart;
+    String nameOf(String id) => members[id]?.displayName ?? id.localpart!;
 
     void add(String id) {
       if (excluded.contains(id)) {

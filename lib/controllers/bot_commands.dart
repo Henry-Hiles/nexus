@@ -50,7 +50,7 @@ class BotCommandsController(final String roomId)
                     ) =>
                       BotCommand(
                         sender: sender,
-                        botName: displayName ?? sender.localpart,
+                        botName: displayName ?? sender.localpart!,
                         botAvatar: avatarUrl,
                         description: description,
                       ),

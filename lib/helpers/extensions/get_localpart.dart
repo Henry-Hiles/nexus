@@ -1,5 +1,5 @@
 extension GetLocalpart on String {
-  String get localpart => length > 1 ? substring(1).split(":").first : "?";
+  String? get localpart => length > 1 ? substring(1).split(":").first : null;
 
   /// Whether this looks like a valid Matrix user ID, e.g. `@user:example.com`.
   bool get isValidUserId => RegExp(r"^@[^:\s]+:[^\s]+$").hasMatch(this);

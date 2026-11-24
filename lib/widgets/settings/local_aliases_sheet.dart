@@ -5,6 +5,7 @@ import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
 import "package:nexus/controllers/client_state.dart";
 import "package:nexus/controllers/local_aliases.dart";
 import "package:nexus/helpers/extensions/better_when.dart";
+import "package:nexus/helpers/extensions/get_localpart.dart";
 import "package:nexus/helpers/hooks/saving.dart";
 import "package:nexus/main.dart";
 import "package:nexus/models/gomuks_exception.dart";
@@ -24,7 +25,7 @@ class const LocalAliasesSheet(
     final localpart = useValueListenable(controller).text.trim();
     final server = ref.watch(
       ClientStateController.provider.select(
-        (state) => state?.userId?.split(":").skip(1).join(":"),
+        (state) => state?.userId?.serverName,
       ),
     );
 

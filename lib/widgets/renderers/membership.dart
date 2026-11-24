@@ -34,7 +34,7 @@ class const MembershipRenderer(
         [
           UserSpan(
             context,
-            content.displayName ?? event.stateKey!.localpart,
+            content.displayName ?? event.stateKey!.localpart!,
             userId: event.stateKey!,
             roomId: event.roomId,
             recognizer: targetRecognizer,

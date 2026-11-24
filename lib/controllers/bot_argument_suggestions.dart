@@ -66,7 +66,7 @@ class BotArgumentSuggestionsController(final ComposerParams composer)
                     ),
                   ) =>
                     BotArgumentSuggestion(
-                      title: displayName ?? userId.localpart,
+                      title: displayName ?? userId.localpart!,
                       subtitle: userId,
                       avatar: avatarUrl,
                       text: userId,

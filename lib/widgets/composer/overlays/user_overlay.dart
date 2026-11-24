@@ -36,13 +36,13 @@ class const UserOverlay(
                     ListTile(
                       leading: AvatarOrHash(
                         avatarUrl,
-                        displayName ?? member.stateKey!.localpart,
+                        displayName ?? member.stateKey!.localpart!,
                       ),
-                      title: Text(displayName ?? member.stateKey!.localpart),
+                      title: Text(displayName ?? member.stateKey!.localpart!),
                       subtitle: Text(member.stateKey!),
                       onTap: () => addTag(
                         id: "[@${displayName ?? member.stateKey!.localpart}](matrix:u/${member.stateKey!.substring(1)})",
-                        name: member.stateKey!.localpart,
+                        name: member.stateKey!.localpart!,
                       ),
                     ),
                   _ => SizedBox.shrink(),

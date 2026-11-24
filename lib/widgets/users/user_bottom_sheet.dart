@@ -76,7 +76,7 @@ final class const UserBottomSheet(
       downloadFilename: member.displayName ?? userId.localpart,
       child: AvatarOrHash(
         member.avatarUrl,
-        member.displayName ?? userId.localpart,
+        member.displayName ?? userId.localpart!,
         dimension: 200,
       ),
     );
@@ -231,7 +231,7 @@ final class const UserBottomSheet(
               if (editable)
                 InlineTextField(
                   value: profile?.displayName,
-                  hint: userId.localpart,
+                  hint: userId.localpart!,
                   style: textTheme.headlineLarge,
                   onChanged: profile == null
                       ? null
@@ -240,7 +240,7 @@ final class const UserBottomSheet(
                 )
               else
                 SelectableText(
-                  member.displayName ?? userId.localpart,
+                  member.displayName ?? userId.localpart!,
                   style: textTheme.headlineLarge,
                   textAlign: .center,
                 ),
@@ -404,7 +404,7 @@ final class const UserBottomSheet(
                                 if (hasDm) {
                                   context.startDirectMessage(
                                     userId,
-                                    name: name,
+                                    name: name!,
                                   );
                                 } else if (await context
                                         .showAdaptiveSheet<bool>(

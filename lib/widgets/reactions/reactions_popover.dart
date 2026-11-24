@@ -118,7 +118,7 @@ class const ReactionsPopover(
                               return ListTile(
                                 leading: AvatarOrHash(
                                   member?.avatarUrl,
-                                  name,
+                                  name!,
                                   dimension: 40,
                                 ),
                                 title: Text(name, overflow: .ellipsis),

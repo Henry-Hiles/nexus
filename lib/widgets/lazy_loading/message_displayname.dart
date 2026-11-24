@@ -27,7 +27,7 @@ class const MessageDisplayname(
             : null,
         child: switch ([
           Text(
-            value?.displayName ?? event.sender.localpart,
+            value?.displayName ?? event.sender.localpart!,
             style: style ?? .new(color: color, fontWeight: .bold),
             maxLines: 1,
             overflow: .ellipsis,

@@ -140,7 +140,7 @@ class const MemberList(final String roomId, {super.key})
                                                   displayName ??
                                                       members[index]
                                                           .stateKey!
-                                                          .localpart,
+                                                          .localpart!,
                                                   overflow: .ellipsis,
                                                   style: .new(
                                                     color: ref.displaynameColor(
@@ -162,7 +162,7 @@ class const MemberList(final String roomId, {super.key})
                                                     displayName ??
                                                         members[index]
                                                             .stateKey!
-                                                            .localpart,
+                                                            .localpart!,
                                                   ),
                                                 ),
                                               ),
