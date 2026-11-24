@@ -60,6 +60,7 @@ class SpacesController extends AsyncNotifier<IList<Space>> {
                     room: room,
                     children: .new(
                       collectDescendants(childId)
+                          .where((id) => !childrenById.containsKey(id))
                           .map((id) => rooms[id])
                           .nonNulls,
                     ),
