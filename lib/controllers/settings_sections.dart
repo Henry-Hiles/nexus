@@ -256,7 +256,7 @@ class SettingsSectionsController
             ),
             .new(
               title: "Room Ordering",
-              description: "Sort rooms by recent activity, optionally showing mentioned and unread rooms first.",
+              description: "Sort rooms and subspaces by recent activity, optionally showing mentioned or unread ones first.",
               icon: Icons.sort,
               builder: (title, description, icon) => DialogListTile<RoomOrder>(
                 icon: Icon(icon),
@@ -266,6 +266,7 @@ class SettingsSectionsController
                 options: RoomOrder.values,
                 getName: (option) => switch (option) {
                   .unreadFirst => "Mentioned, then unread",
+                  .mentionedFirst => "Mentioned only",
                   .recentActivity => "Recent activity only",
                 },
                 onChanged: (value) => ref

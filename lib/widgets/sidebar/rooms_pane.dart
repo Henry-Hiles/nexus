@@ -94,41 +94,48 @@ class const RoomsPane({super.key}) extends ConsumerWidget {
                     ),
                   ],
                 ),
-              if (selectedSpace.children.isNotEmpty)
-                .new(
-                  header: selectedSpace.room == null
-                      ? null
-                      : const DividerWidget(Text("Rooms")),
-                  destinations: selectedSpace.children.toDestinations(
-                    isDm: isDm,
-                  ),
-                ),
-              ...selectedSpace.subSpaces.map(
-                (subSpace) => NavigationRailM3ESection(
-                  header: DividerWidget(
-                    Row(
-                      mainAxisSize: .min,
-                      spacing: 8,
-                      children: [
-                        if (subSpace.room.metadata?.avatar != null)
-                          AvatarOrHash(
-                            subSpace.room.metadata?.avatar,
-                            subSpace.room.metadata?.name ?? "Unnamed Room",
-                            dimension: 16,
-                          ),
-                        Flexible(
-                          child: Text(
-                            subSpace.room.metadata?.name ?? "Unnamed Space",
-                            maxLines: 1,
-                            overflow: .ellipsis,
-                          ),
+              ...selectedSpace.subSpaces
+                  .map(
+                    (subSpace) => NavigationRailM3ESection(
+                      header: DividerWidget(
+                        Row(
+                          mainAxisSize: .min,
+                          spacing: 8,
+                          children: [
+                            if (subSpace.room.metadata?.avatar != null)
+                              AvatarOrHash(
+                                subSpace.room.metadata?.avatar,
+                                subSpace.room.metadata?.name ?? "Unnamed Room",
+                                dimension: 16,
+                              ),
+                            Flexible(
+                              child: Text(
+                                subSpace.room.metadata?.name ?? "Unnamed Space",
+                                maxLines: 1,
+                                overflow: .ellipsis,
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
+                      destinations: subSpace.children.toDestinations(
+                        isDm: isDm,
+                      ),
                     ),
-                  ),
-                  destinations: subSpace.children.toDestinations(isDm: isDm),
-                ),
-              ),
+                  )
+                  .toIList()
+                  // Sorted among the subspaces, matching allChildRooms
+                  .insertAll(selectedSpace.childrenIndex, [
+                    if (selectedSpace.children.isNotEmpty)
+                      NavigationRailM3ESection(
+                        header: selectedSpace.room == null
+                            ? null
+                            : const DividerWidget(Text("Rooms")),
+                        destinations: selectedSpace.children.toDestinations(
+                          isDm: isDm,
+                        ),
+                      ),
+                  ]),
             ],
             onDestinationSelected: (value) {
               ref

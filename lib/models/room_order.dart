@@ -1,1 +1,1 @@
-enum RoomOrder { unreadFirst, recentActivity }
+enum RoomOrder { unreadFirst, mentionedFirst, recentActivity }

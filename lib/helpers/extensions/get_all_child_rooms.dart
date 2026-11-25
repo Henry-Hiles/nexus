@@ -3,6 +3,10 @@ import "package:nexus/models/room.dart";
 import "package:nexus/models/space.dart";
 
 extension GetAllChildRooms on Space {
-  IList<Room> get allChildRooms =>
-      children.addAll(subSpaces.expand((s) => s.children));
+  IList<Room> get allChildRooms => subSpaces
+      .map((subspace) => subspace.children)
+      .toIList()
+      .insert(childrenIndex, children)
+      .expand((rooms) => rooms)
+      .toIList();
 }

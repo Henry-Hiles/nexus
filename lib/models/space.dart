@@ -14,4 +14,5 @@ class const Space({
   final Room? room,
   required final IList<Room> children,
   required final IList<Subspace> subSpaces,
+  final int childrenIndex = 0,
 }) with _$Space;

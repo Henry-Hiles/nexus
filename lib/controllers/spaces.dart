@@ -139,31 +139,57 @@ class SpacesController extends AsyncNotifier<IList<Space>> {
       SettingsController.provider.selectAsync((data) => data.roomOrder),
     );
 
-    // Mentioned -> Unread -> Other
-    int unreadPriority(Room room) => switch (room.metadata) {
-      RoomMetadata(unreadHighlights: > 0) => 0,
-      RoomMetadata(unreadNotifications: > 0) ||
-      RoomMetadata(unreadMessages: > 0) => 1,
-      _ => 2,
+    int priority(Room room) => switch ((roomOrder, room.metadata)) {
+      (.recentActivity, _) => 0,
+      (_, RoomMetadata(unreadHighlights: > 0)) => 0,
+      (.mentionedFirst, _) => 1,
+      (.unreadFirst, RoomMetadata(unreadNotifications: > 0)) ||
+      (.unreadFirst, RoomMetadata(unreadMessages: > 0)) => 1,
+      (.unreadFirst, _) => 2,
+    };
+    DateTime activity(Room room) => room.metadata?.sortingTimestamp ?? .new(0);
+
+    // Higher priority first, then most recent activity first
+    int compare(
+      ({int priority, DateTime activity}) a,
+      ({int priority, DateTime activity}) b,
+    ) => switch (a.priority.compareTo(b.priority)) {
+      0 => b.activity.compareTo(a.activity),
+      final byPriority => byPriority,
     };
 
-    return allSpaces
-        .map(
-          (space) => space.copyWith(
-            children: space.children.sort((a, b) {
-              if (roomOrder == .unreadFirst) {
-                final byUnread = unreadPriority(a).compareTo(unreadPriority(b));
-                if (byUnread != 0) return byUnread;
-              }
+    ({int priority, DateTime activity}) roomKey(Room room) =>
+        (priority: priority(room), activity: activity(room));
 
-              // Most recent activity first
-              return (b.metadata?.sortingTimestamp ?? DateTime(0)).compareTo(
-                a.metadata?.sortingTimestamp ?? DateTime(0),
-              );
-            }),
-          ),
-        )
-        .toIList();
+    ({int priority, DateTime activity}) groupKey(IList<Room> rooms) => (
+      priority: rooms.map(priority).minOrNull ?? 2,
+      activity: rooms.map(activity).maxOrNull ?? .new(0),
+    );
+
+    IList<Room> sortRooms(IList<Room> rooms) =>
+        rooms.sort((a, b) => compare(roomKey(a), roomKey(b)));
+
+    return allSpaces.map((space) {
+      final subSpaces = space.subSpaces
+          .map(
+            (subspace) =>
+                subspace.copyWith(children: sortRooms(subspace.children)),
+          )
+          .toIList()
+          .sort((a, b) => compare(groupKey(a.children), groupKey(b.children)));
+
+      final childrenKey = groupKey(space.children);
+      return space.copyWith(
+        children: sortRooms(space.children),
+        subSpaces: subSpaces,
+        childrenIndex: subSpaces
+            .where(
+              (subspace) =>
+                  compare(groupKey(subspace.children), childrenKey) < 0,
+            )
+            .length,
+      );
+    }).toIList();
   }
 
   static final provider = AsyncNotifierProvider<SpacesController, IList<Space>>(
