@@ -1,4 +1,5 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
+import "package:flutter/services.dart";
 import "package:material_ui/material_ui.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
@@ -46,6 +47,28 @@ final class const RoomChat({
 
     final thread = useState<({String root, int? event})?>(null);
     final threadScaffold = useMemoized(GlobalKey<ScaffoldState>.new);
+    final searchScaffold = useMemoized(GlobalKey<ScaffoldState>.new);
+
+    useEffect(() {
+      bool openSearch(KeyEvent event) {
+        final keyboard = HardwareKeyboard.instance;
+        final search = searchScaffold.currentState;
+        if (event is! KeyDownEvent ||
+            event.logicalKey != .keyF ||
+            !(keyboard.isControlPressed || keyboard.isMetaPressed) ||
+            search == null ||
+            !context.mounted ||
+            !(ModalRoute.of(context)?.isCurrent ?? true)) {
+          return false;
+        }
+
+        search.openEndDrawer();
+        return true;
+      }
+
+      HardwareKeyboard.instance.addHandler(openSearch);
+      return () => HardwareKeyboard.instance.removeHandler(openSearch);
+    }, []);
 
     final userId = ref.watch(ClientStateController.provider)?.userId;
     final memberListOpened = ref
@@ -177,6 +200,7 @@ final class const RoomChat({
         null => null,
       },
       body: Scaffold(
+        key: searchScaffold,
         endDrawerEnableOpenDragGesture: false,
         endDrawer: SearchDrawer(
           roomId,
@@ -184,77 +208,62 @@ final class const RoomChat({
           jumpToEvent: jumpToEvent,
         ),
         body: Builder(
-          builder: (searchContext) => CallbackShortcuts(
-            bindings: {
-              const SingleActivator(.keyF, control: true): Scaffold.of(
-                searchContext,
-              ).openEndDrawer,
-              const SingleActivator(.keyF, meta: true): Scaffold.of(
-                searchContext,
-              ).openEndDrawer,
-            },
-            child: Scaffold(
-              endDrawerEnableOpenDragGesture: false,
-              endDrawer: ThreadsDrawer(roomId, onOpenThread: openThread),
-              body: Builder(
-                builder: (threadsContext) => Scaffold(
-                  endDrawerEnableOpenDragGesture: false,
-                  endDrawer: PinnedEventsDrawer(
-                    roomId,
-                    getEventOptions: getEventOptions,
-                    jumpToEvent: jumpToEvent,
-                  ),
-                  body: Builder(
-                    builder: (middleContext) => Scaffold(
-                      endDrawer: showMembersByDefault
-                          ? null
-                          : MemberList(roomId),
-                      appBar: RoomAppbar(
-                        roomId: roomId,
-                        isDesktop: isDesktop,
-                        onOpenDrawer: Scaffold.of(context).openDrawer,
-                        onOpenMemberList: (thisContext) {
-                          if (!showMembersByDefault) {
-                            return Scaffold.of(thisContext).openEndDrawer();
-                          }
+          builder: (searchContext) => Scaffold(
+            endDrawerEnableOpenDragGesture: false,
+            endDrawer: ThreadsDrawer(roomId, onOpenThread: openThread),
+            body: Builder(
+              builder: (threadsContext) => Scaffold(
+                endDrawerEnableOpenDragGesture: false,
+                endDrawer: PinnedEventsDrawer(
+                  roomId,
+                  getEventOptions: getEventOptions,
+                  jumpToEvent: jumpToEvent,
+                ),
+                body: Builder(
+                  builder: (middleContext) => Scaffold(
+                    endDrawer: showMembersByDefault ? null : MemberList(roomId),
+                    appBar: RoomAppbar(
+                      roomId: roomId,
+                      isDesktop: isDesktop,
+                      onOpenDrawer: Scaffold.of(context).openDrawer,
+                      onOpenMemberList: (thisContext) {
+                        if (!showMembersByDefault) {
+                          return Scaffold.of(thisContext).openEndDrawer();
+                        }
 
-                          ref
-                              .read(
-                                MemberListOpenedController.provider.notifier,
-                              )
-                              .set(!memberListOpened)
-                              .onError(showError);
-                        },
-                        onOpenPinnedMessagesList: Scaffold.of(middleContext)
-                            .openEndDrawer,
-                        onOpenSearch: Scaffold.of(searchContext).openEndDrawer,
-                        onOpenThreads: Scaffold.of(threadsContext)
-                            .openEndDrawer,
-                      ),
-                      body: Column(
-                        children: [
-                          const SyncStatusBanner(),
-                          Expanded(
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: ChatBody(
-                                    chat: chat,
-                                    scroll: scroll,
-                                    jumpToEvent: jumpToEvent,
-                                    getEventOptions: getEventOptions,
-                                    composer: composer,
-                                    onOpenThread: openThread,
-                                  ),
+                        ref
+                            .read(MemberListOpenedController.provider.notifier)
+                            .set(!memberListOpened)
+                            .onError(showError);
+                      },
+                      onOpenPinnedMessagesList: Scaffold.of(middleContext)
+                          .openEndDrawer,
+                      onOpenSearch: Scaffold.of(searchContext).openEndDrawer,
+                      onOpenThreads: Scaffold.of(threadsContext).openEndDrawer,
+                    ),
+                    body: Column(
+                      children: [
+                        const SyncStatusBanner(),
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: ChatBody(
+                                  chat: chat,
+                                  scroll: scroll,
+                                  jumpToEvent: jumpToEvent,
+                                  getEventOptions: getEventOptions,
+                                  composer: composer,
+                                  onOpenThread: openThread,
                                 ),
+                              ),
 
-                                if (memberListOpened && showMembersByDefault)
-                                  MemberList(roomId),
-                              ],
-                            ),
+                              if (memberListOpened && showMembersByDefault)
+                                MemberList(roomId),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
