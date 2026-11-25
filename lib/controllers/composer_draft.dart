@@ -92,19 +92,19 @@ class ComposerDraftController(final ComposerParams composer)
   ({String text, IList<Tag> tags}) _restoreTags(String text) {
     final rooms = ref.read(RoomsController.provider);
     Tag tagOf(Match match) => switch ((match[1], match[2], match[3])) {
-      (final userId?, _, _) => Tag(
+      (final userId?, _, _) => .new(
         id: match[0]!,
         text: userId.split(":").first,
         triggerCharacter: "@",
       ),
-      (_, final roomId?, _) => Tag(
+      (_, final roomId?, _) => .new(
         id: match[0]!,
         text:
             rooms["!$roomId"]?.metadata?.canonicalAlias?.localpart ??
             "!$roomId",
         triggerCharacter: "#",
       ),
-      (_, _, final shortcode) => Tag(
+      (_, _, final shortcode) => .new(
         id: match[0]!,
         text: shortcode!,
         triggerCharacter: ":",

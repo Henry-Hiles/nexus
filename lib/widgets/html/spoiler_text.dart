@@ -10,9 +10,10 @@ class const SpoilerText(final String text, {super.key}) extends HookWidget {
       onTap: () => revealed.value = !revealed.value,
       child: AnimatedContainer(
         duration: Durations.short2,
-        padding: const .symmetric(horizontal: 4, vertical: 2),
         decoration: BoxDecoration(
-          color: revealed.value ? Colors.transparent : Colors.blueGrey,
+          color: revealed.value
+              ? Colors.blueGrey.withValues(alpha: 0.3)
+              : Colors.blueGrey,
           borderRadius: .circular(4),
         ),
         child: Text(
