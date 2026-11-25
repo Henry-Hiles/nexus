@@ -16,7 +16,7 @@ class ShownNotificationsHelper(final Ref ref) {
     final shown = IMap<String, ISet<int>>.fromJson(
       json.decode(await prefs.getString(_key) ?? "{}"),
       (threadId) => threadId as String,
-      (ids) => ISet.fromJson(ids, (id) => id as int),
+      (ids) => .fromJson(ids, (id) => id as int),
     );
 
     await prefs.setString(
@@ -33,7 +33,7 @@ class ShownNotificationsHelper(final Ref ref) {
     (shown) => shown.update(
       threadId,
       (ids) => ids.add(id),
-      ifAbsent: () => ISet({id}),
+      ifAbsent: () => .new({id}),
     ),
   );
 
