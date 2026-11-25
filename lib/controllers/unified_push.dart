@@ -143,7 +143,10 @@ class UnifiedPushController extends AsyncNotifier<String?> {
                   "$accountId/${Platform.isAndroid ? notification.roomId : notification.eventId}"
                       .hashCode &
                   0x7fffffff,
-              threadId: "$accountId/${notification.roomId}",
+              threadId: NotificationController.threadIdFor(
+                accountId,
+                notification.roomId,
+              ),
               title: notification.roomName,
               subtitle: hasOtherAccounts ? notification.self.id : null,
               body: notification.text,

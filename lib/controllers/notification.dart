@@ -2,10 +2,14 @@ import "dart:async";
 import "dart:convert";
 import "dart:io";
 
+import "package:collection/collection.dart";
+import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/services.dart";
 import "package:material_ui/material_ui.dart";
 import "package:nexus/controllers/active_account.dart";
 import "package:nexus/controllers/portal.dart";
+import "package:nexus/controllers/rooms.dart";
+import "package:nexus/controllers/shared_prefs.dart";
 import "package:nexus/controllers/sidebar_page.dart";
 import "package:nexus/main.dart";
 import "package:flutter_local_notifications/flutter_local_notifications.dart";
@@ -58,13 +62,92 @@ class NotificationController
       });
     }
 
+    // Reading a room, here or on another client, dismisses its notifications
+    if (!isInBackground) {
+      ref.listen(
+        RoomsController.provider.select(
+          (rooms) => rooms
+              .where((_, room) => room.metadata?.unreadNotifications == 0)
+              .keys
+              .toISet(),
+        ),
+        (previous, read) {
+          final newlyRead = read.difference(previous ?? const ISetConst({}));
+          if (newlyRead.isEmpty) return;
+
+          final accountId = ref.read(ActiveAccountController.provider);
+          dismiss(newlyRead.map((roomId) => threadIdFor(accountId, roomId)))
+              .onError(showError);
+        },
+        fireImmediately: true,
+      );
+    }
+
     return notifications;
   }
+
+  static String threadIdFor(String accountId, String roomId) =>
+      "$accountId/$roomId";
 
   static String payloadFor(String accountId, int rowId) => "$accountId:$rowId";
 
   static const _androidGroup = "nexus.federated.nexus.MESSAGES";
   static const _summaryPayload = "summary";
+  static const _shownKey = "shownNotifications";
+
+  /// IDs of the notifications shown, by thread. Stored, since they're often
+  /// shown by a background instance.
+  Future<IMap<String, IList<int>>> _shown() async => IMap<String, dynamic>(
+    json.decode(
+      await ref.read(SharedPrefsController.provider).getString(_shownKey) ??
+          "{}",
+    ),
+  ).map((threadId, ids) => .new(threadId, IList((ids as List).cast<int>())));
+
+  Future<void> _setShown(IMap<String, IList<int>> shown) => ref
+      .read(SharedPrefsController.provider)
+      .setString(
+        _shownKey,
+        json.encode(
+          shown.map((threadId, ids) => .new(threadId, ids.unlock)).unlock,
+        ),
+      );
+
+  Future<void> _track(String threadId, int id) async {
+    final shown = await _shown();
+    final ids = shown[threadId] ?? const IListConst([]);
+    if (!ids.contains(id)) await _setShown(shown.add(threadId, ids.add(id)));
+  }
+
+  /// Dismisses the notifications shown for [threadIds].
+  Future<void> dismiss(Iterable<String> threadIds) async {
+    final shown = await _shown();
+    final ids = threadIds.map((threadId) => shown[threadId]).nonNulls.flattened;
+    if (ids.isEmpty) return;
+
+    await _setShown(
+      shown.removeWhere((threadId, _) => threadIds.contains(threadId)),
+    );
+
+    if (Platform.isLinux) {
+      final portal = await ref.read(PortalController.provider.future);
+      await Future.wait(
+        ids.map((id) => portal.notification.removeNotification(id.toString())),
+      );
+      return;
+    }
+
+    final controller = await future;
+    await Future.wait(ids.map((id) => controller.cancel(id: id)));
+
+    // The summary would otherwise outlive its group
+    if (Platform.isAndroid &&
+        (await controller.getActiveNotifications()).every(
+          (notification) => notification.id == 0,
+        )) {
+      await controller.cancel(id: 0);
+    }
+  }
 
   void _open(String payload) {
     if (payload == _summaryPayload) {
@@ -208,6 +291,7 @@ class NotificationController
           // ),
         ],
       );
+      if (threadId != null) await _track(threadId, id);
       return;
     }
 
@@ -292,6 +376,8 @@ class NotificationController
         ),
       ),
     );
+
+    if (threadId != null) await _track(threadId, id);
 
     if (Platform.isAndroid) {
       await controller.show(
