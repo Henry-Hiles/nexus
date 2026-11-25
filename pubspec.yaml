@@ -120,6 +120,7 @@ dependencies:
             path: packages/location
     better_player: 1.38.0
     audioplayers: 6.8.1
+    receive_sharing_intent: 1.9.0
 dev_dependencies:
     flutter_test:
         sdk: flutter

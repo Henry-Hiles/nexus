@@ -24,6 +24,10 @@ class const ComposerDraft({
   final PollStart? poll,
   final LocationMessageContent? location,
 
+  // Bumped when the text is replaced from outside the composer, so that it
+  // rebuilds its text field from the draft
+  final int textReplacements = 0,
+
   // The draft from before an edit, restored once it is sent or cancelled
   final ({ComposerDraft draft, BotCommandDraft? botCommand})? beforeEdit,
 }) with _$ComposerDraft {

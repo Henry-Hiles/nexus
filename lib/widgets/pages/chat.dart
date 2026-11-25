@@ -4,6 +4,7 @@ import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
 import "package:nexus/controllers/init_complete.dart";
 import "package:nexus/controllers/link_request.dart";
+import "package:nexus/controllers/share_request.dart";
 import "package:nexus/helpers/extensions/open_link_info.dart";
 import "package:nexus/main.dart";
 import "package:nexus/controllers/selected_room.dart";
@@ -12,6 +13,7 @@ import "package:nexus/widgets/common/appbar.dart";
 import "package:nexus/widgets/sidebar/sidebar.dart";
 import "package:nexus/widgets/common/sync_status_banner.dart";
 import "package:nexus/widgets/room_chat/room_chat.dart";
+import "package:nexus/widgets/rooms/share_sheet.dart";
 import "package:nexus/widgets/common/loading.dart";
 
 class const ChatPage({super.key}) extends HookConsumerWidget {
@@ -52,6 +54,21 @@ class const ChatPage({super.key}) extends HookConsumerWidget {
       });
       return null;
     }, [linkRequest, initComplete]);
+
+    final shareRequest = ref.watch(ShareRequestController.provider);
+
+    useEffect(() {
+      if (shareRequest == null || !initComplete) return null;
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref.read(ShareRequestController.provider.notifier).consume();
+        navigatorKey.currentState?.popUntil((route) => route.isFirst);
+        scaffoldKey.currentContext?.showAdaptiveSheet(
+          (_) => ShareSheet(shareRequest),
+        );
+      });
+      return null;
+    }, [shareRequest, initComplete]);
 
     return LayoutBuilder(
       builder: (context, constraints) {

@@ -47,6 +47,12 @@
 
 				<data android:scheme="matrix" />
 			</intent-filter>
+			<intent-filter>
+				<action android:name="android.intent.action.SEND" />
+				<category android:name="android.intent.category.DEFAULT" />
+
+				<data android:mimeType="*/*" />
+			</intent-filter>
             <meta-data
               android:name="io.flutter.embedding.android.NormalTheme"
               android:resource="@style/NormalTheme"

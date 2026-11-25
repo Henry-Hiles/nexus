@@ -94,6 +94,7 @@ class const Composer(
       :poll,
       :location,
       :textCommands,
+      :textReplacements,
     ) = ref.watch(
       draftProvider.select(
         (draft) => (
@@ -104,6 +105,7 @@ class const Composer(
           poll: draft.poll,
           location: draft.location,
           textCommands: draft.textCommands,
+          textReplacements: draft.textReplacements,
         ),
       ),
     );
@@ -145,7 +147,7 @@ class const Composer(
           ];
         },
       );
-    }, [composer, editingEvent, hasReplacement]);
+    }, [composer, editingEvent, hasReplacement, textReplacements]);
     useEffect(
       // After the frame, as FlutterTagger and TextField still use it until then
       () =>
