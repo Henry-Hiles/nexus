@@ -1,6 +1,8 @@
 import "dart:async";
+import "dart:io";
 
 import "package:better_player/better_player.dart";
+import "package:flutter/services.dart";
 import "package:material_ui/material_ui.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/client.dart";
@@ -10,6 +12,7 @@ import "package:nexus/models/info/video.dart";
 import "package:nexus/widgets/common/error_dialog.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:nexus/widgets/players/player_controls.dart";
+import "package:window_manager/window_manager.dart";
 
 class const VideoPlayer(
   final Uri uri,
@@ -32,6 +35,41 @@ class const VideoPlayer(
         PlayerConfiguration(
           aspectRatio: aspectRatio,
           fit: .contain,
+          autoDetectFullscreenDeviceOrientation: true,
+          routePageBuilder:
+              (context, animation, secondaryAnimation, provider) => HookBuilder(
+                builder: (context) {
+                  useEffect(() {
+                    if (!(Platform.isLinux ||
+                        Platform.isMacOS ||
+                        Platform.isWindows)) {
+                      return null;
+                    }
+                    final window = WindowManager.instance.getCurrent();
+                    if (window == null || window.isFullScreen) return null;
+
+                    window.isFullScreen = true;
+                    return () => window.isFullScreen = false;
+                  }, []);
+
+                  return Focus(
+                    autofocus: true,
+                    onKeyEvent: (_, event) {
+                      if (event is KeyDownEvent &&
+                          event.logicalKey == .escape) {
+                        provider.controller.exitFullScreen();
+                        return .handled;
+                      }
+                      return .ignored;
+                    },
+                    child: Scaffold(
+                      backgroundColor: Colors.black,
+                      resizeToAvoidBottomInset: false,
+                      body: SizedBox.expand(child: provider),
+                    ),
+                  );
+                },
+              ),
           controlsConfiguration: PlayerControlsConfiguration(
             playerTheme: .custom,
             customControlsBuilder: (controller, _) => HookBuilder(
