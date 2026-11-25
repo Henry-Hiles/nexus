@@ -2,15 +2,14 @@ import "dart:async";
 import "dart:convert";
 import "dart:io";
 
-import "package:collection/collection.dart";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/services.dart";
 import "package:material_ui/material_ui.dart";
 import "package:nexus/controllers/active_account.dart";
 import "package:nexus/controllers/portal.dart";
 import "package:nexus/controllers/rooms.dart";
-import "package:nexus/controllers/shared_prefs.dart";
 import "package:nexus/controllers/sidebar_page.dart";
+import "package:nexus/helpers/shown_notifications_helper.dart";
 import "package:nexus/main.dart";
 import "package:flutter_local_notifications/flutter_local_notifications.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
@@ -30,7 +29,17 @@ class NotificationController
   Future<FlutterLocalNotificationsPlugin> build() async {
     final notifications = FlutterLocalNotificationsPlugin();
 
-    if (!Platform.isLinux) {
+    if (Platform.isLinux) {
+      const MethodChannel("nexus/notifications")
+          .setMethodCallHandler((call) async {
+            if (call case MethodCall(
+              method: "notificationClicked",
+              arguments: final String payload,
+            )) {
+              _open(payload);
+            }
+          });
+    } else {
       final darwin = DarwinInitializationSettings();
 
       await notifications.initialize(
@@ -56,18 +65,6 @@ class NotificationController
           ?.deleteNotificationChannel(channelId: "messages");
     }
 
-    if (Platform.isLinux) {
-      const notificationChannel = MethodChannel("nexus/notifications");
-
-      notificationChannel.setMethodCallHandler((call) async {
-        if (call.method != "notificationClicked") {
-          return;
-        }
-
-        if (call.arguments case final String payload) _open(payload);
-      });
-    }
-
     // Reading a room, here or on another client, dismisses its notifications
     if (!isInBackground) {
       ref.listen(
@@ -82,8 +79,9 @@ class NotificationController
           if (newlyRead.isEmpty) return;
 
           final accountId = ref.read(ActiveAccountController.provider);
-          dismiss(newlyRead.map((roomId) => threadIdFor(accountId, roomId)))
-              .onError(showError);
+          dismiss(
+            newlyRead.map((roomId) => threadIdFor(accountId, roomId)).toISet(),
+          ).onError(showError);
         },
         fireImmediately: true,
       );
@@ -101,41 +99,13 @@ class NotificationController
   static const _summaryPayload = "summary";
 
   static const _messagesChannel = "messages_v2";
-  static const _shownKey = "shownNotifications";
-
-  /// IDs of the notifications shown, by thread. Stored, since they're often
-  /// shown by a background instance.
-  Future<IMap<String, IList<int>>> _shown() async => IMap<String, dynamic>(
-    json.decode(
-      await ref.read(SharedPrefsController.provider).getString(_shownKey) ??
-          "{}",
-    ),
-  ).map((threadId, ids) => .new(threadId, IList((ids as List).cast<int>())));
-
-  Future<void> _setShown(IMap<String, IList<int>> shown) => ref
-      .read(SharedPrefsController.provider)
-      .setString(
-        _shownKey,
-        json.encode(
-          shown.map((threadId, ids) => .new(threadId, ids.unlock)).unlock,
-        ),
-      );
-
-  Future<void> _track(String threadId, int id) async {
-    final shown = await _shown();
-    final ids = shown[threadId] ?? const IListConst([]);
-    if (!ids.contains(id)) await _setShown(shown.add(threadId, ids.add(id)));
-  }
 
   /// Dismisses the notifications shown for [threadIds].
-  Future<void> dismiss(Iterable<String> threadIds) async {
-    final shown = await _shown();
-    final ids = threadIds.map((threadId) => shown[threadId]).nonNulls.flattened;
+  Future<void> dismiss(ISet<String> threadIds) async {
+    final ids = await ref
+        .read(ShownNotificationsHelper.provider)
+        .remove(threadIds);
     if (ids.isEmpty) return;
-
-    await _setShown(
-      shown.removeWhere((threadId, _) => threadIds.contains(threadId)),
-    );
 
     if (Platform.isLinux) {
       final portal = await ref.read(PortalController.provider.future);
@@ -158,12 +128,10 @@ class NotificationController
   }
 
   void _open(String payload) {
-    if (payload == _summaryPayload) {
-      navigatorKey.currentState?.popUntil((route) => route.isFirst);
-      ref.read(SidebarPageController.provider.notifier).set(.notifications);
-      return;
-    }
+    navigatorKey.currentState?.popUntil((route) => route.isFirst);
+    ref.read(SidebarPageController.provider.notifier).set(.notifications);
 
+    // The summary's payload has no row, so it only opens the notifications
     final (accountId, rowId) = switch (payload.split(":")) {
       [final accountId, final rowId] => (accountId, int.tryParse(rowId)),
       // From before notifications were per account
@@ -171,9 +139,6 @@ class NotificationController
       _ => (null, null),
     };
     if (rowId == null) return;
-
-    navigatorKey.currentState?.popUntil((route) => route.isFirst);
-    ref.read(SidebarPageController.provider.notifier).set(.notifications);
 
     ref
         .read(ActiveAccountController.provider.notifier)
@@ -184,73 +149,50 @@ class NotificationController
         .onError(showError);
   }
 
+  // Each resolves to null except on its own platform
   Future<bool> requestPermissions() async {
-    if (Platform.isLinux) {
-      return true;
-    }
-
     final controller = await future;
 
-    if (Platform.isIOS) {
-      return await controller
-              .resolvePlatformSpecificImplementation<
-                IOSFlutterLocalNotificationsPlugin
-              >()
-              ?.requestPermissions(alert: true, badge: true, sound: true) ??
-          true;
-    } else if (Platform.isMacOS) {
-      return await controller
-              .resolvePlatformSpecificImplementation<
-                MacOSFlutterLocalNotificationsPlugin
-              >()
-              ?.requestPermissions(alert: true, badge: true, sound: true) ??
-          true;
-    } else if (Platform.isAndroid) {
-      return await controller
-              .resolvePlatformSpecificImplementation<
-                AndroidFlutterLocalNotificationsPlugin
-              >()
-              ?.requestNotificationsPermission() ??
-          true;
-    }
-
-    return true;
+    return await controller
+            .resolvePlatformSpecificImplementation<
+              IOSFlutterLocalNotificationsPlugin
+            >()
+            ?.requestPermissions(alert: true, badge: true, sound: true) ??
+        await controller
+            .resolvePlatformSpecificImplementation<
+              MacOSFlutterLocalNotificationsPlugin
+            >()
+            ?.requestPermissions(alert: true, badge: true, sound: true) ??
+        await controller
+            .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin
+            >()
+            ?.requestNotificationsPermission() ??
+        true;
   }
 
   /// Whether notifications can currently be shown, without prompting
   Future<bool> permissionsGranted() async {
-    if (Platform.isLinux) {
-      return true;
-    }
-
     final controller = await future;
 
-    if (Platform.isIOS) {
-      return (await controller
-                  .resolvePlatformSpecificImplementation<
-                    IOSFlutterLocalNotificationsPlugin
-                  >()
-                  ?.checkPermissions())
-              ?.isEnabled ??
-          true;
-    } else if (Platform.isMacOS) {
-      return (await controller
-                  .resolvePlatformSpecificImplementation<
-                    MacOSFlutterLocalNotificationsPlugin
-                  >()
-                  ?.checkPermissions())
-              ?.isEnabled ??
-          true;
-    } else if (Platform.isAndroid) {
-      return await controller
-              .resolvePlatformSpecificImplementation<
-                AndroidFlutterLocalNotificationsPlugin
-              >()
-              ?.areNotificationsEnabled() ??
-          true;
-    }
-
-    return true;
+    return (await controller
+                .resolvePlatformSpecificImplementation<
+                  IOSFlutterLocalNotificationsPlugin
+                >()
+                ?.checkPermissions())
+            ?.isEnabled ??
+        (await controller
+                .resolvePlatformSpecificImplementation<
+                  MacOSFlutterLocalNotificationsPlugin
+                >()
+                ?.checkPermissions())
+            ?.isEnabled ??
+        await controller
+            .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin
+            >()
+            ?.areNotificationsEnabled() ??
+        true;
   }
 
   /// Passing [message] shows it as a chat message in the conversation for
@@ -273,6 +215,7 @@ class NotificationController
     // In DMs the title is already the sender
     final sender = message == null || message.isDm ? null : message.sender;
     final prefixedBody = sender == null ? body : "${sender.name}: $body";
+    final shown = ref.read(ShownNotificationsHelper.provider);
 
     if (Platform.isLinux) {
       final portal = await ref.read(PortalController.provider.future);
@@ -299,7 +242,7 @@ class NotificationController
           // ),
         ],
       );
-      if (threadId != null) await _track(threadId, id);
+      if (threadId != null) await shown.add(threadId, id);
       return;
     }
 
@@ -315,6 +258,7 @@ class NotificationController
               .onError((_, _) => null)
         : null;
 
+    final largeIcon = icon == null ? null : FilePathAndroidBitmap(icon.path);
     final darwin = DarwinNotificationDetails(
       subtitle: subtitle,
       presentSound: sound,
@@ -335,9 +279,7 @@ class NotificationController
                 subText: subtitle,
                 silent: !sound,
                 when: timestamp?.millisecondsSinceEpoch,
-                largeIcon: icon == null
-                    ? null
-                    : FilePathAndroidBitmap(icon.path),
+                largeIcon: largeIcon,
                 styleInformation: BigTextStyleInformation(body),
               )
             : .new(
@@ -350,9 +292,7 @@ class NotificationController
                 silent: !sound,
                 when: timestamp?.millisecondsSinceEpoch,
                 category: .message,
-                largeIcon: icon == null
-                    ? null
-                    : FilePathAndroidBitmap(icon.path),
+                largeIcon: largeIcon,
                 styleInformation: MessagingStyleInformation(
                   .new(key: message.self.id, name: message.self.name),
                   conversationTitle: message.isDm ? null : title,
@@ -365,11 +305,12 @@ class NotificationController
                       .new(
                         key: message.sender.id,
                         name: message.sender.name,
-                        icon: message.senderAvatar == null
-                            ? null
-                            : BitmapFilePathAndroidIcon(
-                                message.senderAvatar!.path,
-                              ),
+                        icon: switch (message.senderAvatar) {
+                          final avatar? => BitmapFilePathAndroidIcon(
+                            avatar.path,
+                          ),
+                          null => null,
+                        },
                       ),
                     ),
                   ],
@@ -387,7 +328,7 @@ class NotificationController
       ),
     );
 
-    if (threadId != null) await _track(threadId, id);
+    if (threadId != null) await shown.add(threadId, id);
 
     if (Platform.isAndroid) {
       await controller.show(
