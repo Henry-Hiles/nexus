@@ -28,7 +28,7 @@ Future<void> main(List<String> args) => build(args, (input, output) async {
       libFileName = "libgomuks.dylib";
       final iosConfig = codeConfig.iOS;
       iosSdk = iosConfig.targetSdk;
-      final minVersion = iosConfig.targetVersion;
+      final minVersion = iosConfig.deploymentVersion.major;
       iosSdkPath = await getXCodeTool(sdkType: iosSdk.type);
 
       final archTriple = switch (targetArch) {
