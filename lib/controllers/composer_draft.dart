@@ -1,8 +1,11 @@
+import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
+import "package:fluttertagger/fluttertagger.dart";
 import "package:nexus/controllers/attachment.dart";
 import "package:nexus/controllers/bot_command_draft.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/helpers/extensions/get_filename.dart";
+import "package:nexus/helpers/extensions/get_localpart.dart";
 import "package:nexus/helpers/extensions/is_media.dart";
 import "package:nexus/helpers/extensions/with_latest_edit.dart";
 import "package:nexus/models/composer_draft.dart";
@@ -49,8 +52,10 @@ class ComposerDraftController(final ComposerParams composer)
           },
     );
 
+    final tagged = _restoreTags(text);
     state = ComposerDraft(
-      text: text,
+      text: tagged.text,
+      tags: tagged.tags,
       textCommands: commands,
       relatedEvent: rowId,
       relationType: .edit,
@@ -74,6 +79,45 @@ class ComposerDraftController(final ComposerParams composer)
               : null,
         );
     _botCommand.clear();
+  }
+
+  static final _tagPattern = RegExp(
+    r"\[@[^\]]*\]\(matrix:u/([^)\s]+)\)"
+    r"|\[#[^\]]*\]\(matrix:roomid/([^)?\s]+)[^)\s]*\)"
+    r'|!\[:([^\]\s]+):\]\(mxc://[^)\s]+(?: "(?:[^"\\]|\\.)*")?\)',
+  );
+
+  /// Turns the mentions and custom emoji in [text], an edit source, back into
+  /// tags, formatted like the composer's tagTextFormatter.
+  ({String text, IList<Tag> tags}) _restoreTags(String text) {
+    final rooms = ref.read(RoomsController.provider);
+    Tag tagOf(Match match) => switch ((match[1], match[2], match[3])) {
+      (final userId?, _, _) => Tag(
+        id: match[0]!,
+        text: userId.split(":").first,
+        triggerCharacter: "@",
+      ),
+      (_, final roomId?, _) => Tag(
+        id: match[0]!,
+        text:
+            rooms["!$roomId"]?.metadata?.canonicalAlias?.localpart ??
+            "!$roomId",
+        triggerCharacter: "#",
+      ),
+      (_, _, final shortcode) => Tag(
+        id: match[0]!,
+        text: shortcode!,
+        triggerCharacter: ":",
+      ),
+    };
+
+    return (
+      text: text.replaceAllMapped(_tagPattern, (match) {
+        final tag = tagOf(match);
+        return "${tag.triggerCharacter}${tag.id}#${tag.text}#";
+      }),
+      tags: _tagPattern.allMatches(text).map(tagOf).toISet().toIList(),
+    );
   }
 
   void dismiss() {
