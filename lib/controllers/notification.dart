@@ -63,7 +63,16 @@ class NotificationController
 
   static String payloadFor(String accountId, int rowId) => "$accountId:$rowId";
 
+  static const _androidGroup = "nexus.federated.nexus.MESSAGES";
+  static const _summaryPayload = "summary";
+
   void _open(String payload) {
+    if (payload == _summaryPayload) {
+      navigatorKey.currentState?.popUntil((route) => route.isFirst);
+      ref.read(SidebarPageController.provider.notifier).set(.notifications);
+      return;
+    }
+
     final (accountId, rowId) = switch (payload.split(":")) {
       [final accountId, final rowId] => (accountId, int.tryParse(rowId)),
       // From before notifications were per account
@@ -230,6 +239,7 @@ class NotificationController
             ? .new(
                 "general",
                 "General",
+                groupKey: _androidGroup,
                 subText: subtitle,
                 silent: !sound,
                 when: timestamp?.millisecondsSinceEpoch,
@@ -241,6 +251,7 @@ class NotificationController
             : .new(
                 "messages",
                 "Messages",
+                groupKey: _androidGroup,
                 subText: subtitle,
                 silent: !sound,
                 when: timestamp?.millisecondsSinceEpoch,
@@ -281,6 +292,25 @@ class NotificationController
         ),
       ),
     );
+
+    if (Platform.isAndroid) {
+      await controller.show(
+        id: 0,
+        title: "Nexus",
+        payload: _summaryPayload,
+        notificationDetails: const .new(
+          android: .new(
+            "messages",
+            "Messages",
+            groupKey: _androidGroup,
+            setAsGroupSummary: true,
+            groupAlertBehavior: .children,
+            onlyAlertOnce: true,
+            silent: true,
+          ),
+        ),
+      );
+    }
   }
 
   static final provider =
