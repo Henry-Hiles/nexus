@@ -48,6 +48,12 @@ class NotificationController
           if (details.payload case final payload?) _open(payload);
         },
       );
+
+      await notifications
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >()
+          ?.deleteNotificationChannel(channelId: "messages");
     }
 
     if (Platform.isLinux) {
@@ -93,6 +99,8 @@ class NotificationController
 
   static const _androidGroup = "nexus.federated.nexus.MESSAGES";
   static const _summaryPayload = "summary";
+
+  static const _messagesChannel = "messages_v2";
   static const _shownKey = "shownNotifications";
 
   /// IDs of the notifications shown, by thread. Stored, since they're often
@@ -333,8 +341,10 @@ class NotificationController
                 styleInformation: BigTextStyleInformation(body),
               )
             : .new(
-                "messages",
+                _messagesChannel,
                 "Messages",
+                importance: .high,
+                priority: .high,
                 groupKey: _androidGroup,
                 subText: subtitle,
                 silent: !sound,
@@ -386,8 +396,9 @@ class NotificationController
         payload: _summaryPayload,
         notificationDetails: const .new(
           android: .new(
-            "messages",
+            _messagesChannel,
             "Messages",
+            importance: .high,
             groupKey: _androidGroup,
             setAsGroupSummary: true,
             groupAlertBehavior: .children,
