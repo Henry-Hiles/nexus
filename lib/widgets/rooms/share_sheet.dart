@@ -1,5 +1,4 @@
-import "dart:io";
-
+import "package:better_share_handler/better_share_handler.dart";
 import "package:collection/collection.dart";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:file_selector/file_selector.dart";
@@ -17,9 +16,8 @@ import "package:nexus/helpers/extensions/weighted_search.dart";
 import "package:nexus/main.dart";
 import "package:nexus/models/composer_params.dart";
 import "package:nexus/widgets/avatars/avatar_or_hash.dart";
-import "package:receive_sharing_intent/receive_sharing_intent.dart";
 
-class const ShareSheet(final IList<SharedMediaFile> files, {super.key})
+class const ShareSheet(final SharedMedia media, {super.key})
     extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -42,12 +40,9 @@ class const ShareSheet(final IList<SharedMediaFile> files, {super.key})
               (room) => [(room.name, 2), (room.canonicalAlias, 1)],
             );
 
-    bool isText(SharedMediaFile file) =>
-        file.type == .url ||
-        (file.type == .text && !File(file.path).existsSync());
-
-    final text = files.where(isText).map((file) => file.path).join("\n");
-    final file = files.firstWhereOrNull((file) => !isText(file));
+    final text = media.content ?? "";
+    // The composer takes one attachment
+    final file = media.attachments?.nonNulls.firstOrNull;
 
     Future<void> shareTo(String roomId) async {
       final container = ProviderScope.containerOf(context);

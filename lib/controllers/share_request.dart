@@ -1,27 +1,21 @@
 import "dart:io";
 
-import "package:fast_immutable_collections/fast_immutable_collections.dart";
+import "package:better_share_handler/better_share_handler.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
-import "package:receive_sharing_intent/receive_sharing_intent.dart";
 
-class ShareRequestController extends Notifier<IList<SharedMediaFile>?> {
+class ShareRequestController extends Notifier<SharedMedia?> {
   @override
-  IList<SharedMediaFile>? build() {
+  SharedMedia? build() {
     if (!(Platform.isAndroid || Platform.isIOS)) return null;
 
-    void receive(List<SharedMediaFile> files) {
-      final shared = files
-          // Android reports opened Matrix links as URLs too, which
-          // LinkRequestController handles
-          .where((file) => !(Platform.isAndroid && file.type == .url))
-          .toIList();
-      if (shared.isNotEmpty) state = shared;
-    }
-
-    final sharing = ReceiveSharingIntent.instance;
-    final subscription = sharing.getMediaStream().listen(receive);
+    final sharing = ShareHandler.instance;
+    final subscription = sharing.sharedMediaStream.listen(
+      (media) => state = media,
+    );
     ref.onDispose(subscription.cancel);
-    sharing.getInitialMedia().then(receive).ignore();
+    sharing.getInitialSharedMedia().then((media) {
+      if (media != null) state = media;
+    }).ignore();
 
     return null;
   }
@@ -29,11 +23,11 @@ class ShareRequestController extends Notifier<IList<SharedMediaFile>?> {
   void consume() {
     state = null;
     // So the same share isn't received again once the app is reopened
-    ReceiveSharingIntent.instance.reset().ignore();
+    ShareHandler.instance.resetInitialSharedMedia().ignore();
   }
 
   static final provider =
-      NotifierProvider<ShareRequestController, IList<SharedMediaFile>?>(
+      NotifierProvider<ShareRequestController, SharedMedia?>(
         ShareRequestController.new,
       );
 }

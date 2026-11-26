@@ -19,7 +19,7 @@
 		5A4E00000000000000000008 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A4E00000000000000000001 /* ShareViewController.swift */; };
 		5A4E00000000000000000009 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5A4E00000000000000000007 /* MainInterface.storyboard */; };
 		5A4E0000000000000000000A /* ShareExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 5A4E00000000000000000005 /* ShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		5A4E0000000000000000000B /* receive-sharing-intent in Frameworks */ = {isa = PBXBuildFile; productRef = 5A4E00000000000000000015 /* receive-sharing-intent */; };
+		5A4E0000000000000000000B /* better-share-handler-models in Frameworks */ = {isa = PBXBuildFile; productRef = 5A4E00000000000000000015 /* better-share-handler-models */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -109,7 +109,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5A4E0000000000000000000B /* receive-sharing-intent in Frameworks */,
+				5A4E0000000000000000000B /* better-share-handler-models in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -245,7 +245,7 @@
 			);
 			name = ShareExtension;
 			packageProductDependencies = (
-				5A4E00000000000000000015 /* receive-sharing-intent */,
+				5A4E00000000000000000015 /* better-share-handler-models */,
 			);
 			productName = ShareExtension;
 			productReference = 5A4E00000000000000000005 /* ShareExtension.appex */;
@@ -285,7 +285,7 @@
 			mainGroup = 97C146E51CF9000F007C117D;
 			packageReferences = (
 				781AD8BC2B33823900A9FFBB /* XCLocalSwiftPackageReference "FlutterGeneratedPluginSwiftPackage" */,
-				5A4E00000000000000000014 /* XCLocalSwiftPackageReference "receive_sharing_intent" */,
+				5A4E00000000000000000014 /* XCLocalSwiftPackageReference "better_share_handler" */,
 			);
 			productRefGroup = 97C146EF1CF9000F007C117D /* Products */;
 			projectDirPath = "";
@@ -474,7 +474,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = iphoneos;
@@ -602,7 +602,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -653,7 +653,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = iphoneos;
@@ -721,7 +721,7 @@
 				DEVELOPMENT_TEAM = PK66NJM372;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ShareExtension/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -748,7 +748,7 @@
 				DEVELOPMENT_TEAM = PK66NJM372;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ShareExtension/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -775,7 +775,7 @@
 				DEVELOPMENT_TEAM = PK66NJM372;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ShareExtension/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -842,9 +842,9 @@
 			isa = XCLocalSwiftPackageReference;
 			relativePath = Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage;
 		};
-		5A4E00000000000000000014 /* XCLocalSwiftPackageReference "receive_sharing_intent" */ = {
+		5A4E00000000000000000014 /* XCLocalSwiftPackageReference "better_share_handler" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = "Flutter/ephemeral/Packages/.packages/receive_sharing_intent-1.9.0";
+			relativePath = "Flutter/ephemeral/Packages/.packages/better_share_handler-1.1.1";
 		};
 /* End XCLocalSwiftPackageReference section */
 
@@ -853,10 +853,10 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = FlutterGeneratedPluginSwiftPackage;
 		};
-		5A4E00000000000000000015 /* receive-sharing-intent */ = {
+		5A4E00000000000000000015 /* better-share-handler-models */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 5A4E00000000000000000014 /* XCLocalSwiftPackageReference "receive_sharing_intent" */;
-			productName = "receive-sharing-intent";
+			package = 5A4E00000000000000000014 /* XCLocalSwiftPackageReference "better_share_handler" */;
+			productName = "better-share-handler-models";
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
