@@ -1,3 +1,5 @@
+import "dart:io";
+
 import "package:collection/collection.dart";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:file_selector/file_selector.dart";
@@ -40,13 +42,12 @@ class const ShareSheet(final IList<SharedMediaFile> files, {super.key})
               (room) => [(room.name, 2), (room.canonicalAlias, 1)],
             );
 
-    final text = files
-        .where((file) => file.type == .text || file.type == .url)
-        .map((file) => file.path)
-        .join("\n");
-    final file = files.firstWhereOrNull(
-      (file) => file.type != .text && file.type != .url,
-    );
+    bool isText(SharedMediaFile file) =>
+        file.type == .url ||
+        (file.type == .text && !File(file.path).existsSync());
+
+    final text = files.where(isText).map((file) => file.path).join("\n");
+    final file = files.firstWhereOrNull((file) => !isText(file));
 
     Future<void> shareTo(String roomId) async {
       final container = ProviderScope.containerOf(context);
