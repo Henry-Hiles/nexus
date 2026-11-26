@@ -42,9 +42,11 @@ class const RoomOverlay(
                   ? null
                   : Text(room.metadata!.topic!, maxLines: 1),
               onTap: () {
-                final vias = ref.watch(ViaController.provider(room)).viaQuery;
+                final alias = room.metadata?.canonicalAlias;
                 addTag(
-                  id: "[#$name](matrix:roomid/${room.metadata?.id.substring(1)}$vias)",
+                  id: alias == null
+                      ? "[#$name](matrix:roomid/${room.metadata?.id.substring(1)}${ref.read(ViaController.provider(room)).viaQuery})"
+                      : "[#$name](matrix:r/${alias.substring(1)})",
                   name:
                       room.metadata?.canonicalAlias?.localpart ??
                       room.metadata?.id ??

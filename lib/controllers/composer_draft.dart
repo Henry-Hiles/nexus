@@ -84,6 +84,7 @@ class ComposerDraftController(final ComposerParams composer)
   static final _tagPattern = RegExp(
     r"\[@[^\]]*\]\(matrix:u/([^)\s]+)\)"
     r"|\[#[^\]]*\]\(matrix:roomid/([^)?\s]+)[^)\s]*\)"
+    r"|\[#[^\]]*\]\(matrix:r/([^)?\s]+)[^)\s]*\)"
     r'|!\[:([^\]\s]+):\]\(mxc://[^)\s]+(?: "(?:[^"\\]|\\.)*")?\)',
   );
 
@@ -91,25 +92,31 @@ class ComposerDraftController(final ComposerParams composer)
   /// tags, formatted like the composer's tagTextFormatter.
   ({String text, IList<Tag> tags}) _restoreTags(String text) {
     final rooms = ref.read(RoomsController.provider);
-    Tag tagOf(Match match) => switch ((match[1], match[2], match[3])) {
-      (final userId?, _, _) => .new(
-        id: match[0]!,
-        text: userId.split(":").first,
-        triggerCharacter: "@",
-      ),
-      (_, final roomId?, _) => .new(
-        id: match[0]!,
-        text:
-            rooms["!$roomId"]?.metadata?.canonicalAlias?.localpart ??
-            "!$roomId",
-        triggerCharacter: "#",
-      ),
-      (_, _, final shortcode) => .new(
-        id: match[0]!,
-        text: shortcode!,
-        triggerCharacter: ":",
-      ),
-    };
+    Tag tagOf(Match match) =>
+        switch ((match[1], match[2], match[3], match[4])) {
+          (final userId?, _, _, _) => .new(
+            id: match[0]!,
+            text: userId.split(":").first,
+            triggerCharacter: "@",
+          ),
+          (_, final roomId?, _, _) => .new(
+            id: match[0]!,
+            text:
+                rooms["!$roomId"]?.metadata?.canonicalAlias?.localpart ??
+                "!$roomId",
+            triggerCharacter: "#",
+          ),
+          (_, _, final alias?, _) => .new(
+            id: match[0]!,
+            text: "#$alias".localpart!,
+            triggerCharacter: "#",
+          ),
+          (_, _, _, final shortcode) => .new(
+            id: match[0]!,
+            text: shortcode!,
+            triggerCharacter: ":",
+          ),
+        };
 
     return (
       text: text.replaceAllMapped(_tagPattern, (match) {
