@@ -189,6 +189,7 @@ class RoomsController extends Notifier<IMap<String, Room>> {
                   ? incoming.timeline
                   : existing.timeline.addAll(incoming.timeline),
               receipts: mergeReceipts(existing.receipts, incoming.receipts),
+              accountData: existing.accountData.addAll(incoming.accountData),
             ) ??
             incoming.copyWith(
               receipts: mergeReceipts(const .empty(), incoming.receipts),

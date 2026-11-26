@@ -3,6 +3,7 @@ import "dart:io";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:collection/collection.dart";
 import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
+import "package:nexus/widgets/composer/persona_button.dart";
 import "package:nexus/controllers/bot_argument_suggestions.dart";
 import "package:nexus/controllers/bot_command_draft.dart";
 import "package:nexus/controllers/bot_commands.dart";
@@ -565,6 +566,7 @@ class const Composer(
                             ),
                           )
                           ? [
+                              PersonaButton(roomId),
                               IconButton(
                                 onPressed: hasReplacement
                                     ? null

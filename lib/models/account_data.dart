@@ -1,5 +1,6 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:freezed_annotation/freezed_annotation.dart";
+import "package:nexus/models/per_message_profiles.dart";
 import "package:nexus/models/push_rules.dart";
 
 part "account_data.freezed.dart";
@@ -27,6 +28,8 @@ class const AccountData({
   final PushRules pushRules = const .new(),
   @JsonKey(name: AccountData.ignoredUserListKey)
   final IgnoredUserList ignoredUserList = const .new(),
+  @JsonKey(name: AccountData.perMessageProfilesKey)
+  final PerMessageProfiles perMessageProfiles = const .new(),
 }) with _$AccountData {
   static const invitePermissionConfigKey = "m.invite_permission_config";
   static const directKey = "m.direct";
@@ -35,6 +38,7 @@ class const AccountData({
   static const legacyImagePackRoomsKey = "im.ponies.emote_rooms";
   static const pushRulesKey = "m.push_rules";
   static const ignoredUserListKey = "m.ignored_user_list";
+  static const perMessageProfilesKey = "fi.mau.msc4461.per_message_profiles.v3";
 
   ImagePackRooms get enabledImagePacks =>
       imagePackRooms ?? legacyImagePackRooms ?? const .new();

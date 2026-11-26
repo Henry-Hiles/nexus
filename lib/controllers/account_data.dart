@@ -5,6 +5,8 @@ import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/foundation.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client.dart";
+import "package:nexus/controllers/rooms.dart";
+import "package:nexus/models/per_message_profiles.dart";
 import "package:nexus/models/account_data.dart";
 import "package:nexus/models/push_rules.dart";
 import "package:nexus/models/requests/update_push_rule.dart";
@@ -72,6 +74,40 @@ class AccountDataController extends Notifier<AccountData> {
             ),
         (data) => data.ignoredUserList.contains(userId) == ignored,
       );
+
+  Future<void> setPerMessageProfiles(PerMessageProfiles profiles) =>
+      _sendAndWait(
+        () => ref
+            .read(ClientController.provider.notifier)
+            .setAccountData(
+              .new(type: AccountData.perMessageProfilesKey, content: profiles),
+            ),
+        (data) => data.perMessageProfiles == profiles,
+      );
+
+  Future<void> setRoomProfile(String roomId, String profileId) async {
+    const type = AccountData.perMessageProfilesKey;
+    final current = ref
+        .read(RoomsController.provider)[roomId]
+        ?.accountData[type];
+
+    await ref
+        .read(ClientController.provider.notifier)
+        .setAccountData(
+          .new(
+            type: type,
+            roomId: roomId,
+            content: {...?current, "default_profile_id": profileId},
+          ),
+        );
+    await ref
+        .read(RoomsController.provider.notifier)
+        .awaitRooms(
+          (rooms) =>
+              rooms[roomId]?.accountData[type]?["default_profile_id"] ==
+              profileId,
+        );
+  }
 
   /// Saves [rule] of [kind], creating it if it's new, or otherwise changing only
   /// its actions and whether it's enabled.

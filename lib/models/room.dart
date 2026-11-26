@@ -45,10 +45,12 @@ class const Room({
   final IMap<String, IMap<String, int>> state = const .empty(),
 
   final IMap<String, IList<ReadReceipt>> receipts = const .empty(),
+
+  @JsonKey(fromJson: Room.accountDataJsonToIMap)
+  final IMap<String, Map<String, dynamic>> accountData = const .empty(),
   final bool dismissNotifications = false,
   final bool hasMore = true,
 
-  // IMap<String, AccountData> accountData,
   // IList<Notification> notifications,
 }) with _$Room {
   static IMap<int, int?> timelineTupleJsonToIMap(List<dynamic> json) =>
@@ -60,6 +62,15 @@ class const Room({
           ),
         ),
       );
+
+  static IMap<String, Map<String, dynamic>> accountDataJsonToIMap(
+    Map<String, dynamic> json,
+  ) => .fromEntries(
+    json.entries.map(
+      (entry) =>
+          .new(entry.key, Map<String, dynamic>.from(entry.value["content"])),
+    ),
+  );
 
   static IMap<int, Event> eventsJsonToIMap(List<dynamic> json) =>
       IMap.fromEntries(
