@@ -45,6 +45,7 @@ class const EmojiPicker({
                 const .empty();
 
             return upstream.EmojiPicker(
+              searchHint: "Search or send emoji...",
               onSelection: (emoji) async {
                 final image = switch (emoji.data) {
                   final PackImage image => image,
