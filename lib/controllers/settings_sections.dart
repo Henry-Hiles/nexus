@@ -9,6 +9,7 @@ import "package:m3e_buttons/m3e_buttons.dart";
 import "package:multi_state_switch/multi_state_switch.dart";
 import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
 import "package:nexus/controllers/account_data.dart";
+import "package:nexus/controllers/account_management.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/client_state.dart";
 import "package:nexus/controllers/enabled_image_packs.dart";
@@ -24,6 +25,7 @@ import "package:nexus/helpers/extensions/distributor_name.dart";
 import "package:nexus/helpers/extensions/get_localpart.dart";
 import "package:nexus/helpers/extensions/room_image_packs.dart";
 import "package:nexus/helpers/hooks/saving.dart";
+import "package:nexus/helpers/launch_helper.dart";
 import "package:nexus/models/account_data.dart";
 import "package:nexus/models/client_state.dart";
 import "package:nexus/models/image_pack.dart";
@@ -50,6 +52,40 @@ class SettingsSectionsController
   @override
   Future<IMap<String, IList<SettingsCategory>>> build() async {
     final settings = await ref.watch(SettingsController.provider.future);
+    // Not awaited, so a slow homeserver doesn't hold up the rest of settings
+    final accountManagement = ref
+        .watch(AccountManagementController.provider)
+        .value;
+
+    // Opens [url], a page of the homeserver's account management
+    Setting link(
+      String title,
+      String description,
+      IconData icon,
+      Uri url, {
+      bool danger = false,
+    }) => .new(
+      title: title,
+      description: description,
+      icon: icon,
+      builder: (title, description, icon) => Builder(
+        builder: (context) {
+          final colorScheme = Theme.of(context).colorScheme;
+          return M3EButton.icon(
+            onPressed: () => ref.read(LaunchHelper.provider).launchUrl(url),
+            label: Text(title),
+            icon: Icon(icon),
+            tooltip: description,
+            decoration: danger
+                ? .styleFrom(
+                    backgroundColor: colorScheme.error,
+                    foregroundColor: colorScheme.onError,
+                  )
+                : null,
+          );
+        },
+      ),
+    );
 
     // Loads the enabled packs' state, so they can be shown
     ref.watch(EnabledImagePacksController.provider);
@@ -793,9 +829,23 @@ class SettingsSectionsController
             ]),
           ),
           .new(
-            title: "Other",
-            icon: Icons.key,
+            title: "Account Management",
+            icon: Icons.manage_accounts,
             settings: .new([
+              if (accountManagement case final management?)
+                link(
+                  "Manage Account",
+                  "Change your password, email, and other account details on your homeserver's website.",
+                  Icons.manage_accounts,
+                  management.uri,
+                ),
+              if (accountManagement?.urlFor(.devicesList) case final url?)
+                link(
+                  "Devices",
+                  "See and sign out the devices logged in to your account, on your homeserver's website.",
+                  Icons.devices,
+                  url,
+                ),
               .new(
                 title: "Reset Encryption Identity",
                 description: "Replace your encryption identity and recovery key with new ones, if you've lost your recovery key or your encryption is broken.",
@@ -811,6 +861,14 @@ class SettingsSectionsController
                 ),
                 icon: Icons.key_off,
               ),
+              if (accountManagement?.urlFor(.accountDeactivate) case final url?)
+                link(
+                  "Deactivate Account",
+                  "Permanently deactivate your account, on your homeserver's website. This can't be undone.",
+                  Icons.no_accounts,
+                  url,
+                  danger: true,
+                ),
             ]),
           ),
         ]),

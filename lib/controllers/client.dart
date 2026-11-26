@@ -37,6 +37,7 @@ import "package:nexus/models/requests/get_related_events.dart";
 import "package:nexus/models/requests/get_room_state.dart";
 import "package:nexus/models/requests/get_specific_room_state.dart";
 import "package:nexus/models/content/content.dart";
+import "package:nexus/models/account_management.dart";
 import "package:nexus/models/requests/get_space_hierarchy.dart";
 import "package:nexus/models/requests/get_room_directory.dart";
 import "package:nexus/models/requests/get_threads.dart";
@@ -281,24 +282,19 @@ class ClientController(final String? accountId) extends AsyncNotifier<int> {
   Future<void> resetEncryption(RecoveryKey key) =>
       sendCommand("reset_encryption", key.toJson());
 
-  Future<Uri?> getCrossSigningResetUrl(Uri homeserver) async {
-    const action = "org.matrix.cross_signing_reset";
-    final oauth = (await sendCommand("get_login_flows", {
-      "homeserver_url": homeserver.toString(),
-    }))["oauth"];
-
-    if (oauth?["account_management_uri"] case final String uri
-        when (oauth["account_management_actions_supported"] as List?)?.contains(
-              action,
-            ) ??
-            false) {
-      final parsed = Uri.parse(uri);
-      return parsed.replace(
-        queryParameters: {...parsed.queryParameters, "action": action},
-      );
-    }
-    return null;
-  }
+  Future<AccountManagement?> getAccountManagement(Uri homeserver) async =>
+      switch ((await sendCommand("get_login_flows", {
+        "homeserver_url": homeserver.toString(),
+      }))["oauth"]) {
+        {"account_management_uri": final String uri} && final oauth => .new(
+          .parse(uri),
+          .new(
+            (oauth["account_management_actions_supported"] as List? ?? [])
+                .whereType<String>(),
+          ),
+        ),
+        _ => null,
+      };
 
   Future<String> joinRoom(JoinRoomRequest request) async =>
       (await sendCommand("join_room", request.toJson()))["room_id"];

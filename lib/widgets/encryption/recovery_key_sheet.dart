@@ -6,7 +6,7 @@ import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:material_ui/material_ui.dart";
 import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
 import "package:nexus/controllers/client.dart";
-import "package:nexus/controllers/client_state.dart";
+import "package:nexus/controllers/account_management.dart";
 import "package:nexus/helpers/launch_helper.dart";
 import "package:nexus/models/gomuks_exception.dart";
 import "package:nexus/models/recovery_key.dart";
@@ -41,15 +41,10 @@ class const RecoveryKeySheet(
           // Open the approval page straight away the first time.
           if (!needsApproval.value) {
             needsApproval.value = true;
-            final homeserver = ref
-                .read(ClientStateController.provider)
-                ?.homeserverUrl;
-            final url = homeserver == null
-                ? null
-                : await ref
-                      .read(ClientController.provider.notifier)
-                      .getCrossSigningResetUrl(.parse(homeserver))
-                      .onError((_, _) => null);
+            final url = await ref
+                .read(AccountManagementController.provider.future)
+                .then((management) => management?.urlFor(.crossSigningReset))
+                .onError((_, _) => null);
             if (!context.mounted || url == null) return;
 
             approvalUrl.value = url;
