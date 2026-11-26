@@ -6,6 +6,7 @@ import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/services.dart";
 import "package:material_ui/material_ui.dart";
 import "package:nexus/controllers/active_account.dart";
+import "package:nexus/controllers/launch_scope.dart";
 import "package:nexus/controllers/portal.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/controllers/sidebar_page.dart";
@@ -63,6 +64,17 @@ class NotificationController
             AndroidFlutterLocalNotificationsPlugin
           >()
           ?.deleteNotificationChannel(channelId: "messages");
+
+      // Taps that launched the app don't reach the callback above
+      if (!isInBackground && ref.read(LaunchScopeController.provider)) {
+        if (await notifications.getNotificationAppLaunchDetails()
+            case NotificationAppLaunchDetails(
+              didNotificationLaunchApp: true,
+              notificationResponse: NotificationResponse(:final payload?),
+            )) {
+          _open(payload);
+        }
+      }
     }
 
     // Reading a room, here or on another client, dismisses its notifications
@@ -95,10 +107,8 @@ class NotificationController
 
   static String payloadFor(String accountId, int rowId) => "$accountId:$rowId";
 
-  static const _androidGroup = "nexus.federated.nexus.MESSAGES";
-  static const _summaryPayload = "summary";
-
   static const _messagesChannel = "messages_v2";
+  static const _androidGroup = "nexus.federated.nexus.MESSAGES";
 
   /// Dismisses the notifications shown for [threadIds].
   Future<void> dismiss(ISet<String> threadIds) async {
@@ -131,7 +141,6 @@ class NotificationController
     navigatorKey.currentState?.popUntil((route) => route.isFirst);
     ref.read(SidebarPageController.provider.notifier).set(.notifications);
 
-    // The summary's payload has no row, so it only opens the notifications
     final (accountId, rowId) = switch (payload.split(":")) {
       [final accountId, final rowId] => (accountId, int.tryParse(rowId)),
       // From before notifications were per account
@@ -334,7 +343,7 @@ class NotificationController
       await controller.show(
         id: 0,
         title: "Nexus",
-        payload: _summaryPayload,
+        payload: payload,
         notificationDetails: const .new(
           android: .new(
             _messagesChannel,

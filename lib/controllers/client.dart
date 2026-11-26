@@ -414,17 +414,17 @@ class ClientController(final String? accountId) extends AsyncNotifier<int> {
   Future<void> registerPusher(RegisterPusherRequest request) =>
       sendCommand("register_homeserver_push", request.toJson());
 
-  Future<void> deregisterPusher(DeregisterPusherRequest request) =>
-      sendCommand("register_homeserver_push", {
-        ...request.toJson(),
-        "kind": null,
-      });
+  Future<void> deregisterPusher(DeregisterPusherRequest request) => sendCommand(
+    "register_homeserver_push",
+    {...request.toJson(), "kind": null},
+  );
 
   Future<MessageContent> uploadMedia(UploadMediaRequest request) async =>
       .fromJson(await sendCommand("upload_media", request.toJson()));
 
   Future<File> downloadMedia(DownloadMediaRequest request) async {
     if (accountId == null &&
+        !isInBackground &&
         ref.read(ClientStateController.provider)?.isLoggedIn != true) {
       throw StateError("Can't download media while logged out");
     }

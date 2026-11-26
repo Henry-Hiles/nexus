@@ -3,6 +3,7 @@ import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:flutter_riverpod/misc.dart";
 import "package:material_ui/material_ui.dart";
 import "package:nexus/controllers/active_account.dart";
+import "package:nexus/controllers/launch_scope.dart";
 import "package:nexus/controllers/notification_request.dart";
 
 /// Runs [child] as one account, in a [ProviderScope] of its own that's
@@ -23,6 +24,7 @@ class const AccountScope({
       accountId: initialAccountId,
       notificationRowId: null,
     ));
+    final isLaunch = useState(true);
 
     return ProviderScope(
       key: ValueKey(active.value.accountId),
@@ -30,13 +32,16 @@ class const AccountScope({
       observers: observers,
       overrides: [
         ActiveAccountController.provider.overrideWith(
-          () => ActiveAccountController(
-            active.value.accountId,
-            (next) => active.value = next,
-          ),
+          () => ActiveAccountController(active.value.accountId, (next) {
+            isLaunch.value = false;
+            active.value = next;
+          }),
         ),
         NotificationRequestController.provider.overrideWithBuild(
           (_, _) => active.value.notificationRowId,
+        ),
+        LaunchScopeController.provider.overrideWithBuild(
+          (_, _) => isLaunch.value,
         ),
         ...overrides,
       ],
