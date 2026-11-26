@@ -256,7 +256,7 @@ class SettingsSectionsController
             ),
             .new(
               title: "Room Ordering",
-              description: "Sort rooms and subspaces by recent activity, optionally showing mentioned or unread ones first.",
+              description: "Sort rooms by recent activity, optionally showing mentioned or unread ones first, or keep the order their space sets.",
               icon: Icons.sort,
               builder: (title, description, icon) => DialogListTile<RoomOrder>(
                 icon: Icon(icon),
@@ -268,6 +268,7 @@ class SettingsSectionsController
                   .unreadFirst => "Mentioned, then unread",
                   .mentionedFirst => "Mentioned only",
                   .recentActivity => "Recent activity only",
+                  .spaceOrder => "Space order",
                 },
                 onChanged: (value) => ref
                     .read(SettingsController.provider.notifier)

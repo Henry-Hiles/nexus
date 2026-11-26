@@ -10,6 +10,7 @@ import "package:nexus/controllers/space_edges.dart";
 import "package:nexus/models/room.dart";
 import "package:nexus/models/room_metadata.dart";
 import "package:nexus/models/space.dart";
+import "package:nexus/models/space_edge.dart";
 import "package:nexus/models/subspace.dart";
 
 class SpacesController extends AsyncNotifier<IList<Space>> {
@@ -20,9 +21,27 @@ class SpacesController extends AsyncNotifier<IList<Space>> {
     final spaceEdges = ref.watch(SpaceEdgesController.provider);
     final accountData = ref.watch(AccountDataController.provider);
 
+    bool hasValidOrder(SpaceEdge edge) =>
+        edge.order.isNotEmpty &&
+        edge.order.length <= 50 &&
+        edge.order.codeUnits.every((unit) => unit >= 0x20 && unit <= 0x7E);
+
+    int compareEdges(SpaceEdge a, SpaceEdge b) =>
+        switch ((hasValidOrder(a), hasValidOrder(b))) {
+          (true, false) => -1,
+          (false, true) => 1,
+          (true, true) when a.order != b.order => a.order.compareTo(b.order),
+          _ => switch (a.childEventRowId.compareTo(b.childEventRowId)) {
+            0 => a.childId.compareTo(b.childId),
+            final byRowId => byRowId,
+          },
+        };
+
     final childrenById = spaceEdges.map(
-      (spaceId, edges) =>
-          MapEntry(spaceId, edges.map((edge) => edge.childId).toList()),
+      (spaceId, edges) => .new(
+        spaceId,
+        edges.sort(compareEdges).map((edge) => edge.childId).toList(),
+      ),
     );
 
     /// Everything under [spaceId], however deep, skipping any already
@@ -70,6 +89,10 @@ class SpacesController extends AsyncNotifier<IList<Space>> {
               )
               .nonNulls,
         ),
+        childrenIndex: directChildrenIds
+            .where(rooms.containsKey)
+            .takeWhile(childrenById.containsKey)
+            .length,
       );
     }
 
@@ -140,7 +163,7 @@ class SpacesController extends AsyncNotifier<IList<Space>> {
     );
 
     int priority(Room room) => switch ((roomOrder, room.metadata)) {
-      (.recentActivity, _) => 0,
+      (.recentActivity || .spaceOrder, _) => 0,
       (_, RoomMetadata(unreadHighlights: > 0)) => 0,
       (.mentionedFirst, _) => 1,
       (.unreadFirst, RoomMetadata(unreadNotifications: > 0)) ||
@@ -150,46 +173,32 @@ class SpacesController extends AsyncNotifier<IList<Space>> {
     DateTime activity(Room room) => room.metadata?.sortingTimestamp ?? .new(0);
 
     // Higher priority first, then most recent activity first
-    int compare(
-      ({int priority, DateTime activity}) a,
-      ({int priority, DateTime activity}) b,
-    ) => switch (a.priority.compareTo(b.priority)) {
-      0 => b.activity.compareTo(a.activity),
-      final byPriority => byPriority,
-    };
-
-    ({int priority, DateTime activity}) roomKey(Room room) =>
-        (priority: priority(room), activity: activity(room));
-
-    ({int priority, DateTime activity}) groupKey(IList<Room> rooms) => (
-      priority: rooms.map(priority).minOrNull ?? 2,
-      activity: rooms.map(activity).maxOrNull ?? .new(0),
+    IList<Room> sortRooms(IList<Room> rooms) => rooms.sort(
+      (a, b) => switch (priority(a).compareTo(priority(b))) {
+        0 => activity(b).compareTo(activity(a)),
+        final byPriority => byPriority,
+      },
     );
 
-    IList<Room> sortRooms(IList<Room> rooms) =>
-        rooms.sort((a, b) => compare(roomKey(a), roomKey(b)));
+    IList<Room> orderRooms(Space space, IList<Room> rooms) =>
+        roomOrder == .spaceOrder && space.room != null
+        ? rooms
+        : sortRooms(rooms);
 
-    return allSpaces.map((space) {
-      final subSpaces = space.subSpaces
-          .map(
-            (subspace) =>
-                subspace.copyWith(children: sortRooms(subspace.children)),
-          )
-          .toIList()
-          .sort((a, b) => compare(groupKey(a.children), groupKey(b.children)));
-
-      final childrenKey = groupKey(space.children);
-      return space.copyWith(
-        children: sortRooms(space.children),
-        subSpaces: subSpaces,
-        childrenIndex: subSpaces
-            .where(
-              (subspace) =>
-                  compare(groupKey(subspace.children), childrenKey) < 0,
-            )
-            .length,
-      );
-    }).toIList();
+    return .new(
+      allSpaces.map(
+        (space) => space.copyWith(
+          children: orderRooms(space, space.children),
+          subSpaces: .new(
+            space.subSpaces.map(
+              (subspace) => subspace.copyWith(
+                children: orderRooms(space, subspace.children),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   static final provider = AsyncNotifierProvider<SpacesController, IList<Space>>(

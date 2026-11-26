@@ -7,6 +7,8 @@ part "space_edge.g.dart";
 @JsonSerializable()
 class const SpaceEdge({
   required final String childId,
+  @JsonKey(name: "child_event_rowid") final int childEventRowId = 0,
+  final String order = "",
   final bool suggested = false,
 }) with _$SpaceEdge {
   Map<String, Object?> toJson() => _$SpaceEdgeToJson(this);
