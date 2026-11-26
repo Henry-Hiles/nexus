@@ -43,7 +43,7 @@ import "package:nexus/widgets/settings/block_user_field.dart";
 import "package:nexus/widgets/settings/dialog_list_tile.dart";
 import "package:nexus/widgets/settings/enable_image_packs_sheet.dart";
 import "package:nexus/widgets/settings/keyword_field.dart";
-import "package:nexus/widgets/settings/persona_sheet.dart";
+import "package:nexus/widgets/settings/subprofile_sheet.dart";
 import "package:nexus/widgets/users/user_bottom_sheet.dart";
 import "package:nexus/widgets/encryption/reset_encryption_sheet.dart";
 
@@ -52,7 +52,7 @@ class SettingsSectionsController
   @override
   Future<IMap<String, IList<SettingsCategory>>> build() async {
     final settings = await ref.watch(SettingsController.provider.future);
-    final personas = ref.watch(
+    final subprofiles = ref.watch(
       AccountDataController.provider.select((data) => data.perMessageProfiles),
     );
     // Not awaited, so a slow homeserver doesn't hold up the rest of settings
@@ -448,47 +448,49 @@ class SettingsSectionsController
             ]),
           ),
           .new(
-            title: "Personas",
+            title: "Subprofiles",
             icon: Icons.groups,
             settings: .new([
               .new(
-                title: "Enable Personas",
+                title: "Enable Subprofiles",
                 description: "Send messages as other names and avatars, chosen per room from the composer.",
                 icon: Icons.groups,
                 builder: (title, description, icon) => SwitchListTile(
                   title: Text(title),
                   subtitle: Text(description),
                   secondary: Icon(icon),
-                  value: settings.personas,
+                  value: settings.subprofiles,
                   onChanged: (value) => ref
                       .read(SettingsController.provider.notifier)
-                      .set(settings.copyWith(personas: value))
+                      .set(settings.copyWith(subprofiles: value))
                       .onError(showError),
                 ),
               ),
-              if (settings.personas) ...[
-                if (personas.profiles.isNotEmpty)
+              if (settings.subprofiles) ...[
+                if (subprofiles.profiles.isNotEmpty)
                   .new(
-                    title: "Default Persona",
-                    description: "Who you send as in rooms you haven't chosen a persona for.",
+                    title: "Default Subprofile",
+                    description: "Who you send as in rooms you haven't chosen a subprofile for.",
                     icon: Icons.person_pin,
                     builder: (title, description, icon) =>
                         DialogListTile<String>(
                           icon: Icon(icon),
                           title: title,
                           subtitle: Text(description),
-                          value: personas.defaultProfileId ?? "",
+                          value: subprofiles.defaultProfileId ?? "",
                           options: [
                             "",
-                            ...personas.profiles.map((profile) => profile.id),
+                            ...subprofiles.profiles.map(
+                              (profile) => profile.id,
+                            ),
                           ],
-                          getName: (id) => switch (personas.byId(id)) {
+                          getName: (id) => switch (subprofiles.byId(id)) {
                             final profile? => profile.displayName ?? id,
-                            null => "Yourself",
+                            null => "Account Profile",
                           },
                           onChanged: (id) => accountData
                               .setPerMessageProfiles(
-                                personas.copyWith(
+                                subprofiles.copyWith(
                                   defaultProfileId: id.isEmpty ? null : id,
                                 ),
                               )
@@ -496,20 +498,20 @@ class SettingsSectionsController
                         ),
                   ),
                 header(
-                  "Personas",
+                  "Subprofiles",
                   "The names and avatars you can send messages as.",
                   Icons.groups,
                 ),
-                ...personas.profiles.map(
-                  (persona) => Setting(
-                    title: persona.displayName ?? persona.id,
-                    description: "A persona.",
+                ...subprofiles.profiles.map(
+                  (subprofile) => Setting(
+                    title: subprofile.displayName ?? subprofile.id,
+                    description: "A subprofile.",
                     icon: Icons.person,
                     builder: (title, _, _) => Builder(
                       builder: (context) => ListTile(
-                        leading: AvatarOrHash(persona.avatarUrl, title),
+                        leading: AvatarOrHash(subprofile.avatarUrl, title),
                         title: Text(title),
-                        subtitle: switch (persona.triggers.firstOrNull) {
+                        subtitle: switch (subprofile.triggers.firstOrNull) {
                           final trigger? => Text(
                             "Trigger: ${trigger.prefix}text${trigger.suffix}",
                           ),
@@ -517,14 +519,14 @@ class SettingsSectionsController
                         },
                         trailing: Icon(Icons.chevron_right),
                         onTap: () => context.showAdaptiveSheet(
-                          (_) => PersonaSheet(persona: persona),
+                          (_) => SubprofileSheet(subprofile: subprofile),
                         ),
                       ),
                     ),
                   ),
                 ),
                 .new(
-                  title: "Add Persona",
+                  title: "Add Subprofile",
                   description: "Create a name and avatar to send messages as.",
                   icon: Icons.add,
                   builder: (title, _, icon) => Builder(
@@ -532,7 +534,7 @@ class SettingsSectionsController
                       leading: Icon(icon),
                       title: Text(title),
                       onTap: () => context.showAdaptiveSheet(
-                        (_) => const PersonaSheet(),
+                        (_) => const SubprofileSheet(),
                       ),
                     ),
                   ),

@@ -9,16 +9,18 @@ import "package:nexus/models/per_message_profiles.dart";
 import "package:nexus/widgets/avatars/avatar_or_hash.dart";
 import "package:nexus/widgets/avatars/editable_avatar.dart";
 
-class const PersonaSheet({final StoredProfile? persona, super.key})
+class const SubprofileSheet({final StoredProfile? subprofile, super.key})
     extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final saving = Saving.use();
-    final trigger = persona?.triggers.firstOrNull;
-    final nameController = useTextEditingController(text: persona?.displayName);
+    final trigger = subprofile?.triggers.firstOrNull;
+    final nameController = useTextEditingController(
+      text: subprofile?.displayName,
+    );
     final prefixController = useTextEditingController(text: trigger?.prefix);
     final suffixController = useTextEditingController(text: trigger?.suffix);
-    final avatar = useState(persona?.avatarUrl);
+    final avatar = useState(subprofile?.avatarUrl);
     final name = useValueListenable(nameController).text.trim();
 
     final accountData = ref.read(AccountDataController.provider.notifier);
@@ -35,24 +37,24 @@ class const PersonaSheet({final StoredProfile? persona, super.key})
       final suffix = suffixController.text;
       final edited = StoredProfile(
         id:
-            persona?.id ??
+            subprofile?.id ??
             DateTime.now().microsecondsSinceEpoch.toRadixString(36),
         displayName: name,
         avatarUrl: avatar.value,
         triggers: .new([
           if (prefix.isNotEmpty || suffix.isNotEmpty)
             (trigger ?? const .new()).copyWith(prefix: prefix, suffix: suffix),
-          ...?persona?.triggers.skip(1),
+          ...?subprofile?.triggers.skip(1),
         ]),
       );
       final profiles = current();
 
       return update(
         profiles.copyWith(
-          profiles: persona == null
+          profiles: subprofile == null
               ? profiles.profiles.add(edited)
               : profiles.profiles.replaceFirstWhere(
-                  (profile) => profile.id == persona!.id,
+                  (profile) => profile.id == subprofile!.id,
                   (_) => edited,
                 ),
         ),
@@ -64,9 +66,9 @@ class const PersonaSheet({final StoredProfile? persona, super.key})
       return update(
         profiles.copyWith(
           profiles: profiles.profiles.removeWhere(
-            (profile) => profile.id == persona!.id,
+            (profile) => profile.id == subprofile!.id,
           ),
-          defaultProfileId: profiles.defaultProfileId == persona!.id
+          defaultProfileId: profiles.defaultProfileId == subprofile!.id
               ? null
               : profiles.defaultProfileId,
         ),
@@ -74,9 +76,9 @@ class const PersonaSheet({final StoredProfile? persona, super.key})
     }
 
     return SheetLayout(
-      title: Text(persona == null ? "Add Persona" : "Edit Persona"),
+      title: Text(subprofile == null ? "Add Subprofile" : "Edit Subprofile"),
       actions: [
-        if (persona != null)
+        if (subprofile != null)
           TextButton(
             onPressed: saving.active ? null : delete,
             style: TextButton.styleFrom(
@@ -98,19 +100,19 @@ class const PersonaSheet({final StoredProfile? persona, super.key})
             onChanged: (url) async => avatar.value = url,
             child: AvatarOrHash(
               avatar.value,
-              name.isEmpty ? "Persona" : name,
+              name.isEmpty ? "Subprofile" : name,
               dimension: 120,
             ),
           ),
         ),
         TextField(
           controller: nameController,
-          autofocus: persona == null,
+          autofocus: subprofile == null,
           textCapitalization: .words,
           decoration: const .new(labelText: "Display name"),
         ),
         Text(
-          "Optionally, messages that start with the prefix *and* end with the suffix are sent as this persona, without them. Leave one empty to only need the other. Both are case-sensitive.",
+          "Optionally, messages that start with the prefix *and* end with the suffix are sent as this subprofile, without them. Leave one empty to only need the other. Both are case-sensitive.",
         ),
         Row(
           spacing: 8,

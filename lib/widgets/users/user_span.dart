@@ -3,15 +3,12 @@ import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:material_ui/material_ui.dart";
 import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
 import "package:nexus/controllers/author.dart";
+import "package:nexus/controllers/user.dart";
 import "package:nexus/helpers/extensions/displayname_color.dart";
 import "package:nexus/helpers/extensions/get_localpart.dart";
 import "package:nexus/helpers/extensions/show_user_popover.dart";
 import "package:nexus/models/event.dart";
 
-/// A user's [name] in text, opening their popover when tapped. Unlike a widget
-/// in text, it wraps and ellipsizes with the rest of it.
-
-// Can't be const, since it sets the recognizer's onTapUp
 // ignore: prefer_const_constructors_in_immutables
 class UserSpan(
   BuildContext context,
@@ -59,7 +56,8 @@ class UserSpan(
       children: [
         if (event.pmp != null)
           TextSpan(
-            text: " (via ${event.sender})",
+            text:
+                "(${ref.watch(UserController.provider(.new(roomId: event.roomId, userId: event.sender))).value?.displayName ?? event.sender.localpart})",
             recognizer: recognizer,
             style: Theme.of(context).textTheme.labelSmall
                 ?.copyWith(color: color, fontWeight: .bold),

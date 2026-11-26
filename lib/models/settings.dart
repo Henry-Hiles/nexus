@@ -23,7 +23,7 @@ class const Settings({
   final RoomOrder roomOrder = .unreadFirst,
   final NameColor nameColor = .powerLevel,
   final ShowAndSend typingIndicators = .showAndSend,
-  final bool personas = false,
+  final bool subprofiles = false,
 
   /// When not sending, read receipts are still sent privately, so that the
   /// user's other devices know what has been read.

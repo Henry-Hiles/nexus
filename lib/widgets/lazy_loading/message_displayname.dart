@@ -1,6 +1,7 @@
 import "package:material_ui/material_ui.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/author.dart";
+import "package:nexus/controllers/user.dart";
 import "package:nexus/helpers/extensions/get_localpart.dart";
 import "package:nexus/helpers/extensions/show_user_popover.dart";
 import "package:nexus/helpers/extensions/displayname_color.dart";
@@ -34,7 +35,7 @@ class const MessageDisplayname(
           ),
           if (event.pmp != null)
             Text(
-              "(via ${event.sender})",
+              "(${ref.watch(UserController.provider(.new(roomId: event.roomId, userId: event.sender))).value?.displayName ?? event.sender.localpart})",
               style: Theme.of(context).textTheme.labelSmall
                   ?.copyWith(color: color, fontWeight: .bold),
               maxLines: 1,

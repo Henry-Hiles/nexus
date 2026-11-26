@@ -7,14 +7,15 @@ import "package:nexus/controllers/rooms.dart";
 import "package:nexus/models/account_data.dart";
 import "package:nexus/models/per_message_profiles.dart";
 
-typedef RoomPersonas = ({
+typedef RoomSubprofiles = ({
   IList<StoredProfile> profiles,
   StoredProfile? current,
 });
 
-class PersonasController(final String roomId) extends Notifier<RoomPersonas> {
+class SubprofilesController(final String roomId)
+    extends Notifier<RoomSubprofiles> {
   @override
-  RoomPersonas build() {
+  RoomSubprofiles build() {
     final global = ref.watch(
       AccountDataController.provider.select((data) => data.perMessageProfiles),
     );
@@ -52,5 +53,7 @@ class PersonasController(final String roomId) extends Notifier<RoomPersonas> {
   }
 
   static final provider = NotifierProvider.autoDispose
-      .family<PersonasController, RoomPersonas, String>(PersonasController.new);
+      .family<SubprofilesController, RoomSubprofiles, String>(
+        SubprofilesController.new,
+      );
 }
