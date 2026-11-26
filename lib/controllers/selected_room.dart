@@ -22,9 +22,16 @@ class SelectedRoomController extends Notifier<String?> {
             .addAll([?space.room?.metadata?.id]),
       ),
     );
-    if (roomIds == null) return roomId;
+    if (roomIds == null || roomIds.contains(roomId)) return roomId;
 
-    return roomIds.contains(roomId) ? roomId : roomIds.firstOrNull;
+    final fallback = roomIds.firstOrNull;
+    Future.microtask(() {
+      if (!ref.mounted) return;
+      ref
+          .read(KeyController.provider(KeyController.roomKey).notifier)
+          .set(fallback);
+    });
+    return fallback;
   }
 
   static final provider = NotifierProvider<SelectedRoomController, String?>(

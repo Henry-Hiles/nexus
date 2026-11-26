@@ -44,7 +44,7 @@ class const SpacesRail({super.key}) extends ConsumerWidget {
                 .set(spaces[value].id);
             ref
                 .read(KeyController.provider(KeyController.roomKey).notifier)
-                .set(spaces[value].children.firstOrNull?.metadata?.id);
+                .set(spaces[value].allChildRooms.firstOrNull?.metadata?.id);
           },
           sections: [
             .new(
