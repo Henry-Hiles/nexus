@@ -121,18 +121,20 @@ class UnifiedPushController extends AsyncNotifier<String?> {
 
         final icon = notification.roomAvatar == null
             ? null
-            : await client.downloadMedia(
-                .new(mxc: notification.roomAvatar!, isAvatar: true),
-              );
+            : await client
+                  .downloadMedia(.new(mxc: notification.roomAvatar!))
+                  .then<File?>((file) => file)
+                  .onError((_, _) => null);
 
         final pmp = notification.perMessageProfile;
         final senderAvatarUrl = pmp?.avatar ?? notification.sender.avatar;
         // Only Android can show the sender's avatar
         final senderAvatar = senderAvatarUrl == null || !Platform.isAndroid
             ? null
-            : await client.downloadMedia(
-                .new(mxc: senderAvatarUrl, isAvatar: true),
-              );
+            : await client
+                  .downloadMedia(.new(mxc: senderAvatarUrl))
+                  .then<File?>((file) => file)
+                  .onError((_, _) => null);
 
         await ref
             .read(NotificationController.provider.notifier)

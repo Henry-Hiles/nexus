@@ -8,8 +8,6 @@ part "download_media.g.dart";
 class const DownloadMediaRequest({
   required final Uri mxc,
   final bool encrypted = false,
-  final bool isAvatar = false,
-  final bool thumbnailAvatar = false,
 }) with _$DownloadMediaRequest {
   Map<String, Object?> toJson() => _$DownloadMediaRequestToJson(this);
 

@@ -37,7 +37,7 @@ final class const AvatarOrHash(
             child: avatar == null
                 ? fallback ?? box
                 : Image(
-                    image: MxcImage(ref, .new(mxc: avatar!, isAvatar: true)),
+                    image: MxcImage(ref, .new(mxc: avatar!)),
                     fit: .cover,
                     loadingBuilder: (_, child, loadingProgress) =>
                         loadingProgress == null ? child : fallback ?? box,
