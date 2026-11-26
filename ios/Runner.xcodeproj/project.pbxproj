@@ -844,7 +844,7 @@
 		};
 		5A4E00000000000000000014 /* XCLocalSwiftPackageReference "receive_sharing_intent" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = Flutter/ephemeral/Packages/.packages/receive_sharing_intent;
+			relativePath = "Flutter/ephemeral/Packages/.packages/receive_sharing_intent-1.9.0";
 		};
 /* End XCLocalSwiftPackageReference section */
 
