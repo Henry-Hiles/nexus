@@ -53,7 +53,8 @@ Future<void> main(List<String> args) => build(args, (input, output) async {
       libFileName = "libgomuks.dylib";
       extraEnv = {
         "SDKROOT": await getXCodeTool(),
-        "MACOSX_DEPLOYMENT_TARGET": codeConfig.macOS.targetVersion.toString(),
+        "MACOSX_DEPLOYMENT_TARGET": codeConfig.macOS.deploymentVersion.major
+            .toString(),
       };
       break;
     case OS.windows:
