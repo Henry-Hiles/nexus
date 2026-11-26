@@ -173,31 +173,50 @@ class SpacesController extends AsyncNotifier<IList<Space>> {
     DateTime activity(Room room) => room.metadata?.sortingTimestamp ?? .new(0);
 
     // Higher priority first, then most recent activity first
-    IList<Room> sortRooms(IList<Room> rooms) => rooms.sort(
-      (a, b) => switch (priority(a).compareTo(priority(b))) {
-        0 => activity(b).compareTo(activity(a)),
-        final byPriority => byPriority,
-      },
+    int compare(
+      ({int priority, DateTime activity}) a,
+      ({int priority, DateTime activity}) b,
+    ) => switch (a.priority.compareTo(b.priority)) {
+      0 => b.activity.compareTo(a.activity),
+      final byPriority => byPriority,
+    };
+
+    ({int priority, DateTime activity}) roomKey(Room room) =>
+        (priority: priority(room), activity: activity(room));
+
+    ({int priority, DateTime activity}) groupKey(IList<Room> rooms) => (
+      priority: rooms.map(priority).minOrNull ?? 2,
+      activity: rooms.map(activity).maxOrNull ?? .new(0),
     );
 
-    IList<Room> orderRooms(Space space, IList<Room> rooms) =>
-        roomOrder == .spaceOrder && space.room != null
-        ? rooms
-        : sortRooms(rooms);
+    IList<Room> sortRooms(IList<Room> rooms) =>
+        rooms.sort((a, b) => compare(roomKey(a), roomKey(b)));
 
     return .new(
-      allSpaces.map(
-        (space) => space.copyWith(
-          children: orderRooms(space, space.children),
+      allSpaces.map((space) {
+        if (roomOrder == .spaceOrder && space.room != null) return space;
+
+        final subSpaces = space.subSpaces.sort(
+          (a, b) => compare(groupKey(a.children), groupKey(b.children)),
+        );
+
+        final childrenKey = groupKey(space.children);
+        return space.copyWith(
+          children: sortRooms(space.children),
           subSpaces: .new(
-            space.subSpaces.map(
-              (subspace) => subspace.copyWith(
-                children: orderRooms(space, subspace.children),
-              ),
+            subSpaces.map(
+              (subspace) =>
+                  subspace.copyWith(children: sortRooms(subspace.children)),
             ),
           ),
-        ),
-      ),
+          childrenIndex: subSpaces
+              .where(
+                (subspace) =>
+                    compare(groupKey(subspace.children), childrenKey) < 0,
+              )
+              .length,
+        );
+      }),
     );
   }
 
