@@ -6,11 +6,7 @@ import "package:nexus/controllers/account_data.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/models/account_data.dart";
 import "package:nexus/models/per_message_profiles.dart";
-
-typedef RoomSubprofiles = ({
-  IList<StoredProfile> profiles,
-  StoredProfile? current,
-});
+import "package:nexus/models/room_subprofiles.dart";
 
 class SubprofilesController(final String roomId)
     extends Notifier<RoomSubprofiles> {
@@ -44,8 +40,10 @@ class SubprofilesController(final String roomId)
         );
 
     final currentId = room?.defaultProfileId ?? global.defaultProfileId;
-    return (
+    return .new(
       profiles: profiles,
+      triggerOrder: (room?.profiles ?? const IList<StoredProfile>.empty())
+          .addAll(global.profiles),
       current: currentId == null || currentId.isEmpty
           ? null
           : profiles.firstWhereOrNull((profile) => profile.id == currentId),

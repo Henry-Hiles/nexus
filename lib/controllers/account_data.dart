@@ -87,26 +87,22 @@ class AccountDataController extends Notifier<AccountData> {
 
   Future<void> setRoomProfile(String roomId, String profileId) async {
     const type = AccountData.perMessageProfilesKey;
-    final current = ref
+    final rooms = ref.read(RoomsController.provider.notifier);
+    final previous = ref
         .read(RoomsController.provider)[roomId]
         ?.accountData[type];
+    final content = {...?previous, "default_profile_id": profileId};
 
-    await ref
-        .read(ClientController.provider.notifier)
-        .setAccountData(
-          .new(
-            type: type,
-            roomId: roomId,
-            content: {...?current, "default_profile_id": profileId},
-          ),
-        );
-    await ref
-        .read(RoomsController.provider.notifier)
-        .awaitRooms(
-          (rooms) =>
-              rooms[roomId]?.accountData[type]?["default_profile_id"] ==
-              profileId,
-        );
+    // Shown straight away, rather than once it comes down sync
+    rooms.setAccountData(roomId, type, content);
+    try {
+      await ref
+          .read(ClientController.provider.notifier)
+          .setAccountData(.new(type: type, roomId: roomId, content: content));
+    } catch (_) {
+      rooms.setAccountData(roomId, type, previous);
+      rethrow;
+    }
   }
 
   /// Saves [rule] of [kind], creating it if it's new, or otherwise changing only

@@ -41,6 +41,11 @@ class const ProfileTrigger({
   final String suffix = "",
   final bool keepTrigger = false,
 }) with _$ProfileTrigger {
+  bool matches(String text) =>
+      text.length >= prefix.length + suffix.length &&
+      text.startsWith(prefix) &&
+      text.endsWith(suffix);
+
   Map<String, Object?> toJson() => _$ProfileTriggerToJson(this);
 
   factory ProfileTrigger.fromJson(Map<String, Object?> json) =>

@@ -24,6 +24,7 @@ class const Settings({
   final NameColor nameColor = .powerLevel,
   final ShowAndSend typingIndicators = .showAndSend,
   final bool subprofiles = false,
+  final bool latchSubprofiles = false,
 
   /// When not sending, read receipts are still sent privately, so that the
   /// user's other devices know what has been read.

@@ -27,6 +27,9 @@ import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:nexus/controllers/attachment.dart";
 import "package:nexus/controllers/client.dart";
 import "package:nexus/controllers/settings.dart";
+import "package:nexus/controllers/account_data.dart";
+import "package:nexus/controllers/subprofiles.dart";
+import "package:nexus/models/settings.dart";
 import "package:nexus/controllers/image_picker.dart";
 import "package:nexus/helpers/file_dialog_helper.dart";
 import "package:image_picker/image_picker.dart";
@@ -433,6 +436,20 @@ class const Composer(
           attachment != null && attachment.$2 == null) {
         return;
       }
+      if (ref.read(SettingsController.provider).value case Settings(
+        subprofiles: true,
+        latchSubprofiles: true,
+      )) {
+        final subprofiles = ref.read(SubprofilesController.provider(roomId));
+        if (subprofiles.triggeredBy(controller.text) case final triggered?
+            when triggered.id != subprofiles.current?.id) {
+          ref
+              .read(AccountDataController.provider.notifier)
+              .setRoomProfile(roomId, triggered.id)
+              .onError(showError);
+        }
+      }
+
       onSend(
         "${TextCommand.prefixOf(textCommands)}${controller.formattedText}",
         shouldMention: shouldMention.value,
@@ -566,7 +583,7 @@ class const Composer(
                             ),
                           )
                           ? [
-                              SubprofileButton(roomId),
+                              SubprofileButton(roomId, controller: controller),
                               IconButton(
                                 onPressed: hasReplacement
                                     ? null

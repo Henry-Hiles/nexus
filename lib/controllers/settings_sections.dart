@@ -467,6 +467,21 @@ class SettingsSectionsController
                 ),
               ),
               if (settings.subprofiles) ...[
+                .new(
+                  title: "Latch Triggered Subprofiles",
+                  description: "After you send a message with a subprofile's trigger, keep sending as it in that room until you choose another.",
+                  icon: Icons.push_pin,
+                  builder: (title, description, icon) => SwitchListTile(
+                    title: Text(title),
+                    subtitle: Text(description),
+                    secondary: Icon(icon),
+                    value: settings.latchSubprofiles,
+                    onChanged: (value) => ref
+                        .read(SettingsController.provider.notifier)
+                        .set(settings.copyWith(latchSubprofiles: value))
+                        .onError(showError),
+                  ),
+                ),
                 if (subprofiles.profiles.isNotEmpty)
                   .new(
                     title: "Default Subprofile",
