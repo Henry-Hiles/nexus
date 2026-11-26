@@ -65,14 +65,15 @@ class const Event({
     }
   }
 
-  factory Event.fromJson(Map<String, dynamic> json) =>
-      _$EventFromJson(json).copyWith(
+  factory Event.fromJson(Map<String, dynamic> json) => _$EventFromJson(json)
+      .copyWith(
         replyTo: replyToFromJson(getContentFromJson(json)),
-        pmp: json["content"]?["com.beeper.per_message_profile"] == null
-            ? null
-            : .fromJsonWithCatch(
-                json["content"]?["com.beeper.per_message_profile"],
-              ),
+        pmp: switch (getContentFromJson(
+          json,
+        )["com.beeper.per_message_profile"]) {
+          null => null,
+          final pmp => .fromJsonWithCatch(pmp),
+        },
         content: .fromEventJson(
           getContentFromJson(json),
           json["decrypted_type"] ?? json["type"],
