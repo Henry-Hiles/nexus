@@ -13,6 +13,8 @@ import "package:nexus/models/space.dart";
 import "package:nexus/models/space_edge.dart";
 import "package:nexus/models/subspace.dart";
 
+typedef _SortKey = ({int priority, DateTime activity, int index});
+
 class SpacesController extends AsyncNotifier<IList<Space>> {
   @override
   Future<IList<Space>> build() async {
@@ -162,58 +164,63 @@ class SpacesController extends AsyncNotifier<IList<Space>> {
       SettingsController.provider.selectAsync((data) => data.roomOrder),
     );
 
-    int priority(Room room) => switch ((roomOrder, room.metadata)) {
-      (.recentActivity || .spaceOrder, _) => 0,
-      (_, RoomMetadata(unreadHighlights: > 0)) => 0,
-      (.mentionedFirst, _) => 1,
-      (.unreadFirst, RoomMetadata(unreadNotifications: > 0)) ||
-      (.unreadFirst, RoomMetadata(unreadMessages: > 0)) => 1,
-      (.unreadFirst, _) => 2,
+    int priority(Room? room) => switch (room?.metadata) {
+      _ when !roomOrder.byUnread => 0,
+      RoomMetadata(unreadHighlights: > 0) => 0,
+      RoomMetadata(unreadNotifications: > 0) ||
+      RoomMetadata(unreadMessages: > 0) => 1,
+      _ => 2,
     };
     DateTime activity(Room room) => room.metadata?.sortingTimestamp ?? .new(0);
 
-    // Higher priority first, then most recent activity first
-    int compare(
-      ({int priority, DateTime activity}) a,
-      ({int priority, DateTime activity}) b,
-    ) => switch (a.priority.compareTo(b.priority)) {
-      0 => b.activity.compareTo(a.activity),
-      final byPriority => byPriority,
-    };
-
-    ({int priority, DateTime activity}) roomKey(Room room) =>
-        (priority: priority(room), activity: activity(room));
-
-    ({int priority, DateTime activity}) groupKey(IList<Room> rooms) => (
-      priority: rooms.map(priority).minOrNull ?? 2,
-      activity: rooms.map(activity).maxOrNull ?? .new(0),
-    );
-
-    IList<Room> sortRooms(IList<Room> rooms) =>
-        rooms.sort((a, b) => compare(roomKey(a), roomKey(b)));
-
     return .new(
       allSpaces.map((space) {
-        if (roomOrder == .spaceOrder && space.room != null) return space;
+        final bySpace = roomOrder.bySpace && space.room != null;
+        int compare(_SortKey a, _SortKey b) =>
+            switch (a.priority.compareTo(b.priority)) {
+              0 when bySpace => a.index.compareTo(b.index),
+              0 => b.activity.compareTo(a.activity),
+              final byPriority => byPriority,
+            };
 
-        final subSpaces = space.subSpaces.sort(
-          (a, b) => compare(groupKey(a.children), groupKey(b.children)),
+        _SortKey roomKey(int index, Room room) =>
+            (priority: priority(room), activity: activity(room), index: index);
+
+        _SortKey groupKey(int index, IList<Room> rooms) => (
+          priority: rooms.map(priority).minOrNull ?? priority(null),
+          activity: rooms.map(activity).maxOrNull ?? .new(0),
+          index: index,
         );
 
-        final childrenKey = groupKey(space.children);
+        IList<Room> sortRooms(IList<Room> rooms) => .new(
+          rooms.indexed
+              .sorted(
+                (a, b) => compare(roomKey(a.$1, a.$2), roomKey(b.$1, b.$2)),
+              )
+              .map((entry) => entry.$2),
+        );
+
+        final subSpaces = space.subSpaces.indexed
+            .map(
+              (entry) => (
+                subspace: entry.$2,
+                key: groupKey(entry.$1, entry.$2.children),
+              ),
+            )
+            .sorted((a, b) => compare(a.key, b.key));
+
+        final childrenKey = groupKey(space.childrenIndex, space.children);
         return space.copyWith(
           children: sortRooms(space.children),
           subSpaces: .new(
             subSpaces.map(
-              (subspace) =>
-                  subspace.copyWith(children: sortRooms(subspace.children)),
+              (entry) => entry.subspace.copyWith(
+                children: sortRooms(entry.subspace.children),
+              ),
             ),
           ),
           childrenIndex: subSpaces
-              .where(
-                (subspace) =>
-                    compare(groupKey(subspace.children), childrenKey) < 0,
-              )
+              .where((entry) => compare(entry.key, childrenKey) < 0)
               .length,
         );
       }),

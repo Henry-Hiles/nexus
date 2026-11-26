@@ -19,6 +19,7 @@ class const Settings({
   final bool swipeToReply = false,
   final bool hideMembershipEvents = false,
   final bool hideServerAclEvents = true,
+  @JsonKey(unknownEnumValue: RoomOrder.unreadFirst)
   final RoomOrder roomOrder = .unreadFirst,
   final NameColor nameColor = .powerLevel,
   final ShowAndSend typingIndicators = .showAndSend,
