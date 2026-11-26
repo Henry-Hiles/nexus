@@ -27,18 +27,24 @@ import "package:nexus/models/content/membership.dart";
 import "package:nexus/models/content/name.dart";
 import "package:nexus/models/content/pinned_events.dart";
 import "package:nexus/models/content/poll_end.dart";
+import "package:nexus/models/content/message.dart";
+import "package:nexus/models/content/poll_response.dart";
 import "package:nexus/models/content/power_levels.dart";
+import "package:nexus/models/content/reaction.dart";
+import "package:nexus/models/content/redaction.dart";
 import "package:nexus/models/content/server_acl.dart";
 import "package:nexus/models/content/tombstone.dart";
 import "package:nexus/models/content/topic.dart";
 import "package:nexus/models/event.dart";
 import "package:nexus/widgets/common/error_dialog.dart";
 import "package:nexus/widgets/renderers/message.dart";
+import "package:nexus/widgets/reactions/reaction_key.dart";
 import "package:nexus/widgets/reactions/reaction_row.dart";
 import "package:nexus/widgets/read_receipts/read_receipts_row.dart";
 import "package:nexus/widgets/renderers/membership.dart";
 import "package:nexus/widgets/renderers/diffs/change_line.dart";
 import "package:nexus/widgets/renderers/generic_event.dart";
+import "package:nexus/widgets/renderers/related_event_line.dart";
 import "package:nexus/widgets/renderers/diffs/join_rules_diff.dart";
 import "package:nexus/widgets/renderers/diffs/power_levels_diff.dart";
 import "package:nexus/widgets/renderers/diffs/pinned_events_diff.dart";
@@ -74,7 +80,6 @@ class const EventRenderer(
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final errorStyle = TextStyle(color: colorScheme.error);
     final focusNode = useFocusNode();
     useListenable(focusNode);
     final senderRecognizer = useTapRecognizer();
@@ -104,12 +109,12 @@ class const EventRenderer(
 
     if (event == null) return SizedBox.shrink();
 
-    final (hideMembershipEvents, hideServerAclEvents) = ref
+    final (hideMembershipEvents, showHiddenEvents) = ref
         .watch(SettingsController.provider)
         .maybeWhen(
-          orElse: () => (false, true),
+          orElse: () => (false, false),
           data: (settings) =>
-              (settings.hideMembershipEvents, settings.hideServerAclEvents),
+              (settings.hideMembershipEvents, settings.showHiddenEvents),
         );
 
     final isHidden =
@@ -121,7 +126,7 @@ class const EventRenderer(
               (content) =>
                   content is MembershipContent && content.status == .knock,
             )) ||
-        (hideServerAclEvents && event.content is ServerACLContent);
+        (!showHiddenEvents && event.content is ServerACLContent);
 
     if (isHidden && !textOnly) return SizedBox.shrink();
 
@@ -139,6 +144,7 @@ class const EventRenderer(
     GenericEventRenderer generic(
       IconData icon,
       String text, {
+      List<InlineSpan> spans = const [],
       List<Widget> details = const [],
     }) => .new(
       icon,
@@ -148,8 +154,12 @@ class const EventRenderer(
       [
         UserSpan.sender(context, ref, event, recognizer: senderRecognizer),
         TextSpan(text: text),
+        ...spans,
       ],
     );
+
+    Widget relatedLine(String eventId) =>
+        RelatedEventLine(roomId, eventId, jumpToEvent: jumpToEvent);
 
     // For rooms an upgrade links, i.e. the old and new rooms
     Widget roomLink(String label, String linkedRoomId) => InkWell(
@@ -172,8 +182,15 @@ class const EventRenderer(
       ),
     );
 
-    final child =
-        event.isShownAsMessage || (isThreadRoot && event.redactedBy != null)
+    // Deleted messages still take their place in threads, and among hidden
+    // events, but other deleted events aren't messages
+    final isDeletedMessage =
+        event.redactedBy != null &&
+        event.stateKey == null &&
+        event.type != "m.reaction";
+    final shown =
+        event.isShownAsMessage ||
+            (isDeletedMessage && (isThreadRoot || textOnly || showHiddenEvents))
         ? MessageRenderer(
             event,
             onTapReply: jumpToEvent == null
@@ -435,6 +452,113 @@ class const EventRenderer(
             _ => null,
           };
 
+    final child =
+        shown ??
+        (!textOnly && !showHiddenEvents
+            ? null
+            : event.redactedBy != null
+            ? generic(
+                Icons.delete,
+                "sent ${event.stateKey == null ? "a reaction" : "a state event"} that was deleted",
+              )
+            : event.relationType == "m.replace"
+            ? generic(
+                Icons.edit,
+                "edited a message",
+                details: [
+                  if (event.relatesTo case final id?) relatedLine(id),
+                  if (event.content case MessageContent(:final body?))
+                    ChangeLine(
+                      added: [body].lock,
+                      removedColor: removedColor,
+                      addedColor: addedColor,
+                      quoted: false,
+                    ),
+                ],
+              )
+            : switch (event.content) {
+                ReactionContent(:final key?, :final shortcode) => generic(
+                  Icons.add_reaction,
+                  "reacted with",
+                  spans: [
+                    WidgetSpan(
+                      alignment: .middle,
+                      child: Tooltip(
+                        message: shortcode ?? key,
+                        child: ReactionKey(key, height: 20),
+                      ),
+                    ),
+                  ],
+                  details: [
+                    if (event.relatesTo case final id?) relatedLine(id),
+                  ],
+                ),
+                ReactionContent() => generic(
+                  Icons.add_reaction,
+                  "reacted to a message",
+                  details: [
+                    if (event.relatesTo case final id?) relatedLine(id),
+                  ],
+                ),
+                RedactionContent(:final redacts, :final reason) => generic(
+                  Icons.delete,
+                  "deleted an event",
+                  details: [
+                    if (redacts ?? event.relatesTo case final id?)
+                      relatedLine(id),
+                    if (reason != null && reason.isNotEmpty)
+                      Text(
+                        "Reason: $reason",
+                        style: theme.textTheme.labelMedium,
+                      ),
+                  ],
+                ),
+                PollResponseContent(:final answers) => generic(
+                  Icons.how_to_vote,
+                  answers.isEmpty
+                      ? "removed their vote in a poll"
+                      : "voted in a poll",
+                  details: [
+                    if (event.relatesTo case final id?) relatedLine(id),
+                  ],
+                ),
+                MembershipContent(:final displayName, :final avatarUrl) => () {
+                  final previous = switch (event.previousContent) {
+                    final MembershipContent previous => previous,
+                    _ => null,
+                  };
+                  final nameChanged = previous?.displayName != displayName;
+                  final avatarChanged = previous?.avatarUrl != avatarUrl;
+
+                  return generic(
+                    Icons.person,
+                    switch ((nameChanged, avatarChanged)) {
+                      (true, true) => "changed their profile",
+                      (true, false) when displayName == null =>
+                        "removed their display name",
+                      (true, false) => "changed their display name",
+                      (false, true) when avatarUrl == null =>
+                        "removed their avatar",
+                      (false, true) => "changed their avatar",
+                      (false, false) => "updated their membership",
+                    },
+                    details: [
+                      if (nameChanged)
+                        ChangeLine(
+                          removed: [?previous?.displayName].lock,
+                          added: [?displayName].lock,
+                          removedColor: removedColor,
+                          addedColor: addedColor,
+                        ),
+                    ],
+                  );
+                }(),
+                _ => generic(
+                  Icons.code,
+                  "sent ${event.stateKey == null ? "an event" : "a state event"} of type ${event.type}",
+                ),
+              });
+
     final contextMenuCallback = getEventOptions == null
         ? null
         : (PositionedGestureDetails details) => context.showAdaptiveMenu(
@@ -562,11 +686,6 @@ class const EventRenderer(
               ),
             ),
           ]
-        else if (textOnly)
-          Text(
-            event.redactedBy == null ? "Unknown event type" : "Redacted event",
-            style: errorStyle,
-          )
         else if (threadSummary != null)
           Padding(padding: .only(left: 4), child: threadSummary),
 

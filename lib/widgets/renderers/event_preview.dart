@@ -18,7 +18,8 @@ class const EventPreview(
     );
     if (event == null) return SizedBox.shrink();
 
-    final showSender = event.hasMessageContent;
+    final showSender =
+        event.hasMessageContent && event.relationType != "m.replace";
 
     return IgnorePointer(
       child: Padding(

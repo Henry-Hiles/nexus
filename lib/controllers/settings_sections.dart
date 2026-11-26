@@ -378,17 +378,17 @@ class SettingsSectionsController
               ),
             ),
             .new(
-              title: "Hide Server ACL Events",
-              description: "Hides server ACL (server ban list) changes from appearing in conversations.",
-              icon: Icons.dns,
+              title: "Show Hidden Events",
+              description: "Shows events that are usually hidden, like reactions, edits, deletions and server ACL changes, in conversations.",
+              icon: Icons.visibility,
               builder: (title, description, icon) => SwitchListTile(
                 title: Text(title),
                 subtitle: Text(description),
                 secondary: Icon(icon),
-                value: settings.hideServerAclEvents,
+                value: settings.showHiddenEvents,
                 onChanged: (value) => ref
                     .read(SettingsController.provider.notifier)
-                    .set(settings.copyWith(hideServerAclEvents: value))
+                    .set(settings.copyWith(showHiddenEvents: value))
                     .onError(showError),
               ),
             ),

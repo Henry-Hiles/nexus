@@ -18,7 +18,7 @@ class const Settings({
   final bool showMinimizeButton = false,
   final bool swipeToReply = false,
   final bool hideMembershipEvents = false,
-  final bool hideServerAclEvents = true,
+  final bool showHiddenEvents = false,
   @JsonKey(unknownEnumValue: RoomOrder.unreadFirst)
   final RoomOrder roomOrder = .unreadFirst,
   final NameColor nameColor = .powerLevel,
