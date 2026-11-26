@@ -10,6 +10,7 @@ import "package:nexus/controllers/client.dart";
 import "package:nexus/models/room_notification_level.dart";
 import "package:nexus/controllers/room_settings_sections.dart";
 import "package:nexus/widgets/settings/settings_layout.dart";
+import "package:nexus/widgets/users/room_profile_sheet.dart";
 import "package:nexus/controllers/via.dart";
 import "package:nexus/models/room.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
@@ -166,6 +167,15 @@ final class const RoomMenuButton(
             child: ListTile(
               leading: Icon(Icons.person_add),
               title: Text("Invite"),
+            ),
+          ),
+          PopupMenuItem(
+            onTap: () => context.showAdaptiveSheet(
+              (_) => RoomProfileSheet(room!.metadata!.id),
+            ),
+            child: ListTile(
+              leading: Icon(Icons.manage_accounts),
+              title: Text("Room Profile"),
             ),
           ),
           PopupMenuItem(

@@ -55,6 +55,10 @@ class const EditableAvatar({
             child: Builder(
               builder: (context) => IconButton.filled(
                 tooltip: "Edit avatar",
+                // The theme's default barely contrasts with the button
+                style: IconButton.styleFrom(
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                ),
                 icon: Icon(Icons.edit),
                 onPressed: saving.active
                     ? null

@@ -36,6 +36,7 @@ import "package:nexus/models/requests/get_mentions.dart";
 import "package:nexus/models/requests/get_related_events.dart";
 import "package:nexus/models/requests/get_room_state.dart";
 import "package:nexus/models/requests/get_specific_room_state.dart";
+import "package:nexus/models/content/content.dart";
 import "package:nexus/models/requests/get_space_hierarchy.dart";
 import "package:nexus/models/requests/get_room_directory.dart";
 import "package:nexus/models/requests/get_threads.dart";
@@ -336,14 +337,49 @@ class ClientController(final String? accountId) extends AsyncNotifier<int> {
     );
   }
 
+  /// The raw JSON of the events [request] asks for, for when the parsed
+  /// content would lose fields.
+  Future<List> getSpecificRoomStateJson(
+    GetSpecificRoomStateRequest request,
+  ) async =>
+      (await sendCommand("get_specific_room_state", request.toJson()))
+          as List? ??
+      [];
+
   Future<IList<Event>> getSpecificRoomState(
     GetSpecificRoomStateRequest request,
   ) async => .new(
-    ((await sendCommand("get_specific_room_state", request.toJson()))
-                as List? ??
-            [])
-        .map((event) => .fromJson(event)),
+    (await getSpecificRoomStateJson(request)).map((event) => .fromJson(event)),
   );
+
+  Future<String?> updateMembership(
+    String roomId,
+    String userId,
+    IMap<String, Object?> changes,
+  ) async {
+    final type = EventType.membership.type;
+    final current = switch ((await getSpecificRoomStateJson(
+      .new(
+        keys: .new([.new(roomId: roomId, type: type, stateKey: userId)]),
+      ),
+    )).firstOrNull) {
+      {"content": final Map content} => content.cast<String, Object?>(),
+      _ => throw Exception("You aren't a member of this room"),
+    };
+
+    return await sendCommand("set_state", {
+      "room_id": roomId,
+      "type": type,
+      "state_key": userId,
+      "content": current.lock
+          .addAll(changes)
+          .removeWhere(
+            (key, value) =>
+                value == null || key == "join_authorised_via_users_server",
+          )
+          .unlock,
+    });
+  }
 
   Future<IList<Event>?> getRelatedEvents(
     GetRelatedEventsRequest request,
