@@ -5,7 +5,6 @@ import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:material_ui/material_ui.dart";
 import "package:intl/intl.dart";
-import "package:m3e_buttons/m3e_buttons.dart";
 import "package:multi_state_switch/multi_state_switch.dart";
 import "package:material_adaptive_sheets/material_adaptive_sheets.dart";
 import "package:nexus/controllers/account_data.dart";
@@ -70,18 +69,15 @@ class SettingsSectionsController
       icon: icon,
       builder: (title, description, icon) => Builder(
         builder: (context) {
-          final colorScheme = Theme.of(context).colorScheme;
-          return M3EButton.icon(
-            onPressed: () => ref.read(LaunchHelper.provider).launchUrl(url),
-            label: Text(title),
-            icon: Icon(icon),
-            tooltip: description,
-            decoration: danger
-                ? .styleFrom(
-                    backgroundColor: colorScheme.error,
-                    foregroundColor: colorScheme.onError,
-                  )
-                : null,
+          final error = Theme.of(context).colorScheme.error;
+          return ListTile(
+            leading: Icon(icon),
+            title: Text(title),
+            subtitle: Text(description),
+            trailing: Icon(Icons.open_in_new),
+            textColor: danger ? error : null,
+            iconColor: danger ? error : null,
+            onTap: () => ref.read(LaunchHelper.provider).launchUrl(url),
           );
         },
       ),
@@ -850,13 +846,14 @@ class SettingsSectionsController
                 title: "Reset Encryption Identity",
                 description: "Replace your encryption identity and recovery key with new ones, if you've lost your recovery key or your encryption is broken.",
                 builder: (title, description, icon) => Builder(
-                  builder: (context) => M3EButton.icon(
-                    onPressed: () => context.showAdaptiveSheet(
+                  builder: (context) => ListTile(
+                    leading: Icon(icon),
+                    title: Text(title),
+                    subtitle: Text(description),
+                    trailing: Icon(Icons.chevron_right),
+                    onTap: () => context.showAdaptiveSheet(
                       (_) => const ResetEncryptionSheet(),
                     ),
-                    label: Text(title),
-                    icon: Icon(icon),
-                    tooltip: description,
                   ),
                 ),
                 icon: Icons.key_off,
