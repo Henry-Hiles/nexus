@@ -136,24 +136,6 @@ class RoomsController extends Notifier<IMap<String, Room>> {
         .add(event.eventId, event.rowId);
   });
 
-  void setAccountData(
-    String roomId,
-    String type,
-    Map<String, dynamic>? content,
-  ) {
-    if (state[roomId] case final room?) {
-      state = state.add(
-        roomId,
-        room.copyWith(
-          accountData: switch (content) {
-            final content? => room.accountData.add(type, content),
-            null => room.accountData.remove(type),
-          },
-        ),
-      );
-    }
-  }
-
   void update(
     IMap<String, Room> rooms, [
     ISet<String> leftRooms = const .empty(),

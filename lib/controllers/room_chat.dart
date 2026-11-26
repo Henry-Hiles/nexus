@@ -7,6 +7,8 @@ import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:fluttertagger/fluttertagger.dart";
 import "package:nexus/controllers/attachment.dart";
 import "package:nexus/controllers/client.dart";
+import "package:nexus/controllers/pending_subprofiles.dart";
+import "package:nexus/controllers/subprofiles.dart";
 import "package:nexus/controllers/event.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/controllers/thread_replies.dart";
@@ -399,6 +401,7 @@ class RoomChatController(final ChatParams info)
     required RelationType relationType,
     int? relatedEventRowId,
   }) async {
+    final subprofile = subprofileFor(text);
     final events = ref.read(RoomsController.provider)[info.roomId]?.events;
     final relatedEvent = relatedEventRowId == null
         ? null
@@ -437,6 +440,7 @@ class RoomChatController(final ChatParams info)
     );
 
     final client = ref.read(ClientController.provider.notifier);
+    await awaitSubprofile(text, subprofile);
     final event = await client.sendMessage(
       SendMessageRequest(
         roomId: info.roomId,
@@ -456,6 +460,24 @@ class RoomChatController(final ChatParams info)
     );
 
     addSent(event);
+  }
+
+  String? subprofileFor(String text, {bool synced = false}) {
+    final subprofiles = ref.read(SubprofilesController.provider(info.roomId));
+    return (subprofiles.triggeredBy(text) ??
+            (synced ? subprofiles.synced : subprofiles.current))
+        ?.id;
+  }
+
+  Future<void> awaitSubprofile(String text, String? shown) async {
+    await ref
+        .read(PendingSubprofilesController.provider.notifier)
+        .settled(info.roomId);
+    if (subprofileFor(text, synced: true) != shown) {
+      throw Exception(
+        "The message wasn't sent, as it would have been sent as a different subprofile than shown",
+      );
+    }
   }
 
   /// Shows [event], which was just sent, until it comes down sync.
@@ -614,6 +636,7 @@ class RoomChatController(final ChatParams info)
               .read(RoomsController.provider)[info.roomId]
               ?.events[repliedEventRowId];
 
+    await awaitSubprofile("", subprofileFor(""));
     final event = await ref
         .read(ClientController.provider.notifier)
         .sendMessage(

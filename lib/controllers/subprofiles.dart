@@ -3,6 +3,7 @@ import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/foundation.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/account_data.dart";
+import "package:nexus/controllers/pending_subprofiles.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/models/account_data.dart";
 import "package:nexus/models/per_message_profiles.dart";
@@ -39,14 +40,24 @@ class SubprofilesController(final String roomId)
           ),
         );
 
-    final currentId = room?.defaultProfileId ?? global.defaultProfileId;
+    StoredProfile? byId(String? id) => id == null || id.isEmpty
+        ? null
+        : profiles.firstWhereOrNull((profile) => profile.id == id);
+    final syncedId = room?.defaultProfileId ?? global.defaultProfileId;
+
     return .new(
       profiles: profiles,
       triggerOrder: (room?.profiles ?? const IList<StoredProfile>.empty())
           .addAll(global.profiles),
-      current: currentId == null || currentId.isEmpty
-          ? null
-          : profiles.firstWhereOrNull((profile) => profile.id == currentId),
+      current: byId(
+        ref.watch(
+              PendingSubprofilesController.provider.select(
+                (pending) => pending[roomId]?.id,
+              ),
+            ) ??
+            syncedId,
+      ),
+      synced: byId(syncedId),
     );
   }
 

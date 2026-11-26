@@ -11,6 +11,7 @@ class const RoomSubprofiles({
   // Each trigger is tried in this order, as gomuks does when sending
   required final IList<StoredProfile> triggerOrder,
   final StoredProfile? current,
+  final StoredProfile? synced,
 }) with _$RoomSubprofiles {
   StoredProfile? triggeredBy(String text) => triggerOrder.firstWhereOrNull(
     (profile) =>

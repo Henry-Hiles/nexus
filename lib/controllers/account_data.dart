@@ -5,6 +5,7 @@ import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/foundation.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:nexus/controllers/client.dart";
+import "package:nexus/controllers/pending_subprofiles.dart";
 import "package:nexus/controllers/rooms.dart";
 import "package:nexus/models/per_message_profiles.dart";
 import "package:nexus/models/account_data.dart";
@@ -85,24 +86,33 @@ class AccountDataController extends Notifier<AccountData> {
         (data) => data.perMessageProfiles == profiles,
       );
 
-  Future<void> setRoomProfile(String roomId, String profileId) async {
+  Future<void> setRoomProfile(String roomId, String profileId) {
     const type = AccountData.perMessageProfilesKey;
-    final rooms = ref.read(RoomsController.provider.notifier);
-    final previous = ref
+    const key = "default_profile_id";
+    final current = ref
         .read(RoomsController.provider)[roomId]
         ?.accountData[type];
-    final content = {...?previous, "default_profile_id": profileId};
 
-    // Shown straight away, rather than once it comes down sync
-    rooms.setAccountData(roomId, type, content);
-    try {
-      await ref
-          .read(ClientController.provider.notifier)
-          .setAccountData(.new(type: type, roomId: roomId, content: content));
-    } catch (_) {
-      rooms.setAccountData(roomId, type, previous);
-      rethrow;
-    }
+    return ref.read(PendingSubprofilesController.provider.notifier).track(
+      roomId,
+      profileId,
+      () async {
+        await ref
+            .read(ClientController.provider.notifier)
+            .setAccountData(
+              .new(
+                type: type,
+                roomId: roomId,
+                content: {...?current, key: profileId},
+              ),
+            );
+        await ref
+            .read(RoomsController.provider.notifier)
+            .awaitRooms(
+              (rooms) => rooms[roomId]?.accountData[type]?[key] == profileId,
+            );
+      },
+    );
   }
 
   /// Saves [rule] of [kind], creating it if it's new, or otherwise changing only
