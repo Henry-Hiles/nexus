@@ -8,7 +8,7 @@ import "package:nexus/helpers/launch_helper.dart";
 import "package:nexus/helpers/mxc_image.dart";
 import "package:nexus/widgets/common/expandable_image.dart";
 import "package:nexus/widgets/html/mention_chip.dart";
-import "package:nexus/widgets/html/spoiler_text.dart";
+import "package:nexus/widgets/html/spoiler.dart";
 import "package:nexus/widgets/html/code_block.dart";
 import "package:nexus/widgets/html/quoted.dart";
 
@@ -29,7 +29,11 @@ class const Html(
       }
 
       if (element.attributes.keys.contains("data-mx-spoiler")) {
-        return InlineCustomWidget(child: SpoilerText(element.text));
+        return InlineCustomWidget(
+          child: Spoiler(
+            Html(element.innerHtml, textStyle: textStyle, roomId: roomId),
+          ),
+        );
       }
 
       final height =
